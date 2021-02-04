@@ -113,8 +113,8 @@ public class LookingAtEntityHud extends DrawableHelper {
 			}else if(target instanceof ExplosiveProjectileEntity) {
 				ExplosiveProjectileEntity fireball = (ExplosiveProjectileEntity)target;
 				data[11] = fireball.posX;
-				data[11] = fireball.posY;
-				data[11] = fireball.posZ;
+				data[12] = fireball.posY;
+				data[13] = fireball.posZ;
 			}
 		}
 	}

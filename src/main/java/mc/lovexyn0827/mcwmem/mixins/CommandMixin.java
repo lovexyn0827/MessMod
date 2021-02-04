@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.brigadier.CommandDispatcher;
 
 import mc.lovexyn0827.mcwmem.ExplodeCommand;
+import mc.lovexyn0827.mcwmem.ModifyCommand;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -21,7 +22,7 @@ public class CommandMixin {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void registerCommand(CommandManager.RegistrationEnvironment regEnv, CallbackInfo info) {
-    	System.out.println("Began to register /entitylog");
         ExplodeCommand.register(this.dispatcher);
+        ModifyCommand.register(this.dispatcher);
     }
 }
