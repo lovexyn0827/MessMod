@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.CommandDispatcher;
 
-import mc.lovexyn0827.mcwmem.ExplodeCommand;
-import mc.lovexyn0827.mcwmem.ModifyCommand;
+import mc.lovexyn0827.mcwmem.command.ExplodeCommand;
+import mc.lovexyn0827.mcwmem.command.ModifyCommand;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 

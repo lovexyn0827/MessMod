@@ -9,7 +9,8 @@
   "client": [
     "MinecraftClientMixin",
     "IntegratedServerMixin",
-    "CommandMixin"
+    "CommandMixin",
+    "KeyboardMixin"
   ],
   "injectors": {
     "defaultRequire": 1

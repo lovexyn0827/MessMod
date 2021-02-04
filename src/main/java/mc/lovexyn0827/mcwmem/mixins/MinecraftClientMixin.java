@@ -7,11 +7,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import mc.lovexyn0827.mcwmem.LookingAtEntityHud;
+import mc.lovexyn0827.mcwmem.hud.ClientPlayerHud;
+import mc.lovexyn0827.mcwmem.hud.LookingAtEntityHud;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.RunArgs;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.server.integrated.IntegratedServer;
 
 @Mixin(MinecraftClient.class)
@@ -21,13 +20,15 @@ public class MinecraftClientMixin {
 	
 	@Inject(method = "render",at = @At(value = "CONSTANT",args = "stringValue=blit"))
 	public void onRender(boolean tick,CallbackInfo ci) {
+		int y = 10;
 		if(this.player!=null&&this.server!=null) {
-			LookingAtEntityHud.render(new MatrixStack(),MinecraftClient.getInstance());
+			if(LookingAtEntityHud.shouldRender) y = LookingAtEntityHud.render(10);
+			if(ClientPlayerHud.shouldRender) ClientPlayerHud.render(y);
 		}
 	}
 	
-	@Inject(method = "<init>",at = @At(value = "RETURN"))
-	public void debugLoadClass(RunArgs args,CallbackInfo ci) {
-		Class<IntegratedServer> class0 = IntegratedServer.class;
+	@Inject(method = "tick",at = @At(value = "RETURN"))
+	public void onTick(CallbackInfo ci) {
+		ClientPlayerHud.updateData();
 	}
 }
