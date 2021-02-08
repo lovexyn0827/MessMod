@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import mc.lovexyn0827.mcwmem.hud.LookingAtEntityHud;
-
+import mc.lovexyn0827.mcwmem.MCWMEMod;
 import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.client.MinecraftClient;
@@ -18,12 +17,12 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 @Mixin(MinecraftServer.class)
-public abstract class IntegratedServerMixin {	
+public abstract class MinecraftServerMixin {	
 	@Shadow @Final abstract PlayerManager getPlayerManager();
 	
 	@Inject(method = "tick",at = @At(value = "RETURN"))
 	public void updateHud(BooleanSupplier bs,CallbackInfo ci) {
 		ServerPlayerEntity player = this.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
-		if(player!=null)LookingAtEntityHud.updateData(player);
+		if(player!=null&&MCWMEMod.INSTANCE.hudManager!=null) MCWMEMod.INSTANCE.hudManager.lookingHud.updateData(player);
 	}
 }

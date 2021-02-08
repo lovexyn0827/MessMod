@@ -1,25 +1,21 @@
 package mc.lovexyn0827.mcwmem.hud;
 
-import java.util.Arrays;
-
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class ClientPlayerHud {
-	public static double[] data = new double[15];
-	public static boolean shouldRender;
+public class ClientPlayerHud extends EntityHud{
+	private ClientPlayerEntity player;
 
-	public static int render(int y) {
-		return EntityHudUtil.render(new MatrixStack(), MinecraftClient.getInstance(), data, y,"Local Player");
+	public ClientPlayerHud(HudManager hudManager, ClientPlayerEntity player) {
+		super(hudManager);
+		this.player = player;
 	}
 	
-	public static void updateData() {
-		ClientPlayerEntity player = MinecraftClient.getInstance().player;
-		EntityHudUtil.updateData(player, data);
+	public void render() {
+		this.render(new MatrixStack(), "Local Player");
 	}
 	
-	static {
-		Arrays.fill(data, Double.NaN);
+	public void updateData() {
+		updateData(player);
 	}
 }

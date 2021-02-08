@@ -8,9 +8,12 @@
   ],
   "client": [
     "MinecraftClientMixin",
-    "IntegratedServerMixin",
+    "MinecraftServerMixin",
     "CommandMixin",
-    "KeyboardMixin"
+    "KeyboardMixin",
+    "ExplosionMixin",
+    "BoatEntityMixin",
+    "ClientPlayNetworkHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

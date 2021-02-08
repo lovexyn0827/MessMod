@@ -1,40 +1,33 @@
 package mc.lovexyn0827.mcwmem.hud;
 
-import java.util.Arrays;
 import java.util.Optional;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import mc.lovexyn0827.mcwmem.hud.data.EntityHudInfoType;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
-public class LookingAtEntityHud extends DrawableHelper {
-	public static Entity lastLoogkigAtEntity;
-	/**
-	 * 0-2		Pos
-	 * 3-5		Motion
-	 * 6		Yaw
-	 * 7		Pitch
-	 * 8-10		Speed
-	 * 11-13	Power
-	 * 14		ID
-	 */
-	public static double[] data = new double[15];
-	public static boolean shouldRender = false;
+public class LookingAtEntityHud extends EntityHud {
+	public Entity lastLoogkigAtEntity;
 	
-	public static int render(int y) {
-		String describe =  "TargetEntity"+(Double.isNaN(data[0])?"(Null)":"");
-		return EntityHudUtil.render(new MatrixStack(), MinecraftClient.getInstance(), data,y,describe);
+	public LookingAtEntityHud(HudManager hudManager) {
+		super(hudManager);
 	}
 	
-	static {
-		Arrays.fill(data, Double.NaN);
+	public void render() {
+		String entityInfo = "(Null)";
+		if(getData().get(EntityHudInfoType.ID)!=null) {
+			entityInfo = "("+getData().get(EntityHudInfoType.ID)+","+
+					getData().get(EntityHudInfoType.NAME)+","+
+					getData().get(EntityHudInfoType.AGE)+")";
+		}
+		String describe =  "Target"+entityInfo;
+		if(this.shouldRender) this.render(new MatrixStack(), describe);
 	}
 	
-	public static void updateData(ServerPlayerEntity player) {
-		EntityHudUtil.updateData(getTarget(player), data);
+	public void updateData(ServerPlayerEntity player) {
+		this.updateData(getTarget(player));
 	}
 	
 	public static Entity getTarget(ServerPlayerEntity player) {

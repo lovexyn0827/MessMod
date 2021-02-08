@@ -22,8 +22,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class ModifyCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		System.out.println("Regeristing /modify");
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("modify").
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("modify").requires((source)->source.hasPermissionLevel(1)).
 				then(argument("target",EntityArgumentType.entities()).
 						then(literal("x").
 								then(argument("val",DoubleArgumentType.doubleArg()).
@@ -127,7 +126,8 @@ public class ModifyCommand {
 											forEachEntity(ct,(entity,val)->{
 												((LivingEntity)entity).upwardSpeed = val.floatValue();
 											},
-											(entity)->entity instanceof LivingEntity);											return 0;
+											(entity)->entity instanceof LivingEntity);
+											return 0;
 										}))).
 						then(literal("powerX").
 								then(argument("val",DoubleArgumentType.doubleArg()).
@@ -155,7 +155,14 @@ public class ModifyCommand {
 											},
 											(entity)->entity instanceof ExplosiveProjectileEntity);
 											return 0;
-										}))));
+										}))).
+						then(literal("remove").
+								executes((ct)->{
+									for(Entity entity:EntityArgumentType.getEntities(ct, "target")) {
+										entity.remove();
+									}
+									return 1;
+								})));
 		dispatcher.register(command);
 	}
 	

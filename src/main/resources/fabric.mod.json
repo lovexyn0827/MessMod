@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "mcwmem",
-  "version": "1.16.x-20210205",
+  "version": "1.16.4-20210209",
 
   "name": "Minecraft World Manipulation Enchantment Mod",
   "description": "A Minecraft mod that provides extra ability (like creating explosions,removing mobs) to manipulation a world.",
@@ -15,7 +15,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "mc.lovexyn0827.mcwmem.MCWMEMod"
+      "mc.lovexyn0827.mcwmem.MCWMEMod::INSTANCE"
     ]
   },
   "mixins": [
