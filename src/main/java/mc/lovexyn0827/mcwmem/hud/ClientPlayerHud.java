@@ -1,5 +1,6 @@
 package mc.lovexyn0827.mcwmem.hud;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -16,6 +17,10 @@ public class ClientPlayerHud extends EntityHud{
 	}
 	
 	public void updateData() {
-		updateData(player);
+		updateData(this.player);
+	}
+	
+	public void refreshPlayer() {
+		this.player = MinecraftClient.getInstance().player;
 	}
 }

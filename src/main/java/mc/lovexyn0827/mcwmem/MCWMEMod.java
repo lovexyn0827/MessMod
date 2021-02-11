@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.integrated.IntegratedServer;
 
 public class MCWMEMod implements ModInitializer {
@@ -65,5 +66,9 @@ public class MCWMEMod implements ModInitializer {
 
 	public void onDisconnected() {
 		this.hudManager = null;
+	}
+	
+	public void onPlayerRespawned(PlayerRespawnS2CPacket packet) {
+		this.hudManager.playerHud.refreshPlayer();
 	}
 }
