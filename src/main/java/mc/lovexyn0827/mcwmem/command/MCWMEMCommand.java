@@ -112,7 +112,7 @@ public class MCWMEMCommand {
 				then(literal("entityExplosionInfluence").
 						then(argument("bool",BoolArgumentType.bool()).
 								executes((ct)->{
-									CommandUtil.feedback(ct, "Not available now.");
+									CommandUtil.error(ct, "Not available now.");
 									if(true) return -1;
 									MCWMEMod.INSTANCE.setOption("entityExplosionInfluence", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;

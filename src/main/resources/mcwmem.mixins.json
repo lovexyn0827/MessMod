@@ -12,12 +12,13 @@
     "CommandMixin",
     "KeyboardMixin",
     "ExplosionMixin",
-    "BoatEntityMixin",
+    "BoatEntityAccessor",
     "ClientPlayNetworkHandlerMixin",
     "EntityMixin",
     "KillCommandMixin",
     "WorldSavePathMixin",
-    "PlayerManagerMixin"
+    "PlayerManagerMixin",
+    "EntityAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

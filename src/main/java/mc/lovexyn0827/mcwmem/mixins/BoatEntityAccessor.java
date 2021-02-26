@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.entity.vehicle.BoatEntity;
 
 @Mixin(BoatEntity.class)
-public interface BoatEntityMixin {
+public interface BoatEntityAccessor {
 	@Accessor("velocityDecay")
 	public float getVelocityDeacyMCWMEM();
 }

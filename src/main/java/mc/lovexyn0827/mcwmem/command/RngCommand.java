@@ -11,8 +11,11 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import mc.lovexyn0827.mcwmem.mixins.EntityAccessor;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 
 public class RngCommand {
@@ -49,6 +52,11 @@ public class RngCommand {
 							boolean bool = getRandom(ct).nextBoolean();
 							CommandUtil.feedback(ct,bool);
 							return bool?1:-1;
+						})).
+				then(literal("gaussian").
+						executes((ct)->{
+							CommandUtil.feedback(ct, getRandom(ct).nextGaussian());
+							return 1;
 						}));
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("rng").requires((source)->source.hasPermissionLevel(1)).
 				then(literal("world").
@@ -62,6 +70,16 @@ public class RngCommand {
 	
 	@SuppressWarnings("resource")
 	private static Random getRandom(CommandContext<ServerCommandSource> ct) {
-		return ct.getSource().getWorld().random;
+		if("/rng world".equals(ct.getInput().substring(0,10))) {
+			return ct.getSource().getWorld().random;
+		}else {
+			try {
+				Entity entity = EntityArgumentType.getEntity(ct, "target");
+				return ((EntityAccessor)entity).getRamdomMCWMEM();
+			} catch (CommandSyntaxException e) {
+				CommandUtil.error(ct, e);
+			}
+		}
+		return null;
 	}
 }

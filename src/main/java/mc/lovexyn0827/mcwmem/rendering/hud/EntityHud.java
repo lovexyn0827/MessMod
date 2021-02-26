@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import mc.lovexyn0827.mcwmem.MCWMEMod;
-import mc.lovexyn0827.mcwmem.mixins.BoatEntityMixin;
+import mc.lovexyn0827.mcwmem.mixins.BoatEntityAccessor;
 import mc.lovexyn0827.mcwmem.rendering.hud.data.EntityHudInfoType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -93,7 +93,7 @@ public class EntityHud {
 		this.getData().put(EntityHudInfoType.POWER_Y, epe.posY);
 		this.getData().put(EntityHudInfoType.POWER_Z, epe.posZ);
 		}else if(entity instanceof BoatEntity) {
-		this.getData().put(EntityHudInfoType.VELOCITY_DECAY, ((BoatEntityMixin)entity).getVelocityDeacyMCWMEM());
+		this.getData().put(EntityHudInfoType.VELOCITY_DECAY, ((BoatEntityAccessor)entity).getVelocityDeacyMCWMEM());
 		}
 	}
 	
