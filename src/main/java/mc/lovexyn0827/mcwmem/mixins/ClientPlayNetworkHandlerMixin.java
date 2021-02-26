@@ -11,7 +11,7 @@ import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public class ClientPlayNetworkHandlerMixin {
+public abstract class ClientPlayNetworkHandlerMixin {
 	@Inject(method = "onGameJoin",at = @At(value = "RETURN"))
 	public void onGameJoined(GameJoinS2CPacket packet,CallbackInfo ci) {
 		MCWMEMod.INSTANCE.onGameJoined(packet);

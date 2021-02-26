@@ -1,4 +1,4 @@
-package mc.lovexyn0827.mcwmem.hud;
+package mc.lovexyn0827.mcwmem.rendering.hud;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

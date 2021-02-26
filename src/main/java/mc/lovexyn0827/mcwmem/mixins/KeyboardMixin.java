@@ -8,13 +8,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import mc.lovexyn0827.mcwmem.MCWMEMod;
-import mc.lovexyn0827.mcwmem.hud.ClientPlayerHud;
-import mc.lovexyn0827.mcwmem.hud.LookingAtEntityHud;
+import mc.lovexyn0827.mcwmem.rendering.hud.ClientPlayerHud;
+import mc.lovexyn0827.mcwmem.rendering.hud.LookingAtEntityHud;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 
 @Mixin(Keyboard.class)
-public class KeyboardMixin {
+public abstract class KeyboardMixin {
 	@Shadow @Final MinecraftClient client;
 	
 	@Inject(method = "processF3",at = @At(value = "HEAD"))

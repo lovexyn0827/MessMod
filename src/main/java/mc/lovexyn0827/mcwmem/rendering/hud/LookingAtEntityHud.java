@@ -1,8 +1,8 @@
-package mc.lovexyn0827.mcwmem.hud;
+package mc.lovexyn0827.mcwmem.rendering.hud;
 
 import java.util.Optional;
 
-import mc.lovexyn0827.mcwmem.hud.data.EntityHudInfoType;
+import mc.lovexyn0827.mcwmem.rendering.hud.data.EntityHudInfoType;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;

@@ -1,4 +1,4 @@
-package mc.lovexyn0827.mcwmem.hud;
+package mc.lovexyn0827.mcwmem.rendering.hud;
 
 import mc.lovexyn0827.mcwmem.MCWMEMod;
 

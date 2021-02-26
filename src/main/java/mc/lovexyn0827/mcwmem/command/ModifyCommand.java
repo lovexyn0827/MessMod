@@ -17,11 +17,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Vec3d;
 
 public class ModifyCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+		//The command may be removed after mapping can be used in /entityfield.
+		//How about reserving the command as a simplified /entityfield?
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("modify").requires((source)->source.hasPermissionLevel(1)).
 				then(argument("target",EntityArgumentType.entities()).
 						then(literal("x").
@@ -87,55 +88,49 @@ public class ModifyCommand {
 						then(literal("yaw").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
-											forEachEntity(ct,(entity,val)->{
-												entity.yaw = val.floatValue();
-											},
-											(entity)->true);
+											forEachEntity(ct,
+													(entity,val)->entity.yaw = val.floatValue(),
+													(entity)->true);
 											return 0;
 										}))).
 						then(literal("pitch").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
-											forEachEntity(ct,(entity,val)->{
-												entity.pitch = val.floatValue();
-											},
-											(entity)->true);
+											forEachEntity(ct,
+													(entity,val)->entity.pitch = val.floatValue(),
+													(entity)->true);
 											return 0;
 										}))).
 						then(literal("forward").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
-											forEachEntity(ct,(entity,val)->{
-												((LivingEntity)entity).forwardSpeed = val.floatValue();
-											},
-											(entity)->entity instanceof LivingEntity);
+											forEachEntity(ct,
+													(entity,val)->((LivingEntity)entity).forwardSpeed = val.floatValue(),
+													(entity)->entity instanceof LivingEntity);
 											return 0;
 										}))).
 						then(literal("sideway").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
-											forEachEntity(ct,(entity,val)->{
-												((LivingEntity)entity).sidewaysSpeed = val.floatValue();
-											},
-											(entity)->entity instanceof LivingEntity);
+											forEachEntity(ct,
+													(entity,val)->((LivingEntity)entity).sidewaysSpeed = val.floatValue(),
+													(entity)->entity instanceof LivingEntity);
 											return 0;
 										}))).
 						then(literal("upwards").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
-											forEachEntity(ct,(entity,val)->{
-												((LivingEntity)entity).upwardSpeed = val.floatValue();
-											},
-											(entity)->entity instanceof LivingEntity);
+											forEachEntity(ct,
+													(entity,val)->((LivingEntity)entity).upwardSpeed = val.floatValue(),
+													(entity)->entity instanceof LivingEntity);
 											return 0;
 										}))).
 						then(literal("powerX").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
-											forEachEntity(ct,(entity,val)->{
-												((ExplosiveProjectileEntity)entity).posX = val;
-											},
-											(entity)->entity instanceof ExplosiveProjectileEntity);
+											forEachEntity(ct,
+													(entity,val)->((ExplosiveProjectileEntity)entity).posX = val,
+													(entity)->entity instanceof ExplosiveProjectileEntity);
 											return 0;
 										}))).
 						then(literal("powerY").
@@ -150,10 +145,9 @@ public class ModifyCommand {
 						then(literal("powerZ").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
-											forEachEntity(ct,(entity,val)->{
-												((ExplosiveProjectileEntity)entity).posZ = val;
-											},
-											(entity)->entity instanceof ExplosiveProjectileEntity);
+											forEachEntity(ct,
+													(entity,val)->((ExplosiveProjectileEntity)entity).posZ = val,
+													(entity)->entity instanceof ExplosiveProjectileEntity);
 											return 0;
 										}))).
 						then(literal("remove").
@@ -180,9 +174,9 @@ public class ModifyCommand {
 				
 			}
 			String info = count+" entities selected in total,"+success+" entities succeed to be modified";
-			ct.getSource().sendFeedback(new LiteralText(info), false);
+			CommandUtil.feedback(ct, info);
 		} catch (CommandSyntaxException e) {
-			ct.getSource().sendError(new LiteralText(e.getMessage()));
+			CommandUtil.error(ct, e.getMessage());
 		}
 	}
 }

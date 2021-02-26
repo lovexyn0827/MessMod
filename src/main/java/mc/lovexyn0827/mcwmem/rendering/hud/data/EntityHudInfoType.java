@@ -1,4 +1,4 @@
-package mc.lovexyn0827.mcwmem.hud.data;
+package mc.lovexyn0827.mcwmem.rendering.hud.data;
 
 public enum EntityHudInfoType {
 	ID("ID:",DataType.INTEGER),

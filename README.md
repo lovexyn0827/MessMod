@@ -2,8 +2,9 @@
 **A Minecraft mod that provides extra ability (like creating explosions ect.) to manipulation a world.**  
 ## Requires:
 1.A FabricLoader.  
-2.Minecraft 1.16.x.  
-3.Everything Minecraft 1.16.x requires.  
+2.The carpet-fabric by gem.
+3.Minecraft 1.16.x(1.16.4 is the best).  
+4.Everything Minecraft 1.16.x requires.  
 ## Commands:
 **/biome get <\pos\> **:Get the name of the biome at \<pos\>.  
 **~~/biome set \<pos\> \<biome\>~~(Will be available in future visions)** :Set the biome at \<pos\> to \<biome\>.  
@@ -18,6 +19,7 @@
 ## Keybinds:
 F3+E :Toggle the HUD that displays the information of the entity which the player is looking at.  
 F3+M :Toggle the HUD that displays the information of the local player.  
+## Configure Items
 ## HUD lines:
 Header line :Include the ID(equals to the number of entities loaded before the entity is loaded),name(custom name or the type in /summon) and age(ticks since the entity is loaded).  
 Pos :The position of the entity.  

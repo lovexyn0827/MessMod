@@ -1,4 +1,4 @@
-package mc.lovexyn0827.mcwmem.hud;
+package mc.lovexyn0827.mcwmem.rendering.hud;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -20,6 +20,7 @@ public class ClientPlayerHud extends EntityHud{
 		updateData(this.player);
 	}
 	
+	@SuppressWarnings("resource")
 	public void refreshPlayer() {
 		this.player = MinecraftClient.getInstance().player;
 	}

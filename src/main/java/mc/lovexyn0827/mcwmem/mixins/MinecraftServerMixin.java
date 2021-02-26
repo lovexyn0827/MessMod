@@ -2,27 +2,35 @@ package mc.lovexyn0827.mcwmem.mixins;
 
 import java.util.function.BooleanSupplier;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import mc.lovexyn0827.mcwmem.MCWMEMod;
+
 import org.spongepowered.asm.mixin.injection.At;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin {	
-	@Shadow @Final abstract PlayerManager getPlayerManager();
-	
+public abstract class MinecraftServerMixin {
 	@Inject(method = "tick",at = @At(value = "RETURN"))
-	public void updateHud(BooleanSupplier bs,CallbackInfo ci) {
-		ServerPlayerEntity player = this.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
-		if(player!=null&&MCWMEMod.INSTANCE.hudManager!=null) MCWMEMod.INSTANCE.hudManager.lookingHud.updateData(player);
+	public void onTicked(BooleanSupplier bs,CallbackInfo ci) {
+		MCWMEMod.INSTANCE.onServerTicked((MinecraftServer)(Object)this);
+	}
+	
+	@Inject(method = "runServer",
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/server/MinecraftServer;setupServer()Z",
+					shift = At.Shift.AFTER
+			)
+	)
+	public void onServerStarted(CallbackInfo ci) {
+		MCWMEMod.INSTANCE.onServerStarted((MinecraftServer)(Object)this);
+	}
+	
+	@Inject(method = "shutdown",at = @At(value = "RETURN"))
+	public void onServerShutdown(CallbackInfo ci) {
+		MCWMEMod.INSTANCE.onServerShutdown((MinecraftServer)(Object)this);
 	}
 }

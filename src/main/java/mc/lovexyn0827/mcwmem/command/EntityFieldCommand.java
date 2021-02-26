@@ -9,13 +9,13 @@ import java.util.TreeSet;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Vec3d;
 
 public class EntityFieldCommand {
@@ -27,49 +27,55 @@ public class EntityFieldCommand {
 			}
 			return builder.buildFuture();
 		};
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityfield").
-				then(argument("target",EntityArgumentType.entity()).
-						then(literal("get").
-								then(argument("fieldName",StringArgumentType.string()).suggests(suggests).
-										executes((ct)->{
-											try {
-												Entity entity = EntityArgumentType.getEntity(ct, "target");
-												Object ob = getField(entity.getClass(),StringArgumentType.getString(ct, "fieldName")).get(entity);
-												ct.getSource().sendFeedback(new LiteralText(ob.toString()), false);
-											} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
-												ct.getSource().sendError(new LiteralText("Unexpected exception in getting the field:"+e));
-												return -1;
-											}
-											return 0;
-										}))).
-						then(literal("modify").requires((source)->source.hasPermissionLevel(1)).
-								then(argument("fieldName",StringArgumentType.string()).suggests(suggests).
-										then(argument("newValue",StringArgumentType.string()).
-												executes((ct)->{
-													try {
-														modifyField(EntityArgumentType.getEntity(ct, "target"),
-																StringArgumentType.getString(ct, "fieldName"),
-																StringArgumentType.getString(ct, "newValue"));
-														ct.getSource().sendFeedback(new LiteralText("Field modified successfully"), false);
-														return 1;
-													} catch (Exception e) {
-														ct.getSource().sendError(new LiteralText("Failed to modify thhe field:"+e));
-														return -1;
-													}
-												})))).
-						then(literal("listAvailableFields").
+		LiteralArgumentBuilder<ServerCommandSource> get = literal("get").
+				then(argument("fieldName",StringArgumentType.string()).suggests(suggests).
+						executes((ct)->{
+							try {
+								Entity entity = EntityArgumentType.getEntity(ct, "target");
+								Object ob = getField(entity.getClass(),StringArgumentType.getString(ct, "fieldName")).get(entity);
+								CommandUtil.feedback(ct, ob);
+							} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
+								CommandUtil.error(ct, "Unexpected exception in getting the field:"+e);
+								return -1;
+							}
+							return 0;
+						}));
+		ArgumentBuilder<ServerCommandSource, ?> modify = literal("modify").requires((source)->source.hasPermissionLevel(1)).
+				then(argument("fieldName",StringArgumentType.string()).suggests(suggests).
+						then(argument("newValue",StringArgumentType.string()).
 								executes((ct)->{
-									Set<String> fieldSet;
 									try {
-										fieldSet = getAvailableFields(EntityArgumentType.getEntity(ct, "target"));
-										LiteralText list = new LiteralText(String.join("\t", fieldSet));
-										ct.getSource().sendFeedback(list, false);
+										modifyField(EntityArgumentType.getEntity(ct, "target"),
+												StringArgumentType.getString(ct, "fieldName"),
+												StringArgumentType.getString(ct, "newValue"));
+										CommandUtil.feedback(ct, "Field modified successfully");
+										return 1;
 									} catch (Exception e) {
-										e.printStackTrace();
+										CommandUtil.error(ct, "Failed to modify the field:"+e);
+										return -1;
 									}
-									return 0;
 								})));
+		ArgumentBuilder<ServerCommandSource, ?> listAll = literal("listAvailableFields").
+				executes((ct)->{
+					Set<String> fieldSet;
+					try {
+						fieldSet = getAvailableFields(EntityArgumentType.getEntity(ct, "target"));
+						String list = String.join("  ", fieldSet);
+						CommandUtil.feedback(ct, list);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return 0;
+				});
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityfield").requires((source)->source.hasPermissionLevel(1)).
+				then(argument("target",EntityArgumentType.entity()).then(get).then(modify).then(listAll));
 		dispatcher.register(command);
+	}
+	
+	@SuppressWarnings("unused")
+	private static String getMappedField(String obfuscated) {
+		//Not implemented!
+		throw new AssertionError();
 	}
 
 	private static boolean modifyField(Entity entity, String fieldName, String newValue) throws NumberFormatException, IllegalArgumentException, IllegalAccessException {

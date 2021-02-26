@@ -1,4 +1,4 @@
-package mc.lovexyn0827.mcwmem.hud;
+package mc.lovexyn0827.mcwmem.rendering.hud;
 
 import mc.lovexyn0827.mcwmem.MCWMEMod;
 import net.minecraft.client.MinecraftClient;
@@ -11,6 +11,7 @@ public class HudManager {
 	public AlignMode hudAlign = AlignMode.TOP_RIGHT;
 	public int hudHeight;
 	
+	@SuppressWarnings("resource")
 	public HudManager() {
 		this.hudHeight = 0;
 		this.lookingHud = new LookingAtEntityHud(this);
