@@ -15,6 +15,10 @@ public abstract class KillCommandMixin {
 			target = "Lnet/minecraft/entity/Entity;kill()V")
 	)
 	private static void removeEntity(Entity entity) {
-		if(MCWMEMod.INSTANCE.getBooleanOption("mobFastKill")) entity.remove();
+		if(MCWMEMod.INSTANCE.getBooleanOption("mobFastKill")) {
+			entity.remove();
+		}else{
+			entity.kill();
+		}
 	}
 }
