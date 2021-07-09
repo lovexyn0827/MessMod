@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "lovexyn0827.chunkmap.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  	"ChunkTicketManagerMixin",
+  	"MinecraftServerMixin",
+  	"ThreadedAnvilChunkStorageMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
