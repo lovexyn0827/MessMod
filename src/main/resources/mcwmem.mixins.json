@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "mc.lovexyn0827.mcwmem.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    
+  ],
+  "client": [
+    "MinecraftClientMixin",
+    "MinecraftServerMixin",
+    "CommandMixin",
+    "KeyboardMixin",
+    "ExplosionMixin",
+    "BoatEntityAccessor",
+    "ClientPlayNetworkHandlerMixin",
+    "EntityMixin",
+    "KillCommandMixin",
+    "WorldSavePathMixin",
+    "PlayerManagerMixin",
+    "EntityAccessor",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

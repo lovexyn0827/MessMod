@@ -1,33 +1,33 @@
 {
   "schemaVersion": 1,
-  "id": "chunkmap",
-  "version": "${version}",
+  "id": "mcwmem",
+  "version": "1.16.4-20210616",
 
-  "name": "ChunkMap",
-  "description": "A Minecraft mod to make chunk loading & generating visible",
+  "name": "Minecraft World Manipulation Enchantment Mod",
+  "description": "A Minecraft mod that provides some extra ability to manipulation a world.",
   "authors": [
     "lovexyn0827"
   ],
   "contact": {
-    "sources": "https://github.com/lovexyn0827/chunkmap"
+    "homepage": "http://lovexyn0827mc.x173.win"
   },
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "lovexyn0827.chunkmap.ChunkMapMod::INSTANCE"
+      "mc.lovexyn0827.mcwmem.MCWMEMod::INSTANCE"
     ]
   },
   "mixins": [
-    "chunkmap.mixins.json"
+    "mcwmem.mixins.json"
   ],
-  "accessWidener" : "chunkmap.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.7.4",
     "minecraft": "1.16.x"
   },
-  "suggests": {
-    "another-mod": "*"
+  
+  "recommends": { 
+    "carpet": "*"
   }
 }
