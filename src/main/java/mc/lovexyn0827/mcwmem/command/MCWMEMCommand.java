@@ -50,7 +50,7 @@ public class MCWMEMCommand {
 								}))).
 				then(literal("reloadConfig").
 						executes((ct)->{
-							MCWMEMod.INSTANCE.getOption("foo");
+							MCWMEMod.INSTANCE.options.load();
 							return 1;
 						})).
 				then(literal("entityExplosionRaysVisiblity").
@@ -102,9 +102,20 @@ public class MCWMEMCommand {
 				then(literal("entityExplosionInfluence").
 						then(argument("bool",BoolArgumentType.bool()).
 								executes((ct)->{
-									//CommandUtil.error(ct, "Not available now.");
-									//if(true) return -1;
+									CommandUtil.error(ct, "Maybe not available now.");
 									MCWMEMod.INSTANCE.setOption("entityExplosionInfluence", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									return 1;
+								}))).
+				then(literal("renderBlockShape").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct)->{
+									MCWMEMod.INSTANCE.setOption("renderBlockShape", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									return 1;
+								}))).
+				then(literal("renderFluidShape").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct)->{
+									MCWMEMod.INSTANCE.setOption("renderFluidShape", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 								})));
 		dispatcher.register(command);

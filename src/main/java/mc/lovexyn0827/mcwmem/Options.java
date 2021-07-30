@@ -28,6 +28,8 @@ public class Options extends Properties{
 			this.defaults.put("mobFastKill", "false");
 			this.defaults.put("enabledTools", "false");
 			this.defaults.put("entityExplosionInfluence", "false");
+			this.defaults.put("renderBlockShape", "false");
+			this.defaults.put("renderFluidShape", "false");
 			this.load();
 		}else {
 			this.defaults = null;

@@ -20,7 +20,7 @@ import java.util.Map;
 
 /*
  * A modified version of carpet.script.util.ShapesRenderer
- * Original Author : Gnembon
+ * Original Author : gnembon
  */
 public class ShapeRenderer
 {

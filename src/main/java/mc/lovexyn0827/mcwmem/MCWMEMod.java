@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import mc.lovexyn0827.mcwmem.command.CommandUtil;
 import mc.lovexyn0827.mcwmem.mixins.WorldSavePathMixin;
-import mc.lovexyn0827.mcwmem.rendering.FluidInfoRenderer;
+import mc.lovexyn0827.mcwmem.rendering.BlockInfoRenderer;
 import mc.lovexyn0827.mcwmem.rendering.ServerSyncedBoxRenderer;
 import mc.lovexyn0827.mcwmem.rendering.ShapeRenderer;
 import mc.lovexyn0827.mcwmem.rendering.hud.HudManager;
@@ -34,14 +34,14 @@ public class MCWMEMod implements ModInitializer {
 	public static final MCWMEMod INSTANCE = new MCWMEMod();
 	public final MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
 	public HudManager hudManager;
-	private Options options;
+	public Options options;
 	private int windowX;
 	private int windowY;
 	private ServerSyncedBoxRenderer boxRenderer;
 	private MinecraftServer server;
 	private String scriptDir;
 	private long gameTime;
-	public ShapeRenderer shapeRenderer;;
+	public ShapeRenderer shapeRenderer;
 
 	private MCWMEMod() {
 		this.options = new Options(false);
@@ -89,7 +89,6 @@ public class MCWMEMod implements ModInitializer {
 	}
 	
 	public String getOption(String key) {
-		this.options.load();
 		String val = this.options.getProperty(key);
 		return val==null?this.options.getDefault(key):val;
 	}
@@ -110,7 +109,7 @@ public class MCWMEMod implements ModInitializer {
 		this.boxRenderer.tick();
 		this.gameTime = this.server.getOverworld().getTime();
 		//System.out.println(this.gameTime);
-		FluidInfoRenderer fir = new FluidInfoRenderer();
+		BlockInfoRenderer fir = new BlockInfoRenderer();
 		fir.initializate(this.server);
 		fir.tick();
 	}
@@ -146,6 +145,7 @@ public class MCWMEMod implements ModInitializer {
 		this.boxRenderer.uninitialize();
 		this.server = null;
 		CommandUtil.updateServer(null);
+		this.shapeRenderer.reset();
 	}
 
 	public boolean getBooleanOption(String key) {

@@ -30,10 +30,12 @@ public class MoveEntityCommand {
 										executes((ct)->{
 											EntityArgumentType.getEntities(ct, "targets").forEach((entity)->{
 												try {
+													Vec3d pos = entity.getPos();
 													Vec3d delta = Vec3ArgumentType.getVec3(ct, "delta");
 													HitResult result = ProjectileUtil.getCollision(entity, (e)->true);
 													Vec3d hit = result==null?entity.getPos().add(delta):result.getPos();
 													entity.updatePosition(hit.x, hit.y, hit.z);
+													CommandUtil.feedback(ct, entity.getPos().subtract(pos));
 												} catch (CommandSyntaxException e) {
 													CommandUtil.error(ct, e.getMessage());
 												}
@@ -66,7 +68,9 @@ public class MoveEntityCommand {
 													}
 													EntityArgumentType.getEntities(ct, "targets").forEach((entity)->{
 														try {
+															Vec3d pos = entity.getPos();
 															entity.move(type, Vec3ArgumentType.getVec3(ct, "delta"));
+															CommandUtil.feedback(ct, entity.getPos().subtract(pos));
 														} catch (CommandSyntaxException e) {
 															CommandUtil.error(ct, e.getMessage());
 														}

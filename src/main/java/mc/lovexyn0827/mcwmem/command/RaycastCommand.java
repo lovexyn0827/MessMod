@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 
 public class RaycastCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("raycastblock").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("raycast").requires((source)->source.hasPermissionLevel(1)).
 				then(argument("from",Vec3ArgumentType.vec3()).
 						then(argument("to",Vec3ArgumentType.vec3()).
 								executes(RaycastCommand::print).
