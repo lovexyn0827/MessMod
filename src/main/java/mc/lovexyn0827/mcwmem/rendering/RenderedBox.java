@@ -8,6 +8,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
+/**
+ * Copied From The Fabric-Carpet
+ */
 public class RenderedBox extends Shape {
 
 	private Box box;

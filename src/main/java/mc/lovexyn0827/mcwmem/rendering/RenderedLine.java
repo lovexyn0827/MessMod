@@ -8,6 +8,9 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
+/**
+ * Copied From The Fabric-Carpet
+ */
 public class RenderedLine extends Shape {
 
 	private final Vec3d from;

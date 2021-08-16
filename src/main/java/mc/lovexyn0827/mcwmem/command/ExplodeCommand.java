@@ -3,7 +3,6 @@ package mc.lovexyn0827.mcwmem.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.FloatArgumentType;
 
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
@@ -19,11 +18,11 @@ public class ExplodeCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("explode").requires((source)->source.hasPermissionLevel(1)).
 				then(argument("pos",Vec3ArgumentType.vec3()).
-						then(argument("power",FloatArgumentType.floatArg()).
+						then(argument("power",ExtendedFloatArgumentType.floatArg()).
 								executes((ct)->{
 										ServerWorld world = ct.getSource().getWorld();
 										Vec3d pos = Vec3ArgumentType.getVec3(ct,"pos");
-										createExplosion(world,pos,FloatArgumentType.getFloat(ct,"power"),false);
+										createExplosion(world,pos,ExtendedFloatArgumentType.getFloat(ct,"power"),false);
 										return 1;
 								}).
 								then(argument("fire",BoolArgumentType.bool()).
@@ -31,7 +30,7 @@ public class ExplodeCommand {
 											ServerWorld world = ct.getSource().getWorld();
 											Vec3d pos = Vec3ArgumentType.getVec3(ct,"pos");
 											createExplosion(world,pos,
-													FloatArgumentType.getFloat(ct,"power"),
+													ExtendedFloatArgumentType.getFloat(ct,"power"),
 													BoolArgumentType.getBool(ct, "fire"));
 											return 1;
 										}))));

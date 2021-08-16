@@ -62,7 +62,7 @@ public abstract class ExplosionMixin {
 		if(entity.world instanceof ServerWorld) {
 			ServerWorld world = (ServerWorld)(entity.world);
 			if(MCWMEMod.INSTANCE.getBooleanOption("entityExplosionRaysVisiblity")) {
-				HitResult hit = world.raycast(new RaycastContext(vec3d, source, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
+				HitResult hit = world.raycast(new RaycastContext(source, vec3d, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
 				MCWMEMod.INSTANCE.shapeRenderer.addShape(new RenderedLine(source, hit.getPos(), 0x00FF00FF, MCWMEMCommand.rayLife), entity.getEntityWorld().getRegistryKey());
 				MCWMEMod.INSTANCE.shapeRenderer.addShape(new RenderedLine(hit.getPos(), vec3d, 0xFF0000FF, MCWMEMCommand.rayLife), entity.getEntityWorld().getRegistryKey());
 			}
