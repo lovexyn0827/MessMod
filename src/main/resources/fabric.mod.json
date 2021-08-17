@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "mcwmem",
-  "version": "1.16.4-20210817",
+  "id": "just_a_mess",
+  "version": "1.16.4-20210818",
 
-  "name": "Minecraft World Manipulation Enchantment Mod",
-  "description": "A Minecraft mod that provides some extra ability to manipulation a world.",
+  "name": "Just A Mess",
+  "description": "A Minecraft mod that provides some extra ability to manipulation a world and some enachantments (not something can be applied to items).",
   "authors": [
     "lovexyn0827"
   ],
@@ -15,11 +15,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "mc.lovexyn0827.mcwmem.MCWMEMod::INSTANCE"
+      "lovexyn0827.mess.MessMod::INSTANCE"
     ]
   },
   "mixins": [
-    "mcwmem.mixins.json"
+    "just_a_mess.mixins.json"
   ],
 
   "depends": {
