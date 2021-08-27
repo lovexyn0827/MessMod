@@ -25,6 +25,7 @@ public class MessCfgCommand {
 	public static int rayLife = 300;
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+		// TODO Stop hardcoding the options.
 		SuggestionProvider<ServerCommandSource> suggest = (ct,builder)->{
 			return builder.suggest("topLeft").suggest("topRight").suggest("bottomLeft").suggest("bottomRight").buildFuture();
 			
@@ -141,7 +142,38 @@ public class MessCfgCommand {
 									
 									MessMod.INSTANCE.setOption("blockShapeToBeRendered", type);
 									return 1;
-								})));
+								}))).
+				then(literal("tntChunkLoading").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct)->{
+									MessMod.INSTANCE.setOption("tntChunkLoading", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									return 1;
+								}))).
+				then(literal("projectileChunkLoading").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct)->{
+									MessMod.INSTANCE.setOption("projectileChunkLoading", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									return 1;
+								}))).
+				then(literal("maxClientTicksPerFrame").
+						then(argument("ticks",IntegerArgumentType.integer(0)).
+								executes((ct)->{
+									MessMod.INSTANCE.setOption("maxClientTicksPerFrame", String.valueOf(IntegerArgumentType.getInteger(ct, "ticks")));
+									return 1;
+								}))).
+				then(literal("debugStickSkipsInvaildState").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct)->{
+									MessMod.INSTANCE.setOption("debugStickSkipsInvaildState", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									CommandUtil.feedback(ct, "This option doesn't work for some unknow reason, so try flipinCactus.");
+									return 1;
+								})))/*.
+				then(literal("railNoAutoConnection").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct)->{
+									MessMod.INSTANCE.setOption("railNoAutoConnection", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									return 1;
+								})))*/;
 		dispatcher.register(command);
 	}
 }

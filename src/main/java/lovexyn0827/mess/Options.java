@@ -13,7 +13,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class Options extends Properties{
 	private static final long serialVersionUID = 2005082720050104L;
-	private static final File OPTION_FILE = new File(FabricLoader.getInstance().getGameDir().toString()+"/mcwmem.prop");
+	private static final File OPTION_FILE = new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop");
 	private final Options defaults;
 	
 	public Options(boolean buildDefault) {
@@ -31,6 +31,11 @@ public class Options extends Properties{
 			this.defaults.put("renderBlockShape", "false");
 			this.defaults.put("renderFluidShape", "false");
 			this.defaults.put("blockShapeToBeRendered", "COLLISION");
+			this.defaults.put("tntChunkLoading", "false");
+			this.defaults.put("projectileChunkLoading", "false");
+			this.defaults.put("maxClientTicksPerFrame", "10");
+			this.defaults.put("debugStickSkipsInvaildState", "false");	//Sometimes, this option doesn't work well.
+			//this.defaults.put("railNoAutoConnection", "false");
 			this.load();
 		}else {
 			this.defaults = null;
@@ -50,9 +55,8 @@ public class Options extends Properties{
 				load();
 				return;
 			}
-			LogManager.getLogger().fatal("Failed to open mcwmem.prop");
+			LogManager.getLogger().fatal("Failed to open mcwmem.prop, the Minecraft may crash later.");
 			e.printStackTrace();
-			System.exit(-1);
 		}
 	}
 	
@@ -62,7 +66,6 @@ public class Options extends Properties{
 		} catch (IOException e) {
 			LogManager.getLogger().fatal("Failed to write mcwmem.prop");
 			e.printStackTrace();
-			System.exit(-1);
 		}
 	}
 	

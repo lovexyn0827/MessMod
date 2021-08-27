@@ -1,7 +1,7 @@
-# Minecraft-World-Manipulation-Enchantment-Mod
+# Just A Mess
 `A Minecraft mod that provides extra ability to manipulation a world and some enachantments (not something can be applied to items).`  
 
-Just like what the name says, the Mod contains functions in many fields, therefore the mod seems to be messy, even the style of the source code is messy.
+Just like what the name says, the Mod contains functions in many fields (like world manipulation, information providing, feature changes, fug fixes, etc.) , therefore the mod seems to be messy, even the style of the source code is messy.
 
 In other languages:  
 [简体中文](/README_zh_cn.md)
@@ -23,14 +23,18 @@ Names of agruments are wrapped by pointy semicolons, and optional components are
 `/messcfg`:Display the version and current config of the mod  
 `/messcfg blockShapeToBeRendered  COLLIDER|OUTLINE|RAYSAST|SIDES|VISUAL`:Choose which shape of a block will be rendered when the option renderBlockShape is true. COLLIDER corrsponds the colliding shape, OUTLINE  corrsponds the box which is drawn when the player look at a block. Note that RAYCAST and SIDES shape may be rendered not well.
 `/messcfg enabledTools <bool>`:Enable or disable item tools(See below).  
-`/messcfg entityExplosionInfluence <bool>`:Make the game send the infomation of entities affected by explosions or nothing.Not available in the version.(There is some bugs in non-development environments now)  
+`/messcfg entityExplosionInfluence <bool>`:Make the game send the infomation of entities affected by explosions or nothing. Maybe not available in the version.(There is some bugs in non-development environments now)  
 `/messcfg entityExplosionRaysVisiblity <bool>`:Enable or disable explosion ray (used to calculate the exposure of entities) renderer.  
 `/messcfg entityExplosionRaysVisiblity setLifetime <ticks>`:Set how many ticks the rendered rays remains.   
 `/messcfg mobFastKill <bool>`:Enable or disable fastMobKill,which makes /kill removes mobs directly instead of damage them. 
 `/messcfg reloadConfig`:Update options from mcwmem.prop.  
 `/messcfg renderBlockShape <bool>`:Enable or disable block outline rendering.
-`/messcfg renderFluidShape <bool>`:Enable or disable the renderer of oulines, heights, and vectors of flowing directions of  target fluids.
-`/messcfg serverSyncedBox <bool>`:Enable or disable the server-side hitbox renderer. `/messcfg setHudDisplay bottomLeft|bottomRight|topLeft|TopRight`:Move the HUDs to the given location.   
+`/messcfg renderFluidShape <bool>`:Enable or disable the renderer of outlines, heights, and vectors of flowing directions of  target fluids.
+`/messcfg serverSyncedBox <bool>`:Enable or disable the server-side hitbox renderer.  `/messcfg setHudDisplay bottomLeft|bottomRight|topLeft|TopRight`:Move the HUDs to the given location.    
+`/messcfg debugStickSkipsInvaildState <bool>`:Prevent debug sticks change blocks to a invalid state. By now, the option doesn't work in some cases, like changing the `shape` property of a rail can still turn the rail in to an illegal state.  
+`/messcfg tntChunkLoading <bool>`:Allow or disallow TNT entities to load chunks in their processing, maybe helpful in making some kind of TNT canons. 
+`/messcfg projectileChunkLoading <bool>`:Allow or disallow projectiles to load chunks in their processing, maybe helpful in making pearl canons. 
+`/messcfg maxClientTicksPerFrame <ticks>`:Set the maximum number of ticks can be processed within a single frame when the FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot toggle the flying state when the FPS is too low.  
 `/modify <targets> <key> <val>`:Change the value \<key\> in the entities with to \<val\>.Much simpler than using /entityfield.  
 `/modify <target> remove`:Remove \<target\> from the world.  
 `/moventity <targets> <delta> entity self|piston|shulkerBox|player|shulker`:Move the entity using Entity.move().The distance is determined by \<delta\>.Usually,we should use "self" as the last argument.  After the execution, the actual displacement of the entity is outputted.

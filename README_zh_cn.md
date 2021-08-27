@@ -1,7 +1,7 @@
 # Just A Mess（一团糟）
 `一个用于提供额外的世界访问能力及一些增强功能的Minecraft Mod`  
 
-正如其名字中所说，这个Mod包含了很多方面的功能，有些还是随便写的，非常乱，就连代码风格也很乱。
+正如其名字中所说，这个Mod包含了很多方面的功能（世界控制，信息显示，特性更改以及一些Bug修复等），有些还是随便写的，非常乱，就连代码风格也很乱。
 
 其他语言： 
 [English](/README.md)  
@@ -32,6 +32,10 @@
 `/messcfg renderFluidShape <bool>`：启用或禁用流体轮廓、高度和流向向量的渲染。
 `/messcfg serverSyncedBox <bool>`：启用或禁用服务端碰撞箱显示。  
 `/messcfg setHudDisplay bottomLeft|bottomRight|topLeft|TopRight`：设置实体信息HUD的位置。
+`/messcfg debugStickSkipsInvaildState <bool>`：防止调试棒将方块调整到非法状态。目前这个选项在一些情况下不能正常工作，例如调整铁轨的shape属性时仍可以将其调整到非法状态。 
+`/messcfg tntChunkLoading <bool>`：允许或禁止TNT实体在运算过程中加载区块，在制作一些TNT炮时可能会有所帮助。 
+`/messcfg projectileChunkLoading <bool>`：允许或禁止弹射物实体在运算过程中加载区块，在制作珍珠炮时可能会有所帮助。 
+`/messcfg maxClientTicksPerFrame <ticks>`：设置FPS低于20时每帧客户端可以运行几个游戏刻，将其设为一个较小值可能修复低FPS时无法切换飞行状态的Bug。 
 `/modify <targets> <key> <val>`：修改targets指定的实体的属性，是部分/entityfield的简便用法。  
 `/modify <target> remove`：移除targets指定的实体。  
 `/moventity <targets> <delta> entity self|piston|shulkerBox|player|shulker`：使用Entity.move()移动targets指定的实体，距离由delta指定，通常选择“self”作为最后一个参数。执行完成后输出实际位移。  

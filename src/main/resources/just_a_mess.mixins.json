@@ -20,7 +20,10 @@
     "PlayerManagerMixin",
     "EntityAccessor",
     "WorldRendererMixin",
-    "StructureBlockBlockEntityMixin"
+    "StructureBlockBlockEntityMixin",
+    "DebugStickItemMixin",
+    "TntEntityMixin",
+    "ProjectileEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

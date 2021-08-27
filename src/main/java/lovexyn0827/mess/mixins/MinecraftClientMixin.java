@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -31,9 +32,20 @@ public abstract class MinecraftClientMixin {
 		MessMod.INSTANCE.onClientTicked();
 	}
 
-	@Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V",
+	@Inject(
+			method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V",
 			at = @At(value = "HEAD"))
 	public void onDisconnected(Screen screen,CallbackInfo ci) {
 		MessMod.INSTANCE.onDisconnected();
 	}
+	
+	@Redirect(
+			method = "render",
+			at = @At(value = "INVOKE", 
+					target = "Ljava/lang/Math;min(II)I")
+			)
+	public int modifyMaxTickPerFrame(int i, int j) {
+		return Math.min(MessMod.INSTANCE.getBooleanOption("maxClientTicksPerFrame") ? 5 : 10, j);
+	}
+	
 }

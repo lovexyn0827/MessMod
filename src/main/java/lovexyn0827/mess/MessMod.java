@@ -1,5 +1,6 @@
 package lovexyn0827.mess;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,7 +8,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import lovexyn0827.mess.command.CommandUtil;
+import lovexyn0827.mess.deobfuscating.DummyMapping;
+import lovexyn0827.mess.deobfuscating.Mapping;
+import lovexyn0827.mess.deobfuscating.TinyMapping;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
@@ -16,7 +23,7 @@ import lovexyn0827.mess.rendering.hud.HudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.MappingResolver;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
@@ -27,12 +34,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
 
 public class MessMod implements ModInitializer {
+	public static final Logger LOGGER = LogManager.getLogger();
 	public static final MessMod INSTANCE = new MessMod();
-	public final MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
+	public Mapping mapping;
 	public HudManager hudManager;
 	public Options options;
 	private int windowX;
@@ -46,10 +52,34 @@ public class MessMod implements ModInitializer {
 	private MessMod() {
 		this.options = new Options(false);
 		this.boxRenderer = new ServerSyncedBoxRenderer();
+		this.mapping = this.tryLoadMapping();
 	}
-	
+
 	@Override
 	public void onInitialize() {
+	}
+	
+	private Mapping tryLoadMapping() {
+		try {
+			Class.forName("net.minecraft.entity.Entity$827");
+			LOGGER.info("The Minecraft has probably been deobfuscated, the mapping won't be loaded");
+			return new DummyMapping();
+		} catch (ClassNotFoundException e) {
+			File mapping = new File(FabricLoader.getInstance().getGameDir().toString() + "/mappings/" + 
+					SharedConstants.getGameVersion().getName() + ".tiny");
+			if(mapping.exists()) {
+				return new TinyMapping(mapping);
+			} else {
+				LOGGER.error("The mapping couldn't be found, check if the mapping has been downloaded " + 
+						"and is in the correct folder. Deobfuscating will be disabled in this running.");
+				LOGGER.error("The mapping should be downloaded to" + mapping.getAbsolutePath());
+				return new DummyMapping();
+			}
+		}
+	}
+	
+	public Mapping getMapping() {
+		return this.mapping;
 	}
 	
 	public long getGameTime() {
@@ -65,14 +95,14 @@ public class MessMod implements ModInitializer {
 		if(!Files.exists(scriptPath)) {
 			Files.createDirectories(scriptPath);
 		}
-		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/"+name+".sc"), 
-				Paths.get(this.scriptDir, name+".sc"), 
+		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/" + name+".sc"), 
+				Paths.get(this.scriptDir, name + ".sc"), 
 				StandardCopyOption.REPLACE_EXISTING);
 	}
 	
 	public void onRender(ClientPlayerEntity player, IntegratedServer server) {
 		this.updateWindowSize(MinecraftClient.getInstance().getWindow());
-		if(this.hudManager!=null) this.hudManager.render(player,server);
+		if(this.hudManager != null) this.hudManager.render(player,server);
 	}
 
 	private void updateWindowSize(Window window) {
@@ -90,7 +120,7 @@ public class MessMod implements ModInitializer {
 	
 	public String getOption(String key) {
 		String val = this.options.getProperty(key);
-		return val==null?this.options.getDefault(key):val;
+		return val == null ? this.options.getDefault(key) : val;
 	}
 	
 	public void onGameJoined(GameJoinS2CPacket packet) {
@@ -99,7 +129,7 @@ public class MessMod implements ModInitializer {
 	
 	public void onServerTicked(MinecraftServer server) {
 		ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
-		if(player!=null&&MessMod.INSTANCE.hudManager!=null) {
+		if(player != null && MessMod.INSTANCE.hudManager != null) {
 			MessMod.INSTANCE.hudManager.lookingHud.updateData(player);
 		} else if(this.hudManager != null && this.hudManager.playerHudS == null && player != null) {
 			this.hudManager.playerHudS = new PlayerHud(this.hudManager, player, true);
@@ -115,7 +145,7 @@ public class MessMod implements ModInitializer {
 	}
 
 	public void onClientTicked() {
-		if(this.hudManager!=null) {
+		if(this.hudManager != null) {
 			this.hudManager.playerHudC.updateData();
 		}else {
 			this.hudManager = new HudManager();
@@ -166,8 +196,8 @@ public class MessMod implements ModInitializer {
 				}
 			}
 		} catch (IOException e) {
-			CrashReport cr = CrashReport.create(e, "Couldn't load scarpet scripts");
-			throw new CrashException(cr);
+			LOGGER.error("Scarpet scripts couldn't be loaded.");
+			e.printStackTrace();
 		}
 	}
 
