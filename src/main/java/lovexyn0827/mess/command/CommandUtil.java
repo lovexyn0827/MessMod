@@ -1,8 +1,10 @@
 package lovexyn0827.mess.command;
 
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -24,12 +26,12 @@ public class CommandUtil {
 	private static MinecraftServer server;
 	
 	public static void updateServer(MinecraftServer serverIn) {
-		if(serverIn==null) {
+		if(serverIn == null) {
 			noreplySource = null;
 			noreplyPlayerSource = null;
 			commandManager = null;
 			firstPlayerJoined = false;
-		}else {
+		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}
 
@@ -60,16 +62,16 @@ public class CommandUtil {
 		}
 	}
 	
-	public static void feedback(CommandContext<? extends ServerCommandSource> ct,Object ob) {
+	public static void feedback(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendFeedback(new LiteralText(ob.toString()), false);
 	}
 	
-	public static void error(CommandContext<? extends ServerCommandSource> ct,Object ob) {
+	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendError(new LiteralText(ob.toString()));
 	}
 
 	public static ServerCommandSource noreplySource() {
-		if(noreplySource==null) throw new RuntimeException("Called before initialzation");
+		if(noreplySource == null) throw new RuntimeException("Called before initialzation");
 		return noreplySource;
 	}
 
@@ -107,5 +109,14 @@ public class CommandUtil {
 				new LiteralText("NOREPLY"), 
 				server, 
 				entity);
+	}
+	
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(String ... args) {
+		return (ct, builder) -> {
+			Stream.of(args)
+					.map(Object::toString)
+					.forEach(builder::suggest);
+			return builder.buildFuture();
+		};
 	}
 }

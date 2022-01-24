@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -26,15 +27,15 @@ public class MessCfgCommand {
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		// TODO Stop hardcoding the options.
-		SuggestionProvider<ServerCommandSource> suggest = (ct,builder)->{
+		SuggestionProvider<ServerCommandSource> suggestHud = (ct, builder) -> {
 			return builder.suggest("topLeft").suggest("topRight").suggest("bottomLeft").suggest("bottomRight").buildFuture();
 			
 		};
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("messcfg").
-				executes((ct)->{
+				executes((ct) -> {
 					ModMetadata metadata = FabricLoader.getInstance().getModContainer("just_a_mess").get().getMetadata();
 					CommandUtil.feedback(ct, metadata.getName());
-					CommandUtil.feedback(ct, "Version:"+metadata.getVersion());
+					CommandUtil.feedback(ct, "Version:" + metadata.getVersion());
 					CommandUtil.feedback(ct, metadata.getDescription());
 					CommandUtil.feedback(ct, "Current Options");
 					Options option = MessMod.INSTANCE.options;
@@ -42,26 +43,27 @@ public class MessCfgCommand {
 					return 1;
 				}).
 				then(literal("setHudDisplay").
-						then(argument("location",StringArgumentType.string()).suggests(suggest ).
-								executes((ct)->{
+						then(argument("location",StringArgumentType.string()).suggests(suggestHud).
+								executes((ct) -> {
 									HudManager.AlignMode newAlignMode = MessMod.INSTANCE.hudManager.hudAlign;
 									String location = StringArgumentType.getString(ct, "location");
 									newAlignMode = HudManager.AlignMode.fromString(location);
-									if(newAlignMode==null) {
-										CommandUtil.error(ct, "Undefined location:"+location);
+									if(newAlignMode == null) {
+										CommandUtil.error(ct, "Undefined location:" + location);
 										return -1;
 									}
 									MessMod.INSTANCE.hudManager.hudAlign = newAlignMode;
-									MessMod.INSTANCE.setOption("alignMode",location);
+									MessMod.INSTANCE.setOption("alignMode", location);
 									return 1;
 								}))).
 				then(literal("reloadConfig").
-						executes((ct)->{
+						executes((ct) -> {
+							CommandUtil.feedback(ct, "Reloaded all configs");
 							MessMod.INSTANCE.options.load();
 							return 1;
 						})).
 				then(literal("entityExplosionRaysVisiblity").
-						then(argument("boolean",BoolArgumentType.bool()).
+						then(argument("bool",BoolArgumentType.bool()).
 								executes((ct) -> {
 									MessMod.INSTANCE.setOption("entityExplosionRaysVisiblity", 
 											String.valueOf(BoolArgumentType.getBool(ct, "boolean")));
@@ -69,15 +71,15 @@ public class MessCfgCommand {
 									
 								})).
 						then(literal("setLifetime").
-								then(argument("ticks",IntegerArgumentType.integer()).
-										executes((ct)->{
+								then(argument("ticks",IntegerArgumentType.integer()).suggests(CommandUtil.immutableSuggestions("300")).
+										executes((ct) -> {
 											int lifeTime = IntegerArgumentType.getInteger(ct, "ticks");
 											rayLife = lifeTime;
 											MessMod.INSTANCE.setOption("entityExplosionRayLife", String.valueOf(lifeTime));
 											return 1;
 										})))).
 				then(literal("serverSyncedBox").
-						then(argument("boolean",BoolArgumentType.bool()).
+						then(argument("bool",BoolArgumentType.bool()).
 								executes((ct) -> {
 									boolean bool = BoolArgumentType.getBool(ct, "boolean");
 									MessMod.INSTANCE.setOption("serverSyncedBox", 
@@ -86,13 +88,13 @@ public class MessCfgCommand {
 								}))).
 				then(literal("mobFastKill").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									MessMod.INSTANCE.setOption("mobFastKill", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 								}))).
 				then(literal("enabledTools").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									if(!FabricLoader.getInstance().isModLoaded("carpet")) {
 										CommandUtil.error(ct, NO_CARPET_ERROR);
 										return -1;
@@ -108,20 +110,20 @@ public class MessCfgCommand {
 								}))).
 				then(literal("entityExplosionInfluence").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									CommandUtil.error(ct, "Maybe not available now.");
 									MessMod.INSTANCE.setOption("entityExplosionInfluence", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 								}))).
 				then(literal("renderBlockShape").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									MessMod.INSTANCE.setOption("renderBlockShape", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 								}))).
 				then(literal("renderFluidShape").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									MessMod.INSTANCE.setOption("renderFluidShape", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 								}))).
@@ -145,35 +147,60 @@ public class MessCfgCommand {
 								}))).
 				then(literal("tntChunkLoading").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									MessMod.INSTANCE.setOption("tntChunkLoading", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 								}))).
 				then(literal("projectileChunkLoading").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									MessMod.INSTANCE.setOption("projectileChunkLoading", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 								}))).
 				then(literal("maxClientTicksPerFrame").
-						then(argument("ticks",IntegerArgumentType.integer(0)).
-								executes((ct)->{
+						then(argument("ticks",IntegerArgumentType.integer(0)).suggests(CommandUtil.immutableSuggestions("10")).
+								executes((ct) -> {
 									MessMod.INSTANCE.setOption("maxClientTicksPerFrame", String.valueOf(IntegerArgumentType.getInteger(ct, "ticks")));
 									return 1;
 								}))).
 				then(literal("debugStickSkipsInvaildState").
 						then(argument("bool",BoolArgumentType.bool()).
-								executes((ct)->{
+								executes((ct) -> {
 									MessMod.INSTANCE.setOption("debugStickSkipsInvaildState", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									CommandUtil.feedback(ct, "This option doesn't work for some unknow reason, so try flipinCactus.");
 									return 1;
-								})))/*.
+								}))).
+				then(literal("disableProjectileRandomness").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct) -> {
+									MessMod.INSTANCE.setOption("disableProjectileRandomness", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									return 1;
+								}))).
+				then(literal("endEyeTeleport").
+						then(argument("bool",BoolArgumentType.bool()).
+								executes((ct) -> {
+									MessMod.INSTANCE.setOption("endEyeTeleport", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
+									return 1;
+								}))).
+				then(literal("maxEndEyeTpRadius").
+						then(argument("radius", FloatArgumentType.floatArg(0, 2048)).suggests(CommandUtil.immutableSuggestions("180", "128", "320")).
+								executes((ct) -> {
+									MessMod.INSTANCE.setOption("maxEndEyeTpRadius", String.valueOf(FloatArgumentType.getFloat(ct, "radius")));
+									return 1;
+								}))).
+				then(literal("creativeUpwardsSpeed").
+						then(argument("speed", FloatArgumentType.floatArg()).suggests(CommandUtil.immutableSuggestions("0.05", "0.10")).
+								executes((ct) -> {
+									MessMod.INSTANCE.setOption("creativeUpwardsSpeed", String.valueOf(FloatArgumentType.getFloat(ct, "speed")));
+									return 1;
+								})));
+				/*.
 				then(literal("railNoAutoConnection").
 						then(argument("bool",BoolArgumentType.bool()).
 								executes((ct)->{
 									MessMod.INSTANCE.setOption("railNoAutoConnection", String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
-								})))*/;
+								})))*/
 		dispatcher.register(command);
 	}
 }

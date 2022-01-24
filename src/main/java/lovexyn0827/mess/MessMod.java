@@ -15,6 +15,7 @@ import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.deobfuscating.DummyMapping;
 import lovexyn0827.mess.deobfuscating.Mapping;
 import lovexyn0827.mess.deobfuscating.TinyMapping;
+import lovexyn0827.mess.log.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
@@ -48,11 +49,13 @@ public class MessMod implements ModInitializer {
 	private String scriptDir;
 	private long gameTime;
 	public ShapeRenderer shapeRenderer;
+	private EntityLogger logger;
 
 	private MessMod() {
 		this.options = new Options(false);
 		this.boxRenderer = new ServerSyncedBoxRenderer();
 		this.mapping = this.tryLoadMapping();
+		this.logger = new EntityLogger();
 	}
 
 	@Override
@@ -61,13 +64,14 @@ public class MessMod implements ModInitializer {
 	
 	private Mapping tryLoadMapping() {
 		try {
-			Class.forName("net.minecraft.entity.Entity$827");
+			Class.forName("net.minecraft.entity.Entity$827");	// TODO Remove $827
 			LOGGER.info("The Minecraft has probably been deobfuscated, the mapping won't be loaded");
 			return new DummyMapping();
 		} catch (ClassNotFoundException e) {
 			File mapping = new File(FabricLoader.getInstance().getGameDir().toString() + "/mappings/" + 
 					SharedConstants.getGameVersion().getName() + ".tiny");
 			if(mapping.exists()) {
+				LOGGER.info("Found corrsponding Tiny mapping, typing to load it...");
 				return new TinyMapping(mapping);
 			} else {
 				LOGGER.error("The mapping couldn't be found, check if the mapping has been downloaded " + 
@@ -142,6 +146,11 @@ public class MessMod implements ModInitializer {
 		BlockInfoRenderer fir = new BlockInfoRenderer();
 		fir.initializate(this.server);
 		fir.tick();
+		try {
+			this.logger.tick(server);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void onClientTicked() {
@@ -174,6 +183,7 @@ public class MessMod implements ModInitializer {
 	public void onServerShutdown(MinecraftServer server) {
 		this.boxRenderer.uninitialize();
 		this.server = null;
+		this.logger.closeAll();
 		CommandUtil.updateServer(null);
 		this.shapeRenderer.reset();
 	}
@@ -217,5 +227,9 @@ public class MessMod implements ModInitializer {
 
 	public ShapeRenderer getShapeRenderer() {
 		return this.shapeRenderer;
+	}
+	
+	public EntityLogger getEntityLogger() {
+		return this.logger;
 	}
 }

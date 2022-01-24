@@ -23,7 +23,9 @@
     "StructureBlockBlockEntityMixin",
     "DebugStickItemMixin",
     "TntEntityMixin",
-    "ProjectileEntityMixin"
+    "ProjectileEntityMixin",
+    "EndEyeItemMixin",
+    "ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -15,7 +15,7 @@ public class PlayerHud extends EntityHud{
 	}
 	
 	public void render() {
-		this.render(new MatrixStack(), this.isServer ? "Server" : "Client" + "Player" + this.player.getEntityId());
+		this.render(new MatrixStack(), this.isServer ? "Server" : "Client" + "Player(" + this.player.getEntityId() + ")");
 	}
 	
 	public void updateData() {

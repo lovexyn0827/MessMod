@@ -12,8 +12,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.deobfuscating.DummyMapping;
+import lovexyn0827.mess.deobfuscating.Mapping;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
@@ -34,11 +35,17 @@ public class EntityFieldCommand {
 						executes((ct)->{
 							try {
 								Entity entity = EntityArgumentType.getEntity(ct, "target");
-								Object ob = getField(entity.getClass(),StringArgumentType.getString(ct, "fieldName")).get(entity);
-								CommandUtil.feedback(ct, ob);
+								Field field =getField(entity.getClass(),StringArgumentType.getString(ct, "fieldName"));
+								if(field != null) {
+									CommandUtil.feedback(ct, field == null ? "[NULL]" : field.get(entity));
+								} else {
+									CommandUtil.error(ct, "Specified field coundn't be found!");
+								}
 							} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
-								CommandUtil.error(ct, "Unexpected exception in getting the field:"+e);
+								CommandUtil.error(ct, "Unexpected exception in getting the field:" + e);
 								return -1;
+							} catch (NoSuchFieldError e) {
+								CommandUtil.error(ct, "No such field in the class of the entity");
 							}
 							
 							return 0;
@@ -55,10 +62,9 @@ public class EntityFieldCommand {
 										CommandUtil.feedback(ct, "Field was modified successfully");
 										return 1;
 									} catch (Exception e) {
-										CommandUtil.error(ct, "Failed to modify the field:"+e);
+										CommandUtil.error(ct, "Failed to modify the field:" + e);
 										return -1;
 									}
-									
 								})));
 		
 		ArgumentBuilder<ServerCommandSource, ?> listAll = literal("listAvailableFields").
@@ -97,23 +103,23 @@ public class EntityFieldCommand {
 		Class<?> type = field.getType();
 		if(type == Integer.TYPE) {
 			field.set(entity, Integer.parseInt(newValue));
-		}else if(type == Float.TYPE) {
+		} else if (type == Float.TYPE) {
 			field.set(entity, Float.parseFloat(newValue));
-		}else if(type == Double.TYPE) {
+		} else if (type == Double.TYPE) {
 			field.set(entity, Double.parseDouble(newValue));
-		}else if(type == String.class) {
+		} else if (type == String.class) {
 			field.set(entity, newValue);
-		}else if(type == Vec3d.class) {
+		} else if (type == Vec3d.class) {
 			String[] subVals = newValue.split(",");
 			if(subVals.length!=3) throw new IllegalArgumentException("Too many or too few components given!");
 			Vec3d vec3d = new Vec3d(Double.parseDouble(subVals[0]),
 					Double.parseDouble(subVals[1]),
 					Double.parseDouble(subVals[2]));
 			field.set(entity, vec3d);
-		}else if(type == Boolean.TYPE){
+		} else if (type == Boolean.TYPE){
 			if((!newValue.equals("true")) && (!newValue.equals("false"))) throw new IllegalArgumentException("Use true or false");
 			field.set(entity, Boolean.parseBoolean(newValue));
-		}else{
+		} else {
 			throw new IllegalArgumentException("Unsupported field given!");
 		}
 		
@@ -123,9 +129,14 @@ public class EntityFieldCommand {
 	private static Set<String> getAvailableFields(Entity entity) {
 		Class<?> entityClass = entity.getClass();
 		Set<String> fieldSet = new TreeSet<>();
+		Mapping mapping = MessMod.INSTANCE.getMapping();
 		while(entityClass != Object.class) {
 			for(Field field : entityClass.getDeclaredFields()) {
-				fieldSet.add(getNamedField(field.getName()) + '(' + field.getName() + ')');
+				if(!(mapping instanceof DummyMapping)) {
+					fieldSet.add(getNamedField(field.getName()));
+				} else {
+					fieldSet.add(field.getName());
+				}
 			}
 			
 			entityClass = entityClass.getSuperclass();
@@ -135,6 +146,11 @@ public class EntityFieldCommand {
 	}
 
 	private static Field getField(Class<?> targetClass, String fieldName) {
+		Mapping mapping = MessMod.INSTANCE.getMapping();
+		if(!(mapping instanceof DummyMapping)) {
+			fieldName = mapping.srgFieldRecursively(targetClass, fieldName);
+		}
+		
 		while(true) {
 			try {
 				Field field = targetClass.getDeclaredField(fieldName);

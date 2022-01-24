@@ -7,19 +7,33 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import net.fabricmc.mapping.reader.v2.MappingGetter;
 import net.fabricmc.mapping.reader.v2.TinyMetadata;
 import net.fabricmc.mapping.reader.v2.TinyV2Factory;
 import net.fabricmc.mapping.reader.v2.TinyVisitor;
 
 public class TinyMapping implements Mapping {
-	private final Map<String, String> classes;
+	/**
+	 * Srg <=> Named 
+	 */
+	private final BiMap<String, String> classes;
+	/**
+	 * Srg or named class => BiMap of members => (Srg <=> Named)
+	 */
+	private final Map<String, BiMap<String, String>> fieldsByClass;
+	/**
+	 * Srg => Named
+	 */
 	private final Map<String, String> fields;
 	//private final Map<String, String> methods;
 	
 	public TinyMapping(File mappingFile) {
-		this.classes = new HashMap<>();
+		this.classes = HashBiMap.create();
 		this.fields = new HashMap<>();
+		fieldsByClass = new HashMap<>();
 		//this.methods = HashMap.create(32768);
 		try(BufferedReader br = new BufferedReader(new FileReader(mappingFile))) {
 			TinyV2Factory.visit(br, new Reader());
@@ -38,6 +52,16 @@ public class TinyMapping implements Mapping {
 		return this.fields.containsKey(srg) ? this.fields.get(srg) : srg;
 	}
 	
+	@Override
+	public String srgClass(String named) {
+		return this.classes.inverse().get(named);
+	}
+
+	@Override
+	public String srgField(String clazz, String named) {
+		return this.fieldsByClass.get(clazz).inverse().get(named);
+	}
+	
 	/*@Override
 	public String namedMethod(String srg) {
 		return this.methods.containsKey(srg) ? this.methods.get(srg) : srg;
@@ -46,6 +70,7 @@ public class TinyMapping implements Mapping {
 	private class Reader implements TinyVisitor {
 		private int namedIndex;
 		private int srgIndex;
+		private String currentClassSrg;
 		
 		@Override
 		public void start(TinyMetadata metadata) {
@@ -56,13 +81,20 @@ public class TinyMapping implements Mapping {
 		@Override
 		public void pushClass(MappingGetter name) {
 			String[] names = name.getAllNames();
-			TinyMapping.this.classes.put(names[this.srgIndex].replace('/', '.'), names[this.namedIndex].replace('/', '.'));
+			String srg = names[this.srgIndex].replace('/', '.');
+			String named = names[this.namedIndex].replace('/', '.');
+			TinyMapping.this.classes.put(srg, named);
+			this.currentClassSrg = srg;
+			TinyMapping.this.fieldsByClass.put(srg, HashBiMap.create());
+			TinyMapping.this.fieldsByClass.put(named, HashBiMap.create());
 		}
 		
 		@Override
 		public void pushField(MappingGetter name, String descriptor) {
 			String[] names = name.getAllNames();
+			BiMap<String, String> map = TinyMapping.this.fieldsByClass.get(this.currentClassSrg);
 			TinyMapping.this.fields.put(names[this.srgIndex], names[this.namedIndex]);
+			map.put(names[this.srgIndex], names[this.namedIndex]);
 		}
 		
 		/*@Override

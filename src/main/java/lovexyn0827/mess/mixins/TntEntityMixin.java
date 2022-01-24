@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 
 @Mixin(TntEntity.class)
 public abstract class TntEntityMixin extends Entity{
+	private static final ChunkTicketType<? super Entity> ENTITY_TICKET = ChunkTicketType.create("tnt*.j", (a, b) -> 1, 3);
 	private TntEntityMixin(EntityType<?> type, World world) {
 		super(type, world);
 	}
@@ -29,8 +30,8 @@ public abstract class TntEntityMixin extends Entity{
 			if(MessMod.INSTANCE.getBooleanOption("tntChunkLoading")) {
 				ServerWorld world = (ServerWorld)this.world;
 				Vec3d nextPos = this.getPos();
-				world.getChunkManager().addTicket(ChunkTicketType.create("entity", (a, b) -> 1, 3),
-						new ChunkPos((int)(nextPos.x / 16), (int)(nextPos.z / 16)), 3, this);
+				world.getServer().submitAndJoin(() -> world.getChunkManager().addTicket(ENTITY_TICKET,
+						new ChunkPos((int)(nextPos.x / 16), (int)(nextPos.z / 16)), 3, this));
 			}
 		}
 	}

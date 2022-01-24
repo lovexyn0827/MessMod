@@ -13,6 +13,7 @@ import com.mojang.brigadier.CommandDispatcher;
 
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
+import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
@@ -45,7 +46,8 @@ public abstract class CommandMixin {
         EntityConfigCommand.register(this.dispatcher);
         MoveEntityCommand.register(this.dispatcher);
         RaycastCommand.register(this.dispatcher);
-        RepeatCommand.register(dispatcher);
+        RepeatCommand.register(this.dispatcher);
+        EntityLogCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", at = @At(

@@ -35,6 +35,10 @@ public class Options extends Properties{
 			this.defaults.put("projectileChunkLoading", "false");
 			this.defaults.put("maxClientTicksPerFrame", "10");
 			this.defaults.put("debugStickSkipsInvaildState", "false");	//Sometimes, this option doesn't work well.
+			this.defaults.put("disableProjectileRandomness", "false");
+			this.defaults.put("endEyeTeleport", "false");
+			this.defaults.put("maxEndEyeTpRadius", "180.0");
+			this.defaults.put("creativeUpwardsSpeed", "0.05");
 			//this.defaults.put("railNoAutoConnection", "false");
 			this.load();
 		}else {

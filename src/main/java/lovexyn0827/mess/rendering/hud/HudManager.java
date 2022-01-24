@@ -23,10 +23,11 @@ public class HudManager {
 	public void render(ClientPlayerEntity player, IntegratedServer server) {
 		this.hudHeight = 0;
 		if(this.lookingHud.shouldRender) this.lookingHud.render();
-		if(player!=null&&this.playerHudC.shouldRender) {
+		if(player != null&&this.playerHudC.shouldRender) {
 			this.playerHudC.render();
 		}
-		if(player!=null && this.playerHudS != null && this.playerHudS.shouldRender) {
+		
+		if(player != null && this.playerHudS != null && this.playerHudS.shouldRender) {
 			this.playerHudS.render();
 		}
 	}

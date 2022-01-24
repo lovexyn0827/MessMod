@@ -82,11 +82,16 @@ public class PoiCommand {
 															BlockPosArgumentType.getLoadedBlockPos(ct, "center"), 
 															IntegerArgumentType.getInteger(ct, "radius"), 
 															PointOfInterestStorage.OccupationStatus.ANY);
+
+													if(poiStream.count() == 0) {
+														CommandUtil.feedback(ct, "Not Found");
+														return 0;
+													}
+													
 													poiStream.forEach((poi)->{
 														BlockPos pos = poi.getPos();
 														CommandUtil.feedback(ct, "Found at:"+pos.getX()+","+pos.getY()+","+pos.getZ());
 													});
-													if(poiStream.count()==0) CommandUtil.feedback(ct, "Not Found");;
 													return 1;
 												}))))).
 				then(literal("getDistanceToNearestOccupied").
