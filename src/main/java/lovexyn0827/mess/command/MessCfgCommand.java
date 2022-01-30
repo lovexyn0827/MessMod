@@ -66,7 +66,7 @@ public class MessCfgCommand {
 						then(argument("bool",BoolArgumentType.bool()).
 								executes((ct) -> {
 									MessMod.INSTANCE.setOption("entityExplosionRaysVisiblity", 
-											String.valueOf(BoolArgumentType.getBool(ct, "boolean")));
+											String.valueOf(BoolArgumentType.getBool(ct, "bool")));
 									return 1;
 									
 								})).
@@ -81,7 +81,7 @@ public class MessCfgCommand {
 				then(literal("serverSyncedBox").
 						then(argument("bool",BoolArgumentType.bool()).
 								executes((ct) -> {
-									boolean bool = BoolArgumentType.getBool(ct, "boolean");
+									boolean bool = BoolArgumentType.getBool(ct, "bool");
 									MessMod.INSTANCE.setOption("serverSyncedBox", 
 										String.valueOf(bool));
 									return 1;
