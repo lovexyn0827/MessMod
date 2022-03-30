@@ -44,15 +44,17 @@ public class EntityHud {
 		RenderSystem.matrixMode(5888);
 		RenderSystem.loadIdentity();
 		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
+		float size = this.hudManager.getTextSize();
+		RenderSystem.scalef(size, size, size);
 		TextRenderer tr = client.textRenderer;
 		tr.drawWithShadow(ms,describe,x,y, -1);
 		y += 10;
 		Iterator<Entry<EntityHudInfoType, Object>> iterator = this.getData().entrySet().iterator();
 		while(iterator.hasNext()) {
 			Entry<EntityHudInfoType, Object> item = iterator.next();
-			if(item.getKey()==EntityHudInfoType.NAME||item.getKey()==EntityHudInfoType.ID) continue;
+			if(item.getKey() == EntityHudInfoType.NAME || item.getKey() == EntityHudInfoType.ID) continue;
 			tr.drawWithShadow(ms, entryToLine(item), x, y, 0x31f38b);
-			y+=10;
+			y += 10;
 		}
 		this.updateAlign();
 		this.hudManager.hudHeight += y-this.yStart;
@@ -115,9 +117,10 @@ public class EntityHud {
 	private void updateAlign() {
 		HudManager.AlignMode mode = this.hudManager.hudAlign;
 		this.lastLineWidth = this.getMaxLineLength();
-		this.xStart = mode.name().contains("LEFT")?0:MinecraftClient.getInstance().getWindow().getWidth() - this.lastLineWidth;
+		float size = this.hudManager.getTextSize();
+		this.xStart = mode.name().contains("LEFT") ? 0 : (int) (MinecraftClient.getInstance().getWindow().getWidth() / size - this.lastLineWidth);
 		int offset = this.hudManager.hudHeight;
-		this.yStart = mode.name().contains("TOP")?offset:MinecraftClient.getInstance().getWindow().getHeight()- this.getData().size() * 10 - offset;
+		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight()- this.getData().size() * 10 - offset;
 	}
 	
 	@SuppressWarnings("resource")

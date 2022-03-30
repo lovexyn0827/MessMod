@@ -193,6 +193,14 @@ public class MessCfgCommand {
 								executes((ct) -> {
 									MessMod.INSTANCE.setOption("creativeUpwardsSpeed", String.valueOf(FloatArgumentType.getFloat(ct, "speed")));
 									return 1;
+								}))).
+				then(literal("hudtextSize").
+						then(argument("size", FloatArgumentType.floatArg()).suggests(CommandUtil.immutableSuggestions("1.0", "1.5", "1.8", "2.0")).
+								executes((ct) -> {
+									String size = String.valueOf(FloatArgumentType.getFloat(ct, "size"));
+									MessMod.INSTANCE.setOption("hudtextSize", size);
+									MessMod.INSTANCE.hudManager.setTextSize(Float.parseFloat(size));
+									return 1;
 								})));
 				/*.
 				then(literal("railNoAutoConnection").

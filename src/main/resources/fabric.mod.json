@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "just_a_mess",
-  "version": "1.16.4-20220130",
+  "version": "1.16.4-20220330",
 
   "name": "Just A Mess",
   "description": "A Minecraft mod that provides some extra ability to manipulation a world and some enachantments (not something can be applied to items).",

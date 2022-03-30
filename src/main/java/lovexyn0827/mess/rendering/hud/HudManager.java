@@ -11,6 +11,7 @@ public class HudManager {
 	public AlignMode hudAlign = AlignMode.TOP_RIGHT;
 	public int hudHeight;
 	public PlayerHud playerHudS;
+	private float textSize = Float.parseFloat(MessMod.INSTANCE.getOption("hudtextSize"));
 	
 	@SuppressWarnings("resource")
 	public HudManager() {
@@ -22,8 +23,11 @@ public class HudManager {
 	
 	public void render(ClientPlayerEntity player, IntegratedServer server) {
 		this.hudHeight = 0;
-		if(this.lookingHud.shouldRender) this.lookingHud.render();
-		if(player != null&&this.playerHudC.shouldRender) {
+		if(this.lookingHud.shouldRender) {
+			this.lookingHud.render();
+		}
+		
+		if(player != null && this.playerHudC.shouldRender) {
 			this.playerHudC.render();
 		}
 		
@@ -32,6 +36,14 @@ public class HudManager {
 		}
 	}
 	
+	public float getTextSize() {
+		return textSize;
+	}
+
+	public void setTextSize(float textSize) {
+		this.textSize = textSize;
+	}
+
 	public enum AlignMode {
 		TOP_LEFT,
 		TOP_RIGHT,

@@ -40,6 +40,7 @@ public class Options extends Properties{
 			this.defaults.put("maxEndEyeTpRadius", "180.0");
 			this.defaults.put("creativeUpwardsSpeed", "0.05");
 			//this.defaults.put("railNoAutoConnection", "false");
+			this.defaults.put("hudtextSize", "1.0F");
 			this.load();
 		}else {
 			this.defaults = null;
