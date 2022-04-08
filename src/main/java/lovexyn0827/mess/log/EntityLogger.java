@@ -6,11 +6,8 @@ import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.HashSet;
-<<<<<<< HEAD
-import java.util.Iterator;
-=======
->>>>>>> 270a099e260804279e84cc02c1707dce062c7d70
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
