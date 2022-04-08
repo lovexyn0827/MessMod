@@ -30,7 +30,7 @@ public class PoiCommand {
 			}
 			return builder.buildFuture();
 		};
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("poi").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("poi").requires(CommandUtil.COMMAND_REQUMENT).
 				then(literal("set").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								then(argument("type",StringArgumentType.word()).suggests(sp).

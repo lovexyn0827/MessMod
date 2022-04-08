@@ -16,29 +16,29 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class ExplodeCommand {
 
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("explode").requires((source)->source.hasPermissionLevel(1)).
-				then(argument("pos",Vec3ArgumentType.vec3()).
-						then(argument("power",ExtendedFloatArgumentType.floatArg()).
-								executes((ct)->{
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("explode").requires(CommandUtil.COMMAND_REQUMENT).
+				then(argument("pos", Vec3ArgumentType.vec3()).
+						then(argument("power", ExtendedFloatArgumentType.floatArg()).
+								executes((ct) -> {
 										ServerWorld world = ct.getSource().getWorld();
-										Vec3d pos = Vec3ArgumentType.getVec3(ct,"pos");
-										createExplosion(world,pos,ExtendedFloatArgumentType.getFloat(ct,"power"),false);
+										Vec3d pos = Vec3ArgumentType.getVec3(ct, "pos");
+										createExplosion(world,pos,ExtendedFloatArgumentType.getFloat(ct, "power"), false);
 										return 1;
 								}).
 								then(argument("fire",BoolArgumentType.bool()).
 										executes((ct)->{
 											ServerWorld world = ct.getSource().getWorld();
-											Vec3d pos = Vec3ArgumentType.getVec3(ct,"pos");
-											createExplosion(world,pos,
-													ExtendedFloatArgumentType.getFloat(ct,"power"),
+											Vec3d pos = Vec3ArgumentType.getVec3(ct, "pos");
+											createExplosion(world, pos, 
+													ExtendedFloatArgumentType.getFloat(ct, "power"),
 													BoolArgumentType.getBool(ct, "fire"));
 											return 1;
 										}))));
 		dispatcher.register(command);
 	}
 	
-	private static void createExplosion(ServerWorld world,Vec3d pos,float power,boolean fire) {
-		world.createExplosion(null, pos.x,pos.y,pos.z,power, fire,DestructionType.DESTROY);
+	private static void createExplosion(ServerWorld world, Vec3d pos, float power, boolean fire) {
+		world.createExplosion(null, pos.x, pos.y, pos.z, power, fire, DestructionType.DESTROY);
 	}
 
 }

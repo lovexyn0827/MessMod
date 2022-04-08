@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "just_a_mess",
-  "version": "1.16.4-20220330",
+  "id": "messmod",
+  "version": "1.16.4-20220408",
 
-  "name": "Just A Mess",
-  "description": "A Minecraft mod that provides some extra ability to manipulation a world and some enachantments (not something can be applied to items).",
+  "name": "MessMod",
+  "description": "A Minecraft mod that provides some extra ability to manipulation a world and some enachantments.",
   "authors": [
     "lovexyn0827"
   ],
   "contact": {
-    "homepage": "http://github.com/lovexyn0827"
+    "homepage": "https://github.com/lovexyn0827/Minecraft-World-Manipulation-Enchantment-Mod"
   },
 
   "environment": "*",
@@ -19,7 +19,7 @@
     ]
   },
   "mixins": [
-    "just_a_mess.mixins.json"
+    "messmod.mixins.json"
   ],
 
   "depends": {

@@ -2,6 +2,7 @@ package lovexyn0827.mess.deobfuscating;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import net.fabricmc.mapping.reader.v2.TinyMetadata;
 import net.fabricmc.mapping.reader.v2.TinyV2Factory;
 import net.fabricmc.mapping.reader.v2.TinyVisitor;
 
-public class TinyMapping implements Mapping {
+class TinyMapping implements Mapping {
 	/**
 	 * Srg <=> Named 
 	 */
@@ -30,18 +31,22 @@ public class TinyMapping implements Mapping {
 	private final Map<String, String> fields;
 	//private final Map<String, String> methods;
 	
-	public TinyMapping(File mappingFile) {
+	public TinyMapping(File mappingFile) throws FileNotFoundException {
+		this(new BufferedReader(new FileReader(mappingFile)));
+	}
+
+	public TinyMapping(BufferedReader r) {
 		this.classes = HashBiMap.create();
 		this.fields = new HashMap<>();
 		fieldsByClass = new HashMap<>();
 		//this.methods = HashMap.create(32768);
-		try(BufferedReader br = new BufferedReader(new FileReader(mappingFile))) {
+		try(BufferedReader br = r) {
 			TinyV2Factory.visit(br, new Reader());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public String namedClass(String srg) {
 		return this.classes.containsKey(srg) ? this.classes.get(srg) : srg;

@@ -17,21 +17,21 @@ import net.minecraft.client.MinecraftClient;
 public abstract class KeyboardMixin {
 	@Shadow @Final MinecraftClient client;
 	
-	@Inject(method = "processF3",at = @At(value = "HEAD"))
-	public void onF3Pressed(int key,CallbackInfoReturnable<?> ci) {
-		if(key==69) {
+	@Inject(method = "processF3", at = @At(value = "HEAD"))
+	private void onF3Pressed(int key, CallbackInfoReturnable<?> ci) {
+		if(key == 'E') {
 			LookingAtEntityHud lookingHud = MessMod.INSTANCE.hudManager.lookingHud;
-			if(lookingHud!=null) lookingHud.toggleRender();;
-			this.client.player.sendChatMessage("Looking At Entity HUD:"+(lookingHud.shouldRender?"On":"Off"));
-		}else if(key==77) {
+			if(lookingHud != null) lookingHud.toggleRender();;
+			this.client.player.sendChatMessage("Looking At Entity HUD: " + (lookingHud.shouldRender ? "On" : "Off"));
+		}else if(key == 'M') {
 			PlayerHud playerHud = MessMod.INSTANCE.hudManager.playerHudC;
 			if(playerHud!=null) playerHud.toggleRender();
-			this.client.player.sendChatMessage("Client Player Information HUD:"+(playerHud.shouldRender?"On":"Off"));
+			this.client.player.sendChatMessage("Client Player Information HUD: " + (playerHud.shouldRender ? "On" : "Off"));
 		} else if(key == 'S') {
 			PlayerHud playerHud = MessMod.INSTANCE.hudManager.playerHudS;
-			if(playerHud ==null ) return;
+			if(playerHud == null ) return;
 			playerHud.toggleRender();
-			this.client.player.sendChatMessage("Server Player Information HUD:"+(playerHud.shouldRender?"On":"Off"));
+			this.client.player.sendChatMessage("Server Player Information HUD: " + (playerHud.shouldRender ? "On" : "Off"));
 		}
 	}
 }

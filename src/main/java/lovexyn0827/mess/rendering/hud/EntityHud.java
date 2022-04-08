@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import lovexyn0827.mess.mixins.BoatEntityAccessor;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.data.EntityHudInfoType;
 
 import java.util.TreeMap;
@@ -44,7 +45,7 @@ public class EntityHud {
 		RenderSystem.matrixMode(5888);
 		RenderSystem.loadIdentity();
 		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
-		float size = this.hudManager.getTextSize();
+		float size = OptionManager.hudTextSize;
 		RenderSystem.scalef(size, size, size);
 		TextRenderer tr = client.textRenderer;
 		tr.drawWithShadow(ms,describe,x,y, -1);
@@ -68,9 +69,9 @@ public class EntityHud {
 	public synchronized void updateData(Entity entity) {
 		
 	this.getData().clear();
-		if(entity==null) return;
+		if(entity == null) return;
 	this.getData().put(EntityHudInfoType.ID, entity.getEntityId());
-		String name = entity.hasCustomName()?entity.getCustomName().asString():entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
+		String name = entity.hasCustomName() ? entity.getCustomName().asString() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
 	this.getData().put(EntityHudInfoType.NAME, name);
 	this.getData().put(EntityHudInfoType.AGE, entity.age);
 		Vec3d pos = entity.getPos();
@@ -115,9 +116,9 @@ public class EntityHud {
 	}
 	
 	private void updateAlign() {
-		HudManager.AlignMode mode = this.hudManager.hudAlign;
+		AlignMode mode = OptionManager.hudAlignMode;
 		this.lastLineWidth = this.getMaxLineLength();
-		float size = this.hudManager.getTextSize();
+		float size = OptionManager.hudTextSize;
 		this.xStart = mode.name().contains("LEFT") ? 0 : (int) (MinecraftClient.getInstance().getWindow().getWidth() / size - this.lastLineWidth);
 		int offset = this.hudManager.hudHeight;
 		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight()- this.getData().size() * 10 - offset;

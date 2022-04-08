@@ -13,7 +13,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.deobfuscating.DummyMapping;
 import lovexyn0827.mess.deobfuscating.Mapping;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -21,10 +20,9 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.Vec3d;
 
 public class EntityFieldCommand {
-
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		SuggestionProvider<ServerCommandSource> suggests = (ct,builder)->{
-			for(String fieldName : getAvailableFields(EntityArgumentType.getEntity(ct, "target"))) {
+			for(String fieldName : getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass())) {
 				builder = builder.suggest(fieldName);
 			}
 			return builder.buildFuture();
@@ -71,7 +69,7 @@ public class EntityFieldCommand {
 				executes((ct)->{
 					Set<String> fieldSet;
 					try {
-						fieldSet = getAvailableFields(EntityArgumentType.getEntity(ct, "target"));
+						fieldSet = getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass());
 						String list = String.join("  ", fieldSet);
 						CommandUtil.feedback(ct, list);
 					} catch (Exception e) {
@@ -81,7 +79,7 @@ public class EntityFieldCommand {
 					return 0;
 				});
 		
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityfield").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityfield").requires(CommandUtil.COMMAND_REQUMENT).
 				then(argument("target",EntityArgumentType.entity()).then(get).then(modify).then(listAll));
 		dispatcher.register(command);
 	}
@@ -126,13 +124,12 @@ public class EntityFieldCommand {
 		return true;
 	}
 
-	private static Set<String> getAvailableFields(Entity entity) {
-		Class<?> entityClass = entity.getClass();
+	public static Set<String> getAvailableFields(Class<?> entityClass) {
 		Set<String> fieldSet = new TreeSet<>();
 		Mapping mapping = MessMod.INSTANCE.getMapping();
 		while(entityClass != Object.class) {
 			for(Field field : entityClass.getDeclaredFields()) {
-				if(!(mapping instanceof DummyMapping)) {
+				if(!mapping.isDummy()) {
 					fieldSet.add(getNamedField(field.getName()));
 				} else {
 					fieldSet.add(field.getName());
@@ -147,7 +144,7 @@ public class EntityFieldCommand {
 
 	private static Field getField(Class<?> targetClass, String fieldName) {
 		Mapping mapping = MessMod.INSTANCE.getMapping();
-		if(!(mapping instanceof DummyMapping)) {
+		if(!mapping.isDummy()) {
 			fieldName = mapping.srgFieldRecursively(targetClass, fieldName);
 		}
 		

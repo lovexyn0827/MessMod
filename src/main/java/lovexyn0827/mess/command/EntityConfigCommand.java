@@ -36,7 +36,7 @@ public class EntityConfigCommand {
 					noStepHeightEntities.removeAll(getEntities(ct));
 					return 1;
 				});	
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityconfig").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityconfig").requires(CommandUtil.COMMAND_REQUMENT).
 				then(argument("targets",EntityArgumentType.entities()).then(dsh).then(esh)).
 				then(literal("localPlayer").
 						then(literal("disableStepHeight").

@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnderEyeItem;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -23,14 +23,14 @@ public class EndEyeItemMixin {
 	@Inject(method = "use",
 			at = @At("HEAD")
 			)
-	public void loadChunkIfNeeded(World world, PlayerEntity player, Hand h, CallbackInfoReturnable<TypedActionResult<?>> ci) {
-		if(MessMod.INSTANCE.getBooleanOption("endEyeTeleport")) {
+	private void teleportIfNeeded(World world, PlayerEntity player, Hand h, CallbackInfoReturnable<TypedActionResult<?>> ci) {
+		if(OptionManager.endEyeTeleport) {
 			if(player instanceof ServerPlayerEntity && player.abilities.allowFlying) {
 				ServerPlayerEntity sp = (ServerPlayerEntity)player;
 				Vec3d start = sp.getPos().add(0, sp.getStandingEyeHeight(), 0);
 				float r = 180;
 				try {
-					float f = Float.parseFloat(MessMod.INSTANCE.getOption("maxEndEyeTpRadius"));
+					float f = OptionManager.maxEndEyeTpRadius;
 					if(f >= 0) {
 						r = f;
 					}

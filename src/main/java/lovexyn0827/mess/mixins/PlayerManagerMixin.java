@@ -13,7 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
 	@Inject(method = "onPlayerConnect", at = @At(value = "RETURN"))
-	public void onServerPlayerSpawned(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+	private void onServerPlayerSpawned(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
 		MessMod.INSTANCE.onServerPlayerSpawned(player);
 	}
 }

@@ -1,6 +1,6 @@
 package lovexyn0827.mess.deobfuscating;
 
-public class DummyMapping implements Mapping {
+class DummyMapping implements Mapping {
 
 	@Override
 	public String namedClass(String srg) {
