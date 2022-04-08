@@ -14,9 +14,9 @@ import net.minecraft.server.MinecraftServer;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
-	@Inject(method = "tick",at = @At(value = "RETURN"))
-	public void onTicked(BooleanSupplier bs,CallbackInfo ci) {
-		MessMod.INSTANCE.onServerTicked((MinecraftServer)(Object)this);
+	@Inject(method = "tick", at = @At(value = "RETURN"))
+	public void onTicked(BooleanSupplier bs, CallbackInfo ci) {
+		MessMod.INSTANCE.onServerTicked((MinecraftServer)(Object) this);
 	}
 	
 	@Inject(method = "runServer",
@@ -25,12 +25,12 @@ public abstract class MinecraftServerMixin {
 					shift = At.Shift.AFTER
 			)
 	)
-	public void onServerStarted(CallbackInfo ci) {
+	private void onServerStarted(CallbackInfo ci) {
 		MessMod.INSTANCE.onServerStarted((MinecraftServer)(Object)this);
 	}
 	
 	@Inject(method = "shutdown",at = @At(value = "RETURN"))
-	public void onServerShutdown(CallbackInfo ci) {
+	private void onServerShutdown(CallbackInfo ci) {
 		MessMod.INSTANCE.onServerShutdown((MinecraftServer)(Object)this);
 	}
 }

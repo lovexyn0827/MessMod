@@ -25,7 +25,8 @@
     "TntEntityMixin",
     "ProjectileEntityMixin",
     "EndEyeItemMixin",
-    "ClientPlayerEntityMixin"
+    "ClientPlayerEntityMixin",
+    "AbstractRedstoneGateBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

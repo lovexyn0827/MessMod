@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.KillCommand;
@@ -16,7 +16,7 @@ public abstract class KillCommandMixin {
 			target = "Lnet/minecraft/entity/Entity;kill()V")
 	)
 	private static void removeEntity(Entity entity) {
-		if(MessMod.INSTANCE.getBooleanOption("mobFastKill") && entity instanceof MobEntity) {
+		if(OptionManager.mobFastKill && entity instanceof MobEntity) {
 			entity.remove();
 		} else {
 			entity.kill();

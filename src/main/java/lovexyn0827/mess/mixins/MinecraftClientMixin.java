@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
@@ -22,20 +23,20 @@ public abstract class MinecraftClientMixin {
 	
 	@Shadow abstract Window getWindow();
 	
-	@Inject(method = "render",at = @At(value = "CONSTANT",args = "stringValue=blit"))
-	public void onRender(boolean tick,CallbackInfo ci) {
-		MessMod.INSTANCE.onRender(this.player,this.server);
+	@Inject(method = "render", at = @At(value = "CONSTANT", args = "stringValue=blit"))
+	private void onRender(boolean tick,CallbackInfo ci) {
+		MessMod.INSTANCE.onRender(this.player, this.server);
 	}
 	
-	@Inject(method = "tick",at = @At(value = "RETURN"))
-	public void onTick(CallbackInfo ci) {
+	@Inject(method = "tick", at = @At(value = "RETURN"))
+	private void onTick(CallbackInfo ci) {
 		MessMod.INSTANCE.onClientTicked();
 	}
 
 	@Inject(
-			method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V",
+			method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", 
 			at = @At(value = "HEAD"))
-	public void onDisconnected(Screen screen,CallbackInfo ci) {
+	private void onDisconnected(Screen screen,CallbackInfo ci) {
 		MessMod.INSTANCE.onDisconnected();
 	}
 	
@@ -44,8 +45,8 @@ public abstract class MinecraftClientMixin {
 			at = @At(value = "INVOKE", 
 					target = "Ljava/lang/Math;min(II)I")
 			)
-	public int modifyMaxTickPerFrame(int i, int j) {
-		return Math.min(MessMod.INSTANCE.getBooleanOption("maxClientTicksPerFrame") ? 5 : 10, j);
+	private int modifyMaxTickPerFrame(int i, int j) {
+		return Math.min(OptionManager.maxClientTicksPerFrame, j);
 	}
 	
 }

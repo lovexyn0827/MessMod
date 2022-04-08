@@ -23,7 +23,7 @@ public class ModifyCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		//The command may be removed after mapping can be used in /entityfield.
 		//How about reserving the command as a simplified /entityfield?
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("modify").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("modify").requires(CommandUtil.COMMAND_REQUMENT).
 				then(argument("target",EntityArgumentType.entities()).
 						then(literal("x").
 								then(argument("val",DoubleArgumentType.doubleArg()).

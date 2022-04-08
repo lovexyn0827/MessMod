@@ -19,21 +19,21 @@ import net.minecraft.util.math.Vec3d;
 
 public class MoveEntityCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		SuggestionProvider<ServerCommandSource> typeSuggests = (ct,builder)->{
+		SuggestionProvider<ServerCommandSource> typeSuggests = (ct, builder)->{
 			builder.suggest("self").suggest("piston").suggest("player").suggest("shulker").suggest("shulkerBox");
 			return builder.buildFuture();
-		};;
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("moventity").requires((source)->source.hasPermissionLevel(1)).
-				then(argument("targets",EntityArgumentType.entities()).
-						then(argument("delta",Vec3ArgumentType.vec3(false)).
+		};
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("moventity").requires(CommandUtil.COMMAND_REQUMENT).
+				then(argument("targets", EntityArgumentType.entities()).
+						then(argument("delta", Vec3ArgumentType.vec3(false)).
 								then(literal("projectile").
-										executes((ct)->{
-											EntityArgumentType.getEntities(ct, "targets").forEach((entity)->{
+										executes((ct) -> {
+											EntityArgumentType.getEntities(ct, "targets").forEach((entity) -> {
 												try {
 													Vec3d pos = entity.getPos();
 													Vec3d delta = Vec3ArgumentType.getVec3(ct, "delta");
-													HitResult result = ProjectileUtil.getCollision(entity, (e)->true);
-													Vec3d hit = result==null?entity.getPos().add(delta):result.getPos();
+													HitResult result = ProjectileUtil.getCollision(entity, (e) -> true);
+													Vec3d hit = result == null ? entity.getPos().add(delta) : result.getPos();
 													entity.updatePosition(hit.x, hit.y, hit.z);
 													CommandUtil.feedback(ct, entity.getPos().subtract(pos));
 												} catch (CommandSyntaxException e) {
@@ -43,8 +43,8 @@ public class MoveEntityCommand {
 											return 1;
 										})).
 								then(literal("entity").
-										then(argument("type",StringArgumentType.string()).suggests(typeSuggests ).
-												executes((ct)->{
+										then(argument("type", StringArgumentType.string()).suggests(typeSuggests ).
+												executes((ct) -> {
 													MovementType type;
 													switch(StringArgumentType.getString(ct, "type")) {
 													case "self":
@@ -66,7 +66,8 @@ public class MoveEntityCommand {
 														type = null;
 														break;
 													}
-													EntityArgumentType.getEntities(ct, "targets").forEach((entity)->{
+													
+													EntityArgumentType.getEntities(ct, "targets").forEach((entity) -> {
 														try {
 															Vec3d pos = entity.getPos();
 															entity.move(type, Vec3ArgumentType.getVec3(ct, "delta"));

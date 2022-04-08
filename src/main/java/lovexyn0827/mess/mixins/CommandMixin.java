@@ -11,10 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.CommandDispatcher;
 
+import lovexyn0827.mess.command.EnsureCommand;
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
+import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
 import lovexyn0827.mess.command.MoveEntityCommand;
@@ -48,6 +50,8 @@ public abstract class CommandMixin {
         RaycastCommand.register(this.dispatcher);
         RepeatCommand.register(this.dispatcher);
         EntityLogCommand.register(this.dispatcher);
+        EnsureCommand.register(this.dispatcher);
+        LogMovementCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", at = @At(

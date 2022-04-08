@@ -16,7 +16,7 @@ public class SetExplosionBlockCommand {
 	private static BlockState fireState = Blocks.FIRE.getDefaultState();
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("setexplodeblock").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("setexplodeblock").requires(CommandUtil.COMMAND_REQUMENT).
 				then(argument("blockState",BlockStateArgumentType.blockState()).
 						then(argument("fireState",BlockStateArgumentType.blockState()).
 								executes((ct->{

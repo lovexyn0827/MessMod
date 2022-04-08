@@ -14,7 +14,7 @@ import net.minecraft.server.command.ServerCommandSource;
 
 public class RepeatCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("repeat")
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("repeat").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(argument("times", IntegerArgumentType.integer(0))
 						.then(argument("feedbacks", BoolArgumentType.bool())
 								.fork(dispatcher.getRoot(), (ct) -> {

@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DebugStickItem;
@@ -24,9 +24,9 @@ public abstract class DebugStickItemMixin {
 			at = @At(value = "INVOKE",
 					target = "Lnet/minecraft/item/DebugStickItem;cycle(Lnet/minecraft/block/BlockState;Lnet/minecraft/state/property/Property;Z)Lnet/minecraft/block/BlockState;")
 			)
-	public BlockState skipInvaildStatesIfNeeded(BlockState state, Property<?> property, boolean inverse,
+	private BlockState skipInvaildStatesIfNeeded(BlockState state, Property<?> property, boolean inverse,
 			PlayerEntity player, BlockState stateDuplicated, WorldAccess world, BlockPos pos, boolean update, ItemStack stack) {
-		if(MessMod.INSTANCE.getBooleanOption("debugStickSkipsInvaildState")) {
+		if(OptionManager.debugStickSkipsInvaildState) {
 			Object obj = state.get(property);
 			BlockState to;
 			while(!(to = cycle(state, property, inverse)).canPlaceAt(world, pos)) {

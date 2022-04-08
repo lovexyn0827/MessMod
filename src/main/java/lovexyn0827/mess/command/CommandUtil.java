@@ -1,11 +1,13 @@
 package lovexyn0827.mess.command;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
@@ -18,6 +20,8 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
 public class CommandUtil {
+	public static final Predicate<ServerCommandSource> COMMAND_REQUMENT = (s) -> 
+			!OptionManager.commandExecutionRequirment || s.hasPermissionLevel(1);
 	private static CommandOutput noreplyOutput;
 	private static ServerCommandSource noreplySource;
 	private static ServerCommandSource noreplyPlayerSource;

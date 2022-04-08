@@ -58,7 +58,7 @@ public class RngCommand {
 							CommandUtil.feedback(ct, getRandom(ct).nextGaussian());
 							return 1;
 						}));
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("rng").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("rng").requires(CommandUtil.COMMAND_REQUMENT).
 				then(literal("world").
 						then(branchSetSeed).
 						then(branchNext)).

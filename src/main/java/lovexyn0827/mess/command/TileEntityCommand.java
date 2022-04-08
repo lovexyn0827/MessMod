@@ -25,7 +25,7 @@ public class TileEntityCommand {
 			});
 			return builder.buildFuture();
 		};
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("tileentity").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("tileentity").requires(CommandUtil.COMMAND_REQUMENT).
 				then(literal("get").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								executes((ct)->{

@@ -7,6 +7,6 @@ import net.minecraft.block.entity.StructureBlockBlockEntity;
 @Mixin(StructureBlockBlockEntity.class)
 public abstract class StructureBlockBlockEntityMixin {
 	public double getSquaredRenderDistance() {
-		return 827.0D;
+		return 10E8D;
 	}
 }

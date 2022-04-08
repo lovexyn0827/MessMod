@@ -34,7 +34,7 @@ import net.minecraft.world.World;
 
 public class RaycastCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("raycast").requires((source)->source.hasPermissionLevel(1)).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("raycast").requires(CommandUtil.COMMAND_REQUMENT).
 				then(literal("blocks").
 						then(argument("from",Vec3ArgumentType.vec3()).
 								then(argument("to",Vec3ArgumentType.vec3()).
@@ -100,7 +100,7 @@ public class RaycastCommand {
 				ct.getSource().getEntity());
 		BlockHitResult result = world.raycast(rct);
 		BlockView.raycast(rct, (c, p) -> {
-			CommandUtil.feedback(ct, "Checked: " + p);
+			CommandUtil.feedback(ct, "Checked: " + '(' + p.getX() + ',' + p.getY() + ',' + p.getZ() + ')');
 			return null;
 		}, (c) -> null);
 		if(result != null && result.getType() != HitResult.Type.MISS) {
@@ -109,6 +109,7 @@ public class RaycastCommand {
 			CommandUtil.feedback(ct, 
 					"Pos:" + String.format("%f,%f,%f,", hit.x, hit.y, hit.z) + 
 					"\nBlockPos:" + '(' + p.getX() + ',' + p.getY() + ',' + p.getZ() + ')' + 
+					"\nBlockState:" + world.getBlockState(p) + 
 					"\nSide:" + result.getSide());
 		} else {
 			CommandUtil.feedback(ct, "Missed");

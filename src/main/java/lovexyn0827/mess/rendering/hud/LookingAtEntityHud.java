@@ -16,13 +16,13 @@ public class LookingAtEntityHud extends EntityHud {
 	}
 	
 	public void render() {
-		String entityInfo = "(Null)";
-		if(getData().get(EntityHudInfoType.ID)!=null) {
-			entityInfo = "("+getData().get(EntityHudInfoType.ID)+","+
-					getData().get(EntityHudInfoType.NAME)+","+
-					getData().get(EntityHudInfoType.AGE)+")";
+		String entityInfo = "[Null]";
+		if(getData().get(EntityHudInfoType.ID) != null) {
+			entityInfo = "("+getData().get(EntityHudInfoType.ID) + "," + 
+					getData().get(EntityHudInfoType.NAME) + "," + 
+					getData().get(EntityHudInfoType.AGE) + ")";
 		}
-		String describe =  "Target"+entityInfo;
+		String describe = "Target" + entityInfo;
 		if(this.shouldRender) this.render(new MatrixStack(), describe);
 	}
 	
@@ -36,13 +36,13 @@ public class LookingAtEntityHud extends EntityHud {
 		Vec3d max = pos.add(direction);
 		Entity target = null;
 		double minDistance = 18;
-		for(Entity entity:player.world.getEntitiesByClass((Class<? extends Entity>) Entity.class,
-				player.getBoundingBox().expand(direction.x,direction.y,direction.z), 
-				(e)->true)) {
-			if(entity.getUuid()==player.getUuid()) continue;
+		for(Entity entity:player.world.getEntitiesByClass((Class<? extends Entity>) Entity.class, 
+				player.getBoundingBox().expand(direction.x, direction.y, direction.z),  
+				(e) -> true)) {
+			if(entity.getUuid() == player.getUuid()) continue;
 			Optional<Vec3d> result = entity.getBoundingBox().raycast(pos, max);
 			if(result.isPresent()) {
-				if(result.get().subtract(pos).length()<minDistance) {
+				if(result.get().subtract(pos).length() < minDistance) {
 					target = entity;
 					max = result.get();
 					minDistance = result.get().subtract(pos).length();

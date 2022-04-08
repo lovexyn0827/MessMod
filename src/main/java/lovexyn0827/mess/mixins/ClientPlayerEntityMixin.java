@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerAbilities;
 
@@ -17,9 +17,9 @@ public abstract class ClientPlayerEntityMixin {
 			at = @At(value = "INVOKE", 
 					target = "Lnet/minecraft/entity/player/PlayerAbilities;getFlySpeed()F"
 			))
-	public float modifySpeed(PlayerAbilities abilities) {
+	private float modifySpeed(PlayerAbilities abilities) {
 		try {
-			speed = Float.parseFloat(MessMod.INSTANCE.getOption("creativeUpwardsSpeed"));
+			speed = OptionManager.creativeUpwardsSpeed;
 			if(Float.isFinite(speed) && speed > 0) {
 				return speed;
 			}

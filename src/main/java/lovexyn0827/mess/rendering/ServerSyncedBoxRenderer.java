@@ -1,6 +1,7 @@
 package lovexyn0827.mess.rendering;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -35,7 +36,7 @@ public class ServerSyncedBoxRenderer {
 	}
 	
 	public void tick() {
-		if(this.server==null || this.client.player==null || !MessMod.INSTANCE.getBooleanOption("serverSyncedBox")) return;
+		if(this.server==null || this.client.player==null || !OptionManager.serverSyncedBox) return;
 		this.server.getWorlds().forEach((world) -> this.updateBox(this.client.player.getPos(), world));
 	}
 

@@ -5,6 +5,7 @@ __on_player_uses_item(player,item,h)->(
 	);
 	if(item:0=='bone',
 		run('tick step '+item:1);
+		//print('Stepped '+item:1+' ticks');
 		return()
 	);
 	if(item:0=='netherite_ingot',

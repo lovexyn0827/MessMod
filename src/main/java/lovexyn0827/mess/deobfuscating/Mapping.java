@@ -2,6 +2,8 @@ package lovexyn0827.mess.deobfuscating;
 
 import java.lang.reflect.Field;
 
+import org.jetbrains.annotations.Nullable;
+
 // Methods are not supported yet
 public interface Mapping {
 	String namedClass(String srg);
@@ -35,6 +37,7 @@ public interface Mapping {
 	 * @param fieldName Use the srg name
 	 * @return A Field instance if the specified field exists in the given class or its super classes, null otherwise.
 	 */
+	@Nullable
 	default Field getFieldFromNamed(Class<?> targetClass, String fieldName) {
 		while(targetClass != Object.class) {
 			String srg = this.srgField(targetClass.getName(), fieldName);

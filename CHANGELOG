@@ -1,0 +1,157 @@
+1.16.4-20220408
+Added commands:
+	/ensure <pos>
+	/logmovement
+Added options:
+	commandExecutionRequirment
+	disableExplosionExposureCalculation
+	projectileChunkLoadingPermanence
+	projectileChunkLoadingRange
+	renderRedstoneGateInfo
+	tntChunkLoadingPermanence
+	tntChunkLoadingRange
+Renamed some options
+	setHudDisplay=>hudAlignMode
+	hudtextSize=>hudTextSize
+Better /messcfg
+	The description of each options
+	Colored output
+Better /entitylog
+	Made /entitylog listenField ... works properly
+	/entitylog saves logs to the entitylog folder in thr world folder
+	The type of logged entity is included in the name of the log file.
+	Pause /entitylog in frozen ticks (in other words, when the game is froze via /tick freeze).
+	/entitylog sub won't restart recording.
+	Health of mobs an players will be included in the log.
+	Corrected the number of entitits subscribed/unsubscribed via /entitylog.
+Automatic mapping loading
+	Automatic download the Yarn mapping from the Maven.
+	Load mapping from Carpet TIS Extension.
+Rewrote the option storage code
+Hit block state & better coordation output in /raycast
+Structure block visiblity
+Server-side player info HUD. (Toggle it with F3 + S)
+entityExplosionInfluence incompatiblity warning if the Lithium Mod is loaded.
+Separated mapping loader.
+Removed server_box.sc as it is no longer needed.
+Updated the document.
+
+Date:   Wed Mar 30 18:26:29 2022 +0800
+    1.16.4-20220330
+    Added the ability to resize the text in HUDs
+
+Date:   Sun Jan 30 23:48:38 2022 +0800
+    v20220130
+    Fixed a critial exception which leads to failure in / messcfg execution
+
+Date:   Mon Jan 24 22:15:08 2022 +0800
+    1.16.4-v20220124
+    Added Options:
+            disableProjectileRandomness
+            endEyeTeleport
+            maxEndEyeTpRadius
+            creativeUpwardsSpeed
+    Added Command:
+            /entitylog
+    Fixes & Changes:
+            Debfuscation is now available to be used in /entityfield
+            Projectile/TNT chunk loading can work correctly now
+
+Date:   Fri Aug 27 19:19:40 2021 +0800
+    1.16.x-20210827
+    1.Options:
+    tntChunkLoading //does not work so well
+    projectile //does not work so will
+    maxClientTicksPerFrame
+    debugStickSkipsInvaildState //does not work at all
+    2.Added a simple defuscator, to make /entityfield easier to use
+    3.Document Update
+
+Date:   Wed Aug 18 00:38:02 2021 +0800
+    1.16.x-20210818
+    More types of block shape can be used when the option renderBlockShape is true.
+            However, RAYCAST and SIDES shape may not be rendered correctly.
+    Added /raycast entities & /raycast blocks.
+    Feedbacks can be disabled in /repeat.
+    Structure blocks can be renderer correctly when the carpet rule structureBlockLimit is set to a large number.
+    Stacktrace will be printed when the Carpet Mod is not loaded.
+            If the Carpet Mod is loaded, enabling the superSecretSetting has the same effect.
+    Renamed the root package of the mod to lovexyn0827.mess, and renamed the mod to Just A Mess.
+    Updated README.
+
+Date:   Tue Aug 17 01:46:01 2021 +0800
+    1.16.x-20210817
+    Invaild numbers (NaN and Infinities) can be used as the power in /explode
+    The color of the entity influence determining rays will be correct.
+    Add the comment "Copied From The Fabric-Carpet" to some classes that are modified versions of classes in fabric-carpet.
+
+Date:   Sat Jul 31 07:35:01 2021 +0800
+    1.16.x-v20210731
+    /raycast
+    /repeat
+    Fluid & Block shape renderer
+
+Date:   Fri Jul 23 12:54:12 2021 +0800
+    0723
+
+Date:   Sat Feb 27 01:39:46 2021 +0800
+    1.16.x-20210227
+    /rng : supports nextGaussian() now.
+    Now entity RNG can be used correctly.
+    
+    Documents
+
+Date:   Fri Feb 26 11:26:21 2021 +0800
+    1.16.x-20210226
+    Added Commands:
+    /entityconfig
+    /moventity
+    /poi
+    /rng
+    /tileentity
+    Removed Commands:
+    /biome  It can be implemented using scarpet easier
+    /setpoi merged to /poi
+    Renders:
+    Explosion rays which determined how entity is affected
+    Better hitbox from the server
+    
+    The version of MCWMEMod requires the Carpet.
+
+Date:   Fri Feb 12 03:03:46 2021 +0800
+    1.16.x-20210212
+    Bug Fixing:
+    Local Player HUD doesn't update after a player dies.
+
+Date:   Tue Feb 9 07:03:39 2021 +0800
+    Added some commands:
+    /biome
+    /entityfield
+    /mcwmem
+    /setexplosionblock
+    /setpoi
+    
+    Enachant some commands:
+    /explode:Added optional argument <fire> to tell the game if the explosion causes fire.
+    
+    Other:
+    Refactored the HUDs,removing most static methods.
+    A option file.
+    Many new info lines.
+    MCWMEMod.INSTANCE.???() insteadof MCWMEMod.???().
+    Maybe more.
+
+Date:   Fri Feb 5 00:19:37 2021 +0800
+    1.16.x-20200205
+    Add:
+    Client player info HUD
+    Hiding HUDs
+	
+Date:   Thu Feb 4 19:19:39 2021 +0800
+    adding /modify
+
+Date:   Thu Feb 4 14:29:44 2021 +0800
+    20210204-1429
+
+Date:   Thu Feb 4 14:13:37 2021 +0800
+    Initial commit

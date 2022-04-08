@@ -13,9 +13,11 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 public class CsvWriter implements AutoCloseable, Flushable {
 	private Writer writer;
+	private int columnNumber;
 
 	private CsvWriter(Builder b, Writer writer) {
 		this.writer = writer;
+		this.columnNumber = b.headers.size();
 		try {
 			this.writer.write(toLine(b.headers.stream()));
 		} catch (IOException e) {
@@ -40,6 +42,10 @@ public class CsvWriter implements AutoCloseable, Flushable {
 	
 	public void println(Object... data) {
 		try {
+			if(data.length != this.columnNumber) {
+				throw new IllegalArgumentException("Expected " + this.columnNumber + " elements,  but got " + data.length);
+			}
+			
 			this.writer.write(toLine(Arrays.stream(data)));
 		} catch (IOException e) {
 			e.printStackTrace();
