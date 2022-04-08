@@ -28,7 +28,7 @@ public class EntityHolder {
 		this.entityId = entity.getEntityId();
 		String entityName = e.getName().asString();
 		String name = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) 
-				+ "-" + this.entityId + "-"
+				+ "@" + this.entityId + "-"
 				+ (entityName.length() == 0 ? entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "") : entityName) + ".csv";
 		File f = logger.getLogPath().resolve(name).toFile();
 		try {

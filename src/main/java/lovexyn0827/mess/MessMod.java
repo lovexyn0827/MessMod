@@ -180,6 +180,7 @@ public class MessMod implements ModInitializer {
 		this.server = null;
 		this.logger.closeAll();
 		this.hudManagerS = null;
+		this.logger.closeAll();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.logger.archiveLogs();

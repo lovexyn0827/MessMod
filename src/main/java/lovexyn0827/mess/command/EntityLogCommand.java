@@ -111,40 +111,52 @@ public class EntityLogCommand {
 				.then(literal("flush")
 						.executes((ct) -> {
 							MessMod.INSTANCE.getEntityLogger().flushAll();
-							CommandUtil.feedback(ct, "Flushed all changes");
+							CommandUtil.feedback(ct, "cmd.general.flush");
 							return Command.SINGLE_SUCCESS;
 						}))
 				.then(literal("autoSub")
 						.then(argument("entityType", StringArgumentType.word())
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.executes((ct) -> {
-									EntityType<?> type = Registry.ENTITY_TYPE
-											.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+									Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+									EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 									MessMod.INSTANCE.getEntityLogger().addAutoSubEntityType(type);
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.autosub", id);
 									return Command.SINGLE_SUCCESS;
 								})))
 				.then(literal("stopAutoSub")
 						.then(argument("entityType", StringArgumentType.word())
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.executes((ct) -> {
-									EntityType<?> type = Registry.ENTITY_TYPE
-											.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+									Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+									EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 									MessMod.INSTANCE.getEntityLogger().removeAutoSubEntityType(type);
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.stopautosub", id);
 									return Command.SINGLE_SUCCESS;
 								})))
 				.then(literal("autoSubName")
 						.then(argument("name", StringArgumentType.word())
 								.executes((ct) -> {
-									MessMod.INSTANCE.getEntityLogger().addAutoSubName(StringArgumentType.getString(ct, "name"));
+									String name = StringArgumentType.getString(ct, "name");
+									MessMod.INSTANCE.getEntityLogger().addAutoSubName(name);
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.autosubname", name);
 									return Command.SINGLE_SUCCESS;
 								})))
 				.then(literal("stopAutoSubName")
 						.then(argument("name", StringArgumentType.word())
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.executes((ct) -> {
-									MessMod.INSTANCE.getEntityLogger().removeAutoSubName(StringArgumentType.getString(ct, "name"));
+									String name = StringArgumentType.getString(ct, "name");
+									MessMod.INSTANCE.getEntityLogger().removeAutoSubName(name);
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.stopautosubname", name);
 									return Command.SINGLE_SUCCESS;
-								})));
+								})))
+				.then(literal("countLoggedEntities")
+						.executes((ct) -> {
+							CommandUtil.feedbackWithArgs(ct, "cmd.general.count", 
+									MessMod.INSTANCE.getEntityLogger().countLoggedEntities());
+							return Command.SINGLE_SUCCESS;
+						}));
 		dispatcher.register(command);
 	}
 

@@ -49,7 +49,6 @@ public final class EntityLogger {
 		if(!this.autoSubTypes.isEmpty()) {
 			server.getWorlds().forEach((world) -> {
 				this.subscribe(world.getEntitiesByType(null, (e) -> {
-					// FIXME Automatically subscribing entities with a specified name
 					return this.autoSubTypes.contains(e.getType()) || this.autoSubNames.contains(e.getName().asString());
 				}));
 			});
@@ -215,5 +214,9 @@ public final class EntityLogger {
 
 	public void removeAutoSubName(String name) {
 		this.autoSubNames.remove(name);
+	}
+	
+	public int countLoggedEntities() {
+		return this.entities.size();
 	}
 }
