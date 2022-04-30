@@ -1,4 +1,4 @@
-package lovexyn0827.mess.deobfuscating;
+package lovexyn0827.mess.util.deobfuscating;
 
 class DummyMapping implements Mapping {
 
@@ -21,8 +21,18 @@ class DummyMapping implements Mapping {
 		return named;
 	}
 
-	/*@Override
-	public String namedMethod(String srg) {
+	@Override
+	public boolean isClassMapped(Class<?> clazz) {
+		return false;
+	}
+
+	@Override
+	public String namedMethod(String srg, String desc) {
 		return srg;
-	}*/
+	}
+
+	@Override
+	public String srgMethod(String clazz, String named, String desc) {
+		return named;
+	}
 }

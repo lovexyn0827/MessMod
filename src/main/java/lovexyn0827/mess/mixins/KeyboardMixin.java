@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.LookingAtEntityHud;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
+import lovexyn0827.mess.util.i18n.I18N;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 
@@ -20,18 +21,18 @@ public abstract class KeyboardMixin {
 	@Inject(method = "processF3", at = @At(value = "HEAD"))
 	private void onF3Pressed(int key, CallbackInfoReturnable<?> ci) {
 		if(key == 'E') {
-			LookingAtEntityHud lookingHud = MessMod.INSTANCE.hudManager.lookingHud;
+			LookingAtEntityHud lookingHud = MessMod.INSTANCE.getHudManager().lookingHud;
 			if(lookingHud != null) lookingHud.toggleRender();;
-			this.client.player.sendChatMessage("Looking At Entity HUD: " + (lookingHud.shouldRender ? "On" : "Off"));
+			this.client.player.sendChatMessage(I18N.translate("hud.target") + (lookingHud.shouldRender ? "On" : "Off"));
 		}else if(key == 'M') {
-			PlayerHud playerHud = MessMod.INSTANCE.hudManager.playerHudC;
+			PlayerHud playerHud = MessMod.INSTANCE.getHudManager().playerHudC;
 			if(playerHud!=null) playerHud.toggleRender();
-			this.client.player.sendChatMessage("Client Player Information HUD: " + (playerHud.shouldRender ? "On" : "Off"));
+			this.client.player.sendChatMessage(I18N.translate("hud.client") + (playerHud.shouldRender ? "On" : "Off"));
 		} else if(key == 'S') {
-			PlayerHud playerHud = MessMod.INSTANCE.hudManager.playerHudS;
+			PlayerHud playerHud = MessMod.INSTANCE.getHudManager().playerHudS;
 			if(playerHud == null ) return;
 			playerHud.toggleRender();
-			this.client.player.sendChatMessage("Server Player Information HUD: " + (playerHud.shouldRender ? "On" : "Off"));
+			this.client.player.sendChatMessage(I18N.translate("hud.server") + (playerHud.shouldRender ? "On" : "Off"));
 		}
 	}
 }

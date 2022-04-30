@@ -1,10 +1,11 @@
 {
   "schemaVersion": 1,
   "id": "messmod",
-  "version": "1.16.4-20220408",
+  "version": "1.16.4-20220501",
 
   "name": "MessMod",
-  "description": "A Minecraft mod that provides some extra ability to manipulation a world and some enachantments.",
+  "description": "A minecraft mod that contains many features ranging from world manipulation and information providing to bug fixes and so on, allowing you to take more control of the game, see more information, and do some work easier.", 
+  "license": "CC-0",
   "authors": [
     "lovexyn0827"
   ],

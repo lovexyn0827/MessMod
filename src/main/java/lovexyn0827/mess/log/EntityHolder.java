@@ -3,16 +3,15 @@ package lovexyn0827.mess.log;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Stream;
-
 import com.google.common.collect.Lists;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.deobfuscating.Mapping;
+import lovexyn0827.mess.util.ListenedField;
+import lovexyn0827.mess.util.TranslatableException;
+import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
@@ -22,7 +21,7 @@ public class EntityHolder {
 	private final int entityId;;
 	private final CsvWriter writer;
 	private int age;
-	private List<Field> listenedField = Lists.newArrayList();
+	private List<ListenedField> listenedField = Lists.newArrayList();
 	
 	public EntityHolder(Entity e, EntityLogger logger) {
 		this.entity = e;
@@ -41,30 +40,17 @@ public class EntityHolder {
 			}
 			
 			Mapping map = MessMod.INSTANCE.getMapping();
-			logger.customFields.forEach((field) -> {
-				if(hasField(e.getClass(), field)) {
-					builder.addColumn(map.namedField(field.getName()));
+			logger.getListenedFields().values().forEach((field) -> {
+				if(field.canGetFrom(e)) {
+					builder.addColumn(map.namedField(field.getCustomName()));
 					this.listenedField.add(field);
 				}
 			});
 			
 			this.writer = builder.build(w);
 		} catch (IOException e1) {
-			throw new IllegalStateException("Unable to create new EntityHolder: ", e1);
+			throw new TranslatableException("exp.log.holder", e1);
 		}
-	}
-	
-	private static boolean hasField(Class<?> clazz, final Field field) {
-		while(clazz != Object.class) {
-				try {
-					if(Stream.of(clazz.getDeclaredFields()).anyMatch(field::equals)) {
-						return true;
-					}
-				} catch (SecurityException e) {}
-			clazz = clazz.getSuperclass();
-		}
-	
-		return false;
 	}
 
 	public void tick() {
@@ -76,14 +62,7 @@ public class EntityHolder {
 		}
 		
 		this.listenedField.forEach((f) -> {
-			try {
-				f.setAccessible(true);
-				obs.add(f.get(entity));
-			} catch (IllegalArgumentException | IllegalAccessException e1) {
-				MessMod.LOGGER.fatal("Failed to get the value of " + f.getName() + " from " + e);
-				e1.printStackTrace();
-				throw new RuntimeException("", e1);
-			}
+			obs.add(f.get(entity));
 		});
 		this.writer.println(obs.toArray());
 	}

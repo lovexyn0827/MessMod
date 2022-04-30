@@ -1,6 +1,9 @@
 package lovexyn0827.mess.rendering.hud;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,7 +11,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import lovexyn0827.mess.mixins.BoatEntityAccessor;
 import lovexyn0827.mess.options.OptionManager;
-import lovexyn0827.mess.rendering.hud.data.EntityHudInfoType;
+import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
+import lovexyn0827.mess.rendering.hud.data.HudInfo;
+import lovexyn0827.mess.util.ListenedField;
+import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.access.AccessingPath;
 
 import java.util.TreeMap;
 
@@ -22,20 +29,22 @@ import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.util.math.Vec3d;
 
-public class EntityHud {
+public abstract class EntityHud {
 	protected MinecraftClient client = MinecraftClient.getInstance();
-	private Map<EntityHudInfoType,Object> data = new TreeMap<>();
+	@Deprecated	// Never invoke directly
+	private Map<HudInfo,Object> data = new TreeMap<>();
 	public boolean shouldRender = false;
 	protected int xStart;
 	protected int yStart;
 	private HudManager hudManager;
 	private int lastLineWidth = 0;
+	private List<ListenedField> listenedFields = new ArrayList<>();
 	
 	public EntityHud(HudManager hudManager) {
 		this.hudManager = hudManager;
 	}
 	
-	public synchronized void render(MatrixStack ms, String describe) {
+	public synchronized void render(MatrixStack ms, String description) {
 		int y = this.yStart;
 		int x = this.xStart;
 		// i don't know how it works, but it runs correctly...
@@ -48,67 +57,68 @@ public class EntityHud {
 		float size = OptionManager.hudTextSize;
 		RenderSystem.scalef(size, size, size);
 		TextRenderer tr = client.textRenderer;
-		tr.drawWithShadow(ms,describe,x,y, -1);
+		tr.drawWithShadow(ms,description,x,y, -1);
 		y += 10;
-		Iterator<Entry<EntityHudInfoType, Object>> iterator = this.getData().entrySet().iterator();
-		while(iterator.hasNext()) {
-			Entry<EntityHudInfoType, Object> item = iterator.next();
-			if(item.getKey() == EntityHudInfoType.NAME || item.getKey() == EntityHudInfoType.ID) continue;
-			tr.drawWithShadow(ms, entryToLine(item), x, y, 0x31f38b);
+		Iterator<Entry<HudInfo, Object>> iterator = this.getData().entrySet().iterator();
+		while (iterator.hasNext()) {
+			Entry<HudInfo, Object> item = iterator.next();
+			if(item.getKey() == BuiltinHudInfo.NAME || item.getKey() == BuiltinHudInfo.ID) continue;
+			tr.drawWithShadow(ms, item.getKey().toLine(item.getValue()), x, y, 0x31f38b);
 			y += 10;
 		}
+		
 		this.updateAlign();
 		this.hudManager.hudHeight += y-this.yStart;
 	}
 	
-	protected static String entryToLine(Entry<EntityHudInfoType, Object> entry) {
-		EntityHudInfoType type = entry.getKey();
-		return type.header+type.type.getStringOf(entry.getValue());
-	}
-	
 	public synchronized void updateData(Entity entity) {
-		
-	this.getData().clear();
-		if(entity == null) return;
-	this.getData().put(EntityHudInfoType.ID, entity.getEntityId());
+		this.getData().clear();
+		if (entity == null) return;
+		this.getData().put(BuiltinHudInfo.ID, entity.getEntityId());
 		String name = entity.hasCustomName() ? entity.getCustomName().asString() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
-	this.getData().put(EntityHudInfoType.NAME, name);
-	this.getData().put(EntityHudInfoType.AGE, entity.age);
+		this.getData().put(BuiltinHudInfo.NAME, name);
+		this.getData().put(BuiltinHudInfo.AGE, entity.age);
 		Vec3d pos = entity.getPos();
-	this.getData().put(EntityHudInfoType.POS_X, pos.x);
-	this.getData().put(EntityHudInfoType.POS_Y, pos.y);
-	this.getData().put(EntityHudInfoType.POS_Z, pos.z);
+		this.getData().put(BuiltinHudInfo.POS_X, pos.x);
+		this.getData().put(BuiltinHudInfo.POS_Y, pos.y);
+		this.getData().put(BuiltinHudInfo.POS_Z, pos.z);
 		Vec3d vec = entity.getVelocity();
-	this.getData().put(EntityHudInfoType.MOTION_X, vec.x);
-	this.getData().put(EntityHudInfoType.MOTION_Y, vec.y);
-	this.getData().put(EntityHudInfoType.MOTION_Z, vec.z);
-	this.getData().put(EntityHudInfoType.DELTA_X, pos.x-entity.prevX);
-	this.getData().put(EntityHudInfoType.DELTA_Y, pos.y-entity.prevY);
-	this.getData().put(EntityHudInfoType.DELTA_Z, pos.z-entity.prevZ);
-	this.getData().put(EntityHudInfoType.YAW, entity.yaw);
-	this.getData().put(EntityHudInfoType.PITCH, entity.pitch);
-	this.getData().put(EntityHudInfoType.FALL_DISTANCE, entity.fallDistance);
-	this.getData().put(EntityHudInfoType.GENERAL_FLAGS, EntityHudUtil.getGeneralFlags(entity));
-	this.getData().put(EntityHudInfoType.POSE, entity.getPose());
-		if(entity instanceof LivingEntity) {
+		this.getData().put(BuiltinHudInfo.MOTION_X, vec.x);
+		this.getData().put(BuiltinHudInfo.MOTION_Y, vec.y);
+		this.getData().put(BuiltinHudInfo.MOTION_Z, vec.z);
+		this.getData().put(BuiltinHudInfo.DELTA_X, pos.x-entity.prevX);
+		this.getData().put(BuiltinHudInfo.DELTA_Y, pos.y-entity.prevY);
+		this.getData().put(BuiltinHudInfo.DELTA_Z, pos.z-entity.prevZ);
+		this.getData().put(BuiltinHudInfo.YAW, entity.yaw);
+		this.getData().put(BuiltinHudInfo.PITCH, entity.pitch);
+		this.getData().put(BuiltinHudInfo.FALL_DISTANCE, entity.fallDistance);
+		this.getData().put(BuiltinHudInfo.GENERAL_FLAGS, EntityHudUtil.getGeneralFlags(entity));
+		this.getData().put(BuiltinHudInfo.POSE, entity.getPose());
+		if (entity instanceof LivingEntity) {
 			LivingEntity living = (LivingEntity)entity;
-			this.getData().put(EntityHudInfoType.HEALTH, living.getHealth());
-			this.getData().put(EntityHudInfoType.FORWARD, living.forwardSpeed);
-			this.getData().put(EntityHudInfoType.SIDEWAYS, living.sidewaysSpeed);
-			this.getData().put(EntityHudInfoType.UPWARD, living.upwardSpeed);
-			this.getData().put(EntityHudInfoType.MOVEMENT_SPEED, living.getMovementSpeed());
-			this.getData().put(EntityHudInfoType.FLYING_SPEED, living.flyingSpeed);
-			this.getData().put(EntityHudInfoType.LIVING_FLAGS, EntityHudUtil.getLivingFlags(living));
-		}else if(entity instanceof TntEntity) {
-			this.getData().put(EntityHudInfoType.FUSE, ((TntEntity)entity).getFuseTimer());
-		}else if(entity instanceof ExplosiveProjectileEntity) {
+			this.getData().put(BuiltinHudInfo.HEALTH, living.getHealth());
+			this.getData().put(BuiltinHudInfo.FORWARD, living.forwardSpeed);
+			this.getData().put(BuiltinHudInfo.SIDEWAYS, living.sidewaysSpeed);
+			this.getData().put(BuiltinHudInfo.UPWARD, living.upwardSpeed);
+			this.getData().put(BuiltinHudInfo.MOVEMENT_SPEED, living.getMovementSpeed());
+			this.getData().put(BuiltinHudInfo.FLYING_SPEED, living.flyingSpeed);
+			this.getData().put(BuiltinHudInfo.LIVING_FLAGS, EntityHudUtil.getLivingFlags(living));
+		} else if (entity instanceof TntEntity) {
+			this.getData().put(BuiltinHudInfo.FUSE, ((TntEntity)entity).getFuseTimer());
+		} else if (entity instanceof ExplosiveProjectileEntity) {
 			ExplosiveProjectileEntity epe = (ExplosiveProjectileEntity)entity;
-		this.getData().put(EntityHudInfoType.POWER_X, epe.posX);
-		this.getData().put(EntityHudInfoType.POWER_Y, epe.posY);
-		this.getData().put(EntityHudInfoType.POWER_Z, epe.posZ);
-		}else if(entity instanceof BoatEntity) {
-			this.getData().put(EntityHudInfoType.VELOCITY_DECAY, ((BoatEntityAccessor)entity).getVelocityDeacyMCWMEM());
+			this.getData().put(BuiltinHudInfo.POWER_X, epe.posX);
+			this.getData().put(BuiltinHudInfo.POWER_Y, epe.posY);
+			this.getData().put(BuiltinHudInfo.POWER_Z, epe.posZ);
+		} else if (entity instanceof BoatEntity) {
+			this.getData().put(BuiltinHudInfo.VELOCITY_DECAY, ((BoatEntityAccessor)entity).getVelocityDeacyMCWMEM());
 		}
+		
+		this.listenedFields.forEach((f) -> {
+			if(f.canGetFrom(entity)) {
+				this.getData().put(f, entity);
+			}
+		});
 	}
 	
 	public void toggleRender() {
@@ -127,16 +137,37 @@ public class EntityHud {
 	@SuppressWarnings("resource")
 	protected synchronized int getMaxLineLength() {
 		int lineLength = 0;
-		Iterator<Entry<EntityHudInfoType, Object>> iterator = this.getData().entrySet().iterator();
+		Iterator<Entry<HudInfo, Object>> iterator = this.getData().entrySet().iterator();
 		while(iterator.hasNext()) {
-			Entry<EntityHudInfoType, Object> item = iterator.next();
+			Entry<HudInfo, Object> item = iterator.next();
 			TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-			lineLength = Math.max(lineLength, tr.getWidth(entryToLine(item)));
+			lineLength = Math.max(lineLength, tr.getWidth(item.getKey().toLine(item.getValue())));
 		}
-		return Math.max(lineLength,this.lastLineWidth );
+		
+		return OptionManager.stableHudLocation ? Math.max(lineLength, this.lastLineWidth) : lineLength;
 	}
 
-	protected synchronized Map<EntityHudInfoType, Object> getData() {
+	protected final synchronized Map<HudInfo, Object> getData() {
 		return this.data;
+	}
+	
+	public final boolean addField(Class<?> cl, String field) {
+		return this.addField(cl, field, field, AccessingPath.DUMMY);
+	}
+	
+	public synchronized final boolean addField(Class<?> cl, String field, String name, AccessingPath path) {
+		Field f = Reflection.getFieldFromNamed(cl, field);
+		ListenedField lf = new ListenedField(f, path, name);
+		if(this.listenedFields.contains(lf)) {
+			return false;
+		} else {
+			this.listenedFields.add(lf);
+			return true;
+		}
+		
+	}
+	
+	public final List<ListenedField> getListenedFields() {
+		return new ArrayList<>(this.listenedFields);
 	}
 }

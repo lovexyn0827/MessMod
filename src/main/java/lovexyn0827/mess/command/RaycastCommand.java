@@ -106,13 +106,13 @@ public class RaycastCommand {
 		if(result != null && result.getType() != HitResult.Type.MISS) {
 			Vec3d hit = result.getPos();
 			BlockPos p = result.getBlockPos();
-			CommandUtil.feedback(ct, 
-					"Pos:" + String.format("%f,%f,%f,", hit.x, hit.y, hit.z) + 
-					"\nBlockPos:" + '(' + p.getX() + ',' + p.getY() + ',' + p.getZ() + ')' + 
-					"\nBlockState:" + world.getBlockState(p) + 
-					"\nSide:" + result.getSide());
+			CommandUtil.feedbackWithArgs(ct, "cmd.raycast.result.block", 
+					hit.x, hit.y, hit.z, 
+					p.getX(), p.getY(), p.getZ(), 
+					world.getBlockState(p), 
+					result.getSide());
 		} else {
-			CommandUtil.feedback(ct, "Missed");
+			CommandUtil.feedback(ct, "cmd.raycast.result.miss");
 		}
 		return 1;
 	}
@@ -140,9 +140,9 @@ public class RaycastCommand {
 			if(opt.isPresent() && from.squaredDistanceTo(opt.get()) < lastDistanceSq) {
 				e = toCheck;
 				pos = opt.get();
-				CommandUtil.feedback(ct, 
-						"Entity : " +  (e.hasCustomName() ? e.getCustomName() : e.getType().getTranslationKey().replaceFirst("^.+\\u002e", "")) + '('  + e.getEntityId() + ')' + 
-						"\nAt : " + String.format("%f,%f,%f,", pos.x, pos.y, pos.z)
+				CommandUtil.feedbackWithArgs(ct, "cmd.raycast.result.entity", 
+						e.hasCustomName() ? e.getCustomName() : e.getType().getTranslationKey().replaceFirst("^.+\\u002e", ""), e.getEntityId(), 
+						pos.x, pos.y, pos.z
 				);
 			}
 		}
@@ -164,7 +164,7 @@ public class RaycastCommand {
 		}
 		
 		if(e == null) {
-			CommandUtil.feedback(ct, "Missed");
+			CommandUtil.feedback(ct, "cmd.raycast.result.miss");
 		}
 		
 	}

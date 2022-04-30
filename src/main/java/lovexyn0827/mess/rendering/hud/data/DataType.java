@@ -37,7 +37,7 @@ public enum DataType {
 	};
 	
 	public abstract String getStringOf(Object ob);
-	private static ImmutableMap<EntityPose, String> POSE_NAMES = new ImmutableMap.Builder<EntityPose, String>()
+	private static final ImmutableMap<EntityPose, String> POSE_NAMES = new ImmutableMap.Builder<EntityPose, String>()
 			.put(EntityPose.CROUCHING, "crouching")
 			.put(EntityPose.DYING, "dying")
 			.put(EntityPose.FALL_FLYING, "fall_flying")

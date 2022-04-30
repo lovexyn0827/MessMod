@@ -70,7 +70,8 @@ public class RngCommand {
 	
 	@SuppressWarnings("resource")
 	private static Random getRandom(CommandContext<ServerCommandSource> ct) {
-		if("/rng world".equals(ct.getInput().substring(0,10))) {
+		// FIXME Compatibility with /execute and something else
+		if(ct.getInput().contains("rng world")) {
 			return ct.getSource().getWorld().random;
 		}else {
 			try {

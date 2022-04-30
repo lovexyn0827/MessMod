@@ -1,0 +1,88 @@
+{
+	"readableName" : "English (US)", 
+	"translations" : {
+		//***** Generic translations in commands *****
+		"cmd.general.sub" : "Found %d entities, and subscribed %d entities among them", 
+		"cmd.general.unsub" : "Found %d entities, and unsubscribed %d entities among them", 
+		"cmd.general.found" : "Found at (%d, %d, %d)", 
+		"cmd.general.notfound" : "Not found", 
+		
+		//***** ensure *****
+		"cmd.ensure.usage" : "TODO", 
+		"cmd.ensure.blockat" : "Block at %s: %s",
+		"cmd.ensure.be" : "Block Entity: %s", 
+		
+		//***** entityfield *****
+		"cmd.entityfield" : "TODO", 
+		"cmd.entityfield.nosuchfield" : "No such a field was found in the class of the entity", 
+		"cmd.entityfield.unexpected" : "Unexpected exception in getting the field", 
+		"cmd.entityfield.modify.success" : "Field was modified successfully", 
+		"cmd.entityfield.modify.failure" : "Failed to modify the field", 
+		"cmd.entityfield.modify.vectorsyntax" : "Too many or too few components given! Example: 15.05,67,-211.125", 
+		"cmd.entityfield.modify.unsupported" : "Unsupported field given", 
+		
+		//***** entitylog *****
+		"cmd.entitylog.usage" : "TODO", 
+		"cmd.entitylog.restart" : "Warning: All active logs will be restarted", 
+		"cmd.entitylog.listen" : "Started listening to %s", 
+		"cmd.entitylog.unlisten" : "Stopped listening to %s", 
+		
+		//***** messcfg *****
+		"cmd.messcfg.list" : "Current Options", 
+		"cmd.messcfg.modified" : " (Modified)", 
+		"cmd.messcfg.reload" : "Reloaded config", 
+		"cmd.messcfg.reloadmapping" : "Reloaded the mapping", 
+		"cmd.messcfg.exp" : "(Experimental!)", 
+		"cmd.messcfg.current" : "Current Value: %s", 
+		"cmd.messcfg.global" : "\nGlobal Value: %s", 
+		"cmd.messcfg.default" : "\nDefault Value: %s", 
+		"cmd.messcfg.set" : "Option %s is now set to %s", 
+		"cmd.messcfg.setglobal" : "Option %s is now set to %s globally", 
+		
+		//***** modify *****
+		"cmd.modify.usags" : "TODO", 
+		"cmd.modify.result" : "Found %d entities, and %d entities among them was affected.", 
+		
+		//***** poi *****
+		"cmd.poi.usage" : "TODO", 
+		"cmd.poi.modify" : "Modified POI at (%d, %d, %d)", 
+		"cmd.poi.existed" : "POI already exists at (%d, %d, %d)", 
+		
+		//***** raycast *****
+		"cmd.raycast.usage" : "TODO", 
+		"cmd.raycast.result.block" : "Hit at (%.15f, %.15f, %.15f)\nBlockPos: (%d, %d, %d)\nBlockState: %s\nSide: %s", 
+		"cmd.raycast.result.entity" : "Entity: %s (%d)\nAt: (%.15f, %.15f, %.15f)", 
+		"cmd.raycast.result.miss" : "No collision was detected", 
+		
+		//***** tileentity *****
+		"cmd.tileentity.usage" : "TODO", 
+		"cmd.tileentity.type" : "Type: %s", 
+		"cmd.tileentity.data" : "Data: %s", 
+		
+		//***** Exceptions *****
+		"exp.reqint" : "Requires an integer, but found %s", 
+		"exp.invaildInvocation" : "%s is not a valid method invocation", 
+		"exp.unknownnode" : "Unknown path node given", 
+		"exp.invalidlast" : "Properity %s couldn't be gotten from the last node", 
+		"exp.outbound" : "Out of bound!", 
+		"exp.nofield" : "Field %s couldn't be found in %s", 
+		"exp.unexc" : "Unexcepted exception: %s", 
+		"exp.unboundedclass" : "The declaring class of %s couldn't be known", 
+		"exp.noclass" : "Class %s ins not found", 
+		"exp.staticl.format" : "Use # to separate class name and field name, and use / to separate package names, like \"java/lang/FLOAT#MAX_VALUE\"", 
+		"exp.invalidbp" : "%s is not a valid representation of a BlockPos",
+		"exp.nomethod" : "Method %s couldn't be found in %s", 
+		"exp.failexec" : "Exception in executing method %s: %s", 
+		"exp.nokey" : "The value associated with the given key is not found!", 
+		"exp.notmap" : "The result of the previous node of %s is not a Map!", 
+		"exp.nofieldunlistend" : "Field %s does not exist or haven't been listened yet!", 
+		"exp.log.holder" : "Unable to create new EntityHolder: %s", 
+		"exp.dupfield" : "The field has already been listened in such a way.", 
+		"exp.dupname" : "The name has already been used", 
+		
+		//***** HUDs *****
+		"hud.target" : "Looking At Entity HUD: ", 
+		"hud.client" : "Client Player Information HUD: ", 
+		"hud.server" : "Server Player Information HUD: "
+	}
+}

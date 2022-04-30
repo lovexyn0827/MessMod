@@ -14,6 +14,7 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.RenderedLine;
+import lovexyn0827.mess.rendering.ShapeRenderer;
 
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -68,9 +69,10 @@ public abstract class ExplosionMixin {
 			ServerWorld world = (ServerWorld)(entity.world);
 			if(OptionManager.entityExplosionRaysVisiblity) {
 				HitResult hit = world.raycast(new RaycastContext(source, vec3d, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
-				MessMod.INSTANCE.shapeRenderer.addShape(new RenderedLine(source, hit.getPos(), 0x00FF00FF, 
+				ShapeRenderer sr = MessMod.INSTANCE.shapeRenderer;
+				sr.addShape(new RenderedLine(source, hit.getPos(), 0x00FF00FF, 
 						OptionManager.entityExplosionRaysLifetime), entity.getEntityWorld().getRegistryKey());
-				MessMod.INSTANCE.shapeRenderer.addShape(new RenderedLine(hit.getPos(), vec3d, 0xFF0000FF, 
+				sr.addShape(new RenderedLine(hit.getPos(), vec3d, 0xFF0000FF, 
 						OptionManager.entityExplosionRaysLifetime), entity.getEntityWorld().getRegistryKey());
 			}
 		}
@@ -91,7 +93,7 @@ public abstract class ExplosionMixin {
 			int x, 
 			Entity entity, 
 			double y, double z, double aa, double ab, double ac, double ad, double ae) {
-		// FIXME: Not compatible with Lithium
+		// FIXME: Not compatible with Lithium, may be fixed via disabling the Mixin of it.
 		if(OptionManager.entityExplosionInfluence && !entity.world.isClient) {
 			StringBuilder entityInfoBuilder = new StringBuilder(entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "")).
 					append("[").append(entity.getEntityId()).append(",").append(entity.getPos()).append("]");

@@ -2,7 +2,7 @@ package lovexyn0827.mess.rendering.hud;
 
 import java.util.Optional;
 
-import lovexyn0827.mess.rendering.hud.data.EntityHudInfoType;
+import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -17,11 +17,12 @@ public class LookingAtEntityHud extends EntityHud {
 	
 	public void render() {
 		String entityInfo = "[Null]";
-		if(getData().get(EntityHudInfoType.ID) != null) {
-			entityInfo = "("+getData().get(EntityHudInfoType.ID) + "," + 
-					getData().get(EntityHudInfoType.NAME) + "," + 
-					getData().get(EntityHudInfoType.AGE) + ")";
+		if(getData().get(BuiltinHudInfo.ID) != null) {
+			entityInfo = "("+getData().get(BuiltinHudInfo.ID) + "," + 
+					getData().get(BuiltinHudInfo.NAME) + "," + 
+					getData().get(BuiltinHudInfo.AGE) + ")";
 		}
+		
 		String describe = "Target" + entityInfo;
 		if(this.shouldRender) this.render(new MatrixStack(), describe);
 	}

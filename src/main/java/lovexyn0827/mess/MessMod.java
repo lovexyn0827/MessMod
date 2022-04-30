@@ -10,8 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.deobfuscating.Mapping;
-import lovexyn0827.mess.deobfuscating.MappingProvider;
 import lovexyn0827.mess.log.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.options.OptionManager;
@@ -20,6 +18,8 @@ import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
 import lovexyn0827.mess.rendering.ShapeRenderer;
 import lovexyn0827.mess.rendering.hud.HudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
+import lovexyn0827.mess.util.deobfuscating.Mapping;
+import lovexyn0827.mess.util.deobfuscating.MappingProvider;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -36,23 +36,27 @@ import net.minecraft.text.LiteralText;
 public class MessMod implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final MessMod INSTANCE = new MessMod();
-	public Mapping mapping;
-	public HudManager hudManager;
+	private Mapping mapping;
+	private HudManager hudManager;
 	private int windowX;
 	private int windowY;
 	private ServerSyncedBoxRenderer boxRenderer;
 	private MinecraftServer server;
 	private String scriptDir;
 	private long gameTime;
-	public ShapeRenderer shapeRenderer;
+	public ShapeRenderer shapeRenderer;	// Reading from the field directly may bring high performance.
 	private BlockInfoRenderer blockInfoRederer = new BlockInfoRenderer();
 	private EntityLogger logger;
 
 	private MessMod() {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
-		this.mapping = new MappingProvider().tryLoadMapping();
 		this.logger = new EntityLogger();
+		this.reloadMapping();
 		OptionManager.OPTIONS.toString();
+	}
+
+	public void reloadMapping() {
+		this.mapping = new MappingProvider().tryLoadMapping();
 	}
 
 	@Override
@@ -84,7 +88,7 @@ public class MessMod implements ModInitializer {
 	
 	public void onRender(ClientPlayerEntity player, IntegratedServer server) {
 		this.updateWindowSize(MinecraftClient.getInstance().getWindow());
-		if(this.hudManager != null) this.hudManager.render(player,server);
+		if(this.getHudManager() != null) this.getHudManager().render(player,server);
 	}
 
 	private void updateWindowSize(Window window) {
@@ -106,14 +110,14 @@ public class MessMod implements ModInitializer {
 	
 	public void onServerTicked(MinecraftServer server) {
 		ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
-		if(player != null && MessMod.INSTANCE.hudManager != null) {
-			MessMod.INSTANCE.hudManager.lookingHud.updateData(player);
-		}if(this.hudManager != null && this.hudManager.playerHudS == null && player != null) {
-			this.hudManager.playerHudS = new PlayerHud(this.hudManager, player, true);
+		if(player != null && MessMod.INSTANCE.getHudManager() != null) {
+			MessMod.INSTANCE.getHudManager().lookingHud.updateData(player);
+		}if(this.getHudManager() != null && this.getHudManager().playerHudS == null && player != null) {
+			this.getHudManager().playerHudS = new PlayerHud(this.getHudManager(), player, true);
 		}
 		
-		if(player != null && this.hudManager != null && this.hudManager.playerHudS != null) {
-			this.hudManager.playerHudS.updateData(player);
+		if(player != null && this.getHudManager() != null && this.getHudManager().playerHudS != null) {
+			this.getHudManager().playerHudS.updateData(player);
 		}
 		
 		this.boxRenderer.tick();
@@ -128,8 +132,8 @@ public class MessMod implements ModInitializer {
 	}
 
 	public void onClientTicked() {
-		if(this.hudManager != null) {
-			this.hudManager.playerHudC.updateData();
+		if(this.getHudManager() != null) {
+			this.getHudManager().playerHudC.updateData();
 		}else {
 			this.hudManager = new HudManager();
 		}
@@ -140,16 +144,17 @@ public class MessMod implements ModInitializer {
 	}
 	
 	public void onPlayerRespawned(PlayerRespawnS2CPacket packet) {
-		this.hudManager.playerHudC.refreshPlayer();
+		this.getHudManager().playerHudC.refreshPlayer();
 	}
 
 	public void onServerStarted(MinecraftServer server) {
 		CommandUtil.updateServer(server);
 		this.server = server;
+		OptionManager.updateServer(server);
 		this.boxRenderer.setServer(server);
 		this.blockInfoRederer.initializate(server);
 		try {
-			this.logger.initializePath(server);
+			this.logger.initialize(server);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -159,6 +164,15 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer.uninitialize();
 		this.server = null;
 		this.logger.closeAll();
+		if(OptionManager.entityLogAutoArchiving) {
+			try {
+				this.logger.archiveLogs();
+			} catch (IOException e) {
+				LOGGER.error("Failed to archive entity logs!");
+				e.printStackTrace();
+			}
+		}
+		
 		CommandUtil.updateServer(null);
 		this.shapeRenderer.reset();
 	}
@@ -203,5 +217,9 @@ public class MessMod implements ModInitializer {
 	
 	public EntityLogger getEntityLogger() {
 		return this.logger;
+	}
+
+	public HudManager getHudManager() {
+		return hudManager;
 	}
 }

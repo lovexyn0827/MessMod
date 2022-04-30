@@ -4,11 +4,15 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.i18n.I18N;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
@@ -16,12 +20,25 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 
 public class CommandUtil {
 	public static final Predicate<ServerCommandSource> COMMAND_REQUMENT = (s) -> 
 			!OptionManager.commandExecutionRequirment || s.hasPermissionLevel(1);
+	public static final SuggestionProvider<ServerCommandSource> ENTITY_TYPES = (ct, b) -> {
+		Registry.ENTITY_TYPE.getIds().stream().map(Identifier::getPath).forEach(b::suggest);
+		return b.buildFuture();
+	};
+	public static final SuggestionProvider<ServerCommandSource> FIELDS_SUGGESTION = (ct, builder) -> {
+		Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+		EntityType<?> type = Registry.ENTITY_TYPE.get(id);
+		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
+		Reflection.getAvailableFields(clazz).forEach(builder::suggest);
+		return builder.buildFuture();
+	};
 	private static CommandOutput noreplyOutput;
 	private static ServerCommandSource noreplySource;
 	private static ServerCommandSource noreplyPlayerSource;
@@ -67,11 +84,32 @@ public class CommandUtil {
 	}
 	
 	public static void feedback(CommandContext<? extends ServerCommandSource> ct, Object ob) {
-		ct.getSource().sendFeedback(new LiteralText(ob.toString()), false);
+		ct.getSource().sendFeedback(new LiteralText(ob != null ? I18N.translate(ob.toString()) : "[null]"), false);
+	}
+	
+	public static void feedbackWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
+		ct.getSource().sendFeedback(new LiteralText(String.format(I18N.translate(fmt), args)), false);
+	}
+	
+	public static void feedbackRaw(CommandContext<? extends ServerCommandSource> ct, Object ob) {
+		ct.getSource().sendFeedback(new LiteralText(ob == null ? "[null]" : ob.toString()), false);
 	}
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {
-		ct.getSource().sendError(new LiteralText(ob.toString()));
+		ct.getSource().sendError(new LiteralText(I18N.translate(ob.toString())));
+	}
+	
+	public static void errorWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
+		ct.getSource().sendError(new LiteralText(String.format(I18N.translate(fmt), args)));
+	}
+
+	public static void error(CommandContext<ServerCommandSource> ct, String string, Exception e) {
+		ct.getSource().sendError(new LiteralText(I18N.translate(string) + ": " + I18N.translate(e.getMessage())));
+	}
+	
+	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, Exception e) {
+		// TODO e is unused, but be aware 
+		ct.getSource().sendError(new LiteralText(str == null ? "[null]" : str));
 	}
 
 	public static ServerCommandSource noreplySource() {
@@ -118,7 +156,6 @@ public class CommandUtil {
 	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(String ... args) {
 		return (ct, builder) -> {
 			Stream.of(args)
-					.map(Object::toString)
 					.forEach(builder::suggest);
 			return builder.buildFuture();
 		};

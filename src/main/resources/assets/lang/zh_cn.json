@@ -1,0 +1,88 @@
+{
+	"readableName" : "中文（中国）", 
+	"translations" : {
+		//***** Generic translations in commands *****
+		"cmd.general.sub" : "找到了%d个实体，并开始了其中的%d个实体的记录", 
+		"cmd.general.unsub" : "找到了%d个实体，并取消了对其中的%d个实体的记录", 
+		"cmd.general.found" : "在(%d, %d, %d)找到了POI", 
+		"cmd.general.notfound" : "未找到", 
+		
+		//***** ensure *****
+		"cmd.ensure.usage" : "TODO", 
+		"cmd.ensure.blockat" : "%s处的方块为: %s",
+		"cmd.ensure.be" : "方块实体数据: %s", 
+		
+		//***** entityfield *****
+		"cmd.entityfield" : "TODO", 
+		"cmd.entityfield.nosuchfield" : "该实体对应的类中没有找到所需字段", 
+		"cmd.entityfield.unexpected" : "获取字段的过程中发生了未知错误", 
+		"cmd.entityfield.modify.success" : "成功地修改了字段", 
+		"cmd.entityfield.modify.failure" : "字段修改失败", 
+		"cmd.entityfield.modify.vectorsyntax" : "给出的分量数目不合适！示例：15.05,67,-211.125", 
+		"cmd.entityfield.modify.unsupported" : "暂不支持修改此字段", 
+		
+		//***** entitylog *****
+		"cmd.entitylog.usage" : "TODO", 
+		"cmd.entitylog.restart" : "警告：所有记录将重新开始", 
+		"cmd.entitylog.listen" : "开始监听字段%s", 
+		"cmd.entitylog.unlisten" : "停止监听字段%s", 
+		
+		//***** messcfg *****
+		"cmd.messcfg.list" : "当前配置", 
+		"cmd.messcfg.modified" : "（已修改）", 
+		"cmd.messcfg.reload" : "重新加载了配置", 
+		"cmd.messcfg.reloadmapping" : "重新加载了混淆映射表", 
+		"cmd.messcfg.exp" : "（实验性功能！）", 
+		"cmd.messcfg.current" : "当前值：%s", 
+		"cmd.messcfg.global" : "\n全局设置：%s", 
+		"cmd.messcfg.default" : "\n默认值：%s", 
+		"cmd.messcfg.set" : "选项%s的值现在已被设为%s", 
+		"cmd.messcfg.setglobal" : "全局作用域中选项%s的值现在已被设为%s", 
+		
+		//***** modify *****
+		"cmd.modify.usags" : "TODO", 
+		"cmd.modify.result" : "找到了%d个实体，其中有%d个实体的属性被修改", 
+		
+		//***** poi *****
+		"cmd.poi.usage" : "TODO", 
+		"cmd.poi.modify" : "修改了(%d, %d, %d)处的POI", 
+		"cmd.poi.existed" : "(%d, %d, %d)处已经存在一个POI", 
+		
+		//***** raycast *****
+		"cmd.raycast.usage" : "TODO", 
+		"cmd.raycast.result.block" : "撞击位置：(%.15f, %.15f, %.15f)\n方块坐标：(%d, %d, %d)\n方块：%s\n撞击面：%s", 
+		"cmd.raycast.result.entity" : "实体：%s\n撞击位置：(%.15f, %.15f, %.15f)", 
+		"cmd.raycast.result.miss" : "未检测到碰撞", 
+		
+		//***** tileentity *****
+		"cmd.tileentity.usage" : "TODO", 
+		"cmd.tileentity.type" : "类型：%s", 
+		"cmd.tileentity.data" : "数据：%s", 
+		
+		//***** Exceptions *****
+		"exp.reqint" : "需要整数， 但是出现了%s", 
+		"exp.invaildInvocation" : "%s不是一个有效的方法调用", 
+		"exp.unknownnode" : "未知的访问路径节点", 
+		"exp.invalidlast" : "属性%s无法从上一个节点的返回值中获取", 
+		"exp.outbound" : "索引越界", 
+		"exp.nofield" : "字段%s在%s中没有被找到", 
+		"exp.unexc" : "意外错误：%s", 
+		"exp.unboundedclass" : "声明字段%s的类不能被确定", 
+		"exp.noclass" : "找不到类%", 
+		"exp.staticl.format" : "用#作为类名与字段名的界限，用/分割包名，就像“java/lang/Float/MAX_VALUE”", 
+		"exp.invalidbp" : "%s不是一个有效的方块坐标的表示",
+		"exp.nomethod" : "方法%s在类%s中未被找到", 
+		"exp.failexec" : "执行的方法%s抛出了异常: %s", 
+		"exp.nokey" : "与给定的键关联的值未被找到", 
+		"exp.notmap" : "%s的上一个节点的返回值不是一个Map对象", 
+		"exp.nofieldunlistend" : "字段%s不存在或未被监听", 
+		"exp.log.holder" : "无法创建EntityHolder: %s", 
+		"exp.dupfield" : "该字段已经被以这种方式监听", 
+		"exp.dupname" : "名称重复", 
+		
+		//***** HUDs *****
+		"hud.target" : "目标实体信息HUD: ", 
+		"hud.client" : "客户端玩家信息HUD: ", 
+		"hud.server" : "服务端玩家信息HUD: "
+	}
+}

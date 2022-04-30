@@ -1,47 +1,57 @@
 package lovexyn0827.mess.log;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BooleanSupplier;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import com.google.common.base.Predicates;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap.Entry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.deobfuscating.Mapping;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
-import net.fabricmc.loader.api.FabricLoader;
+import lovexyn0827.mess.util.CarpetUtil;
+import lovexyn0827.mess.util.ListenedField;
+import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.TranslatableException;
+import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 
-// TODO: Automatic archiving
-public class EntityLogger {
-	public static final Map<EntityType<?>, Class<?>> ENTITY_TYPE_TO_CLASS = Maps.newHashMap();
-	private static final Pattern GERERIC_TYPE_EXTRACTOR = Pattern.compile("<([0-9a-zA-Z_.]*)>");
-	private static BooleanSupplier IS_TICK_FROZEN;
+// TODO Support for EnderDragonPart, whose EntityType is not specified
+public final class EntityLogger {
 	Int2ObjectMap<EntityHolder> entities = new Int2ObjectOpenHashMap<>();
-	Set<Field> customFields = new HashSet<>();
+	private Map<String, ListenedField> customFields = new HashMap<>();
 	private Path logPath;
+	private final Set<EntityType<?>> autoSubTypes = Sets.newHashSet();
+	private long lastSessionStart;
+	private boolean hasCreatedAnyLog;
 
 	public void tick(MinecraftServer server) throws IOException {
-		if(IS_TICK_FROZEN != null && IS_TICK_FROZEN.getAsBoolean()) {
+		if(!this.autoSubTypes.isEmpty()) {
+			server.getWorlds().forEach((world) -> {
+				this.subscribe(world.getEntitiesByType(null, (e) -> this.autoSubTypes.contains(e.getType())));
+			});
+		}
+		
+		if(CarpetUtil.isTickFrozen()) {
 			return;
 		}
 		
@@ -69,16 +79,33 @@ public class EntityLogger {
 		this.entities.clear();
 	}
 
-	public void listenToField(String field, EntityType<?> type) throws Exception {
+	public void listenToField(String field, EntityType<?> type, String name, AccessingPath path) {
 		Int2ObjectMap<EntityHolder> temp = new Int2ObjectOpenHashMap<>(this.entities);
 		this.closeAll();
-		Mapping map = MessMod.INSTANCE.getMapping();
-		Field f = map.getFieldFromNamed(ENTITY_TYPE_TO_CLASS.get(type), field);
+		if(this.customFields.containsKey(name)) {
+			throw new TranslatableException("exp.dupname");
+		}
+		
+		Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), field);
 		if(f != null) {
-			f.setAccessible(true);
-			this.customFields.add(f);
+			ListenedField lf = new ListenedField(f, path, name);
+			if(!this.customFields.containsValue(lf)) {
+				this.customFields.put(lf.getCustomName(), lf);
+			} else {
+				throw new TranslatableException("exp.dupfield", field, type.getName());
+			}
 		} else {
-			throw new Exception("Field " + field + " does not exist!");
+			throw new TranslatableException("exp.nofield", field, type.getName());
+		}
+		
+		temp.values().forEach((h) -> this.entities.put(h.getId(), new EntityHolder(h.entity, this)));
+	}
+
+	public void unlistenToField(String name) {
+		Int2ObjectMap<EntityHolder> temp = new Int2ObjectOpenHashMap<>(this.entities);
+		this.closeAll();
+		if(this.customFields.remove(name) == null) {
+			throw new TranslatableException("exp.nofieldunlistend", name);
 		}
 		
 		temp.values().forEach((h) -> this.entities.put(h.getId(), new EntityHolder(h.entity, this)));
@@ -116,7 +143,8 @@ public class EntityLogger {
 		return i.intValue();
 	}
 
-	public void initializePath(MinecraftServer server) throws IOException {
+	public void initialize(MinecraftServer server) throws IOException {
+		this.lastSessionStart = System.currentTimeMillis();
 		this.logPath = server.getSavePath(WorldSavePathMixin.create("entitylog")).toAbsolutePath();
 		if(!Files.exists(this.logPath)) {
 			Files.createDirectory(this.logPath);
@@ -126,40 +154,54 @@ public class EntityLogger {
 	public Path getLogPath() {
 		return this.logPath;
 	}
-
-	static {
-		Stream.of(EntityType.class.getFields())
-				.filter((f) -> Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers()))
-				.forEach((f) -> {
-					try {
-						Matcher m = GERERIC_TYPE_EXTRACTOR.matcher(f.toGenericString());
-						if(m.find() && f.getType() == EntityType.class) {
-							Class<?> cl = Class.forName(m.group(1));
-							if(Entity.class.isAssignableFrom(cl)) {
-								ENTITY_TYPE_TO_CLASS.put((EntityType<?>) f.get(null), cl);
-							}
-						}
-					} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
-						e.printStackTrace();
-					}
-				});
-		if(FabricLoader.getInstance().isModLoaded("carpet")) {
-			try {
-				Field f = Class.forName("carpet.helpers.TickSpeed").getField("process_entities");
-				IS_TICK_FROZEN = () -> {
-					try {
-						return !f.getBoolean(null);
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						e.printStackTrace();
-						return false;
-					}
-				};
-			} catch (ClassNotFoundException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
-				e.printStackTrace();
-				IS_TICK_FROZEN = () -> false;
-			}
-		} else {
-			IS_TICK_FROZEN = () -> false;
+	
+	public void archiveLogs() throws IOException {
+		Path archiveDir = this.logPath.resolve("archived");
+		if(!Files.exists(archiveDir)) {
+			Files.createDirectory(archiveDir);
 		}
+		
+		if(this.hasCreatedAnyLog) {
+			String fn = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
+			Path archive = archiveDir.resolve(fn);
+			try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive.toFile()))) {
+				Files.walk(this.logPath, 1)
+						.filter((f) -> f.getFileName().toString().endsWith(".csv"))
+						.filter((f) -> f.toFile().lastModified() >= this.lastSessionStart)
+						.forEach((f) -> {
+							try {
+								zos.putNextEntry(new ZipEntry(f.getFileName().toString()));
+								zos.write(Files.readAllBytes(f));
+								Files.delete(f);
+							} catch (IOException e) {
+								MessMod.LOGGER.warn("Failed to archive " + f.toString());
+								e.printStackTrace();
+							}
+						});
+				zos.finish();
+			}
+			
+			MessMod.LOGGER.info("Archived the entity logs to " + archive.toAbsolutePath().toString());
+		}
+	}
+	
+	public void addAutoSubEntityType(EntityType<?> type) {
+		this.autoSubTypes.add(type);
+	}
+	
+	public boolean removeAutoSubEntityType(EntityType<?> type) {
+		return this.autoSubTypes.remove(type);
+	}
+	
+	public boolean shouldAutoSub(EntityType<?> type) {
+		return this.autoSubTypes.contains(type);
+	}
+	
+	public ImmutableSet<EntityType<?>> listAutoSubEntityTypes() {
+		return ImmutableSet.copyOf(this.autoSubTypes);
+	}
+
+	public Map<String, ListenedField> getListenedFields() {
+		return this.customFields;
 	}
 }

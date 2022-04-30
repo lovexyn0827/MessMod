@@ -35,77 +35,78 @@ public class PoiCommand {
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								then(argument("type",StringArgumentType.word()).suggests(sp).
 										then(argument("replace",BoolArgumentType.bool()).
-												executes((ct)->{
+												executes((ct) -> {
+													BlockPos pos = BlockPosArgumentType.getBlockPos(ct, "pos");
 													if(setPoi(ct.getSource().getWorld().getPointOfInterestStorage(),
-															BlockPosArgumentType.getBlockPos(ct, "pos"),														StringArgumentType.getString(ct, "type"),
+															pos, StringArgumentType.getString(ct, "type"), 
 															BoolArgumentType.getBool(ct, "replace"))) {
-														CommandUtil.feedback(ct, "Modified POI");
+														CommandUtil.feedbackWithArgs(ct, "cmd.poi.modify", pos.getX(), pos.getY(), pos.getZ());
 														return 1;
 													} else {
-														CommandUtil.error(ct, "POI has alerady existed");
+														CommandUtil.errorWithArgs(ct, "cmd.poi.existed", pos.getX(), pos.getY(), pos.getZ());
 														return 0;
 													}
 												}))))).
 				then(literal("get").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
-								executes((ct)->{
+								executes((ct) -> {
 									PointOfInterestType type = getPoi(ct.getSource().getWorld().getPointOfInterestStorage(),
 											BlockPosArgumentType.getBlockPos(ct, "pos"));
-									CommandUtil.feedback(ct, type==null?"null":type.toString());
+									CommandUtil.feedback(ct, type==null ? "null" : type.toString());
 									return 0;
 								}))).
 				then(literal("scanCobic").
 						then(argument("corner1",BlockPosArgumentType.blockPos()).
 								then(argument("corner2",BlockPosArgumentType.blockPos()).
 										then(argument("type",StringArgumentType.word()).suggests(sp).
-												executes((ct)->{
+												executes((ct) -> {
 													boolean foundAny = false;
 													PointOfInterestType expectedType = Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
 													Iterable<BlockPos> iterator = BlockPos.iterate(BlockPosArgumentType.getLoadedBlockPos(ct, "corner1"), 
 															BlockPosArgumentType.getLoadedBlockPos(ct, "corner2"));
-													for(BlockPos pos:iterator) {
-														if(getPoi(ct.getSource().getWorld().getPointOfInterestStorage(),pos)==expectedType) {
+													for(BlockPos pos : iterator) {
+														if(getPoi(ct.getSource().getWorld().getPointOfInterestStorage(),pos) == expectedType) {
 															foundAny = true;
-															CommandUtil.feedback(ct, "Found at:"+pos.getX()+","+pos.getY()+","+pos.getZ());
+															CommandUtil.feedbackWithArgs(ct, "cmd.general.found", pos.getX(), pos.getY(), pos.getZ());
 														}
 													}
-													if(!foundAny) CommandUtil.feedback(ct, "Not Found");
+													if(!foundAny) CommandUtil.feedback(ct, "cmd.general.notfound");
 													return 1;
 												}))))).
 				then(literal("scan").
 						then(argument("center",BlockPosArgumentType.blockPos()).
 								then(argument("radius",IntegerArgumentType.integer(0)).
 										then(argument("type",StringArgumentType.word()).suggests(sp).
-												executes((ct)->{
+												executes((ct) -> {
 													PointOfInterestType expectedType = Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
-													Stream<PointOfInterest> poiStream = ct.getSource().getWorld().getPointOfInterestStorage().getInCircle((type)->type==expectedType, 
+													Stream<PointOfInterest> poiStream = ct.getSource().getWorld().getPointOfInterestStorage().getInCircle((type) -> type == expectedType, 
 															BlockPosArgumentType.getLoadedBlockPos(ct, "center"), 
 															IntegerArgumentType.getInteger(ct, "radius"), 
 															PointOfInterestStorage.OccupationStatus.ANY);
 
 													if(poiStream.count() == 0) {
-														CommandUtil.feedback(ct, "Not Found");
+														CommandUtil.feedback(ct, "cmd.general.notfound");
 														return 0;
 													}
 													
 													poiStream.forEach((poi)->{
 														BlockPos pos = poi.getPos();
-														CommandUtil.feedback(ct, "Found at:"+pos.getX()+","+pos.getY()+","+pos.getZ());
+														CommandUtil.feedbackWithArgs(ct, "cmd.general.found", pos.getX(), pos.getY(), pos.getZ());
 													});
 													return 1;
 												}))))).
 				then(literal("getDistanceToNearestOccupied").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
-								executes((ct)->{
+								executes((ct) -> {
 									int distance = ct.getSource().getWorld().getOccupiedPointOfInterestDistance(ChunkSectionPos.from(BlockPosArgumentType.getLoadedBlockPos(ct, "pos")));
-									CommandUtil.feedback(ct, distance);
+									CommandUtil.feedbackRaw(ct, distance);
 									return 0;
 								})));
 		dispatcher.register(command);
 	}
 
 	private static boolean setPoi(PointOfInterestStorage poiStorage, BlockPos blockPos, String type, boolean replace) {
-		if(poiStorage.getType(blockPos).isPresent()&&!replace) return false;
+		if(poiStorage.getType(blockPos).isPresent() && !replace) return false;
 		poiStorage.remove(blockPos);
 		poiStorage.add(blockPos, Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(type)));
 		return true;

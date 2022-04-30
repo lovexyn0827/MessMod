@@ -16,10 +16,12 @@ import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
+import lovexyn0827.mess.command.HudFieldListeningCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
 import lovexyn0827.mess.command.MoveEntityCommand;
+import lovexyn0827.mess.command.NameEntityCommand;
 import lovexyn0827.mess.command.PoiCommand;
 import lovexyn0827.mess.command.RaycastCommand;
 import lovexyn0827.mess.command.RepeatCommand;
@@ -52,11 +54,14 @@ public abstract class CommandMixin {
         EntityLogCommand.register(this.dispatcher);
         EnsureCommand.register(this.dispatcher);
         LogMovementCommand.register(this.dispatcher);
+        HudFieldListeningCommand.register(this.dispatcher);
+        NameEntityCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", at = @At(
     		value = "INVOKE",
-    		target = "org/apache/logging/log4j/Logger.isDebugEnabled()V"),
+    		target = "org/apache/logging/log4j/Logger.isDebugEnabled()V", 
+    		remap = false),
     		require = 0)
     private boolean alwaysOutputStackTrace(Logger l) {
     	return true;

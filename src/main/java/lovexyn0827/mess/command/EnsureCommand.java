@@ -25,9 +25,9 @@ public class EnsureCommand {
 								BlockState state = world.getBlockState(pos);
 								BlockEntity be = world.getBlockEntity(pos);
 								String posStr = "(" + pos.getX() + "," + pos.getY() + "," + pos.getZ() + ")";
-								CommandUtil.feedback(ct, "Block at " + posStr + ": " + state);
+								CommandUtil.feedbackWithArgs(ct, "cmd.ensure.blockat", posStr, state);
 								if(be != null) {
-									CommandUtil.feedback(ct, "Block Entity: " + BlockEntityType.getId(be.getType()));
+									CommandUtil.feedbackWithArgs(ct, "cmd.ensure.be", BlockEntityType.getId(be.getType()));
 								}
 								
 								return Command.SINGLE_SUCCESS;

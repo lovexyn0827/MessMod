@@ -1,6 +1,6 @@
 package lovexyn0827.mess.rendering.hud.data;
 
-public enum EntityHudInfoType {
+public enum BuiltinHudInfo implements HudInfo {
 	ID("ID:",DataType.INTEGER),
 	NAME("Name:",DataType.STRING),
 	POS_X("Pos X:",DataType.DOUBLE),
@@ -34,8 +34,13 @@ public enum EntityHudInfoType {
 	public String header;
 	public DataType type;
 	
-	EntityHudInfoType(String header,DataType type){
+	BuiltinHudInfo(String header,DataType type){
 		this.header = header;
 		this.type = type;
+	}
+
+	@Override
+	public String toLine(Object data) {
+		return this.header + this.type.getStringOf(data);
 	}
 }

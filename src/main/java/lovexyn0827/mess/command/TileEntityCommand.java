@@ -28,21 +28,22 @@ public class TileEntityCommand {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("tileentity").requires(CommandUtil.COMMAND_REQUMENT).
 				then(literal("get").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
-								executes((ct)->{
+								executes((ct) -> {
 									BlockEntity be = ct.getSource().getWorld().getBlockEntity(BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
-									if(be==null) {
+									if(be == null) {
 										CommandUtil.feedback(ct, "null");
 										return -1;
 									}
-									CommandUtil.feedback(ct, "Type:"+Registry.BLOCK_ENTITY_TYPE.getId(be.getType()).getPath());
+									
+									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.type", Registry.BLOCK_ENTITY_TYPE.getId(be.getType()).getPath());
 									CompoundTag tag = new CompoundTag();
-									CommandUtil.feedback(ct, "Data:"+be.toTag(tag));
+									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.toTag(tag));
 									return 1;
 								}))).
 				then(literal("set").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								then(argument("type",IdentifierArgumentType.identifier()).suggests(suggestions ).
-										executes((ct)->{
+										executes((ct) -> {
 											BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
 											BlockEntity be = getBlockEntity(ct);;
 											ct.getSource().getWorld().setBlockEntity(pos, be);

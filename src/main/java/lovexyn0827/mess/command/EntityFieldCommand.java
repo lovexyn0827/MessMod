@@ -5,97 +5,129 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 import java.lang.reflect.Field;
 import java.util.Set;
-import java.util.TreeSet;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.deobfuscating.Mapping;
+
+import lovexyn0827.mess.util.TranslatableException;
+import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.Vec3d;
 
 public class EntityFieldCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		SuggestionProvider<ServerCommandSource> suggests = (ct,builder)->{
-			for(String fieldName : getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass())) {
+			for(String fieldName : Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass())) {
 				builder = builder.suggest(fieldName);
 			}
+			
+			builder.suggest("-THIS");
 			return builder.buildFuture();
 		};
 		
-		LiteralArgumentBuilder<ServerCommandSource> get = literal("get").
-				then(argument("fieldName",StringArgumentType.string()).suggests(suggests).
-						executes((ct)->{
-							try {
-								Entity entity = EntityArgumentType.getEntity(ct, "target");
-								Field field =getField(entity.getClass(),StringArgumentType.getString(ct, "fieldName"));
-								if(field != null) {
-									CommandUtil.feedback(ct, field == null ? "[NULL]" : field.get(entity));
-								} else {
-									CommandUtil.error(ct, "Specified field coundn't be found!");
-								}
-							} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
-								CommandUtil.error(ct, "Unexpected exception in getting the field:" + e);
-								return -1;
-							} catch (NoSuchFieldError e) {
-								CommandUtil.error(ct, "No such field in the class of the entity");
-							}
-							
-							return 0;
-						}));
+		LiteralArgumentBuilder<ServerCommandSource> get = literal("get")
+				.then(argument("fieldName",StringArgumentType.string())
+						.suggests(suggests)
+						.executes((ct) -> getField(ct, AccessingPath.DUMMY))
+						.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+								.executes((ct) -> {
+									try {
+										AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
+										return getField(ct, path);
+									} catch (TranslatableException e) {
+										e.printStackTrace();
+										ct.getSource().sendError(new LiteralText(e.getMessage()));
+										return 0;
+									}
+								})));
 		
-		ArgumentBuilder<ServerCommandSource, ?> modify = literal("modify").requires((source)->source.hasPermissionLevel(1)).
-				then(argument("fieldName",StringArgumentType.string()).suggests(suggests).
-						then(argument("newValue",StringArgumentType.string()).
-								executes((ct)->{
+		ArgumentBuilder<ServerCommandSource, ?> modify = literal("modify")
+				.requires((source)->source.hasPermissionLevel(1))
+				.then(argument("fieldName",StringArgumentType.string()).suggests(suggests)
+						.then(argument("newValue",StringArgumentType.string())
+								.executes((ct)->{
 									try {
 										modifyField(EntityArgumentType.getEntity(ct, "target"),
 												StringArgumentType.getString(ct, "fieldName"),
 												StringArgumentType.getString(ct, "newValue"));
-										CommandUtil.feedback(ct, "Field was modified successfully");
+										CommandUtil.feedback(ct, "cmd.entityfield.modify.success");
 										return 1;
 									} catch (Exception e) {
-										CommandUtil.error(ct, "Failed to modify the field:" + e);
+										CommandUtil.error(ct, "cmd.entityfield.modify.failure", e);
 										return -1;
 									}
 								})));
 		
-		ArgumentBuilder<ServerCommandSource, ?> listAll = literal("listAvailableFields").
-				executes((ct)->{
+		ArgumentBuilder<ServerCommandSource, ?> listAll = literal("listAvailableFields")
+				.executes((ct)->{
 					Set<String> fieldSet;
 					try {
-						fieldSet = getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass());
+						fieldSet = Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass());
 						String list = String.join("  ", fieldSet);
 						CommandUtil.feedback(ct, list);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					
-					return 0;
+					return Command.SINGLE_SUCCESS;
 				});
 		
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityfield").requires(CommandUtil.COMMAND_REQUMENT).
-				then(argument("target",EntityArgumentType.entity()).then(get).then(modify).then(listAll));
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityfield")
+				.requires(CommandUtil.COMMAND_REQUMENT)
+				.then(argument("target",EntityArgumentType.entity())
+						.then(get).then(modify).then(listAll));
 		dispatcher.register(command);
 	}
 	
-	private static String getNamedField(String obfuscated) {
-		return MessMod.INSTANCE.mapping.namedField(obfuscated);
+	private static int getField(CommandContext<ServerCommandSource> ct, AccessingPath path) throws CommandSyntaxException {
+		Entity entity = EntityArgumentType.getEntity(ct, "target");
+		String name = StringArgumentType.getString(ct, "fieldName");
+		if("-THIS".equals(name)) {
+			path.initialize(entity.getClass());
+			CommandUtil.feedbackRaw(ct, path.access(entity));
+			return Command.SINGLE_SUCCESS;
+		}
+		
+		try {
+			Field field = Reflection.getFieldFromNamed(entity.getClass(), name);
+			if(field != null) {
+				field.setAccessible(true);
+				Object ob = field.get(entity);
+				path.initialize(field.getGenericType());
+				CommandUtil.feedbackRaw(ct,  ob == null ? "[null]" : path.access(ob));
+			} else {
+				CommandUtil.error(ct, "cmd.entityfield.nosuchfield");
+			}
+			
+			return Command.SINGLE_SUCCESS;
+		} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
+			CommandUtil.error(ct, "cmd.entityfield.unexpected", e);
+			return 0;
+		} catch (NoSuchFieldError e) {
+			CommandUtil.error(ct, "cmd.entityfield.nosuchfield");
+			return 0;
+		} catch (TranslatableException e) {
+			CommandUtil.errorRaw(ct, e.getMessage(), e);
+			e.printStackTrace();
+			return 0;
+		}
 	}
-	
-	/*private static String getSrgField(String clazz, String named) {
-		return MessMod.INSTANCE.mapping.srgField(clazz, named);
-	}*/
 
 	private static boolean modifyField(Entity entity, String fieldName, String newValue) throws NumberFormatException, IllegalArgumentException, IllegalAccessException {
-		Field field = getField(entity.getClass(), fieldName);
+		Field field = Reflection.getFieldFromNamed(entity.getClass(), fieldName);
 		if(field == null) {
-			throw new IllegalArgumentException("Field was not found in class" + entity.getClass());
+			throw new IllegalArgumentException("cmd.entityfield.nosuchfield");
 		}
 		
 		Class<?> type = field.getType();
@@ -109,7 +141,7 @@ public class EntityFieldCommand {
 			field.set(entity, newValue);
 		} else if (type == Vec3d.class) {
 			String[] subVals = newValue.split(",");
-			if(subVals.length!=3) throw new IllegalArgumentException("Too many or too few components given!");
+			if(subVals.length != 3) throw new IllegalArgumentException("cmd.entityfield.modify.vectorsyntax");
 			Vec3d vec3d = new Vec3d(Double.parseDouble(subVals[0]),
 					Double.parseDouble(subVals[1]),
 					Double.parseDouble(subVals[2]));
@@ -118,50 +150,9 @@ public class EntityFieldCommand {
 			if((!newValue.equals("true")) && (!newValue.equals("false"))) throw new IllegalArgumentException("Use true or false");
 			field.set(entity, Boolean.parseBoolean(newValue));
 		} else {
-			throw new IllegalArgumentException("Unsupported field given!");
+			throw new IllegalArgumentException("cmd.entityfield.modify.unsupported");
 		}
 		
 		return true;
 	}
-
-	public static Set<String> getAvailableFields(Class<?> entityClass) {
-		Set<String> fieldSet = new TreeSet<>();
-		Mapping mapping = MessMod.INSTANCE.getMapping();
-		while(entityClass != Object.class) {
-			for(Field field : entityClass.getDeclaredFields()) {
-				if(!mapping.isDummy()) {
-					fieldSet.add(getNamedField(field.getName()));
-				} else {
-					fieldSet.add(field.getName());
-				}
-			}
-			
-			entityClass = entityClass.getSuperclass();
-		}
-		
-		return fieldSet;
-	}
-
-	private static Field getField(Class<?> targetClass, String fieldName) {
-		Mapping mapping = MessMod.INSTANCE.getMapping();
-		if(!mapping.isDummy()) {
-			fieldName = mapping.srgFieldRecursively(targetClass, fieldName);
-		}
-		
-		while(true) {
-			try {
-				Field field = targetClass.getDeclaredField(fieldName);
-				field.setAccessible(true);
-				return field;
-			} catch(NoSuchFieldException e) {
-				if(!Object.class.equals(targetClass)) {
-					targetClass = targetClass.getSuperclass();
-					continue;
-				}
-				
-				return null;
-			}
-		}
-	}
-
 }

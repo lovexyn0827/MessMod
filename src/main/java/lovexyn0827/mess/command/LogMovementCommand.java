@@ -23,16 +23,18 @@ public class LogMovementCommand {
 						.then(argument("target", EntityArgumentType.entities())
 								.executes((ct) -> {
 									Collection<? extends Entity> l = EntityArgumentType.getEntities(ct, "target");
-									SUBSCRIBED_ENTITIES.addAll(l);
-									CommandUtil.feedback(ct, "Subscribed " + l.size() + " Entities");
+									long count = l.stream().filter((e) -> !SUBSCRIBED_ENTITIES.contains(e))
+											.map(SUBSCRIBED_ENTITIES::add).count();
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.sub", l.size(), count);
 									return Command.SINGLE_SUCCESS;
 								})))
 				.then(literal("unsub")
 						.then(argument("target", EntityArgumentType.entities())
 								.executes((ct) -> {
 									Collection<? extends Entity> l = EntityArgumentType.getEntities(ct, "target");
-									SUBSCRIBED_ENTITIES.removeAll(l);
-									CommandUtil.feedback(ct, "Unsubscribed " + l.size() + " Entities");
+									long count = l.stream().filter(SUBSCRIBED_ENTITIES::contains)
+											.map(SUBSCRIBED_ENTITIES::remove).count();
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.unsub", l.size(), count);
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
