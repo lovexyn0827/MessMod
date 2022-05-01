@@ -87,10 +87,11 @@ public class Language {
 
 		@Override
 		public String tryParse(String str) throws InvaildOptionException {
-			// TODO Move application steps to where it should be. And validate before application
+			// TODO Move application steps to where it should be.
 			if(I18N.setLanguage(str)) {
 				return str;
 			} else {
+				// Needn't be translated
 				throw new InvaildOptionException("The language is unsupported currently or incomplete.");
 			}
 		}
@@ -100,12 +101,13 @@ public class Language {
 			return val;
 		}
 		
-		/**
-		 * Remember to add the name of the added language to make it present in command suggestions
-		 */
 		@Override
 		public SuggestionProvider<ServerCommandSource> createSuggestions() {
-			return (ct, b) -> b.suggest("zh_cn").suggest("en_us").buildFuture();
+			return (ct, b) -> {
+				b.suggest("-FOLLOW_SYSTEM_SETTINGS-");
+				I18N.SUPPORTED_LANGUAGES.forEach(b::suggest);
+				return b.buildFuture();
+			};
 		}
 	}
 }

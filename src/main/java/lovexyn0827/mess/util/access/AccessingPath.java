@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A sequence of {@link Node}, used to get some fields or elements from an object.
@@ -79,5 +80,10 @@ public final class AccessingPath {
 			
 			this.initialized = true;
 		}
+	}
+	
+	@Nullable
+	public Type getOutputType() {
+		return this.nodes.getLast().outputType;
 	}
 }

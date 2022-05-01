@@ -77,7 +77,6 @@ public class OptionManager{
 
 	@Option(description = "Whether or not execution of commands defined by this mod require OP permission.", 
 			defaultValue = "false", 
-			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;
 	
@@ -140,7 +139,7 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean entityLogAutoArchiving;
 	
-	// TODO
+	// TODO Assess the performance cost
 	@Option(description = "In the vanilla getEntities() method, only entities which are in subchunks whose Cheshev distance"
 			+ "to the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the "
 			+ "entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especally when"
@@ -162,7 +161,7 @@ public class OptionManager{
 	public static float hudTextSize;
 	
 	@Option(description = "The main language of the Mod", 
-			defaultValue = "en_us", 
+			defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 
 			parserClass = Language.Parser.class)
 	public static String language;
 	
@@ -200,10 +199,8 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean projectileChunkLoadingPermanence;
 	
-	// TODO
-	@Option(description = "Prevent the shape of rails from being changed by sorrounding blocks.", 
+	@Option(description = "Prevent the shape of rails from being changed by sorrounding rails.", 
 			defaultValue = "false", 
-			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
 	
@@ -236,7 +233,7 @@ public class OptionManager{
 	// TODO
 	@Option(description = "Treat accessing paths strictly, to make them more relyable. Disable it may make accessing "
 			+ "processes more likely to fail in varible environments.", 
-			defaultValue = "true", 
+			defaultValue = "false", 
 			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean strictAccessingPathParsing;

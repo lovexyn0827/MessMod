@@ -23,7 +23,6 @@ public class ServerSyncedBoxRenderer {
 	}
 	
 	private void updateBox(Vec3d pos,ServerWorld world) {
-		if(world.getTime() == this.lastUpdated) return;
 		this.lastUpdated = world.getTime();
 		for(Entity entity:world.getEntitiesByClass(Entity.class, new net.minecraft.util.math.Box(pos, pos).expand(128), (e) -> true)) {
 			if(entity instanceof ServerPlayerEntity) continue;
@@ -36,6 +35,7 @@ public class ServerSyncedBoxRenderer {
 	}
 	
 	public void tick() {
+		if(this.server.getOverworld().getTime() == this.lastUpdated) return;
 		if(this.server==null || this.client.player==null || !OptionManager.serverSyncedBox) return;
 		this.server.getWorlds().forEach((world) -> this.updateBox(this.client.player.getPos(), world));
 	}

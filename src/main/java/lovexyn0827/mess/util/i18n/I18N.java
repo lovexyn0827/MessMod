@@ -1,5 +1,9 @@
 package lovexyn0827.mess.util.i18n;
 
+import com.google.common.collect.ImmutableSet;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.GameOptions;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 
@@ -9,6 +13,10 @@ import net.minecraft.util.crash.CrashReport;
  * Date: April 10, 2022
  */
 public class I18N {
+	/**
+	 * Remember to add the name of the added language to make it present in command suggestions
+	 */
+	public static final ImmutableSet<String> SUPPORTED_LANGUAGES = ImmutableSet.<String>builder().add("zh_cn", "en_us").build();
 	public static final Language EN_US;
 	private static Language currentLanguage;
 	
@@ -16,10 +24,30 @@ public class I18N {
 		return currentLanguage.translate(s);
 	}
 	
+	@SuppressWarnings("resource")
 	public static boolean setLanguage(String name) {
+		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {
+			GameOptions gopt = MinecraftClient.getInstance().options;
+			if (gopt != null) {
+				String sysLang = MinecraftClient.getInstance().options.language;
+				if (I18N.SUPPORTED_LANGUAGES.contains(sysLang)) {
+					name = sysLang;
+				} else {
+					name = "en_us";
+				} 
+			} else {
+				name = "en_us";
+			} 
+		}
+		
 		try {
-			currentLanguage = new Language(name);
-			return currentLanguage.vaildate();
+			Language lang = new Language(name);
+			if(lang.vaildate()) {
+				currentLanguage = lang;
+				return true;
+			} else {
+				return false;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

@@ -92,10 +92,10 @@ public final class EntityLogger {
 			if(!this.customFields.containsValue(lf)) {
 				this.customFields.put(lf.getCustomName(), lf);
 			} else {
-				throw new TranslatableException("exp.dupfield", field, type.getName());
+				throw new TranslatableException("exp.dupfield");
 			}
 		} else {
-			throw new TranslatableException("exp.nofield", field, type.getName());
+			throw new TranslatableException("exp.nofield", field, type.getName().getString());
 		}
 		
 		temp.values().forEach((h) -> this.entities.put(h.getId(), new EntityHolder(h.entity, this)));

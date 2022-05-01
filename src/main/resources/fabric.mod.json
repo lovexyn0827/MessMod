@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "messmod",
-  "version": "1.16.4-20220501",
+  "version": "1.16.4-20220502",
 
   "name": "MessMod",
   "description": "A minecraft mod that contains many features ranging from world manipulation and information providing to bug fixes and so on, allowing you to take more control of the game, see more information, and do some work easier.", 

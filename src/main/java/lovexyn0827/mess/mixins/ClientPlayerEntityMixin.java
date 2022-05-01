@@ -18,13 +18,9 @@ public abstract class ClientPlayerEntityMixin {
 					target = "Lnet/minecraft/entity/player/PlayerAbilities;getFlySpeed()F"
 			))
 	private float modifySpeed(PlayerAbilities abilities) {
-		try {
-			speed = OptionManager.creativeUpwardsSpeed;
-			if(Float.isFinite(speed) && speed > 0) {
-				return speed;
-			}
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
+		speed = OptionManager.creativeUpwardsSpeed;
+		if(Float.isFinite(speed) && speed > 0) {
+			return speed;
 		}
 		
 		return abilities.getFlySpeed();

@@ -178,7 +178,6 @@ public class MessMod implements ModInitializer {
 	}
 
 	public void onServerPlayerSpawned(ServerPlayerEntity player) {
-		System.out.println(player.getEntityName() + " spawned");
 		//this.hudManager.playerHudS = new PlayerHud(this.hudManager, player, true);
 		CommandUtil.tryUpdatePlayer(player);
 		try {

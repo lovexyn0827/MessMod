@@ -32,7 +32,7 @@ public class EntityFieldCommand {
 				builder = builder.suggest(fieldName);
 			}
 			
-			builder.suggest("-THIS");
+			builder.suggest("-THIS-");
 			return builder.buildFuture();
 		};
 		
@@ -93,7 +93,7 @@ public class EntityFieldCommand {
 	private static int getField(CommandContext<ServerCommandSource> ct, AccessingPath path) throws CommandSyntaxException {
 		Entity entity = EntityArgumentType.getEntity(ct, "target");
 		String name = StringArgumentType.getString(ct, "fieldName");
-		if("-THIS".equals(name)) {
+		if("-THIS-".equals(name)) {
 			path.initialize(entity.getClass());
 			CommandUtil.feedbackRaw(ct, path.access(entity));
 			return Command.SINGLE_SUCCESS;

@@ -70,7 +70,6 @@ class ValueOfMapNode extends Node {
 		if(lastOutType instanceof ParameterizedType) {
 			ParameterizedType pt = ((ParameterizedType) lastOutType);
 			Class<?> lastCl = Reflection.getRawType(lastOutType);
-			// TODO Primitive2Object & Object2Primitive Maps
 			if(isObject2PrimitiveMap(lastCl, pt.getActualTypeArguments().length)) {
 				Type keyType = pt.getActualTypeArguments()[0];
 				this.key = this.keyLiteral.get(keyType);

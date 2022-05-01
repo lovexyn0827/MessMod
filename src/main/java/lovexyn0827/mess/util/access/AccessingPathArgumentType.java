@@ -1,7 +1,6 @@
 package lovexyn0827.mess.util.access;
 
 import java.util.LinkedList;
-import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 
 import org.jetbrains.annotations.Nullable;
@@ -11,9 +10,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.TranslatableException;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -46,24 +43,17 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 		StringReader sr = new StringReader(stringRepresentation);
 		Node n;
 		while((n = readNode(sr)) != null) {
-			// FIXME
-//			if(!(nodes.isEmpty() || n.canFollow(nodes.getLast()) && OptionManager.strictAccessingPathParsing)) {
-//				throw new TranslatableException("Node %s (%s) couldn't follow %s (%s)", 
-//						n.getClass().getSimpleName(), n, 
-//						nodes.getLast().getClass().getSimpleName(), nodes.getLast());
-//			}
+			if(!nodes.isEmpty() && !n.canFollow(nodes.getLast()) && OptionManager.strictAccessingPathParsing) {
+				throw new TranslatableException("Node %s (%s) couldn't follow %s (%s)", 
+						n.getClass().getSimpleName(), n, 
+						nodes.getLast().getClass().getSimpleName(), nodes.getLast());
+			}
 			
 			nodes.add(n);
 		}
 		
 		return new AccessingPath(nodes);
 	}
-	
-	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
-		// TODO
-        return Suggestions.empty();
-    }
 
 	@Nullable
 	private Node readNode(StringReader sr) throws CommandSyntaxException {

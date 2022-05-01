@@ -35,28 +35,26 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A modified version of carpet.script.util.ShapesRenderer
  * Original Author : gnembon
  */
-// FIXME Rendering shapes in the nether and the end.
 public class ShapeRenderer
 {
-    private final Map<RegistryKey<World>, List<Shape>> shapes;
+    private final Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> shapes;
     private MinecraftClient client; 
     public ShapeRenderer(MinecraftClient minecraftClient)
     {
         this.client = minecraftClient;
         shapes = new HashMap<>();
-        shapes.put(World.OVERWORLD, new ArrayList<>());
-        shapes.put(World.NETHER, new ArrayList<>());
-        shapes.put(World.END, new ArrayList<>());
+        shapes.put(World.OVERWORLD, new HashMap<>());
+        shapes.put(World.NETHER, new HashMap<>());
+        shapes.put(World.END, new HashMap<>());
     }
 
     public void render(Camera camera, float partialTick)
@@ -94,34 +92,18 @@ public class ShapeRenderer
 
         synchronized (shapes)
         {
-            shapes.get(dimensionType).removeIf(
-                    entry -> entry.isExpired(MessMod.INSTANCE.getGameTime())
-            );
-
-            shapes.get(dimensionType).forEach(
-                    s ->
-                    {
-                        if (s.shouldRender(dimensionType))
-                            s.renderFaces(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
-                    }
-            );
-            //lines
-            shapes.get(dimensionType).forEach(
-            		
-
-                    s -> {
-                        if (s.shouldRender(dimensionType))
-                            s.renderLines(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
-                    }
-            );
-            shapes.get(dimensionType).forEach(
-                    s ->
-                    {
-                        if (s.shouldRender(dimensionType))
-                            s.renderLines(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
-                    }
-            );
-
+            this.shapes.get(dimensionType).forEach((space, set) -> {
+            	set.removeIf((entry) -> entry.isExpired(MessMod.INSTANCE.getGameTime()));
+            });   
+            this.shapes.get(dimensionType).forEach((space, set) -> {
+            	set.forEach((s) -> {
+            		if(s.shouldRender(dimensionType)) {
+            			s.renderFaces(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+            			s.renderLines(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+            		}
+            	});
+            });
+            
         }
         RenderSystem.enableCull();
         RenderSystem.depthMask(true);
@@ -135,18 +117,33 @@ public class ShapeRenderer
     public void addShape(Shape shape, RegistryKey<World> dim)
     {
         synchronized(this.shapes) {
-        	this.shapes.get(dim).add(shape);
+        	this.shapes.get(dim).computeIfAbsent(ShapeSpace.DEFAULT, (ss) -> new HashSet<>()).add(shape);
         }
     }
+    
+    public void addShape(Shape shape, RegistryKey<World> dim, ShapeSpace space)
+    {
+        synchronized(this.shapes) {
+        	this.shapes.get(dim).computeIfAbsent(space, (ss) -> new HashSet<>()).add(shape);
+        }
+    }
+    
     public void reset()
     {
         synchronized (shapes)
         {
-            shapes.values().forEach(Collection::clear);
+            shapes.values().forEach((map) -> map.values().forEach(Set::clear));
         }
     }
     
-
+    public void clearSpace(ShapeSpace ss)
+    {
+    	synchronized (shapes)
+        {
+            shapes.values().forEach((map) -> map.computeIfAbsent(ss, (ss1) -> new HashSet<>()).clear());
+        }
+    }
+    
     // some raw shit
 
     public static void drawLine(Tessellator tessellator, BufferBuilder builder, float x1, float y1, float z1, float x2, float y2, float z2, float red1, float grn1, float blu1, float alpha) {
@@ -269,5 +266,15 @@ public class ShapeRenderer
             }
         }
         tessellator.draw();
+    }
+    
+    public static class ShapeSpace {
+    	/**
+    	 * Default space, which can only be managed by the ShapeRenderer class automatically.
+    	 */
+    	public static final ShapeSpace DEFAULT = new ShapeSpace();
+    	
+    	@Deprecated
+    	public ShapeSpace() {}
     }
 }

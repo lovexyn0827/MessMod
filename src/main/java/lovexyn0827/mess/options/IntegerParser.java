@@ -31,7 +31,6 @@ public class IntegerParser implements OptionParser<Integer> {
 	public static class NonNegative extends IntegerParser {
 		@Override
 		public Integer tryParse(String str) throws InvaildOptionException {
-			// FIXME
 			Integer i = super.tryParse(str);
 			if(i >= 0) {
 				return i;

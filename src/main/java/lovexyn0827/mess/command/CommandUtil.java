@@ -4,6 +4,8 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -18,6 +20,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -104,12 +107,13 @@ public class CommandUtil {
 	}
 
 	public static void error(CommandContext<ServerCommandSource> ct, String string, Exception e) {
-		ct.getSource().sendError(new LiteralText(I18N.translate(string) + ": " + I18N.translate(e.getMessage())));
+		ct.getSource().sendError(new LiteralText(I18N.translate(string) + ": " + I18N.translate(e.getMessage()))
+				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(e.toString())))));
 	}
 	
-	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, Exception e) {
-		// TODO e is unused, but be aware 
-		ct.getSource().sendError(new LiteralText(str == null ? "[null]" : str));
+	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, @NotNull Exception e) {
+		ct.getSource().sendError(new LiteralText(str == null ? "[null]" : str)
+				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(e.toString())))));
 	}
 
 	public static ServerCommandSource noreplySource() {

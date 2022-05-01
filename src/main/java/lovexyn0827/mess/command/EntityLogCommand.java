@@ -84,7 +84,6 @@ public class EntityLogCommand {
 																l.listenToField(field, type, name, path);
 																CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
 															} catch (Exception e) {
-																e.printStackTrace();
 																CommandUtil.errorRaw(ct, e.getMessage(), e);
 															}
 															
@@ -140,8 +139,7 @@ public class EntityLogCommand {
 		EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 		Collection<? extends Entity> list = EntityArgumentType.getEntities(ct, "target");
 		int i = l.subscribe(list);
-		CommandUtil.feedback(ct, String.format("cmd.general.sub", 
-				list.size(), i));
+		CommandUtil.feedbackWithArgs(ct, "cmd.general.sub", list.size(), i);
 		return Command.SINGLE_SUCCESS;
 	}
 	
@@ -149,8 +147,7 @@ public class EntityLogCommand {
 		EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 		Collection<? extends Entity> list = EntityArgumentType.getEntities(ct, "target");
 		int i = l.unsubscribe(list);
-		CommandUtil.feedback(ct, String.format("cmd.general.unsub", 
-				list.size(), i));
+		CommandUtil.feedbackWithArgs(ct, "cmd.general.unsub", list.size(), i);
 		return Command.SINGLE_SUCCESS;
 	}
 	

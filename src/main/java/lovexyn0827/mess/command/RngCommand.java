@@ -2,6 +2,7 @@ package lovexyn0827.mess.command;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.util.Iterator;
 import java.util.Random;
 
 import static net.minecraft.server.command.CommandManager.argument;
@@ -11,7 +12,9 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import lovexyn0827.mess.mixins.EntityAccessor;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -70,8 +73,22 @@ public class RngCommand {
 	
 	@SuppressWarnings("resource")
 	private static Random getRandom(CommandContext<ServerCommandSource> ct) {
-		// FIXME Compatibility with /execute and something else
-		if(ct.getInput().contains("rng world")) {
+		boolean isWorld = false;
+		Iterator<ParsedCommandNode<ServerCommandSource>> itr = ct.getNodes().iterator();
+		while (itr.hasNext()) {
+			ParsedCommandNode<ServerCommandSource> node = itr.next();
+			if(node.getNode() instanceof LiteralCommandNode) {
+				LiteralCommandNode<?> lcn = (LiteralCommandNode<?>) node.getNode();
+				if("rng".equals(lcn.getLiteral())) {
+					if(itr.hasNext() && "world".equals(itr.next().getNode().getName())) {
+						isWorld = true;
+						break;
+					}
+				}
+			}
+		}
+		
+		if(isWorld) {
 			return ct.getSource().getWorld().random;
 		}else {
 			try {

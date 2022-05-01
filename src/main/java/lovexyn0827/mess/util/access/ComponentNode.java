@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
@@ -18,9 +19,9 @@ abstract class ComponentNode extends Node {
 	
 	@Override
 	boolean canFollow(Node n) {
-		if(n.outputType instanceof Class<?>) {
-			Class<?> out = (Class<?>) n.outputType;
-			return VECTOR_CLASSES.stream().anyMatch(out::isAssignableFrom);
+		Class<?> rawType = Reflection.getRawType(n.outputType);
+		if(rawType != null) {
+			return VECTOR_CLASSES.stream().anyMatch((c) -> c.isAssignableFrom(rawType));
 		}
 		
 		return false;
@@ -79,7 +80,7 @@ abstract class ComponentNode extends Node {
 		@Override
 		boolean canFollow(Node n) {
 			return super.canFollow(n) && n.outputType instanceof Class<?> 
-					&& ChunkPos.class.isAssignableFrom((Class<?>) n.outputType);
+					&& !ChunkPos.class.isAssignableFrom((Class<?>) n.outputType);
 		}
 
 		@Override

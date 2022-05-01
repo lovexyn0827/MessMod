@@ -73,9 +73,6 @@ public class ElementNode extends Node {
 	@Override
 	boolean canFollow(Node n) {
 		Type t = n.outputType;
-		if(t != null) {
-			System.out.println(t.getTypeName());
-		}
 		return t instanceof Class<?> && (((Class<?>) t).isArray() || Collection.class.isAssignableFrom((Class<?>) t));
 	}
 

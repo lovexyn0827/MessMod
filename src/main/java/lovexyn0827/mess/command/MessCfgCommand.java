@@ -19,6 +19,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -34,11 +35,13 @@ public class MessCfgCommand {
 					CommandUtil.feedbackRaw(ct, metadata.getDescription());
 					s.sendFeedback(new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
 					OptionManager.OPTIONS.forEach((f) -> {
+						Option o = f.getAnnotation(Option.class);
 						String n = f.getName();
 						String v = OptionManager.getString(f);
 						ClickEvent event = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/messcfg " + n);
 						MutableText text = new LiteralText(n + ": " + v)
-								.fillStyle(Style.EMPTY.withClickEvent(event))
+								.fillStyle(Style.EMPTY.withClickEvent(event)
+										.withHoverEvent((new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(o.description())))))
 								.formatted(Formatting.GRAY);
 						boolean modified = !v.equals(f.getAnnotation(Option.class).defaultValue());
 						s.sendFeedback(modified ? text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText()) : text, false);
