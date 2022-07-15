@@ -34,7 +34,9 @@ public final class AccessingPath {
 			this.nodes.forEach((node) -> mo.setValue(node.access(mo.getValue())));
 			return mo.getValue();
 		} catch (NullPointerException | NoSuchElementException e) {
-			return null;
+			return "[null]";
+		} catch (Exception e1) {
+			return "[ERROR]: " + e1.getMessage();
 		}
 	}
 	

@@ -5,12 +5,7 @@ public class FloatParser implements OptionParser<Float> {
 	@Override
 	public Float tryParse(String str) throws InvaildOptionException {
 		try {
-			Float f = Float.valueOf(str);
-			if(f > 0) {
-				return f;
-			} else {
-				throw new InvaildOptionException("Use a positive number here");
-			}
+			return Float.valueOf(str);
 		} catch (NumberFormatException e) {
 			throw new InvaildOptionException("The given value is not a number!");
 		}

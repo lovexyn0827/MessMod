@@ -15,7 +15,7 @@ public abstract class LanguageManagerMixin {
 	@Inject(method = "setLanguage(Lnet/minecraft/client/resource/language/LanguageDefinition;)V",  at = @At("HEAD"))
 	private void updateLanguage(LanguageDefinition ld, CallbackInfo ci) {
 		if("-FOLLOW_SYSTEM_SETTINGS-".equals(OptionManager.language)) {
-			I18N.setLanguage(null);
+			I18N.setLanguage(null, false);
 		}
 	}
 }

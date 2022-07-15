@@ -63,6 +63,7 @@ public class MessCfgCommand {
 		OptionManager.OPTIONS.forEach((f) -> {
 			try {
 				Option o = f.getAnnotation(Option.class);
+				@SuppressWarnings("deprecation")
 				OptionParser<?> parser = o.parserClass().newInstance();
 				SuggestionProvider<ServerCommandSource> sp = parser.createSuggestions();
 				if(sp == null) {

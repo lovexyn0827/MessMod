@@ -88,7 +88,8 @@ public class Language {
 		@Override
 		public String tryParse(String str) throws InvaildOptionException {
 			// TODO Move application steps to where it should be.
-			if(I18N.setLanguage(str)) {
+			boolean forceLoad = str.endsWith("_FORCELOAD");
+			if(I18N.setLanguage(str.replace("_FORCELOAD", ""), forceLoad)) {
 				return str;
 			} else {
 				// Needn't be translated
@@ -105,7 +106,10 @@ public class Language {
 		public SuggestionProvider<ServerCommandSource> createSuggestions() {
 			return (ct, b) -> {
 				b.suggest("-FOLLOW_SYSTEM_SETTINGS-");
-				I18N.SUPPORTED_LANGUAGES.forEach(b::suggest);
+				I18N.SUPPORTED_LANGUAGES.forEach((l) -> {
+					b.suggest(l);
+					b.suggest(l + "_FORCELOAD");
+				});
 				return b.buildFuture();
 			};
 		}

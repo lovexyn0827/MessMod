@@ -131,6 +131,19 @@ public class EntityLogCommand {
 											.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 									MessMod.INSTANCE.getEntityLogger().removeAutoSubEntityType(type);
 									return Command.SINGLE_SUCCESS;
+								})))
+				.then(literal("autoSubName")
+						.then(argument("name", StringArgumentType.word())
+								.executes((ct) -> {
+									MessMod.INSTANCE.getEntityLogger().addAutoSubName(StringArgumentType.getString(ct, "name"));
+									return Command.SINGLE_SUCCESS;
+								})))
+				.then(literal("stopAutoSubName")
+						.then(argument("name", StringArgumentType.word())
+								.suggests(CommandUtil.ENTITY_TYPES)
+								.executes((ct) -> {
+									MessMod.INSTANCE.getEntityLogger().removeAutoSubName(StringArgumentType.getString(ct, "name"));
+									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
 	}

@@ -1,4 +1,6 @@
 package lovexyn0827.mess.rendering.hud;
 
-public interface HudManager {
+// TODO
+public class EntitySideBar {
+	
 }

@@ -25,7 +25,8 @@ public class I18N {
 	}
 	
 	@SuppressWarnings("resource")
-	public static boolean setLanguage(String name) {
+	public static boolean setLanguage(String name, boolean forceLoad) {
+		// FIXME Loading fails in some environments
 		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {
 			GameOptions gopt = MinecraftClient.getInstance().options;
 			if (gopt != null) {
@@ -42,7 +43,7 @@ public class I18N {
 		
 		try {
 			Language lang = new Language(name);
-			if(lang.vaildate()) {
+			if(forceLoad || lang.vaildate()) {
 				currentLanguage = lang;
 				return true;
 			} else {

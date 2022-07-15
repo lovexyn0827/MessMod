@@ -43,11 +43,15 @@ public final class EntityLogger {
 	private final Set<EntityType<?>> autoSubTypes = Sets.newHashSet();
 	private long lastSessionStart;
 	private boolean hasCreatedAnyLog;
+	private final Set<String> autoSubNames = Sets.newHashSet();
 
 	public void tick(MinecraftServer server) throws IOException {
 		if(!this.autoSubTypes.isEmpty()) {
 			server.getWorlds().forEach((world) -> {
-				this.subscribe(world.getEntitiesByType(null, (e) -> this.autoSubTypes.contains(e.getType())));
+				this.subscribe(world.getEntitiesByType(null, (e) -> {
+					// FIXME Automatically subscribing entities with a specified name
+					return this.autoSubTypes.contains(e.getType()) || this.autoSubNames.contains(e.getName().asString());
+				}));
 			});
 		}
 		
@@ -203,5 +207,13 @@ public final class EntityLogger {
 
 	public Map<String, ListenedField> getListenedFields() {
 		return this.customFields;
+	}
+
+	public void addAutoSubName(String name) {
+		this.autoSubNames.add(name);
+	}
+
+	public void removeAutoSubName(String name) {
+		this.autoSubNames.remove(name);
 	}
 }

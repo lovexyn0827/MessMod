@@ -78,7 +78,7 @@ public class ModifyCommand {
 										executes((ct) -> {
 											forEachEntity(ct,(entity,val) -> {
 												Vec3d vec = entity.getVelocity();
-												entity.setVelocity(vec.x,vec.y,vec.z);
+												entity.setVelocity(vec.x,vec.y,val);
 											},
 											(entity) -> true);
 											return 0;

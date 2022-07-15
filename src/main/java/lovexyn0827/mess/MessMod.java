@@ -16,8 +16,9 @@ import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
 import lovexyn0827.mess.rendering.ShapeRenderer;
-import lovexyn0827.mess.rendering.hud.HudManager;
+import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
+import lovexyn0827.mess.rendering.hud.ServerHudManager;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
 import net.fabricmc.api.ModInitializer;
@@ -37,14 +38,15 @@ public class MessMod implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final MessMod INSTANCE = new MessMod();
 	private Mapping mapping;
-	private HudManager hudManager;
+	private ClientHudManager hudManagerC;
+	private ServerHudManager hudManagerS;
 	private int windowX;
 	private int windowY;
 	private ServerSyncedBoxRenderer boxRenderer;
 	private MinecraftServer server;
 	private String scriptDir;
 	private long gameTime;
-	public ShapeRenderer shapeRenderer;	// Reading from the field directly may bring high performance.
+	public ShapeRenderer shapeRenderer;	// Reading from the field directly may bring higher performance.
 	private BlockInfoRenderer blockInfoRederer = new BlockInfoRenderer();
 	private EntityLogger logger;
 
@@ -52,7 +54,6 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
 		this.logger = new EntityLogger();
 		this.reloadMapping();
-		OptionManager.OPTIONS.toString();
 	}
 
 	public void reloadMapping() {
@@ -81,6 +82,7 @@ public class MessMod implements ModInitializer {
 			Files.createDirectories(scriptPath);
 		}
 		
+		// TODO
 		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/" + name + ".sc"), 
 				Paths.get(this.scriptDir, name + ".sc"), 
 				StandardCopyOption.REPLACE_EXISTING);
@@ -88,7 +90,7 @@ public class MessMod implements ModInitializer {
 	
 	public void onRender(ClientPlayerEntity player, IntegratedServer server) {
 		this.updateWindowSize(MinecraftClient.getInstance().getWindow());
-		if(this.getHudManager() != null) this.getHudManager().render(player,server);
+		if(this.getClientHudManager() != null) this.getClientHudManager().render(player,server);
 	}
 
 	private void updateWindowSize(Window window) {
@@ -105,19 +107,27 @@ public class MessMod implements ModInitializer {
 	}
 	
 	public void onGameJoined(GameJoinS2CPacket packet) {
-		this.hudManager = new HudManager();
+		ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
+		this.hudManagerC = new ClientHudManager();
+		this.hudManagerC.playerHudS = new PlayerHud(this.hudManagerC, player, true);
+		this.hudManagerS.playerHudC.updatePlayer();
 	}
 	
 	public void onServerTicked(MinecraftServer server) {
 		ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
-		if(player != null && MessMod.INSTANCE.getHudManager() != null) {
-			MessMod.INSTANCE.getHudManager().lookingHud.updateData(player);
-		}if(this.getHudManager() != null && this.getHudManager().playerHudS == null && player != null) {
-			this.getHudManager().playerHudS = new PlayerHud(this.getHudManager(), player, true);
+		ServerHudManager shm = this.getServerHudManager();
+		if(player != null && shm != null && shm.lookingHud != null) {
+			shm.lookingHud.updateLookingAtEntityData(player);
 		}
 		
-		if(player != null && this.getHudManager() != null && this.getHudManager().playerHudS != null) {
-			this.getHudManager().playerHudS.updateData(player);
+//		if(shm != null && shm.playerHudS == null && player != null) {
+//			this.getServerHudManager().playerHudS = new PlayerHud(this.getServerHudManager(), player, true);
+//			this.getServerHudManager().playerHudS = (PlayerHudDataSenderer) HudDataSenderer
+//					.createHudDataSenderer(this.server.isDedicated(), HudType.SERVER_PLAYER);
+//		}
+		
+		if(player != null && shm != null && shm.playerHudS != null) {
+			shm.playerHudS.updateData(player);
 		}
 		
 		this.boxRenderer.tick();
@@ -131,28 +141,33 @@ public class MessMod implements ModInitializer {
 		}
 	}
 
+	
 	public void onClientTicked() {
-		if(this.getHudManager() != null) {
-			this.getHudManager().playerHudC.updateData();
+		ServerHudManager shm = this.getServerHudManager();
+		if(shm != null && shm.playerHudC != null) {
+			shm.playerHudC.updateData();
 		}else {
-			this.hudManager = new HudManager();
+			this.hudManagerS = new ServerHudManager();
 		}
 	}
 
+	//Client
 	public void onDisconnected() {
-		this.hudManager = null;
+		this.hudManagerC = null;
 	}
 	
+	//Client
 	public void onPlayerRespawned(PlayerRespawnS2CPacket packet) {
-		this.getHudManager().playerHudC.refreshPlayer();
+		this.getServerHudManager().playerHudC.updatePlayer();
 	}
 
 	public void onServerStarted(MinecraftServer server) {
-		CommandUtil.updateServer(server);
 		this.server = server;
+		CommandUtil.updateServer(server);
 		OptionManager.updateServer(server);
 		this.boxRenderer.setServer(server);
 		this.blockInfoRederer.initializate(server);
+		this.hudManagerS = new ServerHudManager();
 		try {
 			this.logger.initialize(server);
 		} catch (IOException e) {
@@ -164,6 +179,7 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer.uninitialize();
 		this.server = null;
 		this.logger.closeAll();
+		this.hudManagerS = null;
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.logger.archiveLogs();
@@ -218,7 +234,15 @@ public class MessMod implements ModInitializer {
 		return this.logger;
 	}
 
-	public HudManager getHudManager() {
-		return hudManager;
+	public ClientHudManager getClientHudManager() {
+		return hudManagerC;
+	}
+	
+	public ServerHudManager getServerHudManager() {
+		return hudManagerS;
+	}
+	
+	public boolean isDedicatedEnv() {
+		return this.server != null && this.server.isDedicated();
 	}
 }

@@ -1,5 +1,7 @@
 package lovexyn0827.mess.rendering;
 
+import java.util.List;
+
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.MinecraftClient;
@@ -9,6 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 
+// FIXME Boxes are still rendered when the corresponding entities have already been removed
 public class ServerSyncedBoxRenderer {
 	private MinecraftClient client;
 	private MinecraftServer server;
@@ -23,14 +26,19 @@ public class ServerSyncedBoxRenderer {
 	}
 	
 	private void updateBox(Vec3d pos,ServerWorld world) {
+		ShapeRenderer sr = MessMod.INSTANCE.shapeRenderer;
 		this.lastUpdated = world.getTime();
-		for(Entity entity:world.getEntitiesByClass(Entity.class, new net.minecraft.util.math.Box(pos, pos).expand(128), (e) -> true)) {
+		float r = OptionManager.serverSyncedBoxRenderRange;
+		List<? extends Entity> list;
+		if(r > 0) {
+			list = world.getEntitiesByClass(Entity.class, new net.minecraft.util.math.Box(pos, pos).expand(r), (e) -> true);
+		} else {
+			list = world.getEntitiesByType(null, (e) -> true);
+		}
+		
+		for(Entity entity : list) {
 			if(entity instanceof ServerPlayerEntity) continue;
-			MessMod.INSTANCE.shapeRenderer.addShape(new RenderedBox(entity.getBoundingBox(), 0x31f38bFF, 0, 1), world.getRegistryKey());
-			Vec3d ePos = entity.getPos();
-			MessMod.INSTANCE.shapeRenderer.addShape(new RenderedLine(ePos, ePos, 0xFFFF00FF, 1), world.getRegistryKey());
-			Vec3d eye = new Vec3d(ePos.x, entity.getEyeY(), ePos.z);
-			MessMod.INSTANCE.shapeRenderer.addShape(new RenderedLine(eye, eye, 0xFF00FFFF, 1), world.getRegistryKey());
+			sr.addShape(new RenderedBox(entity.getBoundingBox(), 0x31f38bFF, 0, 1), world.getRegistryKey());
 		}
 	}
 	

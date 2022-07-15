@@ -36,7 +36,7 @@ Make `<targets>` can/cannot step on blocks directly.
 
 Similar to the last, but the target is always the local player. 
 
-##### `/entityfield <target> get <fieldName>` 
+##### `/entityfield <target> get <fieldName> [<path>]` 
 
 Get the value of `<field>` in the object which corresponds to `<target>`. Note that the names are intermediary names like `field_18276`, please use a mapping to translate them. 
 
@@ -53,19 +53,21 @@ Set the value of `<field>` in the object which represents `<target>` to `<newVal
 Start recording the Motion, position, and listened fields of `<target>` every tick and save them to a CSV file. Note that some of the records will temporarily be saved to a buffer rather than being written to the file immediately, `/entity flush` could be used instead. 
 Logs are saved to the entitylog folder in the world folder. 
 
+##### `/entitylog autoSub <entityType>`
+
 ##### `/entitylog unsub <target>` 
 
 Stop monitoring `<target>` and save the records in the buffer to the disk.
 
-##### `/entitylog listenfield <type> <field>` 
+##### `/entitylog listenfield <entityType> <field> [<name> [<path>]]` 
 
-Mark `<field>` 'listened' so that its value will be recorded if any entity containing this field is subscribed by using `/entitylog sub <target>`, execution of this command will restart all recording processes. Currently, `<type>` wouldn't restrict the scope of influence of this command.
+Mark `<field>` as 'listened' so that its value will be recorded if any entity containing this field is subscribed by using `/entitylog sub <target>`, execution of this command will restart all recording processes. Currently, `<type>` wouldn't restrict the scope of influence of this command. 
 
 ##### `/entitylog flush` 
 
 Save the records in the buffer to the disk without stopping recording.
 
-##### `/explode <pos> <power> <fire>` 
+##### `/explode <pos> <power> [<fire>`] 
 
 Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single preciseness floating-point number, including Infinities and even `NaN`.
 

@@ -31,6 +31,7 @@ import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 
@@ -56,6 +57,11 @@ public class OptionManager{
 	 */
 	public static final Map<String, BiConsumer<String, CommandContext<ServerCommandSource>>> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
 	
+	@Option(description = "Enable anti-cheating for host player in SP & LAN game", 
+			defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean antiHostCheating;
+	
 	@Option(description = "TNTs could be killed by attacking.", 
 			defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -80,6 +86,11 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;
 	
+	@Option(description = "Detect the block updates of crafting tables.", 
+			defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean craftingTableBUD;
+	
 	@Option(description = "Set the speed which the player is flying upwards at in the creative mode.", 
 			defaultValue = "0.05", 
 			suggestions = {"0.05", "0.10"}, 
@@ -93,6 +104,12 @@ public class OptionManager{
 			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean debugStickSkipsInvaildState;
+	
+	// TODO
+	@Option(description = "As described by its name.", 
+			defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean disableChunkLoadingCheckInCommands;
 	
 	@Option(description = "Disable the calculation of explosion exposure to reduce the lag caused by stacked "
 			+ "TNT explosions. This will also mean that blocks cannot prevent entities from be influenced by "
@@ -204,6 +221,11 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
 	
+	@Option(description = "Prevent the chunks from being loaded in some ways.", 
+			defaultValue = "", 
+			parserClass = ListParser.Ticket.class)
+	public static List<ChunkTicketType<?>> rejectChunkTicket;
+	
 	@Option(description = "Enable or disable block boundary box renderer.", 
 			defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -224,6 +246,19 @@ public class OptionManager{
 			defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean serverSyncedBox;
+	
+	@Option(description = "The maximum Cheshev distance beween entity rendered with its bounding bix and the player."
+			+ "All non-positive values are consided as positive infinite.", 
+			defaultValue = "-1", 
+			parserClass = FloatParser.class)
+	public static float serverSyncedBoxRenderRange;
+	
+	// TODO
+	@Option(description = "Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long "
+			+ "distance raycasts.", 
+			defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean skipUnloadedChunkInRaycasting;
 	
 	@Option(description = "Make the location of huds more stable when the length of lines change frequently.", 
 			defaultValue = "true", 
@@ -281,6 +316,7 @@ public class OptionManager{
 			String name = f.getName();
 			try {
 				Option o = f.getAnnotation(Option.class);
+				@SuppressWarnings("deprecation")
 				OptionParser<?> parser = o.parserClass().newInstance();
 				try {
 					localOptionSerializer.computeIfAbsent(name, 
@@ -338,6 +374,7 @@ public class OptionManager{
 			String name = f.getName();
 			try {
 				Option o = f.getAnnotation(Option.class);
+				@SuppressWarnings("deprecation")
 				OptionParser<?> parser = o.parserClass().newInstance();
 				try {
 					GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (k) -> o.defaultValue());
@@ -396,6 +433,7 @@ public class OptionManager{
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static void set(Field f, Object obj) {
 		try {
 			f.set(null, obj);
@@ -410,6 +448,7 @@ public class OptionManager{
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static void setGolbal(Field f, Object obj) {
 		try {
 			GLOBAL_OPTION_SERIALIZER.put(f.getName(), f.getAnnotation(Option.class).parserClass()

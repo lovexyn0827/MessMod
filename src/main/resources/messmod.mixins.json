@@ -28,7 +28,13 @@
     "ClientPlayerEntityMixin",
     "AbstractRedstoneGateBlockMixin",
     "RailPlacementHelperMixin",
-    "LanguageManagerMixin"
+    "LanguageManagerMixin",
+    "BlockViewMixin",
+    "BlockPosArgumentTypeMixin",
+    "CloneCommandMixin", 
+    "CraftingTableBlockMixin", 
+    "ChunkTicketManagerMixin", 
+    "ServerPlayNetworkHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

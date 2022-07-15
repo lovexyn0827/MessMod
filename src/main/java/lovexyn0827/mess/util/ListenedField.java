@@ -4,11 +4,11 @@ import java.lang.reflect.Field;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
-import lovexyn0827.mess.rendering.hud.data.HudInfo;
+import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
 
-public class ListenedField implements HudInfo, Comparable<HudInfo> {
+public class ListenedField implements HudLine, Comparable<HudLine> {
 	private final Field field;
 	// XXX Should the name influence the equality?
 	private final String name;
@@ -44,8 +44,9 @@ public class ListenedField implements HudInfo, Comparable<HudInfo> {
 	}
 
 	@Override
+	// XXX
 	public String toLine(Object data) {
-		return this.name + ": " + this.get(((Entity) data));
+		return this.get(((Entity) data));
 	}
 
 	@Override
@@ -73,7 +74,7 @@ public class ListenedField implements HudInfo, Comparable<HudInfo> {
 	}
 
 	@Override
-	public int compareTo(HudInfo o) {
+	public int compareTo(HudLine o) {
 		if(o instanceof BuiltinHudInfo) {
 			return 1;
 		} else if(o instanceof ListenedField) {
@@ -86,5 +87,10 @@ public class ListenedField implements HudInfo, Comparable<HudInfo> {
 	@Override
 	public String toString() {
 		return this.name + '(' + this.field.getName() + '.' + this.path + ')';
+	}
+
+	@Override
+	public String getName() {
+		return this.getCustomName();
 	}
 }
