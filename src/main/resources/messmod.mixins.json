@@ -29,7 +29,7 @@
     "AbstractRedstoneGateBlockMixin",
     "RailPlacementHelperMixin",
     "LanguageManagerMixin",
-    "BlockViewMixin",
+    "ServerWorldMixin",
     "BlockPosArgumentTypeMixin",
     "CloneCommandMixin", 
     "CraftingTableBlockMixin", 
