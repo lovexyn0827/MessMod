@@ -5,16 +5,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.options.OptionManager;
-import net.minecraft.block.BlockState;
 import net.minecraft.server.command.CloneCommand;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldView;
 
 @Mixin(CloneCommand.class)
-// FIXME
 public abstract class CloneCommandMixin {
 	@Redirect(method = "execute", 
 			at = @At(value = "INVOKE", 

@@ -19,7 +19,6 @@ import net.minecraft.util.math.Vec3d;
 
 public class LocalDataStorage implements HudDataSenderer, HudDataStorage {
 	private Map<HudLine, Object> data = new TreeMap<>();
-	private Map<String, Object> dataByName = new TreeMap<>();
 	private List<HudLine> customLines = new ArrayList<>();
 
 	@Override
@@ -117,7 +116,7 @@ public class LocalDataStorage implements HudDataSenderer, HudDataStorage {
 	}
 
 	@Override
-	public Object get(String id) {
-		return this.dataByName.get(id);
+	public synchronized Object get(HudLine id) {
+		return this.data.get(id);
 	}
 }

@@ -12,19 +12,16 @@ public class LookingAtEntityHud extends EntityHud {
 	}
 	
 	public void render() {
-		String entityInfo = "[Null]";
-		if(getData().get(BuiltinHudInfo.ID.getName()) != null) {
-			entityInfo = "("+getData().get(BuiltinHudInfo.ID.getName()) + "," + 
-					getData().get(BuiltinHudInfo.NAME.getName()) + "," + 
-					getData().get(BuiltinHudInfo.AGE.getName()) + ")";
+		String entityInfo;
+		if(this.getData().get(BuiltinHudInfo.ID) != null) {
+			entityInfo = "("+getData().get(BuiltinHudInfo.ID) + "," + 
+					getData().get(BuiltinHudInfo.NAME) + "," + 
+					getData().get(BuiltinHudInfo.AGE) + ")";
+		} else {
+			entityInfo = "[Null]";
 		}
 		
 		String describe = "Target" + entityInfo;
 		if(this.shouldRender) this.render(new MatrixStack(), describe);
-	}
-
-	public void addField(Class<?> cl, String string) {
-		this.getData();
-		// XXX
 	}
 }

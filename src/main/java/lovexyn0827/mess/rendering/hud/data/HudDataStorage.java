@@ -16,10 +16,10 @@ import lovexyn0827.mess.rendering.hud.ServerHudManager;
 public interface HudDataStorage {
 	void pushData(String name, Object data);
 	int size();
-	Object get(String id);
+	Object get(HudLine id);
 	Iterator<Entry<HudLine, Object>> iterator();
 	default void forEach(BiConsumer<String, Object> action) {
-		
+		this.iterator().forEachRemaining((entry) -> action.accept(entry.getKey().getName(), entry.getKey()));
 	}
 	
 	static HudDataStorage create(HudType type) {
