@@ -27,6 +27,7 @@ import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
+import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
@@ -56,6 +57,17 @@ public class OptionManager{
 	 * Actions taken right after an option is set to a given value.
 	 */
 	public static final Map<String, BiConsumer<String, CommandContext<ServerCommandSource>>> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
+	
+	@Option(description = "There are there initializing strategies available: \n"
+			+ "- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, "
+			+ "including the resolved `Member` instances, will be used to access all subsequent inputs.\n"
+			+ "- Standard strategy: Accessing paths are parsed for every different inputs (a,  b are equal if and only "
+			+ "if the statement `a==b` is true), and the parsed copies are cached until the inputs are discarded by the "
+			+ "garbage collector.\n"
+			+ "- Strict Strategy: Accessing paths are reinitialized each time they are used.", 
+			defaultValue = "STANDARD", 
+			parserClass = AccessingPath.InitializationStrategy.Parser.class)
+	public static AccessingPath.InitializationStrategy accessingPathInitStrategy;
 	
 	@Option(description = "Enable anti-cheating for host player in SP & LAN game", 
 			defaultValue = "false", 

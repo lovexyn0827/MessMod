@@ -17,6 +17,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -94,9 +95,13 @@ public class EntityFieldCommand {
 		Entity entity = EntityArgumentType.getEntity(ct, "target");
 		String name = StringArgumentType.getString(ct, "fieldName");
 		if("-THIS-".equals(name)) {
-			path.initialize(entity.getClass());
-			CommandUtil.feedbackRaw(ct, path.access(entity));
-			return Command.SINGLE_SUCCESS;
+			try {
+				CommandUtil.feedbackRaw(ct, path.access(entity, entity.getClass()));
+				return Command.SINGLE_SUCCESS;
+			} catch (AccessingFailureException e) {
+				CommandUtil.errorRaw(ct, e.getMessage(), e);
+				return 0;
+			}
 		}
 		
 		try {
@@ -104,14 +109,14 @@ public class EntityFieldCommand {
 			if(field != null) {
 				field.setAccessible(true);
 				Object ob = field.get(entity);
-				path.initialize(field.getGenericType());
-				CommandUtil.feedbackRaw(ct,  ob == null ? "[null]" : path.access(ob));
+				CommandUtil.feedbackRaw(ct,  ob == null ? "[null]" : path.access(ob, field.getGenericType()));
 			} else {
 				CommandUtil.error(ct, "cmd.entityfield.nosuchfield");
 			}
 			
 			return Command.SINGLE_SUCCESS;
 		} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
+			e.printStackTrace();
 			CommandUtil.error(ct, "cmd.entityfield.unexpected", e);
 			return 0;
 		} catch (NoSuchFieldError e) {
@@ -120,6 +125,9 @@ public class EntityFieldCommand {
 		} catch (TranslatableException e) {
 			CommandUtil.errorRaw(ct, e.getMessage(), e);
 			e.printStackTrace();
+			return 0;
+		} catch (AccessingFailureException e) {
+			CommandUtil.errorRaw(ct, e.getMessage(), e);
 			return 0;
 		}
 	}

@@ -32,13 +32,15 @@ abstract class Node {
 	 */
 	@Nullable
 	protected Type outputType;
-	private boolean addedToPath;
+	private boolean initialized;
+	/** Shouldn't be modified twice */
+	int ordinary;
 	
 	boolean canFollow(Node n) {
 		return n.outputType != null && !Reflection.isPrimitive(n.outputType);
 	}
 	
-	abstract Object access(Object previous);
+	abstract Object access(Object previous) throws AccessingFailureException;
 	
 	Set<String> listSuggestions() {
 		if(this.outputType != null) {
@@ -49,16 +51,27 @@ abstract class Node {
 	}
 
 	boolean isInitialized() {
-		return addedToPath;
+		return initialized;
 	}
 
-	final void initialize(Type lastOutClass) {
+	final void initialize(Type lastOutClass) throws AccessingFailureException {
 		this.prepare(lastOutClass);
-		this.addedToPath = true;
+		this.initialized = true;
+	}
+	
+	void uninitialize() {
+		this.outputType = null;
+		this.initialized = false;
 	}
 
 	/**
+	 * @throws AccessingFailureException 
 	 * @implNote outputType field shouldn't be null after initialization.
 	 */
-	protected abstract Type prepare(Type lastOutType);
+	protected abstract Type prepare(Type lastOutType) throws AccessingFailureException;
+	
+	/** Nodes obtained this way must maintain its original position in the path */
+	Node createCopyForInput(Object input) {
+		return this;
+	}
 }

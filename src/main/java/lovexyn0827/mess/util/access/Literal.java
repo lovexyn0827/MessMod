@@ -19,8 +19,10 @@ import net.minecraft.util.math.BlockPos;
 abstract class Literal<T> {
 	@NotNull
 	protected final String stringRepresentation;
-	// Whether or not the value could be determined from the string representation directly
-	// and won't change since created
+	/**
+	 * Whether or not the value could be determined from the string representation directly
+	 * and won't change since created.
+	 */
 	protected boolean compiled;
 
 	protected Literal(String strRep) {
@@ -55,10 +57,11 @@ abstract class Literal<T> {
 	}
 
 	/**
+	 * @throws AccessingFailureException 
 	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
 	 */
 	@Nullable
-	abstract T get(Type type);
+	abstract T get(Type type) throws AccessingFailureException;
 	
 	static Literal<?> parse(String strRep) throws CommandSyntaxException {
 		if(strRep.startsWith("\"")) {
@@ -74,6 +77,13 @@ abstract class Literal<T> {
 		} else {
 			return new IntL(strRep);
 		}
+	}
+
+	/**
+	 * @return A Literal instance which can be reinitialized for other inputs
+	 */
+	protected Literal<?> recreate() {
+		return this;
 	}
 	
 	static class StringL extends Literal<String> {
@@ -96,13 +106,13 @@ abstract class Literal<T> {
 
 		@Override
 		@NotNull
-		Object get(Type clazz) {
+		Object get(Type clazz) throws AccessingFailureException {
 			if(this.compiled && this.fieldVal != null) {
 				return this.fieldVal;
 			}
 			
 			if(clazz == null) {
-				throw new TranslatableException("exp.unboundedclass", this.stringRepresentation);
+				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
 			}
 			
 			Class<?> cl = Reflection.getRawType(clazz);
@@ -114,7 +124,7 @@ abstract class Literal<T> {
 						return f.get(null);
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						e.printStackTrace();
-						throw new TranslatableException("exp.nofield", e);
+						throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e);
 					}
 				} else {
 					String[] clAndF = this.stringRepresentation.split("#");
@@ -131,20 +141,27 @@ abstract class Literal<T> {
 								return this.fieldVal;
 							}
 						} catch (ClassNotFoundException e) {
-							throw new TranslatableException("exp.noclass", clAndF[0]);
+							throw new AccessingFailureException(AccessingFailureException.Cause.NO_CLASS, clAndF[0]);
+							
 						} catch (IllegalArgumentException | IllegalAccessException e) {
 							e.printStackTrace();
-							throw new TranslatableException("Unexpected exception: %s", e);
+							throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e);
 						}
 					} else {
-						throw new TranslatableException("exp.staticl.format");
+						throw new AccessingFailureException(AccessingFailureException.Cause.INV_STATIC);
 					}
 					
-					throw new TranslatableException("exp.nofield", this.stringRepresentation, clAndF[0]);
+					throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, 
+							clAndF[1], clAndF[0]);
 				}
 			} else {
-				throw new TranslatableException("exp.unboundedclass", this.stringRepresentation);
+				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
 			}
+		}
+
+		@Override
+		protected Literal<?> recreate() {
+			return new StaticFieldL(this.stringRepresentation);
 		}
 	}
 	
@@ -156,13 +173,13 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		Enum<?> get(Type clazz) {
+		Enum<?> get(Type clazz) throws AccessingFailureException {
 			if(this.compiled && this.enumConstant != null) {
 				return this.enumConstant;
 			}
 			
 			if(clazz == null) {
-				throw new TranslatableException("exp.unboundedclass", this.stringRepresentation);
+				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
 			}
 			
 			Class<?> cl = Reflection.getRawType(clazz);
@@ -176,11 +193,17 @@ abstract class Literal<T> {
 						return e;
 					}
 				}
-				
-				throw new TranslatableException("exp.nofield", this.stringRepresentation, clazz.getTypeName());
+
+				throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, 
+						this.stringRepresentation, clazz.getTypeName());
 			} else {
-				throw new TranslatableException("exp.unboundedclass", this.stringRepresentation);
+				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
 			}
+		}
+
+		@Override
+		protected Literal<?> recreate() {
+			return new EnumL(this.stringRepresentation);
 		}
 	}
 	
@@ -193,7 +216,7 @@ abstract class Literal<T> {
 				this.integer = Integer.parseInt(strRep);
 				this.compiled = true;
 			} catch (NumberFormatException e) {
-				throw new TranslatableException("exp.reqint" + strRep);
+				throw new TranslatableException("exp.reqint", strRep);
 			}
 		}
 
@@ -215,8 +238,8 @@ abstract class Literal<T> {
 				int z = Integer.parseInt(comp[2]);
 				this.pos = new BlockPos(x, y, z);
 				this.compiled = true;
-			} catch (NumberFormatException e) {
-				throw new TranslatableException("exp.invalidbp" + strRep);
+			} catch (Exception e) {
+				throw new TranslatableException("exp.invalidbp", strRep);
 			}
 		}
 

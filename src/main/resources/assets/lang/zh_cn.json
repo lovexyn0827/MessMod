@@ -75,7 +75,7 @@
 		"exp.unexc" : "意外错误：%s", 
 		"exp.unboundedclass" : "声明字段%s的类不能被确定", 
 		"exp.noclass" : "找不到类%", 
-		"exp.staticl.format" : "用#作为类名与字段名的界限，用/分割包名，就像“java/lang/Float/MAX_VALUE”", 
+		"exp.staticl.format" : "用#作为类名与字段名的界限，用/分割包名，就像“java/lang/Float#MAX_VALUE”", 
 		"exp.invalidbp" : "%s不是一个有效的方块坐标的表示",
 		"exp.nomethod" : "方法%s在类%s中未被找到", 
 		"exp.failexec" : "执行的方法%s抛出了异常: %s", 
@@ -85,6 +85,7 @@
 		"exp.log.holder" : "无法创建EntityHolder: %s", 
 		"exp.dupfield" : "该字段已经被以这种方式监听", 
 		"exp.dupname" : "名称重复", 
+		"exp.null" : "发生了空指针异常，可能是因为上一个节点的值为null", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 

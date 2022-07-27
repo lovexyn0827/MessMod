@@ -72,7 +72,7 @@
 		"exp.invalidlast" : "Properity %s couldn't be gotten from the last node", 
 		"exp.outbound" : "Out of bound!", 
 		"exp.nofield" : "Field %s couldn't be found in %s", 
-		"exp.unexc" : "Unexcepted exception: %s", 
+		"exp.unexc" : "Unexpected exception: %s", 
 		"exp.unboundedclass" : "The declaring class of %s couldn't be known", 
 		"exp.noclass" : "Class %s ins not found", 
 		"exp.staticl.format" : "Use # to separate class name and field name, and use / to separate package names, like \"java/lang/FLOAT#MAX_VALUE\"", 
@@ -85,6 +85,7 @@
 		"exp.log.holder" : "Unable to create new EntityHolder: %s", 
 		"exp.dupfield" : "The field has already been listened in such a way.", 
 		"exp.dupname" : "The name has already been used", 
+		"exp.null" : "A NullPointerException was thrown, possibly because the output of the last node is null.", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
+import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
 
@@ -18,7 +19,6 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 		this.field = field;
 		this.name = customName != null ? customName : MessMod.INSTANCE.getMapping().namedField(this.field.getName());
 		this.path = path != null ? path : AccessingPath.DUMMY;
-		this.path.initialize(field.getGenericType());
 	}
 	
 	public boolean canGetFrom(Entity entity) {
@@ -30,11 +30,13 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 		try {
 			this.field.setAccessible(true);
 			ob = this.field.get(entity);
-			Object result = this.path.access(ob);
+			Object result = this.path.access(ob, this.field.getGenericType());
 			return result != null ? result.toString() : "[null]";
 		} catch (IllegalAccessException e1) {
 			e1.printStackTrace();
 			throw new RuntimeException(e1);
+		} catch (AccessingFailureException e) {
+			return e.getShortenedMsg();
 		}
 		
 	}

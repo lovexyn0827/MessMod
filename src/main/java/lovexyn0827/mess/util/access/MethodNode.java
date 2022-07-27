@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 
 class MethodNode extends Node {
@@ -27,24 +26,24 @@ class MethodNode extends Node {
 	}
 	
 	@Override
-	Object access(Object previous) {
+	Object access(Object previous) throws AccessingFailureException {
 		try {
 			this.method.setAccessible(true);
 			return this.method.invoke(previous);
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			throw new TranslatableException("exp.nomethod", 
+			throw new AccessingFailureException(AccessingFailureException.Cause.NO_METHOD, this, 
 					this.name, previous.getClass().getSimpleName());
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			throw new TranslatableException("Unexcepted exception");
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
-			throw new TranslatableException("exp.failexec", this.name, e.toString());
+			throw new AccessingFailureException(AccessingFailureException.Cause.INVOKE_FAIL, this, 
+					this.name, e);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR);
 		}
 	}
 	
-	private void resolveMethod(Class<? extends Object> clazz) {
+	private void resolveMethod(Class<? extends Object> clazz) throws AccessingFailureException {
 		// TODO Support for arguments
 		String srg = MessMod.INSTANCE.getMapping().srgMethodRecursively(clazz, this.name, "()V");
 		Optional<Method> optMethod = Reflection.listMethods(clazz).stream()
@@ -52,7 +51,8 @@ class MethodNode extends Node {
 		if (optMethod.isPresent()) {
 			this.method = optMethod.get();
 		} else {
-			throw new TranslatableException("exp.nomethod", this.name, srg, clazz.getSimpleName());
+			throw new AccessingFailureException(AccessingFailureException.Cause.NO_METHOD, this, 
+					srg, getClass().getSimpleName());
 		}
 	}
 
@@ -83,7 +83,7 @@ class MethodNode extends Node {
 	
 	@Override
 	public String toString() {
-		return this.method.getName() + "()";
+		return this.name + "()";
 	}
 	
 	@Override
@@ -93,7 +93,7 @@ class MethodNode extends Node {
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) {
+	protected Type prepare(Type lastOutType) throws AccessingFailureException {
 		Class<?> cl = Reflection.getRawType(lastOutType);
 		this.resolveMethod(cl == null ? Object.class : cl);
 		this.outputType = method.getGenericReturnType();
@@ -105,9 +105,27 @@ class MethodNode extends Node {
 		return null;
 	}
 
-	public static Literal<?>[] parseArgs(String group) {
+	public static Literal<?>[] parseArgs(String argsStr) {
 		// TODO
 		return null;
 	}
 
+	@Override
+	void uninitialize() {
+		super.uninitialize();
+		this.method = null;
+		if(this.args != null) {
+			for(int i = 0; i < this.args.length; i++) {
+				this.args[i] = this.args[i].recreate();
+			}
+		}
+	}
+
+	@Override
+	Node createCopyForInput(Object input) {
+		MethodNode  mn =  new MethodNode(name, types, args);
+		mn.uninitialize();
+		mn.ordinary = this.ordinary;
+		return mn;
+	}
 }

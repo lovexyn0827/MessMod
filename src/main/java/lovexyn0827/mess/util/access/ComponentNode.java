@@ -6,7 +6,6 @@ import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 
 import lovexyn0827.mess.util.Reflection;
-import lovexyn0827.mess.util.TranslatableException;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.ChunkPos;
@@ -54,7 +53,7 @@ abstract class ComponentNode extends Node {
 	static class X extends ComponentNode {
 
 		@Override
-		Object access(Object previous) {
+		Object access(Object previous) throws AccessingFailureException {
 			if(previous instanceof Entity) {
 				return ((Entity) previous).getX();
 			} else if(previous instanceof Vec3d) {
@@ -66,7 +65,7 @@ abstract class ComponentNode extends Node {
 			} else if(previous instanceof BlockEntity) {
 				return ((BlockEntity) previous).getPos().getX();
 			} else {
-				throw new TranslatableException("exp.invalidlast", this);
+				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
 			}
 		}
 		
@@ -84,7 +83,7 @@ abstract class ComponentNode extends Node {
 		}
 
 		@Override
-		Object access(Object previous) {
+		Object access(Object previous) throws AccessingFailureException {
 			if(previous instanceof Entity) {
 				return ((Entity) previous).getY();
 			} else if(previous instanceof Vec3d) {
@@ -94,7 +93,7 @@ abstract class ComponentNode extends Node {
 			} else if(previous instanceof BlockEntity) {
 				return ((BlockEntity) previous).getPos().getY();
 			} else {
-				throw new TranslatableException("exp.invalidlast", this);
+				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
 			}
 		}
 		
@@ -107,7 +106,7 @@ abstract class ComponentNode extends Node {
 	static class Z extends ComponentNode {
 
 		@Override
-		Object access(Object previous) {
+		Object access(Object previous) throws AccessingFailureException {
 			if(previous instanceof Entity) {
 				return ((Entity) previous).getZ();
 			} else if(previous instanceof Vec3d) {
@@ -119,7 +118,7 @@ abstract class ComponentNode extends Node {
 			} else if(previous instanceof BlockEntity) {
 				return ((BlockEntity) previous).getPos().getZ();
 			} else {
-				throw new TranslatableException("exp.invalidlast", this);
+				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
 			}
 		}
 		

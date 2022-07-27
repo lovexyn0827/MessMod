@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 
 class FieldNode extends Node {
@@ -17,16 +16,17 @@ class FieldNode extends Node {
 	}
 	
 	@Override
-	Object access(Object previous) {
+	Object access(Object previous) throws AccessingFailureException {
 		try {
 			this.field.setAccessible(true);
 			return this.field.get(previous);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-			throw new TranslatableException("exp.nofield", this.fieldName, previous.getClass().getSimpleName());
+			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, this, e, 
+					this.fieldName, previous.getClass().getSimpleName());
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
-			throw new TranslatableException("exp.unexc", e);
+			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, this);
 		}
 	}
 	
@@ -62,7 +62,13 @@ class FieldNode extends Node {
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) {
+	void uninitialize() {
+		super.uninitialize();
+		this.field = null;
+	}
+
+	@Override
+	protected Type prepare(Type lastOutType) throws AccessingFailureException {
 		Field f;
 		if(lastOutType instanceof Class<?>) {
 			f = Reflection.getFieldFromNamed((Class<?>) lastOutType, this.fieldName);
@@ -77,8 +83,15 @@ class FieldNode extends Node {
 			this.outputType = f.getGenericType();
 			return this.outputType;
 		} else {
-			throw new TranslatableException("exp.nofield", this.fieldName, lastOutType.getTypeName());
+			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, this, 
+					this.fieldName, lastOutType.getTypeName());
 		}
 	}
 
+	@Override
+	Node createCopyForInput(Object input) {
+		FieldNode node = new FieldNode(this.fieldName);
+		node.ordinary = this.ordinary;
+		return node;
+	}
 }

@@ -42,6 +42,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 		
 		StringReader sr = new StringReader(stringRepresentation);
 		Node n;
+		int i = 0;
 		while((n = readNode(sr)) != null) {
 			if(!nodes.isEmpty() && !n.canFollow(nodes.getLast()) && OptionManager.strictAccessingPathParsing) {
 				throw new TranslatableException("Node %s (%s) couldn't follow %s (%s)", 
@@ -49,6 +50,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 						nodes.getLast().getClass().getSimpleName(), nodes.getLast());
 			}
 			
+			n.ordinary = i;
 			nodes.add(n);
 		}
 		
@@ -73,7 +75,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			try {
 				return new ElementNode(Integer.parseInt(nodeStr));
 			} catch (NumberFormatException e) {
-				throw new TranslatableException("exp.reqint" + nodeStr);
+				throw new TranslatableException("exp.reqint", nodeStr);
 			}
 		} else if(sr.peek() == '<') {
 			//Map
@@ -104,6 +106,8 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					return new ComponentNode.Z();
 				case "identityHash" : 
 					return SimpleNode.IDENTITY_HASH;
+				case "size" : 
+					return new SizeNode();
 				default : 
 					throw new TranslatableException("exp.unknownnode");
 				}

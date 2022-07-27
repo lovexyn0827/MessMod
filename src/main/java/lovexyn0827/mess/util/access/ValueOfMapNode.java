@@ -4,7 +4,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 
 class ValueOfMapNode extends Node {
@@ -17,16 +16,16 @@ class ValueOfMapNode extends Node {
 	}
 	
 	@Override
-	Object access(Object previous) {
+	Object access(Object previous) throws AccessingFailureException {
 		if(previous instanceof Map<?, ?>) {
 			Map<?, ?> m = (Map<?, ?>) previous;
 			if(m.containsKey(this.key)) {
 				return m.get(this.key);
 			} else {
-				throw new TranslatableException("exp.nokey");
+				throw new AccessingFailureException(AccessingFailureException.Cause.NO_KEY, this);
 			}
 		} else {
-			throw new TranslatableException("exp.notmap", this);
+			throw new AccessingFailureException(AccessingFailureException.Cause.NOT_MAP, this);
 		}
 	}
 	
@@ -52,7 +51,7 @@ class ValueOfMapNode extends Node {
 	
 	@Override
 	public String toString() {
-		String keyStr = this.key.toString();
+		String keyStr = this.keyLiteral.stringRepresentation;;
 		if(this.key instanceof CharSequence) {
 			keyStr = '"' + keyStr + '"';
 		}
@@ -66,7 +65,7 @@ class ValueOfMapNode extends Node {
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) {
+	protected Type prepare(Type lastOutType) throws AccessingFailureException {
 		if(lastOutType instanceof ParameterizedType) {
 			ParameterizedType pt = ((ParameterizedType) lastOutType);
 			Class<?> lastCl = Reflection.getRawType(lastOutType);
@@ -108,4 +107,17 @@ class ValueOfMapNode extends Node {
 		return isFastutilClass(cl) && length == 1 && cl.getName().contains("Object2");
 	}
 
+	@Override
+	void uninitialize() {
+		super.uninitialize();
+		this.key = null;
+		this.keyLiteral = this.keyLiteral.recreate();
+	}
+
+	@Override
+	Node createCopyForInput(Object input) {
+		ValueOfMapNode node = new ValueOfMapNode(this.keyLiteral.recreate());
+		node.ordinary = this.ordinary;
+		return node;
+	}
 }

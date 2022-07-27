@@ -20,8 +20,12 @@ public class I18N {
 	public static final Language EN_US;
 	private static Language currentLanguage;
 	
-	public static String translate(String s) {
-		return currentLanguage.translate(s);
+	public static String translate(String translationKey) {
+		return currentLanguage.translate(translationKey);
+	}
+
+	public static String translate(String translationKey, Object[] args) {
+		return String.format(translate(translationKey), args);
 	}
 	
 	@SuppressWarnings("resource")

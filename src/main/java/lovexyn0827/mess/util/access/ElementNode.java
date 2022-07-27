@@ -6,8 +6,6 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
 
-import lovexyn0827.mess.util.TranslatableException;
-
 public class ElementNode extends Node {
 
 	private int index;
@@ -17,7 +15,7 @@ public class ElementNode extends Node {
 	}
 	
 	@Override
-	Object access(Object previous) {
+	Object access(Object previous) throws AccessingFailureException {
 		if(previous.getClass().isArray()) {
 			try {
 				if(this.index >= 0) {
@@ -26,7 +24,7 @@ public class ElementNode extends Node {
 					return Array.get(previous, Array.getLength(previous) + this.index);
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
-				throw new TranslatableException("Out of bound!");
+				throw new AccessingFailureException(AccessingFailureException.Cause.OUT_OF_BOUND, this);
 			}
 		} else if(previous instanceof Collection<?>) {
 			Collection<?> c = (Collection<?>) previous;
@@ -38,10 +36,10 @@ public class ElementNode extends Node {
 				
 				return itr.next();
 			} else {
-				throw new TranslatableException("Out of bound!");
+				throw new AccessingFailureException(AccessingFailureException.Cause.OUT_OF_BOUND, this);
 			}
 		} else {
-			throw new TranslatableException("exp.invalidLast");
+			throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
 		}
 	}
 	
@@ -93,6 +91,13 @@ public class ElementNode extends Node {
 		
 		this.outputType = Object.class;
 		return Object.class;
+	}
+
+	@Override
+	Node createCopyForInput(Object input) {
+		ElementNode node = new ElementNode(this.index);
+		node.ordinary = this.ordinary;
+		return node;
 	}
 
 }
