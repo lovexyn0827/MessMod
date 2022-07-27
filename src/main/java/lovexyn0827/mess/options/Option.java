@@ -8,7 +8,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Option {
-	String description();
 	String defaultValue();
 	String[] suggestions() default {};
 	boolean experimental() default false;

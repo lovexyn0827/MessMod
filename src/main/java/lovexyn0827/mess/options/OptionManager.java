@@ -58,253 +58,183 @@ public class OptionManager{
 	 */
 	public static final Map<String, BiConsumer<String, CommandContext<ServerCommandSource>>> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
 	
-	@Option(description = "There are there initializing strategies available: \n"
-			+ "- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, "
-			+ "including the resolved `Member` instances, will be used to access all subsequent inputs.\n"
-			+ "- Standard strategy: Accessing paths are parsed for every different inputs (a,  b are equal if and only "
-			+ "if the statement `a==b` is true), and the parsed copies are cached until the inputs are discarded by the "
-			+ "garbage collector.\n"
-			+ "- Strict Strategy: Accessing paths are reinitialized each time they are used.", 
-			defaultValue = "STANDARD", 
+	@Option(defaultValue = "STANDARD", 
 			parserClass = AccessingPath.InitializationStrategy.Parser.class)
 	public static AccessingPath.InitializationStrategy accessingPathInitStrategy;
 	
-	@Option(description = "Enable anti-cheating for host player in SP & LAN game", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean antiHostCheating;
 	
-	@Option(description = "TNTs could be killed by attacking.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean attackableTnt;
 	
 	// TODO Write to the document and implement it.
-	@Option(description = "What will the block information renderers do in ticks frozen by the Carpet.", 
-			defaultValue = "NORMALLY", 
+	@Option(defaultValue = "NORMALLY", 
 			experimental = true, 
 			parserClass = BlockInfoRenderer.FrozenUpdateMode.Parser.class)
 	public static BlockInfoRenderer.FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
 	
-	@Option(description = "Specify the type of block shape rendered when `renderBlockShape` is enabled. "
-			+ "The COLLIDER shape is the  shape used to do calculations about collisions, while the OUTLINE "
-			+ "shape is the shape used to determine which block the player is looking at.", 
-			defaultValue = "COLLISION", 
+	@Option(defaultValue = "COLLISION", 
 			parserClass = ShapeType.Parser.class)
 	public static ShapeType blockShapeToBeRendered;
 
-	@Option(description = "Whether or not execution of commands defined by this mod require OP permission.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;
 	
-	@Option(description = "Detect the block updates of crafting tables.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean craftingTableBUD;
 	
-	@Option(description = "Set the speed which the player is flying upwards at in the creative mode.", 
-			defaultValue = "0.05", 
+	@Option(defaultValue = "0.05", 
 			suggestions = {"0.05", "0.10"}, 
 			parserClass = FloatParser.Positive.class)
 	public static float creativeUpwardsSpeed;
 	
-	@Option(description = "Prevent debug sticks change blocks to a invalid state. By now, the option "
-			+ "**doesn't work** in some cases, like changing the `shape` property of a rail can still "
-			+ "turn the rail in to an illegal state and get broken. ", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean debugStickSkipsInvaildState;
 	
 	// TODO
-	@Option(description = "As described by its name.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean disableChunkLoadingCheckInCommands;
 	
-	@Option(description = "Disable the calculation of explosion exposure to reduce the lag caused by stacked "
-			+ "TNT explosions. This will also mean that blocks cannot prevent entities from be influenced by "
-			+ "explosions.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean disableExplosionExposureCalculation;
 	
-	@Option(description = "Remove the random speed of projectiles. It could be used in testing, but don't "
-			+ "forget to disable it if not needed.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean disableProjectileRandomness;
 	
-	@Option(description = "Item tools, which makes bone and bricks powerful. Requires carpet-fabric.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean enabledTools;
 	
-	@Option(description = "When the player uses ender eyes, teleport it to where it looks at.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean endEyeTeleport;
 	
-	@Option(description = "Send how entities are affected by explosions. This feature may not work properly if "
-			+ "the Lithium is loaded.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean entityExplosionInfluence;
 	
-	@Option(description = "Explosion ray (used to calculate the exposure of entities) renderer.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean entityExplosionRaysVisiblity;
 	
-	@Option(description = "The number of ticks the rendered rays remains. ", 
-			defaultValue = "300", 
+	@Option(defaultValue = "300", 
 			parserClass = IntegerParser.class)
 	public static int entityExplosionRaysLifetime;
 	
-	@Option(description = "Archive the entity log produced within a single session automatically.", 
-			defaultValue = "true", 
+	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class)
 	public static boolean entityLogAutoArchiving;
 	
 	// TODO Assess the performance cost
-	@Option(description = "In the vanilla getEntities() method, only entities which are in subchunks whose Cheshev distance"
-			+ "to the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the "
-			+ "entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especally when"
-			+ "the entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction "
-			+ "between entities and something else.", 
-			defaultValue = "2.0", 
+	@Option(defaultValue = "2.0", 
 			experimental = true, 
 			parserClass = FloatParser.Positive.class)
 	public static float getEntityRangeExpansion;
 	
-	@Option(description = "Move the HUDs to the given location.  ", 
-			defaultValue = "TOP_RIGHT", 
+	@Option(defaultValue = "TOP_RIGHT", 
 			parserClass = AlignMode.Parser.class)
 	public static AlignMode hudAlignMode;
 	
-	@Option(description = "Set the size of the text in the HUDs.", 
-			defaultValue = "1.0", 
+	@Option(defaultValue = "1.0", 
 			parserClass = FloatParser.Positive.class)
 	public static float hudTextSize;
 	
-	@Option(description = "The main language of the Mod", 
-			defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 
+	@Option(defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 
 			parserClass = Language.Parser.class)
 	public static String language;
 	
-	@Option(description = "Set the maximum number of ticks can be processed within a single frame when the "
-			+ "FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot "
-			+ "toggle the flying state when the FPS is too low. ", 
-			defaultValue = "10", 
+	@Option(defaultValue = "10", 
 			parserClass = IntegerParser.Positive.class)
 	public static int maxClientTicksPerFrame;
 	
-	@Option(description = "Set the maximum range of teleporting with endEyeTeleport.", 
-			defaultValue = "180", 
+	@Option(defaultValue = "180", 
 			parserClass = FloatParser.Positive.class)
 	public static float maxEndEyeTpRadius;
 	
-	@Option(description = "/kill kill mobs by removes them directly instead of damaging them.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean mobFastKill;
 	
-	@Option(description = "Allow projectiles to load chunks in their processing, maybe helpful in testing "
-			+ "pearl canons.  Note that if a projectile flies at a extremely high speed when the option is "
-			+ "set to true.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean projectileChunkLoading;
 	
-	@Option(description = "Set the radius of entity processing chunks created by projectileChunkLoading.", 
-			defaultValue = "3", 
+	@Option(defaultValue = "3", 
 			parserClass = IntegerParser.NonNegative.class)
 	public static int projectileChunkLoadingRange;
 	
-	@Option(description = "Projectiles load the chunks they are in permanently when projectileChunkLoading is enabled.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean projectileChunkLoadingPermanence;
 	
-	@Option(description = "Prevent the shape of rails from being changed by sorrounding rails.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
 	
-	@Option(description = "Prevent the chunks from being loaded in some ways.", 
-			defaultValue = "", 
+	@Option(defaultValue = "", 
 			parserClass = ListParser.Ticket.class)
 	public static List<ChunkTicketType<?>> rejectChunkTicket;
 	
-	@Option(description = "Enable or disable block boundary box renderer.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean renderBlockShape;
 	
-	@Option(description = "Enable or disable the renderer of outlines, heights, and vectors of flowing directions "
-			+ "of target fluids.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean renderFluidShape;
 	
-	@Option(description = "Display the output level of repeaters and comparators the player looks at.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean renderRedstoneGateInfo;
 	
-	@Option(description = "Enable or disable the server-side hitbox renderer.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean serverSyncedBox;
 	
-	@Option(description = "The maximum Cheshev distance beween entity rendered with its bounding bix and the player."
-			+ "All non-positive values are consided as positive infinite.", 
-			defaultValue = "-1", 
+	@Option(defaultValue = "-1", 
 			parserClass = FloatParser.class)
 	public static float serverSyncedBoxRenderRange;
 	
 	// TODO
-	@Option(description = "Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long "
-			+ "distance raycasts.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean skipUnloadedChunkInRaycasting;
 	
-	@Option(description = "Make the location of huds more stable when the length of lines change frequently.", 
-			defaultValue = "true", 
+	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class)
 	public static boolean stableHudLocation;
 	
 	// TODO
-	@Option(description = "Treat accessing paths strictly, to make them more relyable. Disable it may make accessing "
-			+ "processes more likely to fail in varible environments.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean strictAccessingPathParsing;
 	
-	@Option(description = "wlujkgfdhlqcmyfdhj...", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean superSuperSecretSetting;
 	
-	@Option(description = "Allow or disallow TNT entities to load chunks in their processing, maybe helpful "
-			+ "in making some kind of TNT canons. Note that if an TNT entity flies at a extremely high speed "
-			+ "when the option is set to true.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean tntChunkLoading;
 	
-	@Option(description = "TNT entities load the chunks they are in permanently when tntChunkLoading is enabled.", 
-			defaultValue = "false", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean tntChunkLoadingPermanence;
 	
-	@Option(description = "Set the radius of entity processing chunks created by tntChunkLoading.", 
-			defaultValue = "3", 
+	@Option(defaultValue = "3", 
 			parserClass = IntegerParser.NonNegative.class)
 	public static int tntChunkLoadingRange;
 	

@@ -24,7 +24,7 @@ public class I18N {
 		return currentLanguage.translate(translationKey);
 	}
 
-	public static String translate(String translationKey, Object[] args) {
+	public static String translate(String translationKey, Object ... args) {
 		return String.format(translate(translationKey), args);
 	}
 	

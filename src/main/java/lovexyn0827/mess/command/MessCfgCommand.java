@@ -8,6 +8,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.sun.org.apache.xml.internal.security.utils.I18n;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.InvaildOptionException;
@@ -15,6 +16,7 @@ import lovexyn0827.mess.options.Option;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.options.OptionParser;
 import lovexyn0827.mess.util.FormattedText;
+import lovexyn0827.mess.util.i18n.I18N;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.server.command.ServerCommandSource;
@@ -41,7 +43,7 @@ public class MessCfgCommand {
 						ClickEvent event = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/messcfg " + n);
 						MutableText text = new LiteralText(n + ": " + v)
 								.fillStyle(Style.EMPTY.withClickEvent(event)
-										.withHoverEvent((new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(o.description())))))
+										.withHoverEvent((new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(getDescription(n))))))
 								.formatted(Formatting.GRAY);
 						boolean modified = !v.equals(f.getAnnotation(Option.class).defaultValue());
 						s.sendFeedback(modified ? text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText()) : text, false);
@@ -77,7 +79,7 @@ public class MessCfgCommand {
 								text.append(new FormattedText("cmd.messcfg.exp", "rcl").asMutableText());
 							}
 							
-							text.append(new LiteralText("\n" + o.description() + "\n").formatted(Formatting.GRAY));
+							text.append(new LiteralText("\n" + getDescription(f.getName()) + "\n").formatted(Formatting.GRAY));
 							String value = OptionManager.getString(f);
 							text.append(new FormattedText("cmd.messcfg.current", "f", true, value).asMutableText());
 							if(!o.defaultValue().equals(value)) {
@@ -133,5 +135,9 @@ public class MessCfgCommand {
 			}
 		});
 		dispatcher.register(command);
+	}
+	
+	private static String getDescription(String name) {
+		return I18N.translate("opt." + name + ".desc");
 	}
 }
