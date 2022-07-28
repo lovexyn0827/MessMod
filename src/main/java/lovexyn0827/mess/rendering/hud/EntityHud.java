@@ -11,16 +11,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
-/*
- * TODO
- * Instead of the introduction of new Hud classes, it would be better to do ssomthing with the data storage.
+/**
  * It should be responable for rendering, not getting data from entities.
  */
 public abstract class EntityHud {
 	protected MinecraftClient client = MinecraftClient.getInstance();
 	@Deprecated	// Never invoke directly
-	// TODO Use a better data storage system, which is compatible with dedicated servers.
-	//private Map<HudLine,Object> data = new TreeMap<>();
 	private HudDataStorage data;
 	public boolean shouldRender = false;
 	protected int xStart;

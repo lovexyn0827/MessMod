@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.server.integrated.IntegratedServer;
 
-// TODO Server & Client
 public class ClientHudManager implements HudManager {
 	public final LookingAtEntityHud lookingHud;
 	public final PlayerHud playerHudC;

@@ -51,8 +51,6 @@ public class Language {
 	 */
 	public String translate(String key) {
 		if(!this.translations.containsKey(key)) {
-			// XXX Should this warning be removed?
-			//MessMod.LOGGER.warn("Couldn't find the translated text for " + key + " in " + this.readableName + "!");
 			return key; 
 		}
 		

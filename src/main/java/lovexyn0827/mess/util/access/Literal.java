@@ -64,18 +64,58 @@ abstract class Literal<T> {
 	abstract T get(Type type) throws AccessingFailureException;
 	
 	static Literal<?> parse(String strRep) throws CommandSyntaxException {
-		if(strRep.startsWith("\"")) {
+		switch(strRep.charAt(0)) {
+		case '\"' : 
 			return new StringL(new StringReader(strRep.substring(1)).readStringUntil('"'));
-		} else if(strRep.startsWith("E+")) {
-			return new EnumL(strRep.substring(2));
-		} else if(strRep.startsWith("S+")) {
-			return new StaticFieldL(strRep.substring(2));
-		} else if(strRep.startsWith("[") && strRep.endsWith("]")) {
+		case 'E' : 
+			if(strRep.charAt(1) == '+') {
+				return new EnumL(strRep.substring(2));
+			}
+		case 'S' : 
+			if(strRep.charAt(1) == '+') {
+				return new StaticFieldL(strRep.substring(2));
+			}
+		case '[' : 
 			return new BlockPosL(strRep);
-		} else if("null".equals(strRep)) {
-			return new NullL();
-		} else {
-			return new IntL(strRep);
+		case '(' : 
+		case '<' : 
+		default : 
+			if("null".equals(strRep)) {
+				return new NullL();
+			} else if (strRep.matches("[0-9]*(?:\\.[0-9]*)?")) {
+				switch(strRep.charAt(strRep.length() - 1)) {
+				case 'D' : 
+					return new DoubleL(strRep);
+				case 'F' : 
+					return new FloatL(strRep);
+				case 'L' :  
+					return new LongL(strRep);
+				case 'I' : 
+					return new IntL(strRep);
+				default : 
+					if(strRep.contains(".")) {
+						return new DoubleL(strRep);
+					} else {
+						return new IntL(strRep);
+					}
+				}
+			} else {
+				boolean bool;
+				if("true".equals(strRep)) {
+					bool = true;
+				} else if ("false".equals(strRep)) {
+					bool = false;
+				} else {
+					throw new TranslatableException("exp.invliteral", strRep);
+				}
+				
+				return new Literal<Boolean>(strRep) {
+					@Override
+					Boolean get(Type type) throws AccessingFailureException {
+						return bool;
+					}
+				};
+			}
 		}
 	}
 
@@ -134,7 +174,6 @@ abstract class Literal<T> {
 							Class<?> decC = Class.forName(MessMod.INSTANCE.getMapping().srgClass(cN));
 							Field f2 = Reflection.getFieldFromNamed(decC, clAndF[1]);
 							if(f2 != null) {
-								// XXX Use the stored value of modifiable field?
 								f2.setAccessible(true);
 								this.fieldVal = f2.get(null);
 								this.compiled = Modifier.isFinal(f2.getModifiers());
@@ -261,5 +300,62 @@ abstract class Literal<T> {
 			return null;
 		}
 		
+	}
+	
+	static class DoubleL extends Literal<Double> {
+		private Double number;
+		
+		protected DoubleL(String strRep) {
+			super(strRep);
+			try {
+				this.number = Double.parseDouble(strRep);
+				this.compiled = true;
+			} catch (NumberFormatException e) {
+				throw new TranslatableException("exp.reqnum", strRep);
+			}
+		}
+
+		@Override
+		Double get(Type clazz) {
+			return this.number;
+		}
+	}
+	
+	static class FloatL extends Literal<Float> {
+		private Float number;
+		
+		protected FloatL(String strRep) {
+			super(strRep);
+			try {
+				this.number = Float.parseFloat(strRep);
+				this.compiled = true;
+			} catch (NumberFormatException e) {
+				throw new TranslatableException("exp.reqnum", strRep);
+			}
+		}
+
+		@Override
+		Float get(Type clazz) {
+			return this.number;
+		}
+	}
+	
+	static class LongL extends Literal<Long> {
+		private Long number;
+		
+		protected LongL(String strRep) {
+			super(strRep);
+			try {
+				this.number = Long.parseLong(strRep);
+				this.compiled = true;
+			} catch (NumberFormatException e) {
+				throw new TranslatableException("exp.reqint", strRep);
+			}
+		}
+
+		@Override
+		Long get(Type clazz) {
+			return this.number;
+		}
 	}
 }

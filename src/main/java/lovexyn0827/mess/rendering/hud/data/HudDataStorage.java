@@ -9,7 +9,7 @@ import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
 
 /**
- * 
+ * A client-side cache of the data in HUDs
  * @author lovexyn0827
  * @date 2022/7/14
  */

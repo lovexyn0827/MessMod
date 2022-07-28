@@ -8,8 +8,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.sun.org.apache.xml.internal.security.utils.I18n;
-
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.InvaildOptionException;
 import lovexyn0827.mess.options.Option;
@@ -37,7 +35,6 @@ public class MessCfgCommand {
 					CommandUtil.feedbackRaw(ct, metadata.getDescription());
 					s.sendFeedback(new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
 					OptionManager.OPTIONS.forEach((f) -> {
-						Option o = f.getAnnotation(Option.class);
 						String n = f.getName();
 						String v = OptionManager.getString(f);
 						ClickEvent event = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/messcfg " + n);

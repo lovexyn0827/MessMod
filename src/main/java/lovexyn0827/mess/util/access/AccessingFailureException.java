@@ -53,6 +53,8 @@ public class AccessingFailureException extends Exception {
 		UNCERTAIN_CLASS("exp.unboundedclass"), 
 		NO_CLASS("exp.noclass"), 
 		NOT_MAP("exp.notmap"), 
+		BAD_ARG("exp.badarg"), 
+		MULTI_TARGET("exp.multitarget"), 
 		INV_STATIC("exp.staticl.format"), 
 		ERROR("exp.unexc");
 		

@@ -21,7 +21,7 @@ class SimpleNode<I, O> extends Node {
 		this.out = out;
 	}
 	
-	@SuppressWarnings("unchecked")	// FIXME
+	@SuppressWarnings("unchecked")	// XXX
 	@Override
 	Object access(Object previous) {
 		return func.apply((I) previous);

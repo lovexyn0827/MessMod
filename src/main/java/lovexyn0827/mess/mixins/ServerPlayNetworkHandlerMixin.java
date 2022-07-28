@@ -19,7 +19,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
 	@Shadow
 	public ServerPlayerEntity player;
 	
-	@Redirect(method = {"onDisconnected", "onUpdateDifficulty", "onUpdateDifficultyLock"},	//XXX
+	@Redirect(method = {"onDisconnected", "onUpdateDifficulty", "onUpdateDifficultyLock"},
 			at = @At(value = "INVOKE", 
 					target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;isHost()Z"
 			)

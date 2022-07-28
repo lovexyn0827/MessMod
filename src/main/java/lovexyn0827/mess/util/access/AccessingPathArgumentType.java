@@ -85,17 +85,9 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			return new ValueOfMapNode(Literal.parse(nodeStr));
 		} else {
 			String nodeStr = sr.readStringUntil('.');
-			if(nodeStr.contains("()")) {
-				// TODO Support for arguments
-				Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
-				if(matcher.matches()) {
-					String name = matcher.group("name");
-					String[] types = MethodNode.parseDescriptor(matcher.group(0));
-					Literal<?>[] args = MethodNode.parseArgs(matcher.group("args"));
-					return new MethodNode(name, types, args);
-				} else {
-					throw new TranslatableException("exp.invaildInvocation", nodeStr);
-				}
+			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
+			if(matcher.matches()) {
+				return new MethodNode(matcher.group("name"), matcher.group("types"), matcher.group("args"));
 			} else {
 				switch(nodeStr) {
 				case "x" : 

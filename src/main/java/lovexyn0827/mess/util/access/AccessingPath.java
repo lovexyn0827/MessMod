@@ -10,6 +10,7 @@ import java.util.WeakHashMap;
 
 import org.jetbrains.annotations.Nullable;
 
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.EnumParser;
 import lovexyn0827.mess.options.OptionManager;
 
@@ -72,9 +73,14 @@ public final class AccessingPath {
 				e.printStackTrace();
 				throw new AccessingFailureException(AccessingFailureException.Cause.NULL, n, e);
 			} catch (AccessingFailureException e2) {
-				throw new AccessingFailureException(e2.cause, n, e2.getCause());
+				if(e2.getShortenedMsg() == null) {
+					throw new AccessingFailureException(e2.cause, n, e2.getCause(), e2.args);
+				} else {
+					throw e2;
+				}
 			} catch (Exception e1) {
-				throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, n, e1);
+				e1.printStackTrace();
+				throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, n, e1, e1);
 			}
 		}
 		

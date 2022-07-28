@@ -4,55 +4,114 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Nullable;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.TranslatableException;
+import lovexyn0827.mess.util.deobfuscating.Mapping;
 
-class MethodNode extends Node {
+class MethodNode extends Node implements Cloneable {
 	static final Pattern METHOD_PATTERN = Pattern.compile(
-			"^(?<name>[$_a-zA-Z0-9]+)(?:\\{(?<types>(?:[ZBCDFIJS]|(?:L[$_a-zA-z0-9/]+[^/];))*)\\})?\\((?<args>.*)\\)$");
+			"^(?<name>[$_a-zA-Z0-9]+)(?:\\<(?<types>[^>]*)\\>)?\\((?<args>.*)\\)$");
 
 	private final String name;
-	private final String[] types;
+	@Nullable
+	private final Class<?>[] types;
 	private final Literal<?>[] args;
+	@Nullable
 	private Method method;
+	private final Integer argNum;
 	
-	MethodNode(String name, String[] types, Literal<?>[] args) {
+	MethodNode(String name, String types, String args) {
 		this.name = name;
-		this.types = types;
-		this.args = args;
+		if(types != null) {
+			if(types.matches("[0-9]+")) {
+				this.types = null;
+				try {
+					this.argNum = Integer.parseInt(types);
+				} catch (NumberFormatException e) {
+					throw new TranslatableException("exp.invaildInvocation", this);
+				}
+			} else {
+				this.argNum = null;
+				this.types = parseDescriptor(types);
+			}
+		} else {
+			this.types = null;
+			this.argNum = null;
+		}
+		
+		try {
+			this.args = parseArgs(args);
+		} catch (CommandSyntaxException e) {
+			TranslatableException e1 = new TranslatableException("exp.invaildInvocation", this);
+			e1.initCause(e);
+			throw e1;
+		}
 	}
 	
 	@Override
 	Object access(Object previous) throws AccessingFailureException {
 		try {
 			this.method.setAccessible(true);
-			return this.method.invoke(previous);
-		} catch (IllegalArgumentException e) {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NO_METHOD, this, 
-					this.name, previous.getClass().getSimpleName());
+			Literal<?>[] argsL = this.args;
+			Object[] argObjs = new Object[argsL.length];
+			for(int i = 0; i < argsL.length; i++) {
+				argObjs[i] = argsL[i].get(previous.getClass());	// XXX Generic type
+			}
+
+			try {
+				return this.method.invoke(previous, argObjs);
+			} catch (IllegalArgumentException e) {
+				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_ARG, e, Arrays.toString(argObjs), this.method.toString());
+			}
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
 			throw new AccessingFailureException(AccessingFailureException.Cause.INVOKE_FAIL, this, 
 					this.name, e);
-		} catch (IllegalAccessException e) {
+		} catch (AccessingFailureException e) {
+			throw e;
+		} catch (Exception e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR);
+			MessMod.LOGGER.info("Failed to invoke " + this.method);
+			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e, e);
 		}
 	}
 	
 	private void resolveMethod(Class<? extends Object> clazz) throws AccessingFailureException {
-		// TODO Support for arguments
-		String srg = MessMod.INSTANCE.getMapping().srgMethodRecursively(clazz, this.name, "()V");
-		Optional<Method> optMethod = Reflection.listMethods(clazz).stream()
-				.filter((m) -> m.getParameterCount() == 0 && m.getName().equals(srg)).findAny();
-		if (optMethod.isPresent()) {
-			this.method = optMethod.get();
-		} else {
+		Mutable<String> srg = new MutableObject<>();
+		Mapping map = MessMod.INSTANCE.getMapping();
+		Object[] candidates = Reflection.listMethods(clazz).stream()
+				.filter((m) -> {
+					String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
+					srg.setValue(map.srgMethodRecursively(clazz, this.name, descriptor));
+					if(m.getName().equals(srg.getValue())) {
+						if(this.argNum != null) {
+							return this.argNum.equals(m.getParameterCount());
+						} else if (this.types != null) {
+							return Arrays.equals(this.types, m.getParameterTypes(), (a, b) -> a.equals(b) ? 0 : 1);
+						} else {
+							return true;
+						}
+					} else {
+						return false;
+					}
+				})
+				.filter((m) -> !m.isSynthetic())
+				.toArray();
+		if(candidates.length == 1) {
+			this.method = (Method) candidates[0];
+		} else if(candidates.length == 0) {
 			throw new AccessingFailureException(AccessingFailureException.Cause.NO_METHOD, this, 
-					srg, getClass().getSimpleName());
+					srg.getValue(), clazz.getSimpleName());	// XXX Deobfusciation
+		} else {
+			throw new AccessingFailureException(AccessingFailureException.Cause.MULTI_TARGET, this);
 		}
 	}
 
@@ -83,7 +142,29 @@ class MethodNode extends Node {
 	
 	@Override
 	public String toString() {
-		return this.name + "()";
+		String types;
+		if(this.argNum != null) {
+			types = '<' + this.argNum.toString() + '>';
+		} else if (this.types != null) {
+			StringBuilder sb = new StringBuilder("<");
+			for(Class<?> cl : this.types) {
+				sb.append(org.objectweb.asm.Type.getDescriptor(cl));
+			}
+			
+			sb.append('>');
+			types = sb.toString();
+		} else {
+			types = "";
+		}
+		
+		StringBuilder sb2 = new StringBuilder("(");
+		for(Literal<?> l : this.args) {
+			sb2.append(l.stringRepresentation);
+			sb2.append(',');
+		}
+		
+		sb2.append(')');
+		return this.name + types + sb2;
 	}
 	
 	@Override
@@ -100,14 +181,36 @@ class MethodNode extends Node {
 		return this.outputType;
 	}
 
-	public static String[] parseDescriptor(String descriptor) {
-		// TODO
-		return null;
+	public static @Nullable Class<?>[] parseDescriptor(String descriptor) {
+		Mapping map = MessMod.INSTANCE.getMapping();
+		org.objectweb.asm.Type[] args = org.objectweb.asm.Type.getArgumentTypes(descriptor);
+		Class<?>[] result = new Class<?>[args.length];
+		for(int i = 0; i < args.length; i++) {
+			String clName = map.srgClass(args[i].getClassName());	// XXX Srg or named
+			try {
+				result[i] = Class.forName(clName);
+			} catch (ClassNotFoundException e) {
+				TranslatableException e1 = new TranslatableException("exp.noclass", clName);
+				e1.initCause(e);
+				throw e1;
+			}
+		}
+		
+		return result;
 	}
 
-	public static Literal<?>[] parseArgs(String argsStr) {
-		// TODO
-		return null;
+	public static Literal<?>[] parseArgs(String argsStr) throws CommandSyntaxException {
+		if(argsStr.isEmpty()) {
+			return new Literal<?>[0];
+		}
+		
+		String[] args = argsStr.split(",\b?");
+		Literal<?>[] result = new Literal[args.length];
+		for(int i = 0; i < args.length; i++) {
+			result[i] = Literal.parse(args[i]);
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -123,9 +226,14 @@ class MethodNode extends Node {
 
 	@Override
 	Node createCopyForInput(Object input) {
-		MethodNode  mn =  new MethodNode(name, types, args);
-		mn.uninitialize();
-		mn.ordinary = this.ordinary;
-		return mn;
+		MethodNode mn;
+		try {
+			mn = (MethodNode) this.clone();
+			mn.uninitialize();
+			mn.ordinary = this.ordinary;
+			return mn;
+		} catch (CloneNotSupportedException e) {
+			throw new AssertionError();
+		}
 	}
 }

@@ -86,6 +86,10 @@
 		"exp.dupfield" : "该字段已经被以这种方式监听", 
 		"exp.dupname" : "名称重复", 
 		"exp.null" : "发生了空指针异常，可能是因为上一个节点的值为null", 
+		"exp.multitarget" : "找到了多个目标", 
+		"exp.badarg" : "参数%s对%s不合法", 
+		"exp.reqnum" : "需要数字， 但是出现了%s", 
+		"exp.invliteral" : "不支持的字面值：%s", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 

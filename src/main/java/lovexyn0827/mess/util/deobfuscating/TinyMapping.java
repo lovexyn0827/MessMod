@@ -88,7 +88,7 @@ class TinyMapping implements Mapping {
 	@Override
 	public String srgMethod(String clazz, String named, String desc) {
 		return this.methodsByClass.get(clazz).stream()
-				.filter((m) -> m.name.equals(named)/* && m.descriptor.equals(desc)*/)
+				.filter((m) -> m.name.equals(named) && m.descriptor.equals(desc))
 				.map((m) -> m.srgName)
 				.findFirst()
 				.orElse(null);
@@ -119,7 +119,6 @@ class TinyMapping implements Mapping {
 			TinyMapping.this.classes.put(srg, named);
 			this.currentClassSrg = srg;
 			TinyMapping.this.fieldsByClass.put(srg, HashBiMap.create());
-			//TinyMapping.this.fieldsByClass.put(named, HashBiMap.create());
 			TinyMapping.this.methodsByClass.put(srg, new HashSet<>());
 		}
 		

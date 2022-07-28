@@ -43,7 +43,6 @@ import net.minecraft.util.crash.CrashReport;
  * Date: April 2, 2022
  */
 public class OptionManager{
-	// TODO Move the descriptions to the language file
 	private static final File GLOBAL_OPTION_FILE = new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop");
 	private static final Properties GLOBAL_OPTION_SERIALIZER = new Properties();
 	public static final List<Field> OPTIONS = Stream.of(OptionManager.class.getFields())
@@ -70,9 +69,7 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean attackableTnt;
 	
-	// TODO Write to the document and implement it.
 	@Option(defaultValue = "NORMALLY", 
-			experimental = true, 
 			parserClass = BlockInfoRenderer.FrozenUpdateMode.Parser.class)
 	public static BlockInfoRenderer.FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
 	
@@ -98,7 +95,6 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean debugStickSkipsInvaildState;
 	
-	// TODO
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean disableChunkLoadingCheckInCommands;
@@ -206,7 +202,6 @@ public class OptionManager{
 			parserClass = FloatParser.class)
 	public static float serverSyncedBoxRenderRange;
 	
-	// TODO
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean skipUnloadedChunkInRaycasting;
