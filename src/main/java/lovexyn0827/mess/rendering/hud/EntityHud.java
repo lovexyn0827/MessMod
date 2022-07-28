@@ -1,14 +1,19 @@
 package lovexyn0827.mess.rendering.hud;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.InvaildOptionException;
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.options.OptionParser;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 
 /**
@@ -16,14 +21,14 @@ import net.minecraft.client.util.math.MatrixStack;
  */
 public abstract class EntityHud {
 	protected MinecraftClient client = MinecraftClient.getInstance();
-	@Deprecated	// Never invoke directly
+	@Deprecated	// Never use it directly
 	private HudDataStorage data;
 	public boolean shouldRender = false;
 	protected int xStart;
 	protected int yStart;
 	private ClientHudManager hudManager;
 	private int lastLineWidth = 0;
-	//private List<HudLine> customLines = new ArrayList<>();
+	private int xEnd;
 	
 	public EntityHud(ClientHudManager hudManager, HudType type) {
 		this.hudManager = hudManager;
@@ -40,17 +45,31 @@ public abstract class EntityHud {
 		RenderSystem.matrixMode(5888);
 		RenderSystem.loadIdentity();
 		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
+		this.updateAlign();
 		float size = OptionManager.hudTextSize;
 		RenderSystem.scalef(size, size, size);
 		TextRenderer tr = client.textRenderer;
-		tr.drawWithShadow(ms,description,x,y, -1);
+		ClientHudManager chm = MessMod.INSTANCE.getClientHudManager();
+		tr.drawWithShadow(ms, description, x, y, -1);
 		y += 10;
 		MutableInt mutableY = new MutableInt(y);
+		MutableBoolean darkBg = new MutableBoolean(true);
 		this.getData().forEach((n, v) -> {
 			if(BuiltinHudInfo.NAME.getName().equals(n) || BuiltinHudInfo.ID.getName().equals(n)) return;
-			tr.drawWithShadow(ms, n + ':' + v, x, mutableY.getAndAdd(10), 0x31f38b);
+			String header = n + ':';
+			String data = v.toString();
+			int y0 = mutableY.intValue();
+			if(chm.renderBackGround) {
+				DrawableHelper.fill(ms, x, y0, this.xEnd, y0 + 10, darkBg.booleanValue() ? 0x80000000 : 0x80808080);
+				darkBg.setValue(!darkBg.getValue());
+			}
+			
+			int dataX = chm.looserLines ? 
+					(int) (MinecraftClient.getInstance().getWindow().getWidth() / size) - tr.getWidth(data) : x + tr.getWidth(header);
+			tr.drawWithShadow(ms, header, x, y0, chm.headerSpeciallyColored ? 0xFF4040 : 0x31F38B);
+			tr.drawWithShadow(ms, data, dataX, mutableY.getAndAdd(10), 0x31F38B);
+			
 		});
-		this.updateAlign();
 		this.hudManager.hudHeight += (mutableY.getValue() - this.yStart);
 	}
 	
@@ -62,9 +81,12 @@ public abstract class EntityHud {
 		AlignMode mode = OptionManager.hudAlignMode;
 		this.lastLineWidth = this.getMaxLineLength();
 		float size = OptionManager.hudTextSize;
-		this.xStart = mode.name().contains("LEFT") ? 0 : (int) (MinecraftClient.getInstance().getWindow().getWidth() / size - this.lastLineWidth);
+		boolean left = mode.name().contains("LEFT");
+		int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
+		this.xStart = left ? 0 : (int) (windowWidth / size - this.lastLineWidth + 1);
+		this.xEnd = left ? this.lastLineWidth - 1 : windowWidth;
 		int offset = this.hudManager.hudHeight;
-		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight()- this.getData().size() * 10 - offset;
+		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight() - this.getData().size() * 10 - offset;
 	}
 	
 	@SuppressWarnings("resource")
@@ -79,5 +101,19 @@ public abstract class EntityHud {
 
 	protected final synchronized HudDataStorage getData() {
 		return this.data;
+	}
+	
+	public static class StylesParser implements OptionParser<String> {
+
+		@Override
+		public String tryParse(String str) throws InvaildOptionException {
+			return str;
+		}
+
+		@Override
+		public String serialize(String val) {
+			return val;
+		}
+		
 	}
 }

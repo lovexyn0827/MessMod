@@ -117,6 +117,7 @@
 		"opt.entityLogAutoArchiving.desc" : "Archive the entity log produced within a single session automatically.", 
 		"opt.getEntityRangeExpansion.desc" : "In the vanilla getEntities() method, only entities which are in subchunks whose Cheshev distanceto the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especally whenthe entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.", 
 		"opt.hudAlignMode.desc" : "Move the HUDs to the given location.  ", 
+		"opt.hudStyles.desc" : "The style of the HUDs, containing zero or more flags below: \n - B: Render a gray background\n - L: Align the headers on the left and the data on the right\n - R: Change the color of headers to red", 
 		"opt.hudTextSize.desc" : "Set the size of the text in the HUDs.", 
 		"opt.language.desc" : "The main language of the Mod", 
 		"opt.maxClientTicksPerFrame.desc" : "Set the maximum number of ticks can be processed within a single frame when the FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot toggle the flying state when the FPS is too low. ", 

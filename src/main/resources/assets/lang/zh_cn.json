@@ -117,6 +117,7 @@
 		"opt.entityLogAutoArchiving.desc" : "自动存档一个会话内产生的实体数据记录", 
 		"opt.getEntityRangeExpansion.desc" : "在原版的getEntity()方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。", 
 		"opt.hudAlignMode.desc" : "设置实体信息HUD的位置。", 
+		"opt.hudStyles.desc" : "HUD的渲染样式, 包括了下面的零个至多个标志: \n - B：渲染背景\n - L：左对齐行标题并右对齐数据\n - R：将行标题改为红色", 
 		"opt.hudTextSize.desc" : "调节HUD字体大小。", 
 		"opt.language.desc" : "该Mod的主要语言", 
 		"opt.maxClientTicksPerFrame.desc" : "FPS低于20时每帧客户端可以运行几个游戏刻，将其设为一个较小值可能修复低FPS时无法切换飞行状态的Bug。", 

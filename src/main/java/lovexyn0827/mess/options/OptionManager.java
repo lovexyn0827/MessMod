@@ -27,6 +27,7 @@ import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
+import lovexyn0827.mess.rendering.hud.EntityHud;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.loader.api.FabricLoader;
@@ -141,6 +142,10 @@ public class OptionManager{
 	@Option(defaultValue = "TOP_RIGHT", 
 			parserClass = AlignMode.Parser.class)
 	public static AlignMode hudAlignMode;
+	
+	@Option(defaultValue = "", 
+			parserClass = EntityHud.StylesParser.class)
+	public static String hudStyles;
 	
 	@Option(defaultValue = "1.0", 
 			parserClass = FloatParser.Positive.class)
@@ -462,6 +467,9 @@ public class OptionManager{
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
 				CommandUtil.error(ct, "Please install the carpet mod!");
 			}
+		});
+		registerCustomApplicationBehavior("hudStyles", (val, ct) -> {
+			MessMod.INSTANCE.getClientHudManager().updateStyle(val);
 		});
 		loadGlobal();
 	}

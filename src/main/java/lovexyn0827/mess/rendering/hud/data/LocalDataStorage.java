@@ -8,14 +8,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 
-import lovexyn0827.mess.mixins.BoatEntityAccessor;
-import lovexyn0827.mess.rendering.hud.EntityHudUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.TntEntity;
-import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.util.math.Vec3d;
 
 public class LocalDataStorage implements HudDataSenderer, HudDataStorage {
 	private Map<HudLine, Object> data = new TreeMap<>();

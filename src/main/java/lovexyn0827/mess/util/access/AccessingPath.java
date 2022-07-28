@@ -5,12 +5,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.WeakHashMap;
 
 import org.jetbrains.annotations.Nullable;
 
-import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.EnumParser;
 import lovexyn0827.mess.options.OptionManager;
 

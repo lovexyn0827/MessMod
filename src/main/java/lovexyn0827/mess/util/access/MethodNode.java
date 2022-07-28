@@ -95,7 +95,7 @@ class MethodNode extends Node implements Cloneable {
 						if(this.argNum != null) {
 							return this.argNum.equals(m.getParameterCount());
 						} else if (this.types != null) {
-							return Arrays.equals(this.types, m.getParameterTypes(), (a, b) -> a.equals(b) ? 0 : 1);
+							return Arrays.equals(this.types, m.getParameterTypes());
 						} else {
 							return true;
 						}
