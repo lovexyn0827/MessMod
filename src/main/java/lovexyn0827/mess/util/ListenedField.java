@@ -46,9 +46,8 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 	}
 
 	@Override
-	// XXX
-	public String toLine(Object data) {
-		return this.get(((Entity) data));
+	public String getFrom(Entity in) {
+		return this.get(in);
 	}
 
 	@Override

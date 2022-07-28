@@ -25,49 +25,15 @@ public class LocalDataStorage implements HudDataSenderer, HudDataStorage {
 	public synchronized void updateData(Entity entity) {
 		this.data.clear();
 		if (entity == null) return;
-		this.data.put(BuiltinHudInfo.ID, entity.getEntityId());
-		String name = entity.hasCustomName() ? entity.getCustomName().asString() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
-		this.data.put(BuiltinHudInfo.NAME, name);
-		this.data.put(BuiltinHudInfo.AGE, entity.age);
-		Vec3d pos = entity.getPos();
-		this.data.put(BuiltinHudInfo.POS_X, pos.x);
-		this.data.put(BuiltinHudInfo.POS_Y, pos.y);
-		this.data.put(BuiltinHudInfo.POS_Z, pos.z);
-		Vec3d vec = entity.getVelocity();
-		this.data.put(BuiltinHudInfo.MOTION_X, vec.x);
-		this.data.put(BuiltinHudInfo.MOTION_Y, vec.y);
-		this.data.put(BuiltinHudInfo.MOTION_Z, vec.z);
-		this.data.put(BuiltinHudInfo.DELTA_X, pos.x-entity.prevX);
-		this.data.put(BuiltinHudInfo.DELTA_Y, pos.y-entity.prevY);
-		this.data.put(BuiltinHudInfo.DELTA_Z, pos.z-entity.prevZ);
-		this.data.put(BuiltinHudInfo.YAW, entity.yaw);
-		this.data.put(BuiltinHudInfo.PITCH, entity.pitch);
-		this.data.put(BuiltinHudInfo.FALL_DISTANCE, entity.fallDistance);
-		this.data.put(BuiltinHudInfo.GENERAL_FLAGS, EntityHudUtil.getGeneralFlags(entity));
-		this.data.put(BuiltinHudInfo.POSE, entity.getPose());
-		if (entity instanceof LivingEntity) {
-			LivingEntity living = (LivingEntity)entity;
-			this.data.put(BuiltinHudInfo.HEALTH, living.getHealth());
-			this.data.put(BuiltinHudInfo.FORWARD, living.forwardSpeed);
-			this.data.put(BuiltinHudInfo.SIDEWAYS, living.sidewaysSpeed);
-			this.data.put(BuiltinHudInfo.UPWARD, living.upwardSpeed);
-			this.data.put(BuiltinHudInfo.MOVEMENT_SPEED, living.getMovementSpeed());
-			this.data.put(BuiltinHudInfo.FLYING_SPEED, living.flyingSpeed);
-			this.data.put(BuiltinHudInfo.LIVING_FLAGS, EntityHudUtil.getLivingFlags(living));
-		} else if (entity instanceof TntEntity) {
-			this.data.put(BuiltinHudInfo.FUSE, ((TntEntity)entity).getFuseTimer());
-		} else if (entity instanceof ExplosiveProjectileEntity) {
-			ExplosiveProjectileEntity epe = (ExplosiveProjectileEntity)entity;
-			this.data.put(BuiltinHudInfo.POWER_X, epe.posX);
-			this.data.put(BuiltinHudInfo.POWER_Y, epe.posY);
-			this.data.put(BuiltinHudInfo.POWER_Z, epe.posZ);
-		} else if (entity instanceof BoatEntity) {
-			this.data.put(BuiltinHudInfo.VELOCITY_DECAY, ((BoatEntityAccessor)entity).getVelocityDeacyMCWMEM());
+		for(HudLine l : BuiltinHudInfo.values()) {
+			if(l.canGetFrom(entity)) {
+				this.data.put(l, l.getFrom(entity));
+			}
 		}
 		
 		this.customLines.forEach((f) -> {
 			if(f.canGetFrom(entity)) {
-				this.data.put(f, f.toLine(entity));
+				this.data.put(f, f.getFrom(entity));
 			}
 		});
 	}
