@@ -17,7 +17,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.RenderedBox;
 import lovexyn0827.mess.rendering.RenderedLine;
-import lovexyn0827.mess.rendering.ShapeRenderer;
+import lovexyn0827.mess.rendering.ShapeSender;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
@@ -53,18 +53,18 @@ public class RaycastCommand {
 														BlockHitResult hit = world.raycast(rct);
 														Vec3d end = hit.getType() == HitResult.Type.MISS?to : hit.getPos();
 														BlockView.raycast(rct, (c, p) -> {
-															MessMod.INSTANCE.getShapeRenderer().addShape(
-																	new RenderedBox(new Box(p), 0x00007fff, 0x00ff001f, 300), world.getRegistryKey());
+															MessMod.INSTANCE.shapeSender.addShape(
+																	new RenderedBox(new Box(p), 0x00007fff, 0x00ff001f, 300, world.getTime()), world.getRegistryKey());
 															world.getBlockState(p).
 																	getCollisionShape(world, p).
 																	forEachBox((x1, y1, z1, x2, y2, z2) -> {
-																		MessMod.INSTANCE.getShapeRenderer().addShape(
-																				new RenderedBox(new Box(x1, y1, z1, x2, y2, z2).offset(p), 0xffff00ff, 0xff00ff3f, 300), world.getRegistryKey());
+																		MessMod.INSTANCE.shapeSender.addShape(
+																				new RenderedBox(new Box(x1, y1, z1, x2, y2, z2).offset(p), 0xffff00ff, 0xff00ff3f, 300, world.getTime()), world.getRegistryKey());
 																	});
 															return null;
 														}, (c) -> null);
-														MessMod.INSTANCE.getShapeRenderer().addShape(new RenderedLine(end, to, 0xff0000ff, 300), world.getRegistryKey());
-														MessMod.INSTANCE.getShapeRenderer().addShape(new RenderedLine(from, end, 0x00ffffff, 300), world.getRegistryKey());
+														MessMod.INSTANCE.shapeSender.addShape(new RenderedLine(end, to, 0xff0000ff, 300, world.getTime()), world.getRegistryKey());
+														MessMod.INSTANCE.shapeSender.addShape(new RenderedLine(from, end, 0x00ffffff, 300, world.getTime()), world.getRegistryKey());
 													} catch (Throwable e) {
 														e.printStackTrace();
 													}
@@ -121,11 +121,12 @@ public class RaycastCommand {
 		Vec3d from = Vec3ArgumentType.getVec3(ct, "from");
 		Vec3d to = Vec3ArgumentType.getVec3(ct, "to");
 		Entity excluded = BoolArgumentType.getBool(ct, "excludeSender") ? ct.getSource().getEntity() : null;
+		ServerWorld world = ct.getSource().getWorld();
 		Box box = new Box(from, to).expand(DoubleArgumentType.getDouble(ct, "expand"));
 		RegistryKey<World> worldKey = ct.getSource().getWorld().getRegistryKey();
-		ShapeRenderer renderer = MessMod.INSTANCE.shapeRenderer;
+		ShapeSender renderer = MessMod.INSTANCE.shapeSender;
 		if(shouldAddShapes)	{
-			renderer.addShape(new RenderedBox(box, 0x7F7F7FFF, 0x7F7F7F3F, 300), worldKey);
+			renderer.addShape(new RenderedBox(box, 0x7F7F7FFF, 0x7F7F7F3F, 300, world.getTime()), worldKey);
 		}
 		
 		List<Entity> entities = ct.getSource().getWorld().getOtherEntities(excluded, box);
@@ -148,18 +149,18 @@ public class RaycastCommand {
 		}
 		
 		if(shouldAddShapes) {
-			renderer.addShape(new RenderedLine(pos, to, 0xFF0000FF, 300), worldKey);
-			renderer.addShape(new RenderedLine(from, pos, 0x00FFFFFF, 300), worldKey);
+			renderer.addShape(new RenderedLine(pos, to, 0xFF0000FF, 300, world.getTime()), worldKey);
+			renderer.addShape(new RenderedLine(from, pos, 0x00FFFFFF, 300, world.getTime()), worldKey);
 			if(e != null) {
 				entities.remove(e);
-				renderer.addShape(new RenderedBox(e.getBoundingBox(), 0x0000FFFF, 0, 300), worldKey);
-				renderer.addShape(new RenderedBox(e.getBoundingBox().expand(0.30000001192092896D), 0xFF0000FF, 0xFF00003F, 300), worldKey);
+				renderer.addShape(new RenderedBox(e.getBoundingBox(), 0x0000FFFF, 0, 300, world.getTime()), worldKey);
+				renderer.addShape(new RenderedBox(e.getBoundingBox().expand(0.30000001192092896D), 0xFF0000FF, 0xFF00003F, 300, world.getTime()), worldKey);
 			}
 			
 			entities.forEach((entity) -> {
 				Box aabb = entity.getBoundingBox();
-				renderer.addShape(new RenderedBox(aabb, 0x0000FFFF, 0, 300), worldKey);
-				renderer.addShape(new RenderedBox(aabb.expand(0.30000001192092896D), 0x00FF00FF, 0, 300), worldKey);
+				renderer.addShape(new RenderedBox(aabb, 0x0000FFFF, 0, 300, world.getTime()), worldKey);
+				renderer.addShape(new RenderedBox(aabb.expand(0.30000001192092896D), 0x00FF00FF, 0, 300, world.getTime()), worldKey);
 			});
 		}
 		

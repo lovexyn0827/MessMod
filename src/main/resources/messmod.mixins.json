@@ -4,37 +4,38 @@
   "package": "lovexyn0827.mess.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    
-  ],
-  "client": [
-    "MinecraftClientMixin",
     "MinecraftServerMixin",
     "CommandMixin",
-    "KeyboardMixin",
     "ExplosionMixin",
     "BoatEntityAccessor",
-    "ClientPlayNetworkHandlerMixin",
-    "EntityMixin",
     "KillCommandMixin",
     "WorldSavePathMixin",
     "PlayerManagerMixin",
     "EntityAccessor",
-    "WorldRendererMixin",
     "StructureBlockBlockEntityMixin",
     "DebugStickItemMixin",
     "TntEntityMixin",
     "ProjectileEntityMixin",
     "EndEyeItemMixin",
-    "ClientPlayerEntityMixin",
-    "AbstractRedstoneGateBlockMixin",
     "RailPlacementHelperMixin",
-    "LanguageManagerMixin",
     "ServerWorldMixin",
     "BlockPosArgumentTypeMixin",
     "CloneCommandMixin", 
     "CraftingTableBlockMixin", 
     "ChunkTicketManagerMixin", 
-    "ServerPlayNetworkHandlerMixin"
+    "ServerPlayNetworkHandlerMixin", 
+    "CustomPayloadC2SPacketAccessor", 
+    "FormattingAccessor"
+  ],
+  "client": [
+    "MinecraftClientMixin",
+    "KeyboardMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "EntityMixin",
+    "WorldRendererMixin",
+    "ClientPlayerEntityMixin",
+    "AbstractRedstoneGateBlockMixin",
+    "LanguageManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

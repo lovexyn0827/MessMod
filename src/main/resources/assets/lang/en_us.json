@@ -33,6 +33,9 @@
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
 		
+		//***** hud *****
+		"cmd.hud.reqsinglepf" : "Epected 1 targets, but %d targets were found.", 
+		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "Current Options", 
 		"cmd.messcfg.modified" : " (Modified)", 

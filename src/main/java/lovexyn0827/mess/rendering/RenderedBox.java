@@ -2,8 +2,11 @@ package lovexyn0827.mess.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -15,17 +18,19 @@ public class RenderedBox extends Shape {
 
 	private Box box;
 
-	public RenderedBox(Box box, int color, int fill, int life) {
-		super(color, fill, life);
+	public RenderedBox(Box box, int color, int fill, int life, long gt) {
+		super(color, fill, life, gt);
 		this.box = box;
 	}
 	
 	public RenderedBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ,
-			int color, int fill, int life) {
-		super(color, fill, life);
+			int color, int fill, int life, long gt) {
+		super(color, fill, life, gt);
+		this.box = new Box(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	protected void renderFaces(Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
 			double cz, float partialTick) {
 		if ((this.a) == 0) return;
@@ -39,6 +44,7 @@ public class RenderedBox extends Shape {
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	protected void renderLines(Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
 			double cz, float partialTick) {
 		if (this.a == 0.0) return;
@@ -56,4 +62,15 @@ public class RenderedBox extends Shape {
 		return true;
 	}
 
+	@Override
+	protected CompoundTag toTag(CompoundTag tag) {
+		CompoundTag basic = super.toTag(tag);
+		basic.putDouble("X0", this.box.minX);
+		basic.putDouble("Y0", this.box.minY);
+		basic.putDouble("Z0", this.box.minZ);
+		basic.putDouble("X1", this.box.maxX);
+		basic.putDouble("Y1", this.box.maxY);
+		basic.putDouble("Z1", this.box.maxZ);
+		return basic;
+	}
 }

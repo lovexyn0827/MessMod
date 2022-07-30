@@ -7,8 +7,7 @@ import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.CarpetUtil;
 import net.minecraft.block.AbstractRedstoneGateBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.property.Properties;
@@ -19,8 +18,7 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 public class BlockInfoRenderer {
-	@SuppressWarnings("deprecation")
-	private static final ShapeRenderer.ShapeSpace BLOCK_INFO_SPACE = new ShapeRenderer.ShapeSpace();
+	private static final ShapeSpace BLOCK_INFO_SPACE = new ShapeSpace("block_info");
 	
 	private MinecraftServer server;
 	
@@ -32,61 +30,56 @@ public class BlockInfoRenderer {
 		this.server = null;
 	}
 
-	@SuppressWarnings("resource")
 	public void tick() {
-		if(this.server != null) {
+		ShapeSender sr = MessMod.INSTANCE.shapeSender;
+		if(this.server != null && sr != null) {
 			boolean frozen = CarpetUtil.isTickFrozen();
 			if(frozen && OptionManager.blockInfoRendererUpdateInFrozenTicks == FrozenUpdateMode.PAUSE) {
 				return;
 			}
 			
 			// Very SB 
-			Entity e = MinecraftClient.getInstance().cameraEntity;
-			if(e == null) {
-				e = MinecraftClient.getInstance().player;
-			}
-			
-			if(e == null) return;
-			ShapeRenderer sr = MessMod.INSTANCE.shapeRenderer;
-			if(!frozen || OptionManager.blockInfoRendererUpdateInFrozenTicks == FrozenUpdateMode.NORMALLY) {
-				sr.clearSpace(BLOCK_INFO_SPACE);
-			}
-			
-			Vec3d from = new Vec3d(e.getX(), e.getEyeY(), e.getZ());
-			World world = this.server.getWorld(e.getEntityWorld().getRegistryKey());
-			ShapeType type = OptionManager.blockShapeToBeRendered;
-			BlockPos pos = world.raycast(new RaycastContext(from, from.add(e.getRotationVector().multiply(16)), type.mjType, RaycastContext.FluidHandling.ANY, e))
-					.getBlockPos();
-			FluidState fluid = world.getFluidState(pos);
-			if(!fluid.isEmpty() && OptionManager.renderFluidShape) {		
-				String info = Float.toString(fluid.getHeight())  + '(' + fluid.getLevel() + ')'+ '\n' + fluid.getVelocity(world, pos);
-				sr.addShape(new RenderedBox(fluid.getShape(world, pos).getBoundingBox().offset(pos), 0xFF0000FF, 0, 1), 
-						world.getRegistryKey(), BLOCK_INFO_SPACE);
-				sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1), 
-						world.getRegistryKey(), BLOCK_INFO_SPACE);;
-			} else {
-				BlockState block = world.getBlockState(pos);
-				VoxelShape voxels = type.getter.getFrom(block, world, pos);
-				if(!voxels.isEmpty() && OptionManager.renderBlockShape) {
-					voxels.getBoundingBoxes().forEach((b) -> sr.addShape(new RenderedBox(b.offset(pos), 0xFF8800FF, 0, 1), 
-							world.getRegistryKey(), BLOCK_INFO_SPACE));
+			for(PlayerEntity e : this.server.getPlayerManager().getPlayerList()) {
+				if(!frozen || OptionManager.blockInfoRendererUpdateInFrozenTicks == FrozenUpdateMode.NORMALLY) {
+					sr.clearSpaceFromServer(BLOCK_INFO_SPACE);
 				}
 				
-				if(block.getBlock() instanceof AbstractRedstoneGateBlock && OptionManager.renderRedstoneGateInfo) {
-					AbstractRedstoneGateBlock gate = (AbstractRedstoneGateBlock) block.getBlock();
-					int out;
-					if(block.get(Properties.POWERED).booleanValue()) {
-						out = ((AbstractRedstoneGateBlockMixin) gate).getOutputRSLevel(world, pos, block);
-					} else {
-						out = 0;
+				Vec3d from = new Vec3d(e.getX(), e.getEyeY(), e.getZ());
+				World world = this.server.getWorld(e.getEntityWorld().getRegistryKey());
+				ShapeType type = OptionManager.blockShapeToBeRendered;
+				BlockPos pos = world.raycast(new RaycastContext(from, from.add(e.getRotationVector().multiply(16)), type.mjType, RaycastContext.FluidHandling.ANY, e))
+						.getBlockPos();
+				FluidState fluid = world.getFluidState(pos);
+				if(!fluid.isEmpty() && OptionManager.renderFluidShape) {		
+					String info = Float.toString(fluid.getHeight())  + '(' + fluid.getLevel() + ')'+ '\n' + fluid.getVelocity(world, pos);
+					sr.addShape(new RenderedBox(fluid.getShape(world, pos).getBoundingBox().offset(pos), 0xFF0000FF, 0, 1, world.getTime()), 
+							world.getRegistryKey(), BLOCK_INFO_SPACE);
+					sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, world.getTime()), 
+							world.getRegistryKey(), BLOCK_INFO_SPACE);;
+				} else {
+					BlockState block = world.getBlockState(pos);
+					VoxelShape voxels = type.getter.getFrom(block, world, pos);
+					if(!voxels.isEmpty() && OptionManager.renderBlockShape) {
+						voxels.getBoundingBoxes().forEach((b) -> sr.addShape(new RenderedBox(b.offset(pos), 0xFF8800FF, 0, 1, world.getTime()), 
+								world.getRegistryKey(), BLOCK_INFO_SPACE));
 					}
 					
-					String info = "Output :" + Integer.toString(out);
-					sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1), 
-							world.getRegistryKey(), BLOCK_INFO_SPACE);;
+					if(block.getBlock() instanceof AbstractRedstoneGateBlock && OptionManager.renderRedstoneGateInfo) {
+						AbstractRedstoneGateBlock gate = (AbstractRedstoneGateBlock) block.getBlock();
+						int out;
+						if(block.get(Properties.POWERED).booleanValue()) {
+							out = ((AbstractRedstoneGateBlockMixin) gate).getOutputRSLevel(world, pos, block);
+						} else {
+							out = 0;
+						}
+						
+						String info = "Output :" + Integer.toString(out);
+						sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, world.getTime()), 
+								world.getRegistryKey(), BLOCK_INFO_SPACE);;
+					}
 				}
 			}
-		}
+		}	
 	}
 	
 	public static enum ShapeType {

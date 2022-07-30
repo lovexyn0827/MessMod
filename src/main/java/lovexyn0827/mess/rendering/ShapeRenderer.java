@@ -24,7 +24,6 @@ package lovexyn0827.mess.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import lovexyn0827.mess.MessMod;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
@@ -33,36 +32,39 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import org.lwjgl.opengl.GL11;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.lwjgl.opengl.GL11;
 
 /**
  * A modified version of carpet.script.util.ShapesRenderer
  * Original Author : gnembon
  */
-public class ShapeRenderer
-{
-    private final Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> shapes;
-    private MinecraftClient client; 
-    public ShapeRenderer(MinecraftClient minecraftClient)
-    {
-        this.client = minecraftClient;
-        shapes = new HashMap<>();
-        shapes.put(World.OVERWORLD, new HashMap<>());
-        shapes.put(World.NETHER, new HashMap<>());
-        shapes.put(World.END, new HashMap<>());
+public class ShapeRenderer {
+    //private final Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> shapes;
+	private final ShapeCache shapes;
+	private MinecraftClient client; 
+	
+    public ShapeRenderer(MinecraftClient mc) {
+        this.shapes = ShapeCache.create(mc);
+		this.client = mc;
     }
+    
+    public ShapeCache getShapeCache() {
+		return shapes;
+	}
 
-    public void render(Camera camera, float partialTick)
-    {
+    public void render(Camera camera, float partialTick) {
         //Camera camera = this.client.gameRenderer.getCamera();
         ClientWorld iWorld = this.client.world;
         RegistryKey<World> dimensionType = iWorld.getRegistryKey();
-        if (shapes.get(dimensionType) == null || shapes.get(dimensionType).isEmpty()) return;
+        Map<ShapeSpace, Set<Shape>> shapesInDim = this.shapes.getShapesInDimension(dimensionType);
+        if (shapesInDim == null || shapesInDim.isEmpty()) {
+        	return;
+        }
+        
         RenderSystem.disableTexture();
         RenderSystem.enableDepthTest();
         RenderSystem.depthFunc(515);
@@ -81,21 +83,19 @@ public class ShapeRenderer
         //RenderSystem.polygonOffset(-3f, -3f);
         //RenderSystem.enablePolygonOffset();
         //Entity entity = this.client.gameRenderer.getCamera().getFocusedEntity();
-
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
-
         // render
         double cameraX = camera.getPos().x;
         double cameraY = camera.getPos().y;
         double cameraZ = camera.getPos().z;
-
-        synchronized (shapes)
-        {
-            this.shapes.get(dimensionType).forEach((space, set) -> {
-            	set.removeIf((entry) -> entry.isExpired(MessMod.INSTANCE.getGameTime()));
-            });   
-            this.shapes.get(dimensionType).forEach((space, set) -> {
+        synchronized (shapes) {
+        	this.shapes.getAllShapes().values().forEach((map) -> {
+    			map.forEach((space3, set) -> {
+                	set.removeIf((entry) -> entry.isExpired(this.shapes.getTime()));
+                });
+    		});
+        	shapesInDim.forEach((space, set) -> {
             	set.forEach((s) -> {
             		if(s.shouldRender(dimensionType)) {
             			s.renderFaces(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
@@ -103,8 +103,8 @@ public class ShapeRenderer
             		}
             	});
             });
-            
         }
+        
         RenderSystem.enableCull();
         RenderSystem.depthMask(true);
         RenderSystem.lineWidth(1.0F);
@@ -112,36 +112,6 @@ public class ShapeRenderer
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableTexture();
         RenderSystem.shadeModel(7424);
-    }
-
-    public void addShape(Shape shape, RegistryKey<World> dim)
-    {
-        synchronized(this.shapes) {
-        	this.shapes.get(dim).computeIfAbsent(ShapeSpace.DEFAULT, (ss) -> new HashSet<>()).add(shape);
-        }
-    }
-    
-    public void addShape(Shape shape, RegistryKey<World> dim, ShapeSpace space)
-    {
-        synchronized(this.shapes) {
-        	this.shapes.get(dim).computeIfAbsent(space, (ss) -> new HashSet<>()).add(shape);
-        }
-    }
-    
-    public void reset()
-    {
-        synchronized (shapes)
-        {
-            shapes.values().forEach((map) -> map.values().forEach(Set::clear));
-        }
-    }
-    
-    public void clearSpace(ShapeSpace ss)
-    {
-    	synchronized (shapes)
-        {
-            shapes.values().forEach((map) -> map.computeIfAbsent(ss, (ss1) -> new HashSet<>()).clear());
-        }
     }
     
     // some raw shit
@@ -159,11 +129,9 @@ public class ShapeRenderer
             float x1, float y1, float z1,
             float x2, float y2, float z2,
             boolean xthick, boolean ythick, boolean zthick,
-            float red1, float grn1, float blu1, float alpha, float red2, float grn2, float blu2)
-    {
+            float red1, float grn1, float blu1, float alpha, float red2, float grn2, float blu2) {
         builder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR); // 3
-        if (xthick)
-        {
+        if (xthick) {
             builder.vertex(x1, y1, z1).color(red1, grn2, blu2, alpha).next();
             builder.vertex(x2, y1, z1).color(red1, grn2, blu2, alpha).next();
 
@@ -176,8 +144,8 @@ public class ShapeRenderer
             builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
         }
-        if (ythick)
-        {
+        
+        if (ythick) {
             builder.vertex(x1, y1, z1).color(red2, grn1, blu2, alpha).next();
             builder.vertex(x1, y2, z1).color(red2, grn1, blu2, alpha).next();
 
@@ -190,8 +158,8 @@ public class ShapeRenderer
             builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
         }
-        if (zthick)
-        {
+        
+        if (zthick) {
             builder.vertex(x1, y1, z1).color(red2, grn2, blu1, alpha).next();
             builder.vertex(x1, y1, z2).color(red2, grn2, blu1, alpha).next();
 
@@ -204,6 +172,7 @@ public class ShapeRenderer
             builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
         }
+        
         tessellator.draw();
     }
 
@@ -212,18 +181,14 @@ public class ShapeRenderer
             float x1, float y1, float z1,
             float x2, float y2, float z2,
             boolean xthick, boolean ythick, boolean zthick,
-            float red1, float grn1, float blu1, float alpha)
-    {
+            float red1, float grn1, float blu1, float alpha) {
         builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
-
-        if (xthick && ythick)
-        {
+        if (xthick && ythick) {
             builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
-            if (zthick)
-            {
+            if (zthick) {
                 builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
                 builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
                 builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
@@ -231,16 +196,12 @@ public class ShapeRenderer
             }
         }
 
-
-        if (zthick && ythick)
-        {
+        if (zthick && ythick) {
             builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
-
-            if (xthick)
-            {
+            if (xthick) {
                 builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
                 builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
                 builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
@@ -249,16 +210,14 @@ public class ShapeRenderer
         }
 
         // now at least drawing one
-        if (zthick && xthick)
-        {
+        if (zthick && xthick) {
             builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
 
 
-            if (ythick)
-            {
+            if (ythick) {
                 builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
                 builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
                 builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
@@ -266,15 +225,5 @@ public class ShapeRenderer
             }
         }
         tessellator.draw();
-    }
-    
-    public static class ShapeSpace {
-    	/**
-    	 * Default space, which can only be managed by the ShapeRenderer class automatically.
-    	 */
-    	public static final ShapeSpace DEFAULT = new ShapeSpace();
-    	
-    	@Deprecated
-    	public ShapeSpace() {}
     }
 }

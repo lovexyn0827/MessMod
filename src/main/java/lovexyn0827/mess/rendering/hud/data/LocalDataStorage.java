@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 
 import net.minecraft.entity.Entity;
 
-public class LocalDataStorage implements HudDataSenderer, HudDataStorage {
+public class LocalDataStorage implements HudDataSender, HudDataStorage {
 	private Map<HudLine, Object> data = new TreeMap<>();
 	private List<HudLine> customLines = new ArrayList<>();
 
@@ -34,26 +34,6 @@ public class LocalDataStorage implements HudDataSenderer, HudDataStorage {
 	@Override
 	public List<HudLine> getCustomLines() {
 		return this.customLines;
-	}
-
-	@Override
-	public boolean addLine(HudLine line) {
-		if(this.customLines.contains(line)) {
-			return false;
-		} else {
-			this.customLines.add(line);
-			return true;
-		}
-	}
-
-	@Override
-	public boolean removeField(String name) {
-		return this.customLines.removeIf(((line) -> line.getName().equals(name)));
-	}
-
-	@Override
-	@Deprecated
-	public void pushData(String name, Object data) {
 	}
 
 	@Override

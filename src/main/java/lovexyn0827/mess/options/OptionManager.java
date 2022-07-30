@@ -458,18 +458,22 @@ public class OptionManager{
 				e.printStackTrace();
 			}
 		});
-		registerCustomApplicationBehavior("entityExplosionInfluence", (val, ct) -> {
+		BiConsumer<String, CommandContext<ServerCommandSource>> checkLithium = (val, ct) -> {
 			if(FabricLoader.getInstance().isModLoaded("lithium")) {
 				CommandUtil.error(ct, "Warning: This feature is not compatible with lithium. Maybe it won't work properly");
 			}
-		});
+		};
+		registerCustomApplicationBehavior("entityExplosionInfluence", checkLithium);
+		registerCustomApplicationBehavior("disableExplosionExposureCalculation", checkLithium);
 		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", (val, ct) -> {
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
 				CommandUtil.error(ct, "Please install the carpet mod!");
 			}
 		});
 		registerCustomApplicationBehavior("hudStyles", (val, ct) -> {
-			MessMod.INSTANCE.getClientHudManager().updateStyle(val);
+			if (!MessMod.isDedicatedEnv()) {
+				MessMod.INSTANCE.getClientHudManager().updateStyle(val);
+			}
 		});
 		loadGlobal();
 	}

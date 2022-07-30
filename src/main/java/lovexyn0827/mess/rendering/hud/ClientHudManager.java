@@ -1,6 +1,7 @@
 package lovexyn0827.mess.rendering.hud;
 
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -43,5 +44,24 @@ public class ClientHudManager implements HudManager {
 		this.headerSpeciallyColored = code.contains("R");
 		this.looserLines = code.contains("L");
 		this.renderBackGround = code.contains("B");
+	}
+	
+	public HudDataStorage getData(HudType type) {
+		EntityHud hud;
+		switch(type) {
+		case TARGET : 
+			hud = this.lookingHud;
+			break;
+		case CLIENT_PLAYER : 
+			hud = this.playerHudC;
+			break;
+		case SERVER_PLAYER : 
+			hud = this.playerHudS;
+			break;
+		default : 
+			throw new IllegalArgumentException();
+		}
+		
+		return hud != null ? hud.getData() : null;
 	}
 }

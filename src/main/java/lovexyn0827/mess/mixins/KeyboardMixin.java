@@ -22,15 +22,15 @@ public abstract class KeyboardMixin {
 	private void onF3Pressed(int key, CallbackInfoReturnable<?> ci) {
 		if(key == 'E') {
 			LookingAtEntityHud lookingHud = MessMod.INSTANCE.getClientHudManager().lookingHud;
-			if(lookingHud != null) lookingHud.toggleRender();;
+			if(lookingHud != null) lookingHud.toggleRender();
 			this.client.player.sendChatMessage(I18N.translate("hud.target") + (lookingHud.shouldRender ? "On" : "Off"));
 		}else if(key == 'M') {
 			PlayerHud playerHud = MessMod.INSTANCE.getClientHudManager().playerHudC;
-			if(playerHud!=null) playerHud.toggleRender();
+			if(playerHud != null) playerHud.toggleRender();
 			this.client.player.sendChatMessage(I18N.translate("hud.client") + (playerHud.shouldRender ? "On" : "Off"));
 		} else if(key == 'S') {
 			PlayerHud playerHud = MessMod.INSTANCE.getClientHudManager().playerHudS;
-			if(playerHud == null ) return;
+			if(playerHud == null) return;
 			playerHud.toggleRender();
 			this.client.player.sendChatMessage(I18N.translate("hud.server") + (playerHud.shouldRender ? "On" : "Off"));
 		}

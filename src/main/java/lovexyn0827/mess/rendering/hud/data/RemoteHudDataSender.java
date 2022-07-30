@@ -1,0 +1,96 @@
+package lovexyn0827.mess.rendering.hud.data;
+
+import java.util.List;
+import com.google.common.collect.Lists;
+import io.netty.buffer.Unpooled;
+import lovexyn0827.mess.fakes.HudDataSubscribeState;
+import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.rendering.hud.HudType;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.server.MinecraftServer;
+
+public class RemoteHudDataSender implements HudDataSender {
+	/** Used to determine the delta */
+	private CompoundTag lastData = new CompoundTag();
+	private final List<HudLine> customLines = Lists.newArrayList();
+	private final MinecraftServer server;
+	private final HudType type;
+
+	public RemoteHudDataSender(MinecraftServer server, HudType type) {
+		this.server = server;
+		this.type = type;
+	}
+	
+	@Override
+	public void updateData(Entity entity) {
+		CompoundTag data = new CompoundTag();
+		List<String> unused = Lists.newArrayList(lastData.getKeys());
+		if (entity != null) {
+			for(HudLine l : BuiltinHudInfo.values()) {
+				if (this.tryPutData(entity, l, data)) {
+					unused.remove(l.getName());
+				}
+			}
+			
+			this.customLines.forEach((l) -> {
+				if (this.tryPutData(entity, l, data)) {
+					unused.remove(l.getName());
+				}
+			});
+		}
+		
+		ListTag toRemove = new ListTag();
+		unused.forEach((n) -> {
+			toRemove.add(StringTag.of(n));
+		});
+		data.put("ToRemove", toRemove);
+		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+		buffer.writeEnumConstant(type);
+		buffer.writeCompoundTag(data);
+		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.HUD, buffer);
+		this.server.getPlayerManager().getPlayerList().stream()
+				.filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(this.type))
+				.forEach((p) -> p.networkHandler.sendPacket(packet));
+	}
+	
+	private boolean tryPutData(Entity entity, HudLine l, CompoundTag data) {
+		String name = l.getName();
+		if(l.canGetFrom(entity)) {
+			Tag last = this.lastData.get(name);
+			String value = l.getFrom(entity);
+			if(last == null || !last.asString().equals(value.toString())) {
+				data.putString(name, value);
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+
+	@Override
+	public List<HudLine> getCustomLines() {
+		return this.customLines;
+	}
+	
+	public static class Player extends RemoteHudDataSender implements PlayerHudDataSender {
+		public Player(MinecraftServer server, HudType type) {
+			super(server, type);
+		}
+
+		@Override
+		public void updatePlayer() {
+		}
+
+		@Override
+		public void updateData() {
+		}
+		
+	}
+}

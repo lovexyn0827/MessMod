@@ -16,7 +16,7 @@ import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
-import lovexyn0827.mess.command.HudFieldListeningCommand;
+import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
@@ -54,7 +54,7 @@ public abstract class CommandMixin {
         EntityLogCommand.register(this.dispatcher);
         EnsureCommand.register(this.dispatcher);
         LogMovementCommand.register(this.dispatcher);
-        HudFieldListeningCommand.register(this.dispatcher);
+        HudCommand.register(this.dispatcher);
         NameEntityCommand.register(this.dispatcher);
     }
     

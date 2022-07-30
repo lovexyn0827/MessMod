@@ -1,9 +1,11 @@
 package lovexyn0827.mess.rendering.hud.data;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Maps;
 import lovexyn0827.mess.mixins.BoatEntityAccessor;
 import lovexyn0827.mess.rendering.hud.EntityHudUtil;
 import net.minecraft.entity.Entity;
@@ -45,6 +47,7 @@ public enum BuiltinHudInfo implements HudLine {
 	VELOCITY_DECAY("Decay", DataType.FLOAT, (e) -> ((BoatEntityAccessor) e).getVelocityDeacyMCWMEM(), BoatEntity.class),
 	POSE("Pose", DataType.POSE, Entity::getPose);
 	
+	public static final Map<String, BuiltinHudInfo> BY_TITLE = Maps.newHashMap();
 	public String header;
 	public DataType type;
 	public Function<Entity, Object> getter;
@@ -74,5 +77,11 @@ public enum BuiltinHudInfo implements HudLine {
 	@Override
 	public String getName() {
 		return this.header;
+	}
+	
+	static {
+		for(BuiltinHudInfo line : values()){
+			BY_TITLE.put(line.header, line);
+		}
 	}
 }

@@ -3,28 +3,32 @@ package lovexyn0827.mess.command;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.util.Collection;
+
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.rendering.hud.data.HudDataSenderer;
-import lovexyn0827.mess.rendering.hud.data.PlayerHudDataSenderer;
+import lovexyn0827.mess.rendering.hud.data.HudDataSender;
+import lovexyn0827.mess.rendering.hud.data.PlayerHudDataSender;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class HudFieldListeningCommand {
+public class HudCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("hudfieldlistening").requires(CommandUtil.COMMAND_REQUMENT)
-				.then(literal("sub")
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("hud").requires(CommandUtil.COMMAND_REQUMENT)
+				.then(literal("subField")
 						.then(literal("target")
 								.then(argument("entityType", StringArgumentType.word())
 										.suggests(CommandUtil.ENTITY_TYPES)
@@ -73,7 +77,7 @@ public class HudFieldListeningCommand {
 																	
 																	return Command.SINGLE_SUCCESS;
 																}))))))
-						.then(literal("client")
+						.then(literal("client").requires((s) -> !MessMod.isDedicatedEnv())
 								.then(argument("field", StringArgumentType.word())
 										.suggests((ct, builder) -> {
 											Reflection.getAvailableFields(ClientPlayerEntity.class).forEach(builder::suggest);
@@ -113,14 +117,14 @@ public class HudFieldListeningCommand {
 															addListenedWithNameAndPath(ct, MessMod.INSTANCE.getServerHudManager().playerHudS, ServerPlayerEntity.class);
 															return Command.SINGLE_SUCCESS;
 														}))))))
-				.then(literal("unsub")
+				.then(literal("unsubField")
 						.then(literal("target")
 								.then(argument("name", StringArgumentType.word())
 										.executes((ct) -> {
 											unsubscribe(MessMod.INSTANCE.getServerHudManager().lookingHud, ct);
 											return Command.SINGLE_SUCCESS;
 										})))
-						.then(literal("client")
+						.then(literal("client").requires((s) -> !MessMod.isDedicatedEnv())
 								.then(argument("name", StringArgumentType.word())
 										.executes((ct) -> {
 											unsubscribe(MessMod.INSTANCE.getServerHudManager().playerHudC, ct);
@@ -132,13 +136,13 @@ public class HudFieldListeningCommand {
 											unsubscribe(MessMod.INSTANCE.getServerHudManager().playerHudS, ct);
 											return Command.SINGLE_SUCCESS;
 										}))))
-				.then(literal("list")
+				.then(literal("listFields")
 						.then(literal("target")
 								.executes((ct) -> {
 									CommandUtil.feedbackRaw(ct, listListenedFields(MessMod.INSTANCE.getServerHudManager().lookingHud));
 									return Command.SINGLE_SUCCESS;
 								}))
-						.then(literal("client")
+						.then(literal("client").requires((s) -> !MessMod.isDedicatedEnv())
 								.executes((ct) -> {
 									CommandUtil.feedbackRaw(ct, listListenedFields(MessMod.INSTANCE.getServerHudManager().playerHudC));
 									return Command.SINGLE_SUCCESS;
@@ -147,16 +151,28 @@ public class HudFieldListeningCommand {
 								.executes((ct) -> {
 									CommandUtil.feedbackRaw(ct, listListenedFields(MessMod.INSTANCE.getServerHudManager().playerHudS));
 									return Command.SINGLE_SUCCESS;
+								})))
+				.then(literal("setHudTarget")
+						.then(argument("profile", GameProfileArgumentType.gameProfile())
+								.executes((ct) -> {
+									Collection<GameProfile> profiles = GameProfileArgumentType.getProfileArgument(ct, "profile");
+									if(profiles.size() != 1) {
+										CommandUtil.error(ct, "cmd.hud.reqsinglepf");
+										return 0;
+									}
+									
+									MessMod.INSTANCE.getServerHudManager().setServerPlayerHudTarget(profiles.iterator().next());
+									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
 	}
 	
-	private static void unsubscribe(HudDataSenderer lookingHud, CommandContext<ServerCommandSource> ct) {
+	private static void unsubscribe(HudDataSender lookingHud, CommandContext<ServerCommandSource> ct) {
 		String name = StringArgumentType.getString(ct, "name");
-		lookingHud.removeField(name);
+		lookingHud.removeCustomLine(name);
 	}
 
-	private static void addListenedWithNameAndPath(CommandContext<ServerCommandSource> ct, PlayerHudDataSenderer playerHudS, Class<?> cl) {
+	private static void addListenedWithNameAndPath(CommandContext<ServerCommandSource> ct, PlayerHudDataSender playerHudS, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
 		AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
@@ -165,7 +181,7 @@ public class HudFieldListeningCommand {
 		}
 	}
 	
-	private static void addListenedWithName(CommandContext<ServerCommandSource> ct, PlayerHudDataSenderer playerHudC, Class<?> cl) {
+	private static void addListenedWithName(CommandContext<ServerCommandSource> ct, PlayerHudDataSender playerHudC, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
 		if(!playerHudC.addField(cl, field, name, null)) {
@@ -173,14 +189,14 @@ public class HudFieldListeningCommand {
 		}
 	}
 	
-	private static void addListened(CommandContext<ServerCommandSource> ct, PlayerHudDataSenderer playerHudC, Class<?> cl) {
+	private static void addListened(CommandContext<ServerCommandSource> ct, PlayerHudDataSender playerHudC, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		if(!playerHudC.addField(cl, field)) {
 			CommandUtil.error(ct, "exp.dupfield");
 		}
 	}
 
-	private static String listListenedFields(HudDataSenderer lookingHud) {
+	private static String listListenedFields(HudDataSender lookingHud) {
 		StringBuilder sb = new StringBuilder();
 		lookingHud.getListenedFields().forEach((lf) -> {
 			sb.append(lf.toString() + '\n');

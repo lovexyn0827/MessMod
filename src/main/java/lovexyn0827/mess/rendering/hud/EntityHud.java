@@ -5,7 +5,9 @@ import org.apache.commons.lang3.mutable.MutableInt;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.options.InvaildOptionException;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.options.OptionParser;
@@ -15,6 +17,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 
 /**
  * It should be responable for rendering, not getting data from entities.
@@ -29,10 +33,12 @@ public abstract class EntityHud {
 	private ClientHudManager hudManager;
 	private int lastLineWidth = 0;
 	private int xEnd;
+	private HudType type;
 	
 	public EntityHud(ClientHudManager hudManager, HudType type) {
 		this.hudManager = hudManager;
 		this.data = HudDataStorage.create(type);
+		this.type = type;
 	}
 	
 	public synchronized void render(MatrixStack ms, String description) {
@@ -75,6 +81,11 @@ public abstract class EntityHud {
 	
 	public void toggleRender() {
 		this.shouldRender ^= true;
+		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		buf.writeEnumConstant(type);
+		buf.writeBoolean(this.shouldRender);
+		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(Channels.HUD, buf);
+		MessMod.INSTANCE.getClientNetworkHandler().send(packet);
 	}
 	
 	private void updateAlign() {
@@ -104,7 +115,6 @@ public abstract class EntityHud {
 	}
 	
 	public static class StylesParser implements OptionParser<String> {
-
 		@Override
 		public String tryParse(String str) throws InvaildOptionException {
 			return str;
@@ -114,6 +124,5 @@ public abstract class EntityHud {
 		public String serialize(String val) {
 			return val;
 		}
-		
 	}
 }

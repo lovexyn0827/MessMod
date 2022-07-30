@@ -1,6 +1,6 @@
 package lovexyn0827.mess.rendering.hud.data;
 
-public interface PlayerHudDataSenderer extends HudDataSenderer {
+public interface PlayerHudDataSender extends HudDataSender {
 	void updatePlayer();
 	void updateData();
 }

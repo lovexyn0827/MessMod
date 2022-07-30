@@ -12,21 +12,27 @@ import org.apache.logging.log4j.Logger;
 import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.log.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import lovexyn0827.mess.network.MessClientNetworkHandler;
+import lovexyn0827.mess.network.MessServerNetworkHandler;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
+import lovexyn0827.mess.rendering.ShapeCache;
 import lovexyn0827.mess.rendering.ShapeRenderer;
+import lovexyn0827.mess.rendering.ShapeSender;
 import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.Window;
 import net.minecraft.network.MessageType;
+import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -38,17 +44,22 @@ public class MessMod implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final MessMod INSTANCE = new MessMod();
 	private Mapping mapping;
+	@Environment(EnvType.CLIENT)
 	private ClientHudManager hudManagerC;
 	private ServerHudManager hudManagerS;
-	private int windowX;
-	private int windowY;
 	private ServerSyncedBoxRenderer boxRenderer;
 	private MinecraftServer server;
 	private String scriptDir;
-	private long gameTime;
+	@Environment(EnvType.CLIENT)
 	public ShapeRenderer shapeRenderer;	// Reading from the field directly may bring higher performance.
+	@Environment(EnvType.CLIENT)
+	public ShapeCache shapeCache;
+	public ShapeSender shapeSender;
 	private BlockInfoRenderer blockInfoRederer = new BlockInfoRenderer();
 	private EntityLogger logger;
+	@Environment(EnvType.CLIENT)
+	private MessClientNetworkHandler clientNetworkHandler;
+	private MessServerNetworkHandler serverNetworkHandler;
 
 	private MessMod() {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
@@ -68,14 +79,6 @@ public class MessMod implements ModInitializer {
 		return this.mapping;
 	}
 	
-	public long getGameTime() {
-		if(this.server != null) {
-			return this.gameTime;
-		} else {
-			return -1;
-		}
-	}
-	
 	private void copyScript(String name) throws IOException {
 		Path scriptPath = Paths.get(this.scriptDir);
 		if(!Files.exists(scriptPath)) {
@@ -88,52 +91,35 @@ public class MessMod implements ModInitializer {
 				StandardCopyOption.REPLACE_EXISTING);
 	}
 	
+	@Environment(EnvType.CLIENT)
 	public void onRender(ClientPlayerEntity player, IntegratedServer server) {
-		this.updateWindowSize(MinecraftClient.getInstance().getWindow());
 		if(this.getClientHudManager() != null) this.getClientHudManager().render(player,server);
 	}
-
-	private void updateWindowSize(Window window) {
-		this.windowX = window.getScaledWidth();
-		this.windowY = window.getScaledHeight();
-	}
 	
-	public int getWindowX() {
-		return this.windowX;
-	}
-	
-	public int getWindowY() {
-		return this.windowY;
-	}
-	
+	@Environment(EnvType.CLIENT)
 	public void onGameJoined(GameJoinS2CPacket packet) {
-		ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
+		this.clientNetworkHandler = new MessClientNetworkHandler(MinecraftClient.getInstance());
+		this.clientNetworkHandler.sendVersion();
+		@SuppressWarnings("resource")
+		ClientPlayerEntity player = MinecraftClient.getInstance().player;
+		ShapeRenderer sr = new ShapeRenderer(MinecraftClient.getInstance());
+        this.shapeRenderer = sr;
+        this.shapeCache = sr.getShapeCache();
 		this.hudManagerC = new ClientHudManager();
 		this.hudManagerC.playerHudS = new PlayerHud(this.hudManagerC, player, true);
-		this.hudManagerS.playerHudC.updatePlayer();
+		if (!isDedicatedEnv()) {
+			this.hudManagerS.playerHudC.updatePlayer();
+		}
 	}
 	
 	public void onServerTicked(MinecraftServer server) {
-		ServerPlayerEntity player = server.getPlayerManager().getPlayer(MinecraftClient.getInstance().getSession().getUsername());
-		ServerHudManager shm = this.getServerHudManager();
-		if(player != null && shm != null && shm.lookingHud != null) {
-			shm.lookingHud.updateLookingAtEntityData(player);
-		}
-		
-//		if(shm != null && shm.playerHudS == null && player != null) {
-//			this.getServerHudManager().playerHudS = new PlayerHud(this.getServerHudManager(), player, true);
-//			this.getServerHudManager().playerHudS = (PlayerHudDataSenderer) HudDataSenderer
-//					.createHudDataSenderer(this.server.isDedicated(), HudType.SERVER_PLAYER);
-//		}
-		
-		if(player != null && shm != null && shm.playerHudS != null) {
-			shm.playerHudS.updateData(player);
+		if(this.hudManagerS != null) {
+			this.hudManagerS.tick(server);
 		}
 		
 		this.boxRenderer.tick();
-		this.gameTime = this.server.getOverworld().getTime();
-		//System.out.println(this.gameTime);
 		this.blockInfoRederer.tick();
+		this.shapeSender.updateClientTime(server.getOverworld().getTime());
 		try {
 			this.logger.tick(server);
 		} catch (IOException e) {
@@ -141,22 +127,22 @@ public class MessMod implements ModInitializer {
 		}
 	}
 
-	
+	@Environment(EnvType.CLIENT)
 	public void onClientTicked() {
 		ServerHudManager shm = this.getServerHudManager();
 		if(shm != null && shm.playerHudC != null) {
 			shm.playerHudC.updateData();
-		}else {
-			this.hudManagerS = new ServerHudManager();
 		}
 	}
 
 	//Client
+	@Environment(EnvType.CLIENT)
 	public void onDisconnected() {
 		this.hudManagerC = null;
 	}
 	
 	//Client
+	@Environment(EnvType.CLIENT)
 	public void onPlayerRespawned(PlayerRespawnS2CPacket packet) {
 		this.getServerHudManager().playerHudC.updatePlayer();
 	}
@@ -165,9 +151,11 @@ public class MessMod implements ModInitializer {
 		this.server = server;
 		CommandUtil.updateServer(server);
 		OptionManager.updateServer(server);
+		this.serverNetworkHandler = new MessServerNetworkHandler(server);
+		this.shapeSender = ShapeSender.create(server);
 		this.boxRenderer.setServer(server);
 		this.blockInfoRederer.initializate(server);
-		this.hudManagerS = new ServerHudManager();
+		this.hudManagerS = new ServerHudManager(server);
 		try {
 			this.logger.initialize(server);
 		} catch (IOException e) {
@@ -181,6 +169,7 @@ public class MessMod implements ModInitializer {
 		this.logger.closeAll();
 		this.hudManagerS = null;
 		this.logger.closeAll();
+		this.serverNetworkHandler = null;
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.logger.archiveLogs();
@@ -191,11 +180,9 @@ public class MessMod implements ModInitializer {
 		}
 		
 		CommandUtil.updateServer(null);
-		this.shapeRenderer.reset();
 	}
 
 	public void onServerPlayerSpawned(ServerPlayerEntity player) {
-		//this.hudManager.playerHudS = new PlayerHud(this.hudManager, player, true);
 		CommandUtil.tryUpdatePlayer(player);
 		try {
 			this.scriptDir = server.getSavePath(WorldSavePathMixin.create("scripts")).toAbsolutePath().toString();
@@ -226,15 +213,12 @@ public class MessMod implements ModInitializer {
 	public String getScriptDir() {
 		return this.scriptDir;
 	}
-
-	public ShapeRenderer getShapeRenderer() {
-		return this.shapeRenderer;
-	}
 	
 	public EntityLogger getEntityLogger() {
 		return this.logger;
 	}
 
+	@Environment(EnvType.CLIENT)
 	public ClientHudManager getClientHudManager() {
 		return hudManagerC;
 	}
@@ -243,7 +227,31 @@ public class MessMod implements ModInitializer {
 		return hudManagerS;
 	}
 	
-	public boolean isDedicatedEnv() {
-		return this.server != null && this.server.isDedicated();
+	/**
+	 * @return Whether or not the running environment is a dedicated server or a client that has joined to a dedicated server
+	 */
+	public static boolean isDedicatedEnv() {
+		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+			return true;
+		} else {
+			MinecraftClient mc = MinecraftClient.getInstance();
+			return mc.getServer() == null && (mc.getCurrentServerEntry() == null ? 
+					false : !mc.getCurrentServerEntry().isLocal());
+		}
+	}
+
+	@Environment(EnvType.CLIENT)
+	public void onDisconnect(DisconnectS2CPacket packet) {
+		this.shapeCache.reset();
+		this.clientNetworkHandler = null;
+	}
+
+	public MessServerNetworkHandler getServerNetworkHandler() {
+		return this.serverNetworkHandler;
+	}
+
+	@Environment(EnvType.CLIENT)
+	public MessClientNetworkHandler getClientNetworkHandler() {
+		return this.clientNetworkHandler;
 	}
 }

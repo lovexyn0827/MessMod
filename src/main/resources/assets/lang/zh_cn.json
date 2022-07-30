@@ -33,6 +33,9 @@
 		"cmd.general.flush" : "已将新内容保存到磁盘", 
 		"cmd.general.count" : "共有%d个被监视实体", 
 		
+		//***** hud *****
+		"cmd.hud.reqsinglepf" : "需要1个目标，但是找到了%d个", 
+		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "当前配置", 
 		"cmd.messcfg.modified" : "（已修改）", 

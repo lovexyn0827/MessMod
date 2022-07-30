@@ -1,6 +1,9 @@
 package lovexyn0827.mess.util;
 
+import java.util.Locale;
+
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.mixins.FormattingAccessor;
 import lovexyn0827.mess.util.i18n.I18N;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
@@ -64,7 +67,7 @@ public class FormattedText {
 	public MutableText asMutableText() {
 		MutableText mt = new LiteralText(String.format(this.content, this.args));
 		for(char c : this.format.toCharArray()) {
-			Formatting f = Formatting.byCode(c);
+			Formatting f = byCode(c);
 			if(f == null) {
 				MessMod.LOGGER.warn("Unknown formatting flag " + c + ", ignoring it.");
 				continue;
@@ -74,5 +77,20 @@ public class FormattedText {
 		}
 		
 		return mt;
+	}
+	
+	// XXX Copied from Formatting.byCode()
+	private static Formatting byCode(char code) {
+		char c = Character.toString(code).toLowerCase(Locale.ROOT).charAt(0);
+		Formatting[] var2 = Formatting.values();
+		int var3 = var2.length;
+		for(int var4 = 0; var4 < var3; ++var4) {
+			Formatting formatting = var2[var4];
+			if (((FormattingAccessor)(Object) formatting).getCode() == c) {
+				return formatting;
+			}
+		}
+
+		return null;
 	}
 }

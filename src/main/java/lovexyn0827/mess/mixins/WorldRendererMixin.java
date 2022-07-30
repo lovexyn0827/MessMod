@@ -3,9 +3,6 @@ package lovexyn0827.mess.mixins;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.rendering.ShapeRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -18,19 +15,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldRenderer.class)
-public class WorldRendererMixin
-{
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void addRenderers(MinecraftClient client, BufferBuilderStorage bufferBuilders, CallbackInfo ci)
-    {
-        MessMod.INSTANCE.shapeRenderer = new ShapeRenderer(client);
-    }
-
+public class WorldRendererMixin {
     @Inject(method = "render", at =  @At(value = "INVOKE", target = "Lnet/minecraft/client/render/debug/DebugRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;DDD)V"))
-    private void renderScarpetThings(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci)
-    {
-        if (MessMod.INSTANCE.shapeRenderer != null)
-        {
+    private void renderShapes(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
+        if (MessMod.INSTANCE.shapeRenderer != null) {
             RenderSystem.pushMatrix();
             MessMod.INSTANCE.shapeRenderer.render(camera, tickDelta);
             RenderSystem.popMatrix();

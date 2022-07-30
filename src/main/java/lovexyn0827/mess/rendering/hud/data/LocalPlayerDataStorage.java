@@ -1,10 +1,14 @@
 package lovexyn0827.mess.rendering.hud.data;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 
-public class LocalPlayerDataStorage extends LocalDataStorage implements PlayerHudDataSenderer {
+@Environment(EnvType.CLIENT)
+public class LocalPlayerDataStorage extends LocalDataStorage implements PlayerHudDataSender {
 	private PlayerEntity player;
+	/** Server player information HUD */
 	private final boolean isServer;
 
 	public LocalPlayerDataStorage(boolean isServer) {

@@ -7,25 +7,26 @@ import java.util.function.BiConsumer;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 /**
  * A client-side cache of the data in HUDs
  * @author lovexyn0827
  * @date 2022/7/14
  */
+@Environment(EnvType.CLIENT)
 public interface HudDataStorage {
-	void pushData(String name, Object data);
 	int size();
 	Object get(HudLine id);
 	Iterator<Entry<HudLine, Object>> iterator();
 	default void forEach(BiConsumer<String, Object> action) {
-		this.iterator().forEachRemaining((entry) -> action.accept(entry.getKey().getName(), entry.getKey()));
+		this.iterator().forEachRemaining((entry) -> action.accept(entry.getKey().getName(), entry.getValue()));
 	}
 	
 	static HudDataStorage create(HudType type) {
-		if(MessMod.INSTANCE.isDedicatedEnv()) {
-			// TODO
-			throw new AssertionError();
+		if(MessMod.isDedicatedEnv()) {
+			return new RemoteHudDataStorage();
 		} else {
 			ServerHudManager shm = MessMod.INSTANCE.getServerHudManager();
 			switch(type) {

@@ -14,7 +14,7 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.RenderedLine;
-import lovexyn0827.mess.rendering.ShapeRenderer;
+import lovexyn0827.mess.rendering.ShapeSender;
 
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -69,11 +69,11 @@ public abstract class ExplosionMixin {
 			ServerWorld world = (ServerWorld)(entity.world);
 			if(OptionManager.entityExplosionRaysVisiblity) {
 				HitResult hit = world.raycast(new RaycastContext(source, vec3d, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
-				ShapeRenderer sr = MessMod.INSTANCE.shapeRenderer;
+				ShapeSender sr = MessMod.INSTANCE.shapeSender;
 				sr.addShape(new RenderedLine(source, hit.getPos(), 0x00FF00FF, 
-						OptionManager.entityExplosionRaysLifetime), entity.getEntityWorld().getRegistryKey());
+						OptionManager.entityExplosionRaysLifetime, world.getTime()), entity.getEntityWorld().getRegistryKey());
 				sr.addShape(new RenderedLine(hit.getPos(), vec3d, 0xFF0000FF, 
-						OptionManager.entityExplosionRaysLifetime), entity.getEntityWorld().getRegistryKey());
+						OptionManager.entityExplosionRaysLifetime, world.getTime()), entity.getEntityWorld().getRegistryKey());
 			}
 		}
 	}
