@@ -25,7 +25,8 @@
     "ChunkTicketManagerMixin", 
     "ServerPlayNetworkHandlerMixin", 
     "CustomPayloadC2SPacketAccessor", 
-    "FormattingAccessor"
+    "FormattingAccessor", 
+    "ChunkStatusMixin"
   ],
   "client": [
     "MinecraftClientMixin",

@@ -6,6 +6,7 @@
 		"cmd.general.unsub" : "找到了%d个实体，并取消了对其中的%d个实体的记录", 
 		"cmd.general.found" : "在(%d, %d, %d)找到了POI", 
 		"cmd.general.notfound" : "未找到", 
+		"cmd.general.nodef" : "%s未被定义", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -136,6 +137,7 @@
 		"opt.renderRedstoneGateInfo.desc" : "显示玩家注视的红石中继器或红石比较器的信号等级。", 
 		"opt.serverSyncedBox.desc" : "服务端碰撞箱显示。", 
 		"opt.serverSyncedBoxRenderRange.desc" : "服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非负值会被认为是无穷大。", 
+		"opt.skippedGenerationStages.desc" : "跳过一些世界生成阶段", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "忽略未加载区块中的潜在碰撞，可以降低远距离raycast的卡顿。", 
 		"opt.stableHudLocation.desc" : "使HUD的位置在数据长度频繁变化是更加稳定。", 
 		"opt.strictAccessingPathParsing.desc" : "解释阶段严格检查Accessing Path。启用这一功能可使Accessing Path在多变的环境中表现更稳定。", 

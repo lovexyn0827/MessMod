@@ -24,6 +24,7 @@ import com.mojang.brigadier.context.CommandContext;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
@@ -183,7 +184,7 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
 	
-	@Option(defaultValue = "", 
+	@Option(defaultValue = "[]", 
 			parserClass = ListParser.Ticket.class)
 	public static List<ChunkTicketType<?>> rejectChunkTicket;
 	
@@ -206,6 +207,10 @@ public class OptionManager{
 	@Option(defaultValue = "-1", 
 			parserClass = FloatParser.class)
 	public static float serverSyncedBoxRenderRange;
+	
+	@Option(defaultValue = "[]", 
+			parserClass = RangeParser.ChunkStatusRange.class)
+	public static List<ChunkStatusSorter> skippedGenerationStages;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -12,46 +13,59 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ChunkTicketType;
 
-public abstract class ListParser implements OptionParser<List<?>> {
+public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 	public static final String EMPTY_LIST = "[]";
+	protected final BiMap<String, T> elements;
 	
-	public static class Ticket extends ListParser {
+	public ListParser(BiMap<String, T> elements) {
+		this.elements = elements;
+	}
+	
+	@Override
+	public List<T> tryParse(String str) throws InvaildOptionException {
+		if(EMPTY_LIST.equals(str) || str.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
+		List<T> types = Lists.newArrayList();
+		for(String typeName : str.split(",")) {
+			T type = this.elements.get(typeName);
+			if(type != null) {
+				types.add(type);
+			}
+		}
+		
+		return types;
+	}
+
+	@Override
+	public String serialize(List<? extends T> val) {
+		if (val.isEmpty()) {
+			return EMPTY_LIST;
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		val.forEach((t) -> {
+			sb.append(',').append(this.elements.inverse().get(t));
+		});
+		
+		return sb.charAt(0) == ',' ? sb.deleteCharAt(0).toString() : sb.toString();
+	}
+	
+	@Override
+	public SuggestionProvider<ServerCommandSource> createSuggestions() {
+		return (ct, b) -> {
+			this.elements.keySet().forEach(b::suggest);
+			b.suggest(EMPTY_LIST);
+			return b.buildFuture();
+		};
+	}
+	
+	public static class Ticket extends ListParser<ChunkTicketType<?>> {
 		private static final ImmutableBiMap<String, ChunkTicketType<?>> VANILLA_TICKET_TYPES;
 		
-		@Override
-		public List<ChunkTicketType<?>> tryParse(String str) throws InvaildOptionException {
-			if(EMPTY_LIST.equals(str)) {
-				return Collections.emptyList();
-			}
-			
-			List<ChunkTicketType<?>> types = Lists.newArrayList();
-			for(String typeName : str.split(",")) {
-				ChunkTicketType<?> type = VANILLA_TICKET_TYPES.get(typeName);
-				if(type != null) {
-					types.add(type);
-				}
-			}
-			
-			return types;
-		}
-
-		@Override
-		public String serialize(List<?> val) {
-			StringBuilder sb = new StringBuilder();
-			val.forEach((t) -> {
-				sb.append(',').append(VANILLA_TICKET_TYPES.inverse().get(t));
-			});
-			
-			return sb.toString();
-		}
-		
-		@Override
-		public SuggestionProvider<ServerCommandSource> createSuggestions() {
-			return (ct, b) -> {
-				VANILLA_TICKET_TYPES.keySet().forEach(b::suggest);
-				b.suggest(EMPTY_LIST);
-				return b.buildFuture();
-			};
+		public Ticket() {
+			super(VANILLA_TICKET_TYPES);
 		}
 		
 		static {

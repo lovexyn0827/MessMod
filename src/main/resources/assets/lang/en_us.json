@@ -6,6 +6,7 @@
 		"cmd.general.unsub" : "Found %d entities, and unsubscribed %d entities among them", 
 		"cmd.general.found" : "Found at (%d, %d, %d)", 
 		"cmd.general.notfound" : "Not found", 
+		"cmd.general.nodef" : "%s was not defined", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -137,6 +138,7 @@
 		"opt.serverSyncedBox.desc" : "Enable or disable the server-side hitbox renderer.", 
 		"opt.serverSyncedBoxRenderRange.desc" : "The maximum Cheshev distance beween entity rendered with its bounding bix and the player.All non-positive values are consided as positive infinite.", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long distance raycasts.", 
+		"opt.skippedGenerationStages.desc" : "Skip some stages in the world generation.", 
 		"opt.stableHudLocation.desc" : "Make the location of huds more stable when the length of lines change frequently.", 
 		"opt.strictAccessingPathParsing.desc" : "Treat accessing paths strictly, to make them more relyable. Disable it may make accessing processes more likely to fail in varible environments.", 
 		"opt.superSuperSecretSetting.desc" : "wlujkgfdhlqcmyfdhj...", 
