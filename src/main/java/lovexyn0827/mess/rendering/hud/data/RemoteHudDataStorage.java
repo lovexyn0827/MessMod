@@ -13,7 +13,6 @@ public class RemoteHudDataStorage implements HudDataStorage {
 	
 	public synchronized void pushData(CompoundTag tag) {
 		tag.getList("ToRemove", 8).forEach((item) -> this.cache.remove(generateHudLine(item.asString())));
-		//this.cache.clear();
 		tag.remove("ToRemove");
 		tag.getKeys().forEach((key) -> {
 			Tag line = tag.get(key);

@@ -6,6 +6,7 @@ import com.mojang.authlib.GameProfile;
 
 import lovexyn0827.mess.rendering.hud.data.HudDataSender;
 import lovexyn0827.mess.rendering.hud.data.PlayerHudDataSender;
+import lovexyn0827.mess.rendering.hud.data.SidebarDataSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -13,12 +14,14 @@ public class ServerHudManager implements HudManager {
 	public final HudDataSender lookingHud;
 	public final PlayerHudDataSender playerHudC;
 	public final PlayerHudDataSender playerHudS;
+	public final SidebarDataSender sidebar;
 	private GameProfile subscribedProfile;
 	
 	public ServerHudManager(MinecraftServer server) {
 		lookingHud = HudDataSender.createHudDataSenderer(HudType.TARGET, server);
 		playerHudC = (PlayerHudDataSender) HudDataSender.createHudDataSenderer(HudType.CLIENT_PLAYER, server);
 		playerHudS = (PlayerHudDataSender) HudDataSender.createHudDataSenderer(HudType.SERVER_PLAYER, server);
+		sidebar = SidebarDataSender.create(server);
 	}
 
 	public void setServerPlayerHudTarget(GameProfile gameProfile) {
@@ -45,5 +48,7 @@ public class ServerHudManager implements HudManager {
 				this.playerHudS.updateData(player);
 			}
 		}
+		
+		this.sidebar.updateData();
 	}
 }

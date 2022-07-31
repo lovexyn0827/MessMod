@@ -37,10 +37,14 @@ public abstract class EntityHud {
 	
 	public EntityHud(ClientHudManager hudManager, HudType type) {
 		this.hudManager = hudManager;
-		this.data = HudDataStorage.create(type);
+		this.data = this.createDataStorage(type);
 		this.type = type;
 	}
 	
+	protected HudDataStorage createDataStorage(HudType type) {
+		return HudDataStorage.create(type);
+	}
+
 	public synchronized void render(MatrixStack ms, String description) {
 		int y = this.yStart;
 		int x = this.xStart;

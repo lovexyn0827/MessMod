@@ -21,7 +21,9 @@ public interface HudDataStorage {
 	Object get(HudLine id);
 	Iterator<Entry<HudLine, Object>> iterator();
 	default void forEach(BiConsumer<String, Object> action) {
-		this.iterator().forEachRemaining((entry) -> action.accept(entry.getKey().getName(), entry.getValue()));
+		synchronized (this) {
+			this.iterator().forEachRemaining((entry) -> action.accept(entry.getKey().getName(), entry.getValue()));
+		}
 	}
 	
 	static HudDataStorage create(HudType type) {
@@ -30,12 +32,14 @@ public interface HudDataStorage {
 		} else {
 			ServerHudManager shm = MessMod.INSTANCE.getServerHudManager();
 			switch(type) {
-			case TARGET: 
+			case TARGET : 
 				return (HudDataStorage) shm.lookingHud;
-			case SERVER_PLAYER: 
+			case SERVER_PLAYER : 
 				return (HudDataStorage) shm.playerHudS;
-			case CLIENT_PLAYER: 
+			case CLIENT_PLAYER : 
 				return (HudDataStorage) shm.playerHudC;
+			case SIDEBAR : 
+				return (HudDataStorage) shm.sidebar;
 			}
 			
 			throw new AssertionError();

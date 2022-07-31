@@ -16,6 +16,7 @@ import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
+import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
@@ -56,6 +57,7 @@ public abstract class CommandMixin {
         LogMovementCommand.register(this.dispatcher);
         HudCommand.register(this.dispatcher);
         NameEntityCommand.register(this.dispatcher);
+        EntitySidebarCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", at = @At(

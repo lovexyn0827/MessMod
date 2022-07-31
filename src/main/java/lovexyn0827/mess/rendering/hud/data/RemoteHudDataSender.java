@@ -1,6 +1,8 @@
 package lovexyn0827.mess.rendering.hud.data;
 
 import java.util.List;
+import java.util.stream.Stream;
+
 import com.google.common.collect.Lists;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
@@ -17,9 +19,9 @@ import net.minecraft.server.MinecraftServer;
 
 public class RemoteHudDataSender implements HudDataSender {
 	/** Used to determine the delta */
-	private CompoundTag lastData = new CompoundTag();
-	private final List<HudLine> customLines = Lists.newArrayList();
-	private final MinecraftServer server;
+	protected CompoundTag lastData = new CompoundTag();
+	protected final List<HudLine> customLines = Lists.newArrayList();
+	protected final MinecraftServer server;
 	private final HudType type;
 
 	public RemoteHudDataSender(MinecraftServer server, HudType type) {
@@ -27,18 +29,12 @@ public class RemoteHudDataSender implements HudDataSender {
 		this.type = type;
 	}
 	
-	@Override
 	public void updateData(Entity entity) {
 		CompoundTag data = new CompoundTag();
 		List<String> unused = Lists.newArrayList(lastData.getKeys());
+		Stream<HudLine> lines = this.streamAllLines();
 		if (entity != null) {
-			for(HudLine l : BuiltinHudInfo.values()) {
-				if (this.tryPutData(entity, l, data)) {
-					unused.remove(l.getName());
-				}
-			}
-			
-			this.customLines.forEach((l) -> {
+			lines.forEach((l) -> {
 				if (this.tryPutData(entity, l, data)) {
 					unused.remove(l.getName());
 				}
@@ -59,6 +55,10 @@ public class RemoteHudDataSender implements HudDataSender {
 				.forEach((p) -> p.networkHandler.sendPacket(packet));
 	}
 	
+	protected Stream<HudLine> streamAllLines() {
+		return Stream.concat(Stream.of(BuiltinHudInfo.values()), this.customLines.stream());
+	}
+
 	private boolean tryPutData(Entity entity, HudLine l, CompoundTag data) {
 		String name = l.getName();
 		if(l.canGetFrom(entity)) {
@@ -92,5 +92,47 @@ public class RemoteHudDataSender implements HudDataSender {
 		public void updateData() {
 		}
 		
+	}
+	
+	public static class Sidebar extends RemoteHudDataSender implements SidebarDataSender {
+		public Sidebar(MinecraftServer server) {
+			super(server, HudType.SIDEBAR);
+		}
+
+		public void updateData() {
+			CompoundTag data = new CompoundTag();
+			List<String> unused = Lists.newArrayList(this.lastData.getKeys());
+			Stream<HudLine> lines = this.streamAllLines();
+			lines.forEach((l) -> {
+				if(l instanceof SidebarLine) {
+					SidebarLine line = (SidebarLine) l;
+					if(line.canGet()) {
+						Object ob = line.get();
+						data.put(line.getName(), StringTag.of(ob.toString()));
+					}
+				} else {
+					throw new IllegalStateException("Only SidebarLines are permitted");
+				}
+				
+				unused.remove(l.getName());
+			});
+			ListTag toRemove = new ListTag();
+			unused.forEach((n) -> {
+				toRemove.add(StringTag.of(n));
+			});
+			data.put("ToRemove", toRemove);
+			PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+			buffer.writeEnumConstant(HudType.SIDEBAR);
+			buffer.writeCompoundTag(data);
+			CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.HUD, buffer);
+			this.server.getPlayerManager().getPlayerList().stream()
+					//.filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(HudType.SIDEBAR))
+					.forEach((p) -> p.networkHandler.sendPacket(packet));
+		}
+		
+		@Override
+		protected Stream<HudLine> streamAllLines() {
+			return this.customLines.stream();
+		}
 	}
 }

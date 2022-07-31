@@ -34,6 +34,10 @@
 		"cmd.general.flush" : "已将新内容保存到磁盘", 
 		"cmd.general.count" : "共有%d个被监视实体", 
 		
+		//***** fixedentityhud *****
+		"cmd.fixedentityhud.add" : "向Sidebar中添加了一行数据", 
+		"cmd.fixedentityhud.remove" : "移除了Sidebar中名为%s的数据", 
+		
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "需要1个目标，但是找到了%d个", 
 		

@@ -11,6 +11,7 @@ public class ClientHudManager implements HudManager {
 	public final PlayerHud playerHudC;
 	public int hudHeight;
 	public PlayerHud playerHudS;
+	public EntitySideBar sidebar;
 	// Whether or not headers of lines are rendered red
 	boolean headerSpeciallyColored;
 	boolean looserLines;
@@ -19,9 +20,10 @@ public class ClientHudManager implements HudManager {
 	@SuppressWarnings("resource")
 	public ClientHudManager() {
 		this.hudHeight = 0;
-		this.lookingHud = new LookingAtEntityHud(this, HudType.TARGET);
+		this.lookingHud = new LookingAtEntityHud(this);
 		ClientPlayerEntity player = MinecraftClient.getInstance().player;
 		this.playerHudC = new PlayerHud(this, player, false);
+		this.sidebar = new EntitySideBar(this);
 		this.updateStyle(OptionManager.hudStyles);
 	}
 	
@@ -37,6 +39,10 @@ public class ClientHudManager implements HudManager {
 		
 		if(player != null && this.playerHudS != null && this.playerHudS.shouldRender) {
 			this.playerHudS.render();
+		}
+		
+		if(player != null && this.sidebar != null && this.sidebar.shouldRender) {
+			this.sidebar.render();
 		}
 	}
 
@@ -57,6 +63,9 @@ public class ClientHudManager implements HudManager {
 			break;
 		case SERVER_PLAYER : 
 			hud = this.playerHudS;
+			break;
+		case SIDEBAR : 
+			hud = this.sidebar;
 			break;
 		default : 
 			throw new IllegalArgumentException();

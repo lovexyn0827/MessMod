@@ -34,6 +34,10 @@
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
 		
+		//***** fixedentityhud *****
+		"cmd.fixedentityhud.add" : "Added a new line to the sidebar.", 
+		"cmd.fixedentityhud.remove" : "Removed the line named %s from the sidebar.", 
+		
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "Epected 1 targets, but %d targets were found.", 
 		
