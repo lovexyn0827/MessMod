@@ -31,7 +31,6 @@ public final class AccessingPath {
 	}
 
 	public Object access(Object start, Type genericType) throws AccessingFailureException {
-		
 		switch(OptionManager.accessingPathInitStrategy) {
 		case STANDARD: 
 			AccessingPath path = this.initializedSubPaths.get(start);

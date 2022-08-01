@@ -3,8 +3,6 @@
   "id": "messmod",
   "version": "${version}",
 
-  "accessWidener" : "messmod.accesswidener",
-
   "name": "MessMod",
   "description": "A minecraft mod that contains many features ranging from world manipulation and information providing to bug fixes and so on, allowing you to take more control of the game, see more information, and do some work easier.", 
   "license": "CC-0",

@@ -1,3 +1,0 @@
-accessWidener	v1	named
-
-accessible method net/minecraft/server/world/BlockView raycast (Lnet/minecraft/world/RaycastContext;Ljava/util/function/BiFunction;Ljava/util/function/Function;)Ljava/lang/Object;

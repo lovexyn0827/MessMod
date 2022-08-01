@@ -13,6 +13,7 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.data.SidebarDataSender;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TickingPhase;
+import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -49,6 +50,10 @@ public class EntitySidebarCommand {
 																.executes((EntitySidebarCommand::addSidebarWithPointAndPath))))))))
 				.then(literal("remove")
 						.then(argument("name",StringArgumentType.string())
+								.suggests((ct, b) -> {
+									MessMod.INSTANCE.getServerHudManager().sidebar.getCustomLines().forEach((l) -> b.suggest(l.getName()));
+									return b.buildFuture();
+								})
 								.executes((ct) -> {
 									String name = StringArgumentType.getString(ct, "name");
 									SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
@@ -68,13 +73,18 @@ public class EntitySidebarCommand {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
-		if (sender.addLine(e, field, name, AccessingPath.DUMMY)) {
-			CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
-		} else {
-			CommandUtil.error(ct, "exp.dupname");
+		try {
+			if (sender.addLine(e, field, name, AccessingPath.DUMMY)) {
+				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+			} else {
+				CommandUtil.error(ct, "exp.dupname");
+			}
+			
+			return Command.SINGLE_SUCCESS;
+		} catch (TranslatableException e1) {
+			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
+			return 0;
 		}
-		
-		return Command.SINGLE_SUCCESS;
 	}
 	
 	private static int addSidebarWithPoint(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
@@ -82,13 +92,18 @@ public class EntitySidebarCommand {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
-		if (sender.addLine(e, field, name, AccessingPath.DUMMY)) {
-			CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
-		} else {
-			CommandUtil.error(ct, "exp.dupname");
+		try {
+			if (sender.addLine(e, field, name, AccessingPath.DUMMY)) {
+				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+			} else {
+				CommandUtil.error(ct, "exp.dupname");
+			}
+			
+			return Command.SINGLE_SUCCESS;
+		} catch (TranslatableException e1) {
+			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
+			return 0;
 		}
-		
-		return Command.SINGLE_SUCCESS;
 	}
 	
 	private static int addSidebarWithPointAndPath(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
@@ -97,12 +112,17 @@ public class EntitySidebarCommand {
 		String name = StringArgumentType.getString(ct, "name");
 		AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
-		if (sender.addLine(e, field, name, path)) {
-			CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
-		} else {
-			CommandUtil.error(ct, "exp.dupname");
+		try {
+			if (sender.addLine(e, field, name, path)) {
+				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+			} else {
+				CommandUtil.error(ct, "exp.dupname");
+			}
+			
+			return Command.SINGLE_SUCCESS;
+		} catch (TranslatableException e1) {
+			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
+			return 0;
 		}
-		
-		return Command.SINGLE_SUCCESS;
 	}
 }

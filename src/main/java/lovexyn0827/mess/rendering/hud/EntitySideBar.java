@@ -13,7 +13,9 @@ public class EntitySideBar extends EntityHud {
 	}
 	
 	public void render() {
-		this.render(new MatrixStack(), "Entity Sidebar");
+		if(this.getData().size() > 0) {
+			this.render(new MatrixStack(), "Entity Sidebar");
+		}
 	}
 	
 	@Override
@@ -26,7 +28,6 @@ public class EntitySideBar extends EntityHud {
 			return new RemoteHudDataStorage();
 		} else {
 			return (HudDataStorage) MessMod.INSTANCE.getServerHudManager().sidebar;
-			//return new LocalSidebarDataStorage();
 		}
 	}
 }
