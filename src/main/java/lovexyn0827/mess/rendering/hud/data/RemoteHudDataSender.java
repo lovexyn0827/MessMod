@@ -3,11 +3,14 @@ package lovexyn0827.mess.rendering.hud.data;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Lists;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.rendering.hud.HudType;
+import lovexyn0827.mess.util.TickingPhase;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -16,6 +19,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 
 public class RemoteHudDataSender implements HudDataSender {
 	/** Used to determine the delta */
@@ -99,14 +103,14 @@ public class RemoteHudDataSender implements HudDataSender {
 			super(server, HudType.SIDEBAR);
 		}
 
-		public void updateData() {
+		public void updateData(TickingPhase phase, @Nullable ServerWorld world) {
 			CompoundTag data = new CompoundTag();
 			List<String> unused = Lists.newArrayList(this.lastData.getKeys());
 			Stream<HudLine> lines = this.streamAllLines();
 			lines.forEach((l) -> {
 				if(l instanceof SidebarLine) {
 					SidebarLine line = (SidebarLine) l;
-					if(line.canGet()) {
+					if(SidebarDataSender.shouldUpdate(line, phase, world)) {
 						Object ob = line.get();
 						data.put(line.getName(), StringTag.of(ob.toString()));
 					}

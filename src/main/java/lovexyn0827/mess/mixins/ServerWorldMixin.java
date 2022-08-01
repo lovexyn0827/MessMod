@@ -1,7 +1,15 @@
 package lovexyn0827.mess.mixins;
 
+import java.util.function.BooleanSupplier;
+
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.TickingPhase;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.server.world.ServerWorld;
@@ -39,5 +47,64 @@ public abstract class ServerWorldMixin implements BlockView {
 			Vec3d vec3d = raycastContext.getStart().subtract(raycastContext.getEnd());
 			return BlockHitResult.createMissed(raycastContext.getEnd(), Direction.getFacing(vec3d.x, vec3d.y, vec3d.z), new BlockPos(raycastContext.getEnd()));
 		});
+	}
+	
+	@Inject(method = "tick", 
+			at = @At(value = "INVOKE_STRING", 
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
+					args = "ldc=chunkSource")
+			)
+	private void startChunkTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.WEATHER_CYCLE, (ServerWorld)(Object) this);
+	}
+	
+	@Inject(method = "tick", 
+			at = @At(value = "INVOKE_STRING", 
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
+					args = "ldc=tickPending")
+			)
+	private void startScheduledTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.CHUNK, (ServerWorld)(Object) this);
+	}
+	
+	@Inject(method = "tick", 
+			at = @At(value = "INVOKE_STRING", 
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
+					args = "ldc=raid")
+			)
+	private void startVillageTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.SCHEDULED_TICK, (ServerWorld)(Object) this);
+	}
+	
+	@Inject(method = "tick", 
+			at = @At(value = "INVOKE_STRING", 
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
+					args = "ldc=blockEvents")
+			)
+	private void startBlockEventTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.VILLAGE, (ServerWorld)(Object) this);
+	}
+	
+	@Inject(method = "tick", 
+			at = @At(value = "INVOKE_STRING", 
+					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
+					args = "ldc=entities")
+			)
+	private void startEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.BLOCK_EVENT, (ServerWorld)(Object) this);
+	}
+	
+	@Inject(method = "tick", 
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V")
+			)
+	private void startBlockEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.ENTITY, (ServerWorld)(Object) this);
+	}
+	
+	@Inject(method = "tick", 
+			at = @At("RETURN")
+			)
+	private void endTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.TILE_ENTITY, (ServerWorld)(Object) this);
 	}
 }

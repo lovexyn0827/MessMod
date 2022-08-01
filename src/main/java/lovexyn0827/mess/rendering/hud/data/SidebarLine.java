@@ -2,15 +2,18 @@ package lovexyn0827.mess.rendering.hud.data;
 
 import org.jetbrains.annotations.NotNull;
 
+import lovexyn0827.mess.util.TickingPhase;
 import net.minecraft.entity.Entity;
 
 public final class SidebarLine implements HudLine, Comparable<HudLine> {
 	private final HudLine backend;
 	public final Entity entity;
+	public final TickingPhase updatePhase;
 	
-	public SidebarLine(HudLine backend, Entity e) {
+	public SidebarLine(HudLine backend, Entity e, TickingPhase updatePhase) {
 		this.backend = backend;
 		this.entity = e;
+		this.updatePhase = updatePhase;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 import lovexyn0827.mess.rendering.hud.data.HudDataSender;
 import lovexyn0827.mess.rendering.hud.data.PlayerHudDataSender;
 import lovexyn0827.mess.rendering.hud.data.SidebarDataSender;
+import lovexyn0827.mess.util.TickingPhase;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -49,6 +50,6 @@ public class ServerHudManager implements HudManager {
 			}
 		}
 		
-		this.sidebar.updateData();
+		this.sidebar.updateData(TickingPhase.SERVER_TASKS, null);
 	}
 }

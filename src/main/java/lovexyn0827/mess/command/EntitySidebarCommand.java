@@ -23,7 +23,7 @@ import net.minecraft.server.command.ServerCommandSource;
 public class EntitySidebarCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("entitysidebar")
-				.requires(CommandUtil.COMMAND_REQUMENT)
+				.requires(CommandUtil.COMMAND_REQUMENT).requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("add")
 						.then(argument("target",EntityArgumentType.entity())
 								.then(argument("field",StringArgumentType.string())
@@ -74,7 +74,7 @@ public class EntitySidebarCommand {
 		String name = StringArgumentType.getString(ct, "name");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
-			if (sender.addLine(e, field, name, AccessingPath.DUMMY)) {
+			if (sender.addLine(e, field, name, TickingPhase.SERVER_TASKS, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
@@ -91,9 +91,10 @@ public class EntitySidebarCommand {
 		Entity e = EntityArgumentType.getEntity(ct, "target");
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
+		TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
-			if (sender.addLine(e, field, name, AccessingPath.DUMMY)) {
+			if (sender.addLine(e, field, name, phase, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
@@ -110,10 +111,11 @@ public class EntitySidebarCommand {
 		Entity e = EntityArgumentType.getEntity(ct, "target");
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
+		TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
 		AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
-			if (sender.addLine(e, field, name, path)) {
+			if (sender.addLine(e, field, name, phase, path)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
