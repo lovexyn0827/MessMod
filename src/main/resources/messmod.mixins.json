@@ -36,7 +36,8 @@
     "WorldRendererMixin",
     "ClientPlayerEntityMixin",
     "AbstractRedstoneGateBlockMixin",
-    "LanguageManagerMixin"
+    "LanguageManagerMixin", 
+    "DebugRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

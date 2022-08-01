@@ -8,9 +8,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.Channels;
-import lovexyn0827.mess.options.InvaildOptionException;
 import lovexyn0827.mess.options.OptionManager;
-import lovexyn0827.mess.options.OptionParser;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
 import net.minecraft.client.MinecraftClient;
@@ -116,17 +114,5 @@ public abstract class EntityHud {
 
 	protected final synchronized HudDataStorage getData() {
 		return this.data;
-	}
-	
-	public static class StylesParser implements OptionParser<String> {
-		@Override
-		public String tryParse(String str) throws InvaildOptionException {
-			return str;
-		}
-
-		@Override
-		public String serialize(String val) {
-			return val;
-		}
 	}
 }

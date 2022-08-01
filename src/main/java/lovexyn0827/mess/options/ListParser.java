@@ -10,6 +10,11 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
+import lovexyn0827.mess.MessMod;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ChunkTicketType;
 
@@ -83,6 +88,33 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 					})
 					.forEach((t) -> builder.put(t.toString(), t));
 			VANILLA_TICKET_TYPES = builder.build();
+		}
+	}
+	
+
+	@SuppressWarnings("resource")
+	@Environment(EnvType.CLIENT)
+	public static class DebugRender extends ListParser<DebugRenderer.Renderer> {
+		private static final ImmutableBiMap<String, DebugRenderer.Renderer> VANILLA_DEBUG_RENDERERS;
+		
+		public DebugRender() {
+			super(VANILLA_DEBUG_RENDERERS);
+		}
+
+		static {
+			ImmutableBiMap.Builder<String, DebugRenderer.Renderer> builder = ImmutableBiMap.builder();
+			Stream.of(DebugRenderer.class.getDeclaredFields())
+					.filter((f) -> DebugRenderer.Renderer.class.isAssignableFrom(f.getType()))
+					.forEach((f) -> {
+						try {
+							builder.put(MessMod.INSTANCE.getMapping().namedField(f.getName()), 
+									(DebugRenderer.Renderer) f.get(MinecraftClient.getInstance().debugRenderer));
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							e.printStackTrace();
+							throw new RuntimeException(e);
+						}
+					});
+			VANILLA_DEBUG_RENDERERS = builder.build();
 		}
 	}
 }

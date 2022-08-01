@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import lovexyn0827.mess.command.CommandUtil;
+import lovexyn0827.mess.fakes.DebugRendererEnableState;
 import lovexyn0827.mess.log.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.network.MessClientNetworkHandler;
@@ -98,11 +99,12 @@ public class MessMod implements ModInitializer {
 	
 	@Environment(EnvType.CLIENT)
 	public void onGameJoined(GameJoinS2CPacket packet) {
-		this.clientNetworkHandler = new MessClientNetworkHandler(MinecraftClient.getInstance());
+		MinecraftClient mc = MinecraftClient.getInstance();
+		this.clientNetworkHandler = new MessClientNetworkHandler(mc);
 		this.clientNetworkHandler.sendVersion();
-		@SuppressWarnings("resource")
-		ClientPlayerEntity player = MinecraftClient.getInstance().player;
-		ShapeRenderer sr = new ShapeRenderer(MinecraftClient.getInstance());
+		ClientPlayerEntity player = mc.player;
+		ShapeRenderer sr = new ShapeRenderer(mc);
+		((DebugRendererEnableState) (mc.debugRenderer)).update();
         this.shapeRenderer = sr;
         this.shapeCache = sr.getShapeCache();
 		this.hudManagerC = new ClientHudManager();

@@ -95,10 +95,6 @@ public class MessCfgCommand {
 										String value = StringArgumentType.getString(ct, "value");
 										Object obj = parser.tryParse(value);
 										OptionManager.set(f, obj);
-										OptionManager.CUSTOM_APPLICATION_BEHAVIORS.computeIfPresent(f.getName(), (name, behavior) -> {
-											behavior.accept(value, ct);
-											return behavior;
-										});
 										CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.set", f.getName(), value);
 										return Command.SINGLE_SUCCESS;
 									} catch (InvaildOptionException e) {
@@ -115,10 +111,6 @@ public class MessCfgCommand {
 												String value = StringArgumentType.getString(ct, "value");
 												Object obj = parser.tryParse(value);
 												OptionManager.setGolbal(f, obj);
-												OptionManager.CUSTOM_APPLICATION_BEHAVIORS.computeIfPresent(f.getName(), (name, behavior) -> {
-													behavior.accept(value, ct);
-													return behavior;
-												});
 												CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.setglobal", f.getName(), value);
 												return Command.SINGLE_SUCCESS;
 											} catch (InvaildOptionException e) {

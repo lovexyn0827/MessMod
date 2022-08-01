@@ -23,15 +23,16 @@ import com.mojang.brigadier.context.CommandContext;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.CommandUtil;
+import lovexyn0827.mess.fakes.DebugRendererEnableState;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
-import lovexyn0827.mess.rendering.hud.EntityHud;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ChunkTicketType;
@@ -145,7 +146,7 @@ public class OptionManager{
 	public static AlignMode hudAlignMode;
 	
 	@Option(defaultValue = "", 
-			parserClass = EntityHud.StylesParser.class)
+			parserClass = StringParser.class)
 	public static String hudStyles;
 	
 	@Option(defaultValue = "1.0", 
@@ -243,6 +244,10 @@ public class OptionManager{
 			parserClass = IntegerParser.NonNegative.class)
 	public static int tntChunkLoadingRange;
 	
+	@Option(defaultValue = "[]", 
+			parserClass = StringParser.class)
+	public static String vanillaDebugRenderers;
+	
 	/**
 	 * Refresh the save-local option storage
 	 */
@@ -303,7 +308,7 @@ public class OptionManager{
 		}
 	}
 
-	// Only calls from <clinit> is permitted
+	// Only calls from <clinit> are permitted
 	private static void loadGlobal() {
 		if(GLOBAL_OPTION_FILE.exists()) {
 			try (FileInputStream in = new FileInputStream(GLOBAL_OPTION_FILE)) {
@@ -417,7 +422,7 @@ public class OptionManager{
 	}
 
 	private static void registerCustomApplicationBehavior(String name, 
-			@Nullable BiConsumer<String, CommandContext<ServerCommandSource>> behavior) {
+			@Nullable BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior) {
 		CUSTOM_APPLICATION_BEHAVIORS.put(name, behavior);
 	}
 	
@@ -446,11 +451,19 @@ public class OptionManager{
 			localOptionFile = null;
 		}
 	}
+
+	private static void sendErrorOrWarn(@Nullable CommandContext<ServerCommandSource> ct, String msg) {
+		if (ct != null) {
+			CommandUtil.error(ct, msg);
+		} else {
+			MessMod.LOGGER.warn(msg);
+		}
+	}
 	
 	static{
 		registerCustomApplicationBehavior("enabledTools", (val, ct) -> {
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
-				CommandUtil.error(ct, "Please install the carpet mod!");
+				sendErrorOrWarn(ct, "Please install the carpet mod!");
 			}
 			
 			try {
@@ -464,20 +477,30 @@ public class OptionManager{
 			}
 		});
 		BiConsumer<String, CommandContext<ServerCommandSource>> checkLithium = (val, ct) -> {
-			if(FabricLoader.getInstance().isModLoaded("lithium")) {
-				CommandUtil.error(ct, "Warning: This feature is not compatible with lithium. Maybe it won't work properly");
+			if (FabricLoader.getInstance().isModLoaded("lithium")) {
+				sendErrorOrWarn(ct, "Warning: This feature is not compatible with lithium. Maybe it won't work properly");
 			}
 		};
 		registerCustomApplicationBehavior("entityExplosionInfluence", checkLithium);
 		registerCustomApplicationBehavior("disableExplosionExposureCalculation", checkLithium);
 		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", (val, ct) -> {
-			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
-				CommandUtil.error(ct, "Please install the carpet mod!");
+			if (!FabricLoader.getInstance().isModLoaded("carpet")) {
+				sendErrorOrWarn(ct, "Please install the carpet mod!");
 			}
 		});
 		registerCustomApplicationBehavior("hudStyles", (val, ct) -> {
 			if (!MessMod.isDedicatedEnv()) {
 				MessMod.INSTANCE.getClientHudManager().updateStyle(val);
+			}
+		});
+		registerCustomApplicationBehavior("vanillaDebugRenderers", (val, ct) -> {
+			if (!MessMod.isDedicatedEnv()) {
+				MinecraftClient mc = MinecraftClient.getInstance();
+				try {
+					((DebugRendererEnableState) (mc.debugRenderer)).setEnabledRenderers(new ListParser.DebugRender().tryParse((String) val));
+				} catch (InvaildOptionException e) {
+					sendErrorOrWarn(ct, e.getMessage());
+				}
 			}
 		});
 		loadGlobal();
