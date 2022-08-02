@@ -137,7 +137,8 @@ public class EntityFieldCommand {
 		if(field == null) {
 			throw new IllegalArgumentException("cmd.entityfield.nosuchfield");
 		}
-		
+
+		field.setAccessible(true);
 		Class<?> type = field.getType();
 		if(type == Integer.TYPE) {
 			field.set(entity, Integer.parseInt(newValue));
