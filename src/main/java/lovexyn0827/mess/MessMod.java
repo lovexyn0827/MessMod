@@ -92,27 +92,7 @@ public class MessMod implements ModInitializer {
 				StandardCopyOption.REPLACE_EXISTING);
 	}
 	
-	@Environment(EnvType.CLIENT)
-	public void onRender(ClientPlayerEntity player, IntegratedServer server) {
-		if(this.getClientHudManager() != null) this.getClientHudManager().render(player,server);
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public void onGameJoined(GameJoinS2CPacket packet) {
-		MinecraftClient mc = MinecraftClient.getInstance();
-		this.clientNetworkHandler = new MessClientNetworkHandler(mc);
-		this.clientNetworkHandler.sendVersion();
-		ClientPlayerEntity player = mc.player;
-		ShapeRenderer sr = new ShapeRenderer(mc);
-		((DebugRendererEnableState) (mc.debugRenderer)).update();
-        this.shapeRenderer = sr;
-        this.shapeCache = sr.getShapeCache();
-		this.hudManagerC = new ClientHudManager();
-		this.hudManagerC.playerHudS = new PlayerHud(this.hudManagerC, player, true);
-		if (!isDedicatedEnv()) {
-			this.hudManagerS.playerHudC.updatePlayer();
-		}
-	}
+	//************ SERVER SIDE *****************
 	
 	public void onServerTicked(MinecraftServer server) {
 		if(this.hudManagerS != null) {
@@ -128,26 +108,7 @@ public class MessMod implements ModInitializer {
 			e.printStackTrace();
 		}
 	}
-
-	@Environment(EnvType.CLIENT)
-	public void onClientTicked() {
-		ServerHudManager shm = this.getServerHudManager();
-		if(shm != null && shm.playerHudC != null) {
-			shm.playerHudC.updateData();
-		}
-	}
-
-	//Client
-	@Environment(EnvType.CLIENT)
-	public void onDisconnected() {
-		this.hudManagerC = null;
-	}
 	
-	//Client
-	@Environment(EnvType.CLIENT)
-	public void onPlayerRespawned(PlayerRespawnS2CPacket packet) {
-		this.getServerHudManager().playerHudC.updatePlayer();
-	}
 
 	public void onServerStarted(MinecraftServer server) {
 		this.server = server;
@@ -199,6 +160,50 @@ public class MessMod implements ModInitializer {
 			LOGGER.error("Scarpet scripts couldn't be loaded.");
 			e.printStackTrace();
 		}
+	}
+
+	//************ CLIENT SIDE *****************
+	
+	@Environment(EnvType.CLIENT)
+	public void onRender(ClientPlayerEntity player, IntegratedServer server) {
+		if(this.getClientHudManager() != null) this.getClientHudManager().render(player,server);
+	}
+	
+	@Environment(EnvType.CLIENT)
+	public void onGameJoined(GameJoinS2CPacket packet) {
+		MinecraftClient mc = MinecraftClient.getInstance();
+		this.clientNetworkHandler = new MessClientNetworkHandler(mc);
+		this.clientNetworkHandler.sendVersion();
+		ClientPlayerEntity player = mc.player;
+		ShapeRenderer sr = new ShapeRenderer(mc);
+		((DebugRendererEnableState) (mc.debugRenderer)).update();
+        this.shapeRenderer = sr;
+        this.shapeCache = sr.getShapeCache();
+		this.hudManagerC = new ClientHudManager();
+		this.hudManagerC.playerHudS = new PlayerHud(this.hudManagerC, player, true);
+		if (!isDedicatedEnv()) {
+			this.hudManagerS.playerHudC.updatePlayer();
+		}
+	}
+
+	@Environment(EnvType.CLIENT)
+	public void onClientTicked() {
+		ServerHudManager shm = this.getServerHudManager();
+		if(shm != null && shm.playerHudC != null) {
+			shm.playerHudC.updateData();
+		}
+	}
+
+	//Client
+	@Environment(EnvType.CLIENT)
+	public void onDisconnected() {
+		this.hudManagerC = null;
+	}
+	
+	//Client
+	@Environment(EnvType.CLIENT)
+	public void onPlayerRespawned(PlayerRespawnS2CPacket packet) {
+		this.getServerHudManager().playerHudC.updatePlayer();
 	}
 
 	public void sendMessageToEveryone(Object... message) {
