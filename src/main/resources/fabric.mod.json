@@ -5,6 +5,7 @@
 
   "name": "MessMod",
   "description": "A minecraft mod that contains many features ranging from world manipulation and information providing to bug fixes and so on, allowing you to take more control of the game, see more information, and do some work easier.", 
+  "icon": "assets/MessMod.png", 
   "license": "CC-0",
   "authors": [
     "lovexyn0827"
