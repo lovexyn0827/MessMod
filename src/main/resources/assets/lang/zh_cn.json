@@ -68,6 +68,9 @@
 		"cmd.raycast.result.entity" : "实体：%s\n撞击位置：(%.15f, %.15f, %.15f)", 
 		"cmd.raycast.result.miss" : "未检测到碰撞", 
 		
+		//***** ride *****
+		"cmd.ride.info" : "找到了%d个候选实体，其中%d个成功开始了骑乘", 
+		
 		//***** tileentity *****
 		"cmd.tileentity.usage" : "TODO", 
 		"cmd.tileentity.type" : "类型：%s", 

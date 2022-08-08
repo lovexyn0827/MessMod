@@ -26,6 +26,7 @@ import lovexyn0827.mess.command.NameEntityCommand;
 import lovexyn0827.mess.command.PoiCommand;
 import lovexyn0827.mess.command.RaycastCommand;
 import lovexyn0827.mess.command.RepeatCommand;
+import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
@@ -58,6 +59,7 @@ public abstract class CommandMixin {
         HudCommand.register(this.dispatcher);
         NameEntityCommand.register(this.dispatcher);
         EntitySidebarCommand.register(this.dispatcher);
+        RideCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", at = @At(

@@ -68,6 +68,9 @@
 		"cmd.raycast.result.entity" : "Entity: %s (%d)\nAt: (%.15f, %.15f, %.15f)", 
 		"cmd.raycast.result.miss" : "No collision was detected", 
 		
+		//***** ride *****
+		"cmd.ride.info" : "%d candidates are found, and %d of them succeeded to ride", 
+		
 		//***** tileentity *****
 		"cmd.tileentity.usage" : "TODO", 
 		"cmd.tileentity.type" : "Type: %s", 
