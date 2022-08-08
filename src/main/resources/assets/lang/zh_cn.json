@@ -7,6 +7,7 @@
 		"cmd.general.found" : "在(%d, %d, %d)找到了POI", 
 		"cmd.general.notfound" : "未找到", 
 		"cmd.general.nodef" : "%s未被定义", 
+		"cmd.general.unexpected" : "发生了未知错误", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -40,6 +41,10 @@
 		
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "需要1个目标，但是找到了%d个", 
+		
+		//***** lag *****
+		"cmd.lag.unsupported" : "专用服务器环境下无法访问线程%s", 
+		"cmd.lag.done" : "卡顿完成", 
 		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "当前配置", 

@@ -7,6 +7,7 @@
 		"cmd.general.found" : "Found at (%d, %d, %d)", 
 		"cmd.general.notfound" : "Not found", 
 		"cmd.general.nodef" : "%s was not defined", 
+		"cmd.general.unexpected" : "Unexpected error", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -40,6 +41,10 @@
 		
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "Epected 1 targets, but %d targets were found.", 
+		
+		//***** lag *****
+		"cmd.lag.unsupported" : "Unable to access thread %s in the dedicated server environment.", 
+		"cmd.lag.done" : "Lagging completed", 
 		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "Current Options", 
