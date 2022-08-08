@@ -23,7 +23,7 @@ import net.minecraft.server.command.ServerCommandSource;
 public class EntitySidebarCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("entitysidebar")
-				.requires(CommandUtil.COMMAND_REQUMENT).requires(CommandUtil.COMMAND_REQUMENT)
+				.requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("add")
 						.then(argument("target",EntityArgumentType.entity())
 								.then(argument("field",StringArgumentType.string())

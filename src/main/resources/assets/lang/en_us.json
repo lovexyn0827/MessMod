@@ -156,6 +156,7 @@
 		"opt.superSuperSecretSetting.desc" : "wlujkgfdhlqcmyfdhj...", 
 		"opt.tntChunkLoading.desc" : "Allow or disallow TNT entities to load chunks in their processing, maybe helpful in making some kind of TNT canons. Note that if an TNT entity flies at a extremely high speed when the option is set to true.", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT entities load the chunks they are in permanently when tntChunkLoading is enabled.", 
-		"opt.tntChunkLoadingRange.desc" : "Set the radius of entity processing chunks created by tntChunkLoading."
+		"opt.tntChunkLoadingRange.desc" : "Set the radius of entity processing chunks created by tntChunkLoading.", 
+		"opt.vanillaDebugRenderers.desc" : "Enable some vanilla debugging renderers"
 	}
 }
