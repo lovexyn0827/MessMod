@@ -39,7 +39,7 @@ public enum BuiltinHudInfo implements HudLine {
 	HEALTH("Health", DataType.FLOAT, (e) -> ((LivingEntity) e).getHealth(), LivingEntity.class),
 	LIVING_FLAGS("Living State", DataType.STRING, (e) -> EntityHudUtil.getLivingFlags((LivingEntity) e), LivingEntity.class),
 	MOVEMENT_SPEED("OnLand Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).getMovementSpeed(), LivingEntity.class),
-	FLYING_SPEED("Fly Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).flyingSpeed, LivingEntity.class),
+	FLYING_SPEED("Fly Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).airStrafingSpeed, LivingEntity.class),
 	FUSE("Fuse", DataType.INTEGER, (e) -> ((TntEntity) e).getFuse(), TntEntity.class),
 	POWER_X("Power X", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerX, ExplosiveProjectileEntity.class),
 	POWER_Y("Power Y", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerY, ExplosiveProjectileEntity.class),

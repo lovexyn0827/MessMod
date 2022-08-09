@@ -101,7 +101,7 @@ public class ShapeRenderer {
             			} else {
             				MatrixStack matrixStack = RenderSystem.getModelViewStack();
             				matrixStack.push();
-                            matrixStack.method_34425(matrices.peek().getModel());
+                            matrixStack.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
                             RenderSystem.applyModelViewMatrix();
                             s.renderFaces(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
                 			s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+@SuppressWarnings("deprecation")
 public class CsvWriter implements AutoCloseable, Flushable {
 	private Writer writer;
 	private int columnNumber;

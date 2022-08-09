@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 
 @Mixin(CloneCommand.class)
 public abstract class CloneCommandMixin {
+	@SuppressWarnings("deprecation")
 	@Redirect(method = "execute", 
 			at = @At(value = "INVOKE", 
 			target = "Lnet/minecraft/server/world/ServerWorld;"

@@ -26,7 +26,7 @@ public abstract class CraftingTableBlockMixin extends AbstractBlock {
 		if(OptionManager.craftingTableBUD && !world.isClient) {
 			if(world instanceof ServerWorld) {
 				ServerWorld sw = (ServerWorld) world;
-				sw.getServer().getPlayerManager().broadcastChatMessage(
+				sw.getServer().getPlayerManager().broadcast(
 						new FormattedText("NC: Tick %d @ (%d, %d, %d)", "cl", false, world.getTime(), 
 								pos.getX(), pos.getY(), pos.getZ()).asMutableText(), 
 						MessageType.SYSTEM, Util.NIL_UUID);
@@ -38,7 +38,7 @@ public abstract class CraftingTableBlockMixin extends AbstractBlock {
 	public void prepare(BlockState state, WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth) {
 		if(OptionManager.craftingTableBUD && world instanceof ServerWorld) {
 			ServerWorld sw = (ServerWorld) world;
-			sw.getServer().getPlayerManager().broadcastChatMessage(
+			sw.getServer().getPlayerManager().broadcast(
 					new FormattedText("PP: Tick %d @ (%d, %d, %d)", "1l", false, sw.getTime(), 
 							pos.getX(), pos.getY(), pos.getZ()).asMutableText(), 
 					MessageType.SYSTEM, Util.NIL_UUID);

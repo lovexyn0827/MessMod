@@ -28,7 +28,7 @@ public class ChunkStatusMixin {
 	@Inject(method = "runGenerationTask", at = @At(value = "HEAD"), cancellable = true)
 	private void skipTaskIfNeeded(Executor executor, ServerWorld world, ChunkGenerator chunkGenerator, StructureManager structureManager, 
 			ServerLightingProvider lightingProvider, 
-			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> chunks, 
+			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> chunks, boolean bl, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
 		if(OptionManager.skippedGenerationStages.isEmpty()) {
 			return;

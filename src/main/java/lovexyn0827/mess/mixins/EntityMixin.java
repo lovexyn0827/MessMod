@@ -1,8 +1,6 @@
 package lovexyn0827.mess.mixins;
 
 import java.util.List;
-import java.util.stream.Stream;
-
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,7 +15,6 @@ import com.google.common.collect.Lists;
 
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
@@ -26,7 +23,6 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import net.minecraft.util.collection.ReusableStream;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -55,17 +51,12 @@ public abstract class EntityMixin {
 			method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private void onCalculatingStepHeight(Vec3d movement, 
-			CallbackInfoReturnable<Vec3d> ci, 
-			Box box, 
-			ShapeContext shapeContext, 
-			Stream stream, Stream stream2, 
-			ReusableStream reusableStream, 
-			Vec3d vec3d) {
+	private void onCalculatingStepHeight(Vec3d movement, CallbackInfoReturnable<Vec3d> cir, 
+			Box box, List list, Vec3d vec3d) {
 		Entity entity = (Entity)(Object)this;
 		if(EntityConfigCommand.shouldDisableStepHeight(entity)) {
-			ci.setReturnValue(vec3d);
-			ci.cancel();
+			cir.setReturnValue(vec3d);
+			cir.cancel();
 		}
 	}
 	
@@ -166,7 +157,7 @@ public abstract class EntityMixin {
 	private void postMove(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if(currentReport != null && !this.world.isClient) {
 			currentReport.add(new LiteralText("Final Motion: " + this.velocity));
-			currentReport.forEach((t) -> world.getServer().getPlayerManager().broadcastChatMessage(t, MessageType.CHAT, Util.NIL_UUID));
+			currentReport.forEach((t) -> world.getServer().getPlayerManager().broadcast(t, MessageType.CHAT, Util.NIL_UUID));
 			currentReport = null;
 			lastMovement = new Vec3d(Double.NaN, Double.NaN, Double.NaN);
 		}

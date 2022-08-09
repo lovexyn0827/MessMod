@@ -36,8 +36,7 @@ public class TileEntityCommand {
 									}
 									
 									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.type", Registry.BLOCK_ENTITY_TYPE.getId(be.getType()).getPath());
-									NbtCompound tag = new NbtCompound();
-									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.writeNbt(tag));
+									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.createNbtWithId());
 									return 1;
 								}))).
 				then(literal("set").

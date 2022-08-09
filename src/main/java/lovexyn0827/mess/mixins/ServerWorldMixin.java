@@ -23,6 +23,7 @@ import net.minecraft.world.RaycastContext;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin implements BlockView {
+	@SuppressWarnings("deprecation")
 	@Override
 	public BlockHitResult raycast(RaycastContext context2) {
 		return BlockView.raycast(context2.getStart(), context2.getEnd(), context2, (context, pos) -> {

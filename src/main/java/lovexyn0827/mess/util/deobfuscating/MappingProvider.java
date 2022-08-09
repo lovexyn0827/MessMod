@@ -79,6 +79,7 @@ public class MappingProvider {
 	
 	private static Optional<Mapping> tryLoadMappingFromTisAddition() throws IOException {
 		LOGGER.info("Trying to load mapping bundled in Carpet TIS Addition...");
+		@SuppressWarnings("deprecation")
 		Path path = Files.walk(FabricLoader.getInstance().getModContainer("carpet-tis-addition").get().getPath("assets/carpettisaddition"))
 				.filter((f) -> f.getFileName().toString().endsWith(".tiny"))
 				.findFirst()

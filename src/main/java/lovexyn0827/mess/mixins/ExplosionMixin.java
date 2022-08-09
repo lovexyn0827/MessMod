@@ -62,7 +62,7 @@ public abstract class ExplosionMixin {
 			Entity entity, 
 			CallbackInfoReturnable<Float> cir, 
 			Box box, 
-			double d, double e, double f, double g, double h, int i, int j, float k, float l, float m, double n, double o, double p, 
+			double d, double e, double f, double g, double h, int i, int j, double k, double l, double m, double n, double o, double p, 
 			Vec3d vec3d
 			) {
 		if(entity.world instanceof ServerWorld) {

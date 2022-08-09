@@ -11,6 +11,7 @@ import net.minecraft.util.Lazy;
  * @author lovexyn0827
  * Date: April 10, 2022
  */
+@SuppressWarnings("deprecation")
 public class CarpetUtil {
 	private static final Lazy<BooleanSupplier> IS_TICK_FROZEN = new Lazy<>(() -> {
 		if(FabricLoader.getInstance().isModLoaded("carpet")) {

@@ -33,6 +33,7 @@ public class Language {
 		this.id = id;
 		try(Reader r = new InputStreamReader(
 				Language.class.getResourceAsStream("/assets/lang/" + id + ".json"))) {
+			@SuppressWarnings("deprecation")
 			JsonObject def = new JsonParser().parse(r).getAsJsonObject();
 			this.readableName = def.get("readableName").getAsString();
 			def.getAsJsonObject("translations")

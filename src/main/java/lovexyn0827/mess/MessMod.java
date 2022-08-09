@@ -212,7 +212,7 @@ public class MessMod implements ModInitializer {
 			merged += ob;
 		}
 		
-		this.server.getPlayerManager().broadcastChatMessage(new LiteralText(merged), 
+		this.server.getPlayerManager().broadcast(new LiteralText(merged), 
 				MessageType.SYSTEM, 
 				new UUID(0x31f38bL,0x31f0b8L));
 	}
