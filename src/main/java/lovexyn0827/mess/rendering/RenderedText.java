@@ -10,10 +10,9 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.AffineTransformation;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.util.math.Matrix4f;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -33,13 +32,13 @@ public class RenderedText extends Shape {
 	}
 
 	@Override
-	protected void renderFaces(Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX, double cameraY,
+	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX, double cameraY,
 			double cameraZ, float partialTick) {
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderLines(Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX, double cameraY,
+	protected void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX, double cameraY,
 			double cameraZ, float partialTick) {
 		if (this.a == 0.0) return;
 		MinecraftClient client = MinecraftClient.getInstance();
@@ -55,17 +54,16 @@ public class RenderedText extends Shape {
         double e = camera1.getPos().y;
         double f = camera1.getPos().z;
         RenderSystem.disableCull();
-        RenderSystem.pushMatrix();
-        RenderSystem.translatef((float)(pos.x - d), (float)(pos.y - e), (float)(pos.z - f));
-        RenderSystem.normal3f(0.0F, 1.0F, 0.0F);
-
-        RenderSystem.multMatrix(new Matrix4f(camera1.getRotation()));
-        RenderSystem.scalef(0.01f, -0.01f, 0.01f);
-        RenderSystem.scalef(-1.0F, 1.0F, 1.0F);
+        matrices.push();
+        matrices.translate((float)(pos.x - d), (float)(pos.y - e), (float)(pos.z - f));
+        matrices.multiply(camera1.getRotation());
+        matrices.scale(0.01f, -0.01f, 0.01f);
+        matrices.scale(-1.0F, 1.0F, 1.0F);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-        textRenderer.draw(this.value, 0, 0.0F, this.color, false, AffineTransformation.identity().getMatrix(), immediate, false, 0x0000002f, 15728880);
+        //textRenderer.draw(this.value, 0, 0.0F, this.color, false, matrices.peek().getModel(), immediate, false, 0x0000002f, 15728880);
+        textRenderer.draw(this.value, 0, 0, this.color, false, matrices.peek().getModel(), immediate, false, 0x0000002f, 15728880);
         immediate.draw();
-        RenderSystem.popMatrix();
+        matrices.pop();
         RenderSystem.enableCull();
 	}
 
@@ -75,12 +73,12 @@ public class RenderedText extends Shape {
 	}
 	
 	@Override
-	protected CompoundTag toTag(CompoundTag tag) {
-		CompoundTag basic = super.toTag(tag);
+	protected NbtCompound toTag(NbtCompound tag) {
+		NbtCompound basic = super.toTag(tag);
 		basic.putDouble("X", this.pos.x);
 		basic.putDouble("Y", this.pos.y);
 		basic.putDouble("Z", this.pos.z);
-		basic.put("Value", StringTag.of(this.value));
+		basic.put("Value", NbtString.of(this.value));
 		return basic;
 	}
 }

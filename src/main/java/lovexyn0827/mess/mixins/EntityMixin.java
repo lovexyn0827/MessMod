@@ -35,7 +35,7 @@ import net.minecraft.world.World;
 public abstract class EntityMixin {
 	@Shadow private Vec3d pos;
 	@Shadow private Vec3d velocity;
-	@Shadow private int entityId;
+	@Shadow private int id;
 	@Shadow private World world;
 	@Shadow private EntityType<?> type;
 	private static List<Text> currentReport;
@@ -77,7 +77,7 @@ public abstract class EntityMixin {
 			if(LogMovementCommand.SUBSCRIBED_ENTITIES.contains((Entity)(Object) this) && !this.world.isClient) {
 				currentReport = Lists.newArrayList();
 				currentReport.add(new LiteralText("Tick: " + this.world.getTime()).formatted(Formatting.DARK_GREEN, Formatting.BOLD));
-				currentReport.add(new LiteralText("Entity: " + this.type + '(' + this.entityId + ')'));
+				currentReport.add(new LiteralText("Entity: " + this.type + '(' + this.id + ')'));
 				String typeStr = "Unknown";
 				switch(type) {
 				case PISTON :

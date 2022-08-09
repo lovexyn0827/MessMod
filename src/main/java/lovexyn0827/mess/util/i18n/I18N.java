@@ -3,7 +3,7 @@ package lovexyn0827.mess.util.i18n;
 import com.google.common.collect.ImmutableSet;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 

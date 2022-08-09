@@ -2,7 +2,7 @@ package lovexyn0827.mess.rendering;
 
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.network.Channels;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -24,8 +24,8 @@ public class RemoteShapeSender implements ShapeSender {
 		buffer.writeEnumConstant(UpdateMode.ADD_SHAPE);
 		buffer.writeIdentifier(dim.getValue());
 		buffer.writeString(space.name);
-		CompoundTag tag = new CompoundTag();
-		buffer.writeCompoundTag(shape.toTag(tag));
+		NbtCompound tag = new NbtCompound();
+		buffer.writeNbt(shape.toTag(tag));
 		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.SHAPE, buffer);
 		this.server.getPlayerManager().sendToDimension(packet, dim);
 	}

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.util.math.Matrix4f;
 
 /**
  * It should be responable for rendering, not getting data from entities.
@@ -47,15 +48,20 @@ public abstract class EntityHud {
 		int y = this.yStart;
 		int x = this.xStart;
 		// i don't know how it works, but it runs correctly...
-		RenderSystem.matrixMode(5889);
-		RenderSystem.loadIdentity();
-		RenderSystem.ortho(0.0D, (double)this.client.getWindow().getFramebufferWidth(), (double)this.client.getWindow().getFramebufferHeight(), 0.0D, 1000.0D, 3000.0D);
-		RenderSystem.matrixMode(5888);
-		RenderSystem.loadIdentity();
-		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
+		//
+		Matrix4f matrix4f = Matrix4f.projectionMatrix(0.0f, 
+				this.client.getWindow().getFramebufferWidth(), 0.0f, 
+				this.client.getWindow().getFramebufferHeight(), 1000.0f, 3000.0f);
+		RenderSystem.setProjectionMatrix(matrix4f);
+		MatrixStack matrixStack = RenderSystem.getModelViewStack();
+		matrixStack.loadIdentity();
+		matrixStack.translate(0.0, 0.0, -2000.0);
+		RenderSystem.applyModelViewMatrix();
+		RenderSystem.lineWidth(1.0f);
+		RenderSystem.disableTexture();
 		this.updateAlign();
 		float size = OptionManager.hudTextSize;
-		RenderSystem.scalef(size, size, size);
+		ms.scale(size, size, size);
 		TextRenderer tr = client.textRenderer;
 		ClientHudManager chm = MessMod.INSTANCE.getClientHudManager();
 		tr.drawWithShadow(ms, description, x, y, -1);

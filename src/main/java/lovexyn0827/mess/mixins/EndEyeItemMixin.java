@@ -13,7 +13,6 @@ import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -25,7 +24,7 @@ public class EndEyeItemMixin {
 			)
 	private void teleportIfNeeded(World world, PlayerEntity player, Hand h, CallbackInfoReturnable<TypedActionResult<?>> ci) {
 		if(OptionManager.endEyeTeleport) {
-			if(player instanceof ServerPlayerEntity && player.abilities.allowFlying) {
+			if(player instanceof ServerPlayerEntity && player.getAbilities().allowFlying) {
 				ServerPlayerEntity sp = (ServerPlayerEntity)player;
 				Vec3d start = sp.getPos().add(0, sp.getStandingEyeHeight(), 0);
 				float r = 180;
@@ -45,8 +44,8 @@ public class EndEyeItemMixin {
 				if(hit.getType() != HitResult.Type.MISS) {
 					Vec3d pos = hit.getPos();
 					sp.getServerWorld().getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, 
-							new ChunkPos(((int)sp.chunkX), ((int)sp.chunkZ)), 1, sp.getEntityId());
-					sp.networkHandler.requestTeleport(pos.x, pos.y, pos.z, sp.yaw, sp.pitch);
+							sp.getChunkPos(), 1, sp.getId());
+					sp.networkHandler.requestTeleport(pos.x, pos.y, pos.z, sp.getYaw(), sp.getPitch());
 				}
 			}
 		}

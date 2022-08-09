@@ -1,5 +1,6 @@
 package lovexyn0827.mess.rendering;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lovexyn0827.mess.MessMod;
@@ -27,11 +28,12 @@ public class ServerSyncedBoxRenderer {
 		ShapeSender sr = MessMod.INSTANCE.shapeSender;
 		this.lastUpdated = world.getTime();
 		float r = OptionManager.serverSyncedBoxRenderRange;
-		List<? extends Entity> list;
+		List<Entity> list;
 		if(r > 0) {
 			list = world.getEntitiesByClass(Entity.class, new net.minecraft.util.math.Box(pos, pos).expand(r), (e) -> true);
 		} else {
-			list = world.getEntitiesByType(null, (e) -> true);
+			list = new ArrayList<Entity>();
+			world.iterateEntities().forEach(list::add);
 		}
 		
 		for(Entity entity : list) {

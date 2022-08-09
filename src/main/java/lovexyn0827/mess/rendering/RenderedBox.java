@@ -6,7 +6,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -31,7 +32,7 @@ public class RenderedBox extends Shape {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderFaces(Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
 			double cz, float partialTick) {
 		if ((this.a) == 0) return;
         RenderSystem.lineWidth(1.0F);
@@ -45,10 +46,10 @@ public class RenderedBox extends Shape {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderLines(Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
 			double cz, float partialTick) {
 		if (this.a == 0.0) return;
-        RenderSystem.lineWidth(2);
+        RenderSystem.lineWidth(2.0F);
         ShapeRenderer.drawBoxWireGLLines(tessellator, bufferBuilder,
                 (float)(box.minX - cx - renderEpsilon), (float)(box.minY - cy - renderEpsilon), (float)(box.minZ - cz - renderEpsilon),
                 (float)(box.maxX - cx + renderEpsilon), (float)(box.maxY - cy + renderEpsilon), (float)(box.maxZ - cz + renderEpsilon),
@@ -63,8 +64,8 @@ public class RenderedBox extends Shape {
 	}
 
 	@Override
-	protected CompoundTag toTag(CompoundTag tag) {
-		CompoundTag basic = super.toTag(tag);
+	protected NbtCompound toTag(NbtCompound tag) {
+		NbtCompound basic = super.toTag(tag);
 		basic.putDouble("X0", this.box.minX);
 		basic.putDouble("Y0", this.box.minY);
 		basic.putDouble("Z0", this.box.minZ);

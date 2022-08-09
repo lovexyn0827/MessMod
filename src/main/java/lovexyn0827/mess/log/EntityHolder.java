@@ -25,7 +25,7 @@ public class EntityHolder {
 	
 	public EntityHolder(Entity e, EntityLogger logger) {
 		this.entity = e;
-		this.entityId = entity.getEntityId();
+		this.entityId = entity.getId();
 		String entityName = e.getName().asString();
 		String name = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) 
 				+ "@" + this.entityId + "-"
@@ -77,7 +77,7 @@ public class EntityHolder {
 	}
 	
 	public boolean isInvaild() {
-		return this.entity.removed;
+		return this.entity.isRemoved();
 	}
 
 	public void close() {

@@ -14,6 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
 import net.minecraft.server.command.ServerCommandSource;
@@ -87,7 +88,7 @@ public class ModifyCommand {
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct) -> {
 											forEachEntity(ct,
-													(entity,val) -> entity.yaw = val.floatValue(),
+													(entity,val) -> entity.setYaw(val.floatValue()),
 													(entity) -> true);
 											return 0;
 										}))).
@@ -95,7 +96,7 @@ public class ModifyCommand {
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct) -> {
 											forEachEntity(ct,
-													(entity,val) -> entity.pitch = val.floatValue(),
+													(entity,val) -> entity.setPitch(val.floatValue()),
 													(entity) -> true);
 											return 0;
 										}))).
@@ -127,7 +128,7 @@ public class ModifyCommand {
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct) -> {
 											forEachEntity(ct,
-													(entity,val) -> ((ExplosiveProjectileEntity)entity).posX = val,
+													(entity,val) -> ((ExplosiveProjectileEntity)entity).powerX = val,
 													(entity) -> entity instanceof ExplosiveProjectileEntity);
 											return 0;
 										}))).
@@ -135,7 +136,7 @@ public class ModifyCommand {
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct) -> {
 											forEachEntity(ct,(entity,val) -> {
-												((ExplosiveProjectileEntity)entity).posY = val;
+												((ExplosiveProjectileEntity)entity).powerY = val;
 											},
 											(entity) -> entity instanceof ExplosiveProjectileEntity);
 											return 0;
@@ -144,14 +145,14 @@ public class ModifyCommand {
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct)->{
 											forEachEntity(ct,
-													(entity,val) -> ((ExplosiveProjectileEntity)entity).posZ = val,
+													(entity,val) -> ((ExplosiveProjectileEntity)entity).powerZ = val,
 													(entity) -> entity instanceof ExplosiveProjectileEntity);
 											return 0;
 										}))).
 						then(literal("remove").
 								executes((ct) -> {
 									for(Entity entity : EntityArgumentType.getEntities(ct, "target")) {
-										entity.remove();
+										entity.remove(RemovalReason.DISCARDED);
 									}
 									return 1;
 								})));

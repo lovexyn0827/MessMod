@@ -15,7 +15,7 @@ import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 
 public enum BuiltinHudInfo implements HudLine {
-	ID("ID", DataType.INTEGER, Entity::getEntityId, null),
+	ID("ID", DataType.INTEGER, Entity::getId, null),
 	NAME("Name", DataType.STRING, (entity) -> {
 		return entity.hasCustomName() ? entity.getCustomName().asString() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
 	}),
@@ -29,8 +29,8 @@ public enum BuiltinHudInfo implements HudLine {
 	DELTA_X("Delta X", DataType.DOUBLE, (e) -> e.getX() - e.prevX),
 	DELTA_Y("Delta Y", DataType.DOUBLE, (e) -> e.getY() - e.prevY),
 	DELTA_Z("Delta Z", DataType.DOUBLE, (e) -> e.getZ() - e.prevZ),
-	YAW("Yaw", DataType.FLOAT, (e) -> e.yaw),
-	PITCH("Pitch", DataType.FLOAT, (e) -> e.pitch),
+	YAW("Yaw", DataType.FLOAT, (e) -> e.getYaw()),
+	PITCH("Pitch", DataType.FLOAT, (e) -> e.getPitch()),
 	FALL_DISTANCE("Fall Distance", DataType.FLOAT, (e) -> e.fallDistance),
 	GENERAL_FLAGS("State", DataType.STRING, EntityHudUtil::getGeneralFlags),
 	FORWARD("Forward", DataType.FLOAT, (e) -> ((LivingEntity) e).forwardSpeed, LivingEntity.class),
@@ -41,9 +41,9 @@ public enum BuiltinHudInfo implements HudLine {
 	MOVEMENT_SPEED("OnLand Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).getMovementSpeed(), LivingEntity.class),
 	FLYING_SPEED("Fly Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).flyingSpeed, LivingEntity.class),
 	FUSE("Fuse", DataType.INTEGER, (e) -> ((TntEntity) e).getFuse(), TntEntity.class),
-	POWER_X("Power X", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).posX, ExplosiveProjectileEntity.class),
-	POWER_Y("Power Y", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).posY, ExplosiveProjectileEntity.class),
-	POWER_Z("Power Z", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).posZ, ExplosiveProjectileEntity.class),
+	POWER_X("Power X", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerX, ExplosiveProjectileEntity.class),
+	POWER_Y("Power Y", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerY, ExplosiveProjectileEntity.class),
+	POWER_Z("Power Z", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerZ, ExplosiveProjectileEntity.class),
 	VELOCITY_DECAY("Decay", DataType.FLOAT, (e) -> ((BoatEntityAccessor) e).getVelocityDeacyMCWMEM(), BoatEntity.class),
 	POSE("Pose", DataType.POSE, Entity::getPose);
 	

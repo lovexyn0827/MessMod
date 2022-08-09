@@ -27,16 +27,17 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 import java.util.Map;
 import java.util.Set;
-
-import org.lwjgl.opengl.GL11;
 
 /**
  * A modified version of carpet.script.util.ShapesRenderer
@@ -56,7 +57,7 @@ public class ShapeRenderer {
 		return shapes;
 	}
 
-    public void render(Camera camera, float partialTick) {
+    public void render(MatrixStack matrices, Camera camera, float partialTick) {
         //Camera camera = this.client.gameRenderer.getCamera();
         ClientWorld iWorld = this.client.world;
         RegistryKey<World> dimensionType = iWorld.getRegistryKey();
@@ -67,16 +68,13 @@ public class ShapeRenderer {
         
         RenderSystem.disableTexture();
         RenderSystem.enableDepthTest();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderSystem.depthFunc(515);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         //RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
         //RenderSystem.shadeModel(7425);
-        RenderSystem.shadeModel(GL11.GL_FLAT);
-        RenderSystem.enableAlphaTest();
-        RenderSystem.alphaFunc(GL11.GL_GREATER, 0.003f);
         RenderSystem.disableCull();
-        RenderSystem.disableLighting();
         RenderSystem.depthMask(false);
         // causes water to vanish
         //RenderSystem.depthMask(true);
@@ -98,8 +96,18 @@ public class ShapeRenderer {
         	shapesInDim.forEach((space, set) -> {
             	set.forEach((s) -> {
             		if(s.shouldRender(dimensionType)) {
-            			s.renderFaces(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
-            			s.renderLines(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+            			if(s instanceof RenderedText) {
+            				s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+            			} else {
+            				MatrixStack matrixStack = RenderSystem.getModelViewStack();
+            				matrixStack.push();
+                            matrixStack.method_34425(matrices.peek().getModel());
+                            RenderSystem.applyModelViewMatrix();
+                            s.renderFaces(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+                			s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+                			matrixStack.pop();
+                            RenderSystem.applyModelViewMatrix();
+            			}
             		}
             	});
             });
@@ -111,13 +119,12 @@ public class ShapeRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableTexture();
-        RenderSystem.shadeModel(7424);
     }
     
     // some raw shit
 
     public static void drawLine(Tessellator tessellator, BufferBuilder builder, float x1, float y1, float z1, float x2, float y2, float z2, float red1, float grn1, float blu1, float alpha) {
-        builder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR); // 3
+        builder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR); // 3
         builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
         builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
         tessellator.draw();
@@ -130,7 +137,7 @@ public class ShapeRenderer {
             float x2, float y2, float z2,
             boolean xthick, boolean ythick, boolean zthick,
             float red1, float grn1, float blu1, float alpha, float red2, float grn2, float blu2) {
-        builder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR); // 3
+        builder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR); // 3
         if (xthick) {
             builder.vertex(x1, y1, z1).color(red1, grn2, blu2, alpha).next();
             builder.vertex(x2, y1, z1).color(red1, grn2, blu2, alpha).next();
@@ -182,7 +189,7 @@ public class ShapeRenderer {
             float x2, float y2, float z2,
             boolean xthick, boolean ythick, boolean zthick,
             float red1, float grn1, float blu1, float alpha) {
-        builder.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+        builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         if (xthick && ythick) {
             builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
             builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();

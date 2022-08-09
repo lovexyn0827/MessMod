@@ -42,9 +42,9 @@ public abstract class TntEntityMixin extends Entity{
 	@Override
 	public boolean handleAttack(Entity attacker) {
 		if(OptionManager.attackableTnt) {
-			this.remove();
+			this.remove(RemovalReason.KILLED);
 			if(attacker.isSneaking()) {
-				this.world.getEntitiesByType(EntityType.TNT, this.getBoundingBox(), (e) -> true).forEach(Entity::remove);
+				this.world.getEntitiesByType(EntityType.TNT, this.getBoundingBox(), (e) -> true).forEach((e) -> e.remove(RemovalReason.KILLED));
 			}
 			
 			return true;

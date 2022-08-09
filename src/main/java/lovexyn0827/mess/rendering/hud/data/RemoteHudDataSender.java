@@ -12,10 +12,10 @@ import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.util.TickingPhase;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -23,7 +23,7 @@ import net.minecraft.server.world.ServerWorld;
 
 public class RemoteHudDataSender implements HudDataSender {
 	/** Used to determine the delta */
-	protected CompoundTag lastData = new CompoundTag();
+	protected NbtCompound lastData = new NbtCompound();
 	protected final List<HudLine> customLines = Lists.newArrayList();
 	protected final MinecraftServer server;
 	private final HudType type;
@@ -34,7 +34,7 @@ public class RemoteHudDataSender implements HudDataSender {
 	}
 	
 	public void updateData(Entity entity) {
-		CompoundTag data = new CompoundTag();
+		NbtCompound data = new NbtCompound();
 		List<String> unused = Lists.newArrayList(lastData.getKeys());
 		Stream<HudLine> lines = this.streamAllLines();
 		if (entity != null) {
@@ -45,14 +45,14 @@ public class RemoteHudDataSender implements HudDataSender {
 			});
 		}
 		
-		ListTag toRemove = new ListTag();
+		NbtList toRemove = new NbtList();
 		unused.forEach((n) -> {
-			toRemove.add(StringTag.of(n));
+			toRemove.add(NbtString.of(n));
 		});
 		data.put("ToRemove", toRemove);
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		buffer.writeEnumConstant(type);
-		buffer.writeCompoundTag(data);
+		buffer.writeNbt(data);
 		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.HUD, buffer);
 		this.server.getPlayerManager().getPlayerList().stream()
 				.filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(this.type))
@@ -63,10 +63,10 @@ public class RemoteHudDataSender implements HudDataSender {
 		return Stream.concat(Stream.of(BuiltinHudInfo.values()), this.customLines.stream());
 	}
 
-	private boolean tryPutData(Entity entity, HudLine l, CompoundTag data) {
+	private boolean tryPutData(Entity entity, HudLine l, NbtCompound data) {
 		String name = l.getName();
 		if(l.canGetFrom(entity)) {
-			Tag last = this.lastData.get(name);
+			NbtElement last = this.lastData.get(name);
 			String value = l.getFrom(entity);
 			if(last == null || !last.asString().equals(value.toString())) {
 				data.putString(name, value);
@@ -104,7 +104,7 @@ public class RemoteHudDataSender implements HudDataSender {
 		}
 
 		public void updateData(TickingPhase phase, @Nullable ServerWorld world) {
-			CompoundTag data = new CompoundTag();
+			NbtCompound data = new NbtCompound();
 			List<String> unused = Lists.newArrayList(this.lastData.getKeys());
 			Stream<HudLine> lines = this.streamAllLines();
 			lines.forEach((l) -> {
@@ -112,7 +112,7 @@ public class RemoteHudDataSender implements HudDataSender {
 					SidebarLine line = (SidebarLine) l;
 					if(SidebarDataSender.shouldUpdate(line, phase, world)) {
 						Object ob = line.get();
-						data.put(line.getName(), StringTag.of(ob.toString()));
+						data.put(line.getName(), NbtString.of(ob.toString()));
 					}
 				} else {
 					throw new IllegalStateException("Only SidebarLines are permitted");
@@ -120,14 +120,14 @@ public class RemoteHudDataSender implements HudDataSender {
 				
 				unused.remove(l.getName());
 			});
-			ListTag toRemove = new ListTag();
+			NbtList toRemove = new NbtList();
 			unused.forEach((n) -> {
-				toRemove.add(StringTag.of(n));
+				toRemove.add(NbtString.of(n));
 			});
 			data.put("ToRemove", toRemove);
 			PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 			buffer.writeEnumConstant(HudType.SIDEBAR);
-			buffer.writeCompoundTag(data);
+			buffer.writeNbt(data);
 			CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.HUD, buffer);
 			this.server.getPlayerManager().getPlayerList().stream()
 					//.filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(HudType.SIDEBAR))

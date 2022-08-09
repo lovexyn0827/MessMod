@@ -2,6 +2,7 @@ package lovexyn0827.mess.mixins;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +26,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 @Mixin(ChunkStatus.class)
 public class ChunkStatusMixin {
 	@Inject(method = "runGenerationTask", at = @At(value = "HEAD"), cancellable = true)
-	private void skipTaskIfNeeded(ServerWorld world, ChunkGenerator chunkGenerator, StructureManager structureManager, 
+	private void skipTaskIfNeeded(Executor executor, ServerWorld world, ChunkGenerator chunkGenerator, StructureManager structureManager, 
 			ServerLightingProvider lightingProvider, 
 			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> chunks, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {

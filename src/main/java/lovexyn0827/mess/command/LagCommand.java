@@ -60,12 +60,12 @@ public class LagCommand {
 			Runnable lagAsync = () -> {
 				try {
 					Thread.sleep((long) (nanos / 1000000), (int) (nanos % 1000000));
-					ct.getSource().getMinecraftServer().execute(() -> {
+					ct.getSource().getServer().execute(() -> {
 						CommandUtil.feedback(ct, "cmd.lag.done");
 					});
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-					ct.getSource().getMinecraftServer().execute(() -> {
+					ct.getSource().getServer().execute(() -> {
 						CommandUtil.feedback(ct, "cmd.general.unexpected");
 					});
 					result.setValue(0);

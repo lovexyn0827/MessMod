@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.KillCommand;
 
@@ -17,7 +18,7 @@ public abstract class KillCommandMixin {
 	)
 	private static void removeEntity(Entity entity) {
 		if(OptionManager.mobFastKill && entity instanceof MobEntity) {
-			entity.remove();
+			entity.remove(RemovalReason.KILLED);
 		} else {
 			entity.kill();
 		}

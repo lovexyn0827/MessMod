@@ -7,6 +7,7 @@ import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.CarpetUtil;
 import net.minecraft.block.AbstractRedstoneGateBlock;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.server.MinecraftServer;
@@ -85,7 +86,7 @@ public class BlockInfoRenderer {
 	public static enum ShapeType {
 		OUTLINE(RaycastContext.ShapeType.OUTLINE, BlockState::getOutlineShape),
 		SIDES(RaycastContext.ShapeType.COLLIDER, BlockState::getSidesShape),
-		VISUAL(RaycastContext.ShapeType.VISUAL, (b, w, p) -> b.getVisualShape(w, p, null)),
+		VISUAL(RaycastContext.ShapeType.VISUAL, (b, w, p) -> b.getCameraCollisionShape(w, p, ShapeContext.absent())),
 		RAYCAST(RaycastContext.ShapeType.OUTLINE, BlockState::getRaycastShape),
 		COLLISION(RaycastContext.ShapeType.COLLIDER, BlockState::getCollisionShape);
 		

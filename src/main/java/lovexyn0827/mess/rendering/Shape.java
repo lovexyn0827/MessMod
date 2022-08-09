@@ -7,7 +7,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -44,11 +45,11 @@ public abstract class Shape {
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected abstract void renderFaces(Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX,
+	protected abstract void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX,
 			double cameraY, double cameraZ, float partialTick);
 
 	@Environment(EnvType.CLIENT)
-	protected abstract void renderLines(Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX,
+	protected abstract void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX,
 			double cameraY, double cameraZ, float partialTick);
 
 	protected abstract boolean shouldRender(RegistryKey<World> dimensionType);
@@ -57,7 +58,7 @@ public abstract class Shape {
 		return this.life + this.createdTime - gameTime < 0;
 	}
 
-	protected CompoundTag toTag(CompoundTag tag) {
+	protected NbtCompound toTag(NbtCompound tag) {
 		tag.putString("ID", IDS.inverse().get(this.getClass()));
 		tag.putInt("Color", this.color);
 		tag.putInt("Fill", this.fill);
@@ -66,7 +67,7 @@ public abstract class Shape {
 		return tag;
 	}
 
-	public static Shape fromTag(CompoundTag tag) {
+	public static Shape fromTag(NbtCompound tag) {
 		switch(tag.get("ID").asString()) {
 		case "box" : 
 			return new RenderedBox(tag.getDouble("X0"), tag.getDouble("Y0"), tag.getDouble("Z0"), 

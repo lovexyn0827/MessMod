@@ -24,29 +24,29 @@ import net.minecraft.world.RaycastContext;
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin implements BlockView {
 	@Override
-	public BlockHitResult raycast(RaycastContext context) {
-		return (BlockHitResult)BlockView.raycast(context, (raycastContext, blockPos) -> {
+	public BlockHitResult raycast(RaycastContext context2) {
+		return BlockView.raycast(context2.getStart(), context2.getEnd(), context2, (context, pos) -> {
 			if(OptionManager.skipUnloadedChunkInRaycasting) {
-				if(!((ServerWorld)(Object) this).isChunkLoaded(blockPos)) {
+				if(!((ServerWorld)(Object) this).isChunkLoaded(pos)) {
 					return null;
 				}
 			}
 			
-			BlockState blockState = this.getBlockState(blockPos);
-			FluidState fluidState = this.getFluidState(blockPos);
-			Vec3d vec3d = raycastContext.getStart();
-			Vec3d vec3d2 = raycastContext.getEnd();
-			VoxelShape voxelShape = raycastContext.getBlockShape(blockState, this, blockPos);
-			BlockHitResult blockHitResult = this.raycastBlock(vec3d, vec3d2, blockPos, voxelShape, blockState);
-			VoxelShape voxelShape2 = raycastContext.getFluidShape(fluidState, this, blockPos);
-			BlockHitResult blockHitResult2 = voxelShape2.raycast(vec3d, vec3d2, blockPos);
-			double d = blockHitResult == null ? Double.MAX_VALUE : raycastContext.getStart().squaredDistanceTo(blockHitResult.getPos());
-			double e = blockHitResult2 == null ? Double.MAX_VALUE : raycastContext.getStart().squaredDistanceTo(blockHitResult2.getPos());
-			return d <= e ? blockHitResult : blockHitResult2;
-		}, (raycastContext) -> {
-			Vec3d vec3d = raycastContext.getStart().subtract(raycastContext.getEnd());
-			return BlockHitResult.createMissed(raycastContext.getEnd(), Direction.getFacing(vec3d.x, vec3d.y, vec3d.z), new BlockPos(raycastContext.getEnd()));
-		});
+            BlockState blockState = this.getBlockState((BlockPos)pos);
+            FluidState fluidState = this.getFluidState((BlockPos)pos);
+            Vec3d vec3d = context.getStart();
+            Vec3d vec3d2 = context.getEnd();
+            VoxelShape voxelShape = context.getBlockShape(blockState, this, (BlockPos)pos);
+            BlockHitResult blockHitResult = this.raycastBlock(vec3d, vec3d2, (BlockPos)pos, voxelShape, blockState);
+            VoxelShape voxelShape2 = context.getFluidShape(fluidState, this, (BlockPos)pos);
+            BlockHitResult blockHitResult2 = voxelShape2.raycast(vec3d, vec3d2, (BlockPos)pos);
+            double d = blockHitResult == null ? Double.MAX_VALUE : context.getStart().squaredDistanceTo(blockHitResult.getPos());
+            double e = blockHitResult2 == null ? Double.MAX_VALUE : context.getStart().squaredDistanceTo(blockHitResult2.getPos());
+            return d <= e ? blockHitResult : blockHitResult2;
+        }, context -> {
+            Vec3d vec3d = context.getStart().subtract(context.getEnd());
+            return BlockHitResult.createMissed(context.getEnd(), Direction.getFacing(vec3d.x, vec3d.y, vec3d.z), new BlockPos(context.getEnd()));
+        });
 	}
 	
 	@Inject(method = "tick", 
@@ -87,7 +87,7 @@ public abstract class ServerWorldMixin implements BlockView {
 	
 	@Inject(method = "tick", 
 			at = @At(value = "INVOKE_STRING", 
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", 
 					args = "ldc=entities")
 			)
 	private void startEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {

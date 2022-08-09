@@ -52,7 +52,7 @@ public class RaycastCommand {
 														World world = ct.getSource().getWorld();
 														BlockHitResult hit = world.raycast(rct);
 														Vec3d end = hit.getType() == HitResult.Type.MISS?to : hit.getPos();
-														BlockView.raycast(rct, (c, p) -> {
+														BlockView.raycast(from, to, rct, (c, p) -> {
 															MessMod.INSTANCE.shapeSender.addShape(
 																	new RenderedBox(new Box(p), 0x00007fff, 0x00ff001f, 300, world.getTime()), world.getRegistryKey());
 															world.getBlockState(p).
@@ -93,13 +93,14 @@ public class RaycastCommand {
 	
 	private static int print(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
 		ServerWorld world = ct.getSource().getWorld();
-		RaycastContext rct = new RaycastContext(Vec3ArgumentType.getVec3(ct, "from"), 
-				Vec3ArgumentType.getVec3(ct, "to"), 
+		Vec3d from = Vec3ArgumentType.getVec3(ct, "from");
+		Vec3d to = Vec3ArgumentType.getVec3(ct, "to");
+		RaycastContext rct = new RaycastContext(from, to, 
 				RaycastContext.ShapeType.COLLIDER, 
 				RaycastContext.FluidHandling.NONE, 
 				ct.getSource().getEntity());
 		BlockHitResult result = world.raycast(rct);
-		BlockView.raycast(rct, (c, p) -> {
+		BlockView.raycast(from, to, rct, (c, p) -> {
 			CommandUtil.feedback(ct, "Checked: " + '(' + p.getX() + ',' + p.getY() + ',' + p.getZ() + ')');
 			return null;
 		}, (c) -> null);
@@ -142,7 +143,7 @@ public class RaycastCommand {
 				e = toCheck;
 				pos = opt.get();
 				CommandUtil.feedbackWithArgs(ct, "cmd.raycast.result.entity", 
-						e.hasCustomName() ? e.getCustomName() : e.getType().getTranslationKey().replaceFirst("^.+\\u002e", ""), e.getEntityId(), 
+						e.hasCustomName() ? e.getCustomName() : e.getType().getTranslationKey().replaceFirst("^.+\\u002e", ""), e.getId(), 
 						pos.x, pos.y, pos.z
 				);
 			}

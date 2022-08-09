@@ -6,7 +6,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -27,13 +28,13 @@ public class RenderedLine extends Shape {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderFaces(Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
 			double cz, float partialTick) {
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderLines(Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
 			double cz, float partialTick) {
         RenderSystem.lineWidth(2);
         ShapeRenderer.drawLine(tessellator, bufferBuilder,
@@ -49,8 +50,8 @@ public class RenderedLine extends Shape {
 	}
 	
 	@Override
-	protected CompoundTag toTag(CompoundTag tag) {
-		CompoundTag basic = super.toTag(tag);
+	protected NbtCompound toTag(NbtCompound tag) {
+		NbtCompound basic = super.toTag(tag);
 		basic.putDouble("X0", this.from.x);
 		basic.putDouble("Y0", this.from.y);
 		basic.putDouble("Z0", this.from.z);

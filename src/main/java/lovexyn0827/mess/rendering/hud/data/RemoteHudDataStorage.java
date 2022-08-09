@@ -5,17 +5,17 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 
 public class RemoteHudDataStorage implements HudDataStorage {
 	private Map<HudLine, Object> cache = new TreeMap<>();
 	
-	public synchronized void pushData(CompoundTag tag) {
+	public synchronized void pushData(NbtCompound tag) {
 		tag.getList("ToRemove", 8).forEach((item) -> this.cache.remove(generateHudLine(item.asString())));
 		tag.remove("ToRemove");
 		tag.getKeys().forEach((key) -> {
-			Tag line = tag.get(key);
+			NbtElement line = tag.get(key);
 			cache.put(generateHudLine(key), line.asString());
 		});
 	}

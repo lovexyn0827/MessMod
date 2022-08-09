@@ -9,7 +9,7 @@ import lovexyn0827.mess.rendering.hud.data.RemoteHudDataStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -31,7 +31,7 @@ public class MessClientNetworkHandler {
 			} else if (Channels.HUD.equals(id)) {
 				PacketByteBuf buffer = packet.getData();
 				HudType type = buffer.readEnumConstant(HudType.class);
-				CompoundTag tag = buffer.readCompoundTag();
+				NbtCompound tag = buffer.readNbt();
 				HudDataStorage cache = MessMod.INSTANCE.getClientHudManager().getData(type);
 				if (cache instanceof RemoteHudDataStorage) {
 					((RemoteHudDataStorage) cache).pushData(tag);

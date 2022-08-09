@@ -11,8 +11,8 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
-import net.minecraft.command.argument.NbtTagArgumentType;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.command.argument.NbtCompoundArgumentType;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -36,8 +36,8 @@ public class TileEntityCommand {
 									}
 									
 									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.type", Registry.BLOCK_ENTITY_TYPE.getId(be.getType()).getPath());
-									CompoundTag tag = new CompoundTag();
-									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.toTag(tag));
+									NbtCompound tag = new NbtCompound();
+									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.writeNbt(tag));
 									return 1;
 								}))).
 				then(literal("set").
@@ -45,17 +45,16 @@ public class TileEntityCommand {
 								then(argument("type",IdentifierArgumentType.identifier()).suggests(suggestions ).
 										executes((ct) -> {
 											BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
-											BlockEntity be = getBlockEntity(ct);;
-											ct.getSource().getWorld().setBlockEntity(pos, be);
+											BlockEntity be = getBlockEntity(ct, pos);
+											ct.getSource().getWorld().addBlockEntity(be);
 											return 1;
 										}).
-										then(argument("tag",NbtTagArgumentType.nbtTag()).
+										then(argument("tag",NbtCompoundArgumentType.nbtCompound()).
 												executes((ct)->{
 													BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
-													BlockEntity be = getBlockEntity(ct);
-													be.fromTag(ct.getSource().getWorld().getBlockState(pos), 
-															(CompoundTag) NbtTagArgumentType.getTag(ct, "tag"));
-													ct.getSource().getWorld().setBlockEntity(pos, be);
+													BlockEntity be = getBlockEntity(ct, pos);
+													be.readNbt((NbtCompound) NbtCompoundArgumentType.getNbtCompound(ct, "tag"));
+													ct.getSource().getWorld().addBlockEntity(be);
 													return 1;
 											}))))).
 				then(literal("remove").
@@ -67,7 +66,8 @@ public class TileEntityCommand {
 		dispatcher.register(command);
 	}
 
-	private static BlockEntity getBlockEntity(CommandContext<ServerCommandSource> ct) {
-		return Registry.BLOCK_ENTITY_TYPE.get(IdentifierArgumentType.getIdentifier(ct, "type")).instantiate();
+	private static BlockEntity getBlockEntity(CommandContext<ServerCommandSource> ct, BlockPos pos) {
+		return Registry.BLOCK_ENTITY_TYPE.get(IdentifierArgumentType.getIdentifier(ct, "type"))
+				.instantiate(pos, ct.getSource().getWorld().getBlockState(pos));
 	}
 }

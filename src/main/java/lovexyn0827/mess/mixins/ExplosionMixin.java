@@ -85,21 +85,16 @@ public abstract class ExplosionMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private void onExplosionInfluencedEntity(CallbackInfo ci, 
-			Set set, 
-			float q, int r, int s, int t, int u, int v, int w, 
-			List list, 
-			Vec3d vec3d, 
-			int x, 
-			Entity entity, 
-			double y, double z, double aa, double ab, double ac, double ad, double ae) {
+	private void onExplosionInfluencedEntity(CallbackInfo ci, Set set, int i, float j, int k, int l, int d, int q, 
+			int e, int r, List f, Vec3d vec3d, int g, Entity entity, double h, double s, double t, double u, 
+			double blockPos, double fluidState, double v) {
 		// FIXME: Not compatible with Lithium, may be fixed via disabling the Mixin of it.
 		if(OptionManager.entityExplosionInfluence && !entity.world.isClient) {
 			StringBuilder entityInfoBuilder = new StringBuilder(entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "")).
-					append("[").append(entity.getEntityId()).append(",").append(entity.getPos()).append("]");
+					append("[").append(entity.getId()).append(",").append(entity.getPos()).append("]");
 			MessMod.INSTANCE.sendMessageToEveryone("Affected Entity: ", entityInfoBuilder.toString(), "\n", 
-					"Exposure: ", ad, "\n", 
-					"Infulence: ", ae);
+					"Exposure: ", fluidState, "\n", 
+					"Infulence: ", v);
 			
 		}
 	}

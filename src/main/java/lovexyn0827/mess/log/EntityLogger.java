@@ -121,7 +121,7 @@ public final class EntityLogger {
 		MutableInt i = new MutableInt();
 		entities.stream()
 				.forEach((e) -> {
-					this.entities.computeIfAbsent(e.getEntityId(), (id) -> {
+					this.entities.computeIfAbsent(e.getId(), (id) -> {
 						i.increment();
 						return new EntityHolder(e, this);
 					});
@@ -136,7 +136,7 @@ public final class EntityLogger {
 	public int unsubscribe(Collection<? extends Entity> entities) {
 		MutableInt i = new MutableInt();
 		entities.stream()
-				.map(Entity::getEntityId)
+				.map(Entity::getId)
 				.map(this.entities::remove)
 				.filter(Predicates.notNull())
 				.forEach((eh)-> {
