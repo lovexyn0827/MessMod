@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -104,13 +103,11 @@ public abstract class ExplosionMixin {
 		}
 	}
 	
-	@Redirect(method = "collectBlocksAndDamageEntities", 
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/explosion/Explosion;getExposure"
-							+ "(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/Entity;)F"
-			)
-	)
-	private float tryDisableExpsure(Vec3d pos, Entity e) {
-		return OptionManager.disableExplosionExposureCalculation ? 1.0F : Explosion.getExposure(pos, e);
+	@Inject(method = "getExposure", at = @At("HEAD"), cancellable = true)
+	private static void tryDisableExpsure(Vec3d pos, Entity e, CallbackInfoReturnable<Float> cir) {
+		if(OptionManager.disableExplosionExposureCalculation) {
+			cir.setReturnValue(1.0F);
+			cir.cancel();
+		}
 	}
 }
