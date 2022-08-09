@@ -2,8 +2,8 @@ package lovexyn0827.mess.util.i18n;
 
 import com.google.common.collect.ImmutableSet;
 
+import lovexyn0827.mess.MessMod;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.GameOptions;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 
@@ -32,8 +32,7 @@ public class I18N {
 	public static boolean setLanguage(String name, boolean forceLoad) {
 		// FIXME Loading fails in some environments
 		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {
-			GameOptions gopt = MinecraftClient.getInstance().options;
-			if (gopt != null) {
+			if (!MessMod.isDedicatedEnv() && MinecraftClient.getInstance().options != null) {
 				String sysLang = MinecraftClient.getInstance().options.language;
 				if (I18N.SUPPORTED_LANGUAGES.contains(sysLang)) {
 					name = sysLang;
