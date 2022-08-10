@@ -99,6 +99,13 @@ public class ShapeRenderer {
             	set.forEach((s) -> {
             		if(s.shouldRender(dimensionType)) {
             			s.renderFaces(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+            		}
+            	});
+            });
+        	
+        	shapesInDim.forEach((space, set) -> {
+            	set.forEach((s) -> {
+            		if(s.shouldRender(dimensionType)) {
             			s.renderLines(tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
             		}
             	});
