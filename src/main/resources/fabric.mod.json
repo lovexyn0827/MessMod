@@ -31,5 +31,9 @@
   
   "recommends": { 
     "carpet": "*"
+  },
+  
+  "conflicts": {
+    "lithium": "*"
   }
 }
