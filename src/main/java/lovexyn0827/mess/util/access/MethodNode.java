@@ -4,12 +4,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.Lists;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
@@ -87,7 +89,8 @@ class MethodNode extends Node implements Cloneable {
 	private void resolveMethod(Class<? extends Object> clazz) throws AccessingFailureException {
 		Mutable<String> srg = new MutableObject<>();
 		Mapping map = MessMod.INSTANCE.getMapping();
-		Object[] candidates = Reflection.listMethods(clazz).stream()
+		final List<Method> candidates = Lists.newArrayList();
+		Reflection.listMethods(clazz).stream()
 				.filter((m) -> {
 					String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
 					srg.setValue(map.srgMethodRecursively(clazz, this.name, descriptor));
@@ -104,10 +107,23 @@ class MethodNode extends Node implements Cloneable {
 					}
 				})
 				.filter((m) -> !m.isSynthetic())
-				.toArray();
-		if(candidates.length == 1) {
-			this.method = (Method) candidates[0];
-		} else if(candidates.length == 0) {
+				.forEach((target) -> {
+					boolean hasTheSame = false;
+					for(Method m : candidates) {
+						if(Arrays.equals(m.getParameterTypes(), target.getParameterTypes())
+								&& m.getReturnType().equals(target.getReturnType())) {
+							hasTheSame = true;
+							break;
+						}
+					}
+					
+					if(!hasTheSame) {
+						candidates.add(target);
+					}
+				});
+		if(candidates.size() == 1) {
+			this.method = candidates.get(0);
+		} else if(candidates.size() == 0) {
 			throw new AccessingFailureException(AccessingFailureException.Cause.NO_METHOD, this, 
 					srg.getValue(), clazz.getSimpleName());	// XXX Deobfusciation
 		} else {
