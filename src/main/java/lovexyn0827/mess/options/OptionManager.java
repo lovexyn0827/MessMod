@@ -145,7 +145,7 @@ public class OptionManager{
 			parserClass = AlignMode.Parser.class)
 	public static AlignMode hudAlignMode;
 	
-	@Option(defaultValue = "", 
+	@Option(defaultValue = "(BL)^2/(mR)", 
 			parserClass = StringParser.class)
 	public static String hudStyles;
 	

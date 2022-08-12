@@ -13,8 +13,8 @@
 
 1. Fabric Loader 0.7.4+  
 2. gnembon的地毯Mod（fabric-carpet）（部分功能需要，所以强烈推荐，但并非必需）  
-3. Minecraft 1.16.4或1.16.5  
-4. Minecraft 1.16.x 需要的所有东西 
+3. Minecraft 1.16.4/1.16.5/1.17.1/1.18.2
+4. Minecraft需要的所有东西 
 
 ## 命令
 
@@ -32,9 +32,9 @@
 
 允许或禁止客户端玩家直接走上方块。  
 
-##### `/entityfield <target> get <fieldName>`
+##### `/entityfield <target> get <fieldName> [<path>]`
 
-获取代表target指定的实体的对象中名为`<fieldName`>的字段。如果没有加载混淆映射表，此处的名称是类似于field_827的intermediary names，需要人工查阅以便理解。  
+获取代表target指定的实体的对象中名为`<fieldName>`的字段，可以指定Accessing Path。如果没有加载混淆映射表，此处的名称是类似于`field_827`的intermediary names，需要人工查阅以便理解。  
 
 ##### `/entityfield <target> listAvailableFields`
 
@@ -42,7 +42,7 @@
 
 ##### `/entityfield <target> set <fieldName> <newValue>`
 
-将代表`<target>`指定的实体的对象中名为`<fieldName>`的字段的值设为`<newValue>`。支持的类型：int、float、double、boolean（现在可能设置失败）和Vec3d。  
+将代表`<target>`指定的实体的对象中名为`<fieldName>`的字段的值设为`<newValue>`。支持的类型：int、float、double、boolean（现在可能设置失败）和Vec3d（如“1,2,3”，须用双引号括住）。  
 
 ##### `/entitylog sub <target>`
 
@@ -135,6 +135,14 @@
 ##### `/lag nanoseconds [<thread>]`
 
 让游戏的某一线程`<thread>`卡死`<nonoseconds>`纳秒，可用于某些测试。如未指定线程则卡死服务端线程。
+
+##### `/logmovement sub <target>`
+
+监听实体受活塞，潜影盒以及潜影贝的推动影响的情况。
+
+##### `/logmovement unsub <target>`
+
+停止监听实体受推动影响的情况。
 
 ##### `/messcfg`
 
@@ -676,17 +684,29 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 首行包含实体ID（等于该实体对象创建前创建的Entity实例总数），名称（`/summon`中使用的实体类型或自定义名称），年龄（实体最近一次被加载后存在的刻数）。 
 `Pos`：实体的坐标。 
+
 `Motion`：Entity类中域变量`motion`（MCP），`velocity`（Yarn）或`deltaMovement`（官方）的值,一般接近或等于实体的速度。 
+
 `Delta`：实体上一刻的位移，可视为速度。 
+
 `Yaw,Pitch`：实体的水平方向角和仰角。 
+
 `Fall Distance`：实体自上一次着陆以来的向下移动的长度，但也可能受到一些其他因素的影响，如落入岩浆。 
+
 `General State`：所有实体共有的一些布尔（非真即假）属性，详见下文。 
+
 `Health`：LivingEntity（生物、玩家和盔甲架）的生命值。 
+
 `Forward,Sideways,Upward`：与实体运动AI有关。 
+
 `Speed`：与实体运动速度（分别是路上和空中）正相关。 
+
 `Living State`：`LivingEntity`共有的一些布尔（非真即假）属性，详见下文。 
+
 `Fuse`：TNT的引线长度，单位为刻。人工点燃的TNT中值总为80。 
+
 `Power`：火球的加速度。注意，火球有0.05gt^-1的阻力，所以不会一直加速。 
+
 `Velocity Decay`：船的阻力系数，在不同地面上不同。  
 
 ## 缩写的状态（state）
@@ -694,24 +714,44 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 ### 通用
 
 `Gl` :拥有该状态的实体有一个发光的轮廓。 
+
 `Inv` :拥有该状态的实体免疫大部分伤害。 
+
 `Col` :拥有该状态的实体毁于其他实体发生碰撞。 
+
 `NG` :拥有该状态的实体不受重力影响。 
+
 `HC` :表示实体在上一次移动中发生了水平方向的碰撞。 
+
 `VC` :表示实体在上一次移动中发生了竖直方向的碰撞。 
+
 `Wet` :表示实体的一部分处于水中。
+
+`Sbm`：实体浸没于水中 <font color=#FF0000>**[WIP]**</font>
+
 `Sp` :表示实体在疾跑。 
+
 `Sn` :表示实体在潜行。 
+
 `De` :表示实体在下蹲（类似于潜行)。 
+
 `Sw` :表示实体在游泳。 
+
 `Og` :表示实体已经着地。
 
 ### Living
 
 `Hurt` :表示实体在上一刻中受到了伤害。 
+
 `Fly` :表示实体在使用鞘翅飞行。 
+
 `Slp` :表示实体在睡觉 
+
 `Dead` :表示实体的生命值是0或更低，或者说已经死亡。
+
+## Accessing Path
+
+见Wiki。
 
 ## 其他特性
 
@@ -721,6 +761,6 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 ## 注意事项
 
 1.该Mod仍在开发中，一些功能可能不可用或存在bug，如果发现了请告诉我。  
-2.客户端玩家是`CilentPlayerEntity`而不是对应的`ServerPlayerEntity`，因为玩家运动的大部分运算在客户端进行。 对查看服务端玩家信息的支持可能在后续版本中加入。
+2.客户端玩家是`CilentPlayerEntity`而不是对应的`ServerPlayerEntity`，因为玩家运动的大部分运算在客户端进行。
 3.该版本对专用服务器的支持很弱，存在大量稳定性问题，一般情况下请只在单人游戏或局域网（仅房主所在客户端）中使用该Mod。  
 4.一些命令，像/explode \~ \~ \~ 2147483647 true可能造成服务端卡死，请注意。

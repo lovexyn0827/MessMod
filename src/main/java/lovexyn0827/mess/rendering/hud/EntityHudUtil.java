@@ -22,6 +22,7 @@ public class EntityHudUtil {
 		if(entity.horizontalCollision) result += "HC|";
 		if(entity.verticalCollision) result += "VC|";
 		if(entity.isWet()) result += "Wet|";
+		if(entity.isSubmergedInWater()) result += "Sbm|";
 		if(entity.isSprinting()) result += "Sp|";
 		if(entity.isSneaking()) result += "Sn|";
 		if(entity.isDescending()) result += "De|";
