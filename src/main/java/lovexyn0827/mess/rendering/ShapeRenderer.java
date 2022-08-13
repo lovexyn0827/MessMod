@@ -52,8 +52,12 @@ public class ShapeRenderer {
 		this.client = mc;
     }
     
+    public void close() {
+    	this.shapes.close();
+    }
+    
     public ShapeCache getShapeCache() {
-		return shapes;
+		return this.shapes;
 	}
 
     public void render(Camera camera, float partialTick) {

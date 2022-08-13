@@ -22,27 +22,30 @@ public abstract class ShapeCache {
 		this.backend.put(World.END, new HashMap<>());
 	}
 	
-	public synchronized Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> getAllShapes() {
+	public final synchronized Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> getAllShapes() {
 		return this.backend;
 	}
 	
-	public synchronized Map<ShapeSpace, Set<Shape>> getShapesInDimension(RegistryKey<World> dimensionType) {
+	public final synchronized Map<ShapeSpace, Set<Shape>> getShapesInDimension(RegistryKey<World> dimensionType) {
 		return this.backend.get(dimensionType);
 	}
 	
-	public synchronized void reset() {
-		this.getAllShapes().values().forEach(Map::clear);
+	public final synchronized void reset() {
+		this.backend.values().forEach(Map::clear);
 	}
 	
-	public synchronized void clearSpace(ShapeSpace ss) {
-		this.getAllShapes().values().forEach((map) -> map.computeIfAbsent(ss, (ss1) -> Sets.newHashSet()).clear());
+	public final synchronized void clearSpace(ShapeSpace ss) {
+		this.backend.values().forEach((map) -> map.computeIfAbsent(ss, (ss1) -> Sets.newHashSet()).clear());
 	}
 	
 	public static ShapeCache create(MinecraftClient mc) {
 		return MessMod.isDedicatedEnv() ? new RemoteShapeCache() : (ShapeCache) MessMod.INSTANCE.shapeSender;
 	}
 	
-	public long getTime() {
+	public final long getTime() {
 		return this.time;
+	}
+
+	public void close() {
 	}
 }

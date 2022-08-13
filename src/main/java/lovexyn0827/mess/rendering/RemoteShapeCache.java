@@ -1,9 +1,6 @@
 package lovexyn0827.mess.rendering;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Sets;
 
 import lovexyn0827.mess.MessMod;
@@ -16,22 +13,22 @@ import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.World;
 
 public class RemoteShapeCache extends ShapeCache {
-	private static final ThreadExecutor<Runnable> SHAPE_HANDLER = new ThreadExecutor<Runnable>("MessMod Shape Handler") {
+	private final ThreadExecutor<RemoteShapeTask> shapeHandler = new ThreadExecutor<RemoteShapeTask>("MessMod Shape Handler") {
 		private final Thread thread = createThread();
+		private boolean running = true;
 		
 		@Override
-		protected Runnable createTask(Runnable runnable) {
-			return runnable;
+		protected RemoteShapeTask createTask(Runnable runnable) {
+			return new RemoteShapeTask(runnable);
 		}
 
 		private Thread createThread() {
 			Thread t = new Thread(() -> {
-				while(true) {
+				while(this.running) {
 					this.runTasks();
 					this.waitForTasks();
 				}
 			}, "MessMod Shape Handler");
-			t.setDaemon(true);
 			t.start();
 			t.setUncaughtExceptionHandler((th, e) -> {
 				MessMod.LOGGER.warn("Failed to handle shapes: {}", e);
@@ -40,7 +37,7 @@ public class RemoteShapeCache extends ShapeCache {
 		}
 
 		@Override
-		protected boolean canExecute(Runnable task) {
+		protected boolean canExecute(RemoteShapeTask task) {
 			return true;
 		}
 
@@ -49,6 +46,12 @@ public class RemoteShapeCache extends ShapeCache {
 			return this.thread;
 		}
 		
+		@Override
+		public void close() {
+			super.close();
+			this.cancelTasks();
+			this.running = false;
+		}
 	};
 	
 	RemoteShapeCache() {
@@ -57,13 +60,8 @@ public class RemoteShapeCache extends ShapeCache {
 		backend.put(World.END, new HashMap<>());
 	}
 
-	@Override
-	public synchronized Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> getAllShapes() {
-		return backend;
-	}
-
 	public synchronized void handlePacket(CustomPayloadS2CPacket packet) {
-		SHAPE_HANDLER.execute(() -> {
+		this.shapeHandler.execute(() -> {
 			synchronized (this) {
 				PacketByteBuf buffer = packet.getData();
 				switch(buffer.readEnumConstant(RemoteShapeSender.UpdateMode.class)) {
@@ -72,7 +70,8 @@ public class RemoteShapeCache extends ShapeCache {
 					RegistryKey<World> dim = RegistryKey.of(Registry.DIMENSION, buffer.readIdentifier());
 					ShapeSpace space = new ShapeSpace(buffer.readString());
 					CompoundTag tag = buffer.readCompoundTag();
-					this.getShapesInDimension(dim).computeIfAbsent(space, (s) -> Sets.newHashSet()).add(Shape.fromTag(tag));
+					this.getShapesInDimension(dim).computeIfAbsent(space, (s) -> Sets.newHashSet())
+							.add(Shape.fromTag(tag));
 					break;
 				case CLEAR_SPACE : 
 					ShapeSpace space2 = new ShapeSpace(buffer.readString());
@@ -84,9 +83,22 @@ public class RemoteShapeCache extends ShapeCache {
 			}
 		});
 	}
-
+	
 	@Override
-	public long getTime() {
-		return this.time;
+	public void close() {
+		this.shapeHandler.close();
+	}
+	
+	protected class RemoteShapeTask implements Runnable {
+		private final Runnable operation;
+
+		public RemoteShapeTask(Runnable runnable) {
+			this.operation = runnable;
+		}
+
+		@Override
+		public void run() {
+			this.operation.run();
+		}
 	}
 }
