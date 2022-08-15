@@ -1,5 +1,9 @@
 package lovexyn0827.mess.network;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.RemoteShapeCache;
@@ -16,6 +20,7 @@ import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 
 public class MessClientNetworkHandler {
+	private static final Map<Identifier, PacketHandler> PACKET_HANDLERS = Maps.newHashMap();
 	private MinecraftClient client;
 
 	public MessClientNetworkHandler(MinecraftClient mc) {
@@ -25,18 +30,9 @@ public class MessClientNetworkHandler {
 	public boolean handlePacket(CustomPayloadS2CPacket packet) {
 		try {
 			Identifier id = packet.getChannel();
-			if (Channels.SHAPE.equals(id)) {
-				((RemoteShapeCache) MessMod.INSTANCE.shapeCache).handlePacket(packet);
-				return true;
-			} else if (Channels.HUD.equals(id)) {
-				PacketByteBuf buffer = packet.getData();
-				HudType type = buffer.readEnumConstant(HudType.class);
-				CompoundTag tag = buffer.readCompoundTag();
-				HudDataStorage cache = MessMod.INSTANCE.getClientHudManager().getData(type);
-				if (cache instanceof RemoteHudDataStorage) {
-					((RemoteHudDataStorage) cache).pushData(tag);
-				}
-				
+			PacketHandler handler = PACKET_HANDLERS.get(id);
+			if(handler != null) {
+				handler.onPacket(packet);
 				return true;
 			}
 		} catch (Exception e) {
@@ -60,5 +56,28 @@ public class MessClientNetworkHandler {
 				.getVersion().getFriendlyString());
 		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(Channels.VERSION, buf);
 		this.send(packet);
+	}
+
+	private static void register(Identifier hud, PacketHandler handler) {
+		PACKET_HANDLERS.put(hud, handler);
+	}
+	
+	static {
+		register(Channels.HUD, (packet) -> {
+			PacketByteBuf buffer = packet.getData();
+			HudType type = buffer.readEnumConstant(HudType.class);
+			CompoundTag tag = buffer.readCompoundTag();
+			HudDataStorage cache = MessMod.INSTANCE.getClientHudManager().getData(type);
+			if (cache instanceof RemoteHudDataStorage) {
+				((RemoteHudDataStorage) cache).pushData(tag);
+			}
+		});
+		register(Channels.SHAPE, (packet) -> {
+			((RemoteShapeCache) MessMod.INSTANCE.shapeCache).handlePacket(packet);
+		});
+	}
+	
+	public interface PacketHandler {
+		void onPacket(CustomPayloadS2CPacket packet);
 	}
 }

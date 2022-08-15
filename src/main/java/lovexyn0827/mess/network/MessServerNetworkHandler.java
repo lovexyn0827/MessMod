@@ -1,5 +1,9 @@
 package lovexyn0827.mess.network;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
@@ -12,6 +16,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class MessServerNetworkHandler {
+	private static final Map<Identifier, PacketHandler> PACKET_HANDLERS = Maps.newHashMap();
 	@SuppressWarnings("unused")
 	private final MinecraftServer server;
 
@@ -24,38 +29,53 @@ public class MessServerNetworkHandler {
 			CustomPayloadC2SPacketAccessor accessor = (CustomPayloadC2SPacketAccessor) packet;
 			Identifier channel = accessor.getMessChannel();
 			PacketByteBuf buf = accessor.getMessData();
-			if(channel.equals(Channels.HUD)) {
-				HudType type = buf.readEnumConstant(HudType.class);
-				if (buf.readBoolean()) {
-					((HudDataSubscribeState) player.networkHandler).subscribe(type);
-				} else {
-					((HudDataSubscribeState) player.networkHandler).subscribe(type);
-				}
-				
+			PacketHandler handler = PACKET_HANDLERS.get(channel);
+			if(handler != null) {
+				handler.onPacket(player, channel, buf);
 				return true;
-			} else if (channel.equals(Channels.VERSION)) {
-				int protocol = buf.readInt();
-				String ver = buf.readString(32767);
-				MessMod.LOGGER.info("Player {} joined the game with MessMod {} (Protocol Version: {})", 
-						player.getName().asString(), ver, protocol);
-				if(protocol != Channels.CHANNEL_VERSION) {
-					MessMod.LOGGER.warn("But note that the protocol version of the client differs from the one here.");
-				}
-				
-				return true;
-			} else if (channel.equals(Channels.UNDO)) {
-				if(OptionManager.blockPlacementHistory) {
-					MessMod.INSTANCE.getPlacementHistory().undo(player);
-				}
-			} else if (channel.equals(Channels.REDO)) {
-				if(OptionManager.blockPlacementHistory) {
-					MessMod.INSTANCE.getPlacementHistory().redo(player);
-				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		return false;
+	}
+
+	private static void register(Identifier hud, PacketHandler handler) {
+		PACKET_HANDLERS.put(hud, handler);
+	}
+	
+	static {
+		register(Channels.HUD, (player, channel, buf) -> {
+			HudType type = buf.readEnumConstant(HudType.class);
+			if (buf.readBoolean()) {
+				((HudDataSubscribeState) player.networkHandler).subscribe(type);
+			} else {
+				((HudDataSubscribeState) player.networkHandler).subscribe(type);
+			}
+		});
+		register(Channels.VERSION, (player, channel, buf) -> {
+			int protocol = buf.readInt();
+			String ver = buf.readString(32767);
+			MessMod.LOGGER.info("Player {} joined the game with MessMod {} (Protocol Version: {})", 
+					player.getName().asString(), ver, protocol);
+			if(protocol != Channels.CHANNEL_VERSION) {
+				MessMod.LOGGER.warn("But note that the protocol version of the client differs from the one here.");
+			}
+		});
+		register(Channels.UNDO, (player, channel, buf) -> {
+			if(OptionManager.blockPlacementHistory) {
+				MessMod.INSTANCE.getPlacementHistory().undo(player);
+			}
+		});
+		register(Channels.UNDO, (player, channel, buf) -> {
+			if(OptionManager.blockPlacementHistory) {
+				MessMod.INSTANCE.getPlacementHistory().redo(player);
+			}
+		});
+	}
+	
+	public interface PacketHandler {
+		void onPacket(ServerPlayerEntity player, Identifier channel, PacketByteBuf buf);
 	}
 }
