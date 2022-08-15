@@ -3,6 +3,7 @@ package lovexyn0827.mess.network;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -42,6 +43,14 @@ public class MessServerNetworkHandler {
 				}
 				
 				return true;
+			} else if (channel.equals(Channels.UNDO)) {
+				if(OptionManager.blockPlacementHistory) {
+					MessMod.INSTANCE.getPlacementHistory().undo(player);
+				}
+			} else if (channel.equals(Channels.REDO)) {
+				if(OptionManager.blockPlacementHistory) {
+					MessMod.INSTANCE.getPlacementHistory().redo(player);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -117,6 +117,7 @@
 		"opt.antiHostCheating.desc" : "Enable anti-cheating for host player in SP & LAN game.", 
 		"opt.attackableTnt.desc" : "TNTs could be killed by attacking.", 
 		"opt.blockInfoRendererUpdateInFrozenTicks.desc" : "What will the block information renderers do in ticks frozen by the Carpet.", 
+		"opt.blockPlacementHistory.desc" : "Record what the players has placed recently so that you may undo or redo these operations later.", 
 		"opt.blockShapeToBeRendered.desc" : "Specify the type of block shape rendered when `renderBlockShape` is enabled. The COLLIDER shape is the  shape used to do calculations about collisions, while the OUTLINE shape is the shape used to determine which block the player is looking at.", 
 		"opt.commandExecutionRequirment.desc" : "Whether or not execution of commands defined by this mod require OP permission.", 
 		"opt.craftingTableBUD.desc" : "Detect the block updates around crafting tables.", 

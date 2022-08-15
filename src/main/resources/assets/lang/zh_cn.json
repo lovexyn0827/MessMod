@@ -117,6 +117,7 @@
 		"opt.antiHostCheating.desc" : "对局域网游戏的房主启用反作弊", 
 		"opt.attackableTnt.desc" : "TNT可以被玩家的攻击杀死", 
 		"opt.blockInfoRendererUpdateInFrozenTicks.desc" : "游戏运算被地毯端中/tick指令暂停时方块信息渲染器的行为。", 
+		"opt.blockPlacementHistory.desc" : "记录玩家最近放置的方块用于撤销/重做.", 
 		"opt.blockShapeToBeRendered.desc" : "选项renderBlockShape为true时被渲染的方块轮廓类型。COLLIDER对应方块的碰撞箱，OUTLINE对应方块在玩家对准时显示的边界。", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 

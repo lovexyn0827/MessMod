@@ -1,5 +1,6 @@
 package lovexyn0827.mess.util;
 
+// TODO Event system
 public enum TickingPhase {
 	WEATHER_CYCLE,
 	CHUNK,

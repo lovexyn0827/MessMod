@@ -76,6 +76,10 @@ public class OptionManager{
 			parserClass = BlockInfoRenderer.FrozenUpdateMode.Parser.class)
 	public static BlockInfoRenderer.FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean blockPlacementHistory;
+	
 	@Option(defaultValue = "COLLISION", 
 			parserClass = ShapeType.Parser.class)
 	public static ShapeType blockShapeToBeRendered;

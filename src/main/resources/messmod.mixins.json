@@ -26,7 +26,9 @@
     "ServerPlayNetworkHandlerMixin", 
     "CustomPayloadC2SPacketAccessor", 
     "FormattingAccessor", 
-    "ChunkStatusMixin"
+    "ChunkStatusMixin", 
+    "ServerPlayerInteractionManagerMixin", 
+    "BlockItemMixin"
   ],
   "client": [
     "MinecraftClientMixin",

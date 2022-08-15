@@ -24,6 +24,7 @@ import lovexyn0827.mess.rendering.ShapeSender;
 import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
+import lovexyn0827.mess.util.BlockPlacementHistory;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
 import net.fabricmc.api.EnvType;
@@ -39,6 +40,7 @@ import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.text.LiteralText;
 
 public class MessMod implements ModInitializer {
@@ -61,11 +63,13 @@ public class MessMod implements ModInitializer {
 	@Environment(EnvType.CLIENT)
 	private MessClientNetworkHandler clientNetworkHandler;
 	private MessServerNetworkHandler serverNetworkHandler;
+	private BlockPlacementHistory placementHistory;
 
 	private MessMod() {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
 		this.logger = new EntityLogger();
 		this.reloadMapping();
+		ServerPlayerInteractionManager.class.getAnnotatedInterfaces();
 	}
 
 	public void reloadMapping() {
@@ -119,6 +123,7 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer.setServer(server);
 		this.blockInfoRederer.initializate(server);
 		this.hudManagerS = new ServerHudManager(server);
+		this.placementHistory = new BlockPlacementHistory();
 		try {
 			this.logger.initialize(server);
 		} catch (IOException e) {
@@ -133,6 +138,7 @@ public class MessMod implements ModInitializer {
 		this.hudManagerS = null;
 		this.logger.closeAll();
 		this.serverNetworkHandler = null;
+		this.placementHistory = new BlockPlacementHistory();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.logger.archiveLogs();
@@ -260,5 +266,9 @@ public class MessMod implements ModInitializer {
 	@Environment(EnvType.CLIENT)
 	public MessClientNetworkHandler getClientNetworkHandler() {
 		return this.clientNetworkHandler;
+	}
+
+	public BlockPlacementHistory getPlacementHistory() {
+		return this.placementHistory;
 	}
 }
