@@ -92,7 +92,7 @@ Save the records in the buffer to the disk without stopping recording.
 
 ##### `/entitysidebar add <target> <field> <name> [<whereToUpdate> [<path>]]`
 
-Add a new line to the entity info sidebar. You can specify where the data get updated and an accessing path if necessary.
+Add a new line to the entity information sidebar. You can specify where the data get updated and an accessing path if necessary.
 
 Supported ticking phases: 
 
@@ -107,7 +107,7 @@ Supported ticking phases:
 
 ##### `/entitysidebar remove <name>`
 
-从实体信息侧边栏中移除一行。
+Remove a line from the entity information sidebar.
 
 ##### `/explode <pos> <power> [<fire>`] 
 
@@ -126,8 +126,6 @@ Add a listened field to the client-side/server-side player information HUD. You 
 Remove a listened field from a HUD.
 
 ##### `/hud setHudTarget <profile>`
-
-设置多人环境下服务端玩家信息HUD和目标实体信息HUD的数据获取中所用的玩家。
 
 Set the player used in getting the data in the server-side player information HUD and the looking at entity HUD in multiplayer games.
 
@@ -160,8 +158,6 @@ Set the save-specific value of `<option>` to `<value>`. See the next section of 
 Read options from `mcwmem.prop`. 
 
 ##### `/messcfg setGlobal <option> <value>`
-
-将选项`<option>`的对于新打开的存档的默认值及当前存档的局部取值设为`<value>`。
 
 Set the global value (used as the default value of options for new saves) and the save-specific value of `<option>` to `<value>`.
 
