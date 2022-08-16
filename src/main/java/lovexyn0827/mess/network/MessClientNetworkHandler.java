@@ -1,11 +1,14 @@
 package lovexyn0827.mess.network;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.RemoteShapeCache;
 import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
@@ -74,6 +77,13 @@ public class MessClientNetworkHandler {
 		});
 		register(Channels.SHAPE, (packet) -> {
 			((RemoteShapeCache) MessMod.INSTANCE.shapeCache).handlePacket(packet);
+		});
+		register(Channels.OPTIONS, (packet) -> {
+			try {
+				OptionManager.loadFromServer(new ByteArrayInputStream(packet.getData().readString().getBytes()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		});
 	}
 	

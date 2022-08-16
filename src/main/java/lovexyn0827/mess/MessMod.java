@@ -41,7 +41,6 @@ import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.text.LiteralText;
 
 public class MessMod implements ModInitializer {
@@ -70,7 +69,6 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
 		this.logger = new EntityLogger();
 		this.reloadMapping();
-		ServerPlayerInteractionManager.class.getAnnotatedInterfaces();
 	}
 
 	public void reloadMapping() {
@@ -164,6 +162,7 @@ public class MessMod implements ModInitializer {
 							"/script load tool global");
 				}
 			}
+			OptionManager.sendOptionsTo(player);
 		} catch (IOException e) {
 			LOGGER.error("Scarpet scripts couldn't be loaded.");
 			e.printStackTrace();

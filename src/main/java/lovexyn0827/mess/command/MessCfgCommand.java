@@ -94,7 +94,7 @@ public class MessCfgCommand {
 									try {
 										String value = StringArgumentType.getString(ct, "value");
 										Object obj = parser.tryParse(value);
-										OptionManager.set(f, obj);
+										OptionManager.set(f, obj, ct);
 										CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.set", f.getName(), value);
 										return Command.SINGLE_SUCCESS;
 									} catch (InvaildOptionException e) {
@@ -110,7 +110,7 @@ public class MessCfgCommand {
 											try {
 												String value = StringArgumentType.getString(ct, "value");
 												Object obj = parser.tryParse(value);
-												OptionManager.setGolbal(f, obj);
+												OptionManager.setGlobal(f, obj);
 												CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.setglobal", f.getName(), value);
 												return Command.SINGLE_SUCCESS;
 											} catch (InvaildOptionException e) {

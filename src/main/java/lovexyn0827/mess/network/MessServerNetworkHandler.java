@@ -11,13 +11,13 @@ import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class MessServerNetworkHandler {
 	private static final Map<Identifier, PacketHandler> PACKET_HANDLERS = Maps.newHashMap();
-	@SuppressWarnings("unused")
 	private final MinecraftServer server;
 
 	public MessServerNetworkHandler(MinecraftServer server) {
@@ -68,7 +68,7 @@ public class MessServerNetworkHandler {
 				MessMod.INSTANCE.getPlacementHistory().undo(player);
 			}
 		});
-		register(Channels.UNDO, (player, channel, buf) -> {
+		register(Channels.REDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
 				MessMod.INSTANCE.getPlacementHistory().redo(player);
 			}
@@ -77,5 +77,9 @@ public class MessServerNetworkHandler {
 	
 	public interface PacketHandler {
 		void onPacket(ServerPlayerEntity player, Identifier channel, PacketByteBuf buf);
+	}
+
+	public void sendToEveryone(CustomPayloadS2CPacket packet) {
+		this.server.getPlayerManager().sendToAll(packet);
 	}
 }
