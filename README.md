@@ -293,6 +293,14 @@ Possible values: NORMALLY|PAUSE|NO_REMOVAL
 
 Default value: NORMALLY
 
+##### `blockPlacementHistory`
+
+Record what the players has placed recently so that you may undo or redo these operations later.
+
+Possible values: true or false
+
+Default value: false
+
 ##### `blockShapeToBeRendered` 
 
 Specify the type of block shape rendered when `renderBlockShape` is enabled. The `COLLIDER` shape is the shape used to do calculations about collisions, while the `OUTLINE` shape is the shape used to determine which block the player is looking at.
@@ -622,6 +630,10 @@ Default value: `[]`
 **F3 + M** : Toggle the HUD that displays the information of the local player. 
 
 **F3 + S**: Toggle the HUD that displays the information of the server-side player. 
+
+**Ctrl + Z**: Undo block placement or breaking. (Requires `blockPlacementHistory`)
+
+**Ctrl+ Y**: Redo block placement or breaking. (Requires `blockPlacementHistory`)
 
 ### Renderers
 

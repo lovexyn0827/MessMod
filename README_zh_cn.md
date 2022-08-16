@@ -304,6 +304,14 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`NORMALLY`
 
+##### `blockPlacementHistory`
+
+记录玩家最近放置的方块用于撤销/重做。
+
+允许取值：true或false
+
+默认值：false
+
 ##### `blockShapeToBeRendered  `
 
 在选项`renderBlockShape`为true时被渲染的方块轮廓类型。`COLLIDER`对应方块的碰撞箱，OUTLINE对应方块在玩家对准时显示的边界。
@@ -645,6 +653,10 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 **`F3 + M`**：开关显示客户端玩家信息的HUD。与投影的默认设置冲突，可以手动修改。
 
 **`F3 + S`**：开关显示服务端玩家信息的HUD。
+
+**Ctrl + Z**：撤销方块放置/破坏操作（需要`blockPlacementHistory`）
+
+**Ctrl+ Y**：重做方块放置/破坏操作（需要`blockPlacementHistory`）
 
 ## 渲染器
 
