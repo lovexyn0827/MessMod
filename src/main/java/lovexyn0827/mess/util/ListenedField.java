@@ -21,7 +21,7 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 		this.field = field;
 		this.name = customName != null ? customName : MessMod.INSTANCE.getMapping().namedField(this.field.getName());
 		this.path = path != null ? path : AccessingPath.DUMMY;
-		//this.phase = TickingPhase.SERVER_TASKS;
+		//this.phase = TickingPhase.TICKED_ALL_WORLDS;
 	}
 
 	public boolean canGetFrom(Entity entity) {

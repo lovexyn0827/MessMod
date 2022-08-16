@@ -81,7 +81,7 @@ public class EntityHolder {
 	
 	public void updateData(TickingPhase phase, World world) {
 		this.listenedFields.entrySet().forEach((e) -> {
-			if(e.getKey().phase == phase && (phase == TickingPhase.SERVER_TASKS || world == this.entity.world)) {
+			if(e.getKey().phase == phase && (phase == TickingPhase.TICKED_ALL_WORLDS || world == this.entity.world)) {
 //				if(e.getValue() != ToBeReplaced.INSTANCE) {
 //					throw new IllegalStateException();
 //				}

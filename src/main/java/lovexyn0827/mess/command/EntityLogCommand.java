@@ -47,7 +47,7 @@ public class EntityLogCommand {
 													.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 											String field = StringArgumentType.getString(ct, "field");
 											try {
-												l.listenToField(field, type, null, null, TickingPhase.SERVER_TASKS);
+												l.listenToField(field, type, null, null, TickingPhase.TICKED_ALL_WORLDS);
 												CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 											} catch (Exception e) {
 												CommandUtil.errorRaw(ct, e.getMessage(), e);
@@ -64,7 +64,7 @@ public class EntityLogCommand {
 													String field = StringArgumentType.getString(ct, "field");
 													String name = StringArgumentType.getString(ct, "name");
 													try {
-														l.listenToField(field, type, name, null, TickingPhase.SERVER_TASKS);
+														l.listenToField(field, type, name, null, TickingPhase.TICKED_ALL_WORLDS);
 														CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 													} catch (Exception e) {
 														CommandUtil.errorRaw(ct, e.getMessage(), e);
@@ -82,7 +82,7 @@ public class EntityLogCommand {
 															String name = StringArgumentType.getString(ct, "name");
 															AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 															try {
-																l.listenToField(field, type, name, path, TickingPhase.SERVER_TASKS);
+																l.listenToField(field, type, name, path, TickingPhase.TICKED_ALL_WORLDS);
 																CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
 															} catch (Exception e) {
 																CommandUtil.errorRaw(ct, e.getMessage(), e);

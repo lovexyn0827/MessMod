@@ -21,7 +21,7 @@ public enum TickingPhase {
 	BLOCK_EVENT,
 	ENTITY,
 	TILE_ENTITY,
-	SERVER_TASKS;
+	TICKED_ALL_WORLDS;
 	
 	private final List<Event> events = Lists.newArrayList();
 	

@@ -67,7 +67,7 @@ public class EntitySidebarCommand {
 		String name = StringArgumentType.getString(ct, "name");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
-			if (sender.addLine(e, field, name, TickingPhase.SERVER_TASKS, AccessingPath.DUMMY)) {
+			if (sender.addLine(e, field, name, TickingPhase.TICKED_ALL_WORLDS, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
