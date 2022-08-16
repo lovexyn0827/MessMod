@@ -6,22 +6,27 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.ListenedField;
+import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 public class EntityHolder {
 	final Entity entity;
 	private final int entityId;;
 	private final CsvWriter writer;
 	private int age;
-	private List<ListenedField> listenedField = Lists.newArrayList();
+	private Map<ListenedField.Phased, Object> listenedFields = Maps.newHashMap();
 	
 	public EntityHolder(Entity e, EntityLogger logger) {
 		this.entity = e;
@@ -43,7 +48,7 @@ public class EntityHolder {
 			logger.getListenedFields().values().forEach((field) -> {
 				if(field.canGetFrom(e)) {
 					builder.addColumn(map.namedField(field.getCustomName()));
-					this.listenedField.add(field);
+					this.listenedFields.put(field, ToBeReplaced.INSTANCE);
 				}
 			});
 			
@@ -51,6 +56,8 @@ public class EntityHolder {
 		} catch (IOException e1) {
 			throw new TranslatableException("exp.log.holder", e1);
 		}
+		
+		TickingPhase.addEventToAll(this::updateData);
 	}
 
 	public void tick() {
@@ -61,10 +68,29 @@ public class EntityHolder {
 			obs.add(((LivingEntity) e).getHealth());
 		}
 		
-		this.listenedField.forEach((f) -> {
-			obs.add(f.get(entity));
+		this.listenedFields.forEach((field, value) -> {
+			if(value == ToBeReplaced.INSTANCE) {
+				throw new IllegalStateException();
+			}
+			
+			obs.add(value);
 		});
+		this.listenedFields.entrySet().forEach((entry) -> entry.setValue(ToBeReplaced.INSTANCE));
 		this.writer.println(obs.toArray());
+	}
+	
+	public void updateData(TickingPhase phase, World world) {
+		this.listenedFields.entrySet().forEach((e) -> {
+			if(e.getKey().phase == phase && (phase == TickingPhase.SERVER_TASKS || world == this.entity.world)) {
+//				if(e.getValue() != ToBeReplaced.INSTANCE) {
+//					throw new IllegalStateException();
+//				}
+				MessMod.LOGGER.info(e.getValue());
+//				Thread.dumpStack();
+				
+				e.setValue(e.getKey().getFrom(this.entity));
+			}
+		});
 	}
 	
 	public void flush() {
@@ -91,5 +117,9 @@ public class EntityHolder {
 
 	public int getId() {
 		return this.entityId;
+	}
+	
+	private static enum ToBeReplaced {
+		INSTANCE
 	}
 }

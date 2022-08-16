@@ -25,6 +25,7 @@ import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
 import lovexyn0827.mess.util.BlockPlacementHistory;
+import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
 import net.fabricmc.api.EnvType;
@@ -138,7 +139,8 @@ public class MessMod implements ModInitializer {
 		this.hudManagerS = null;
 		this.logger.closeAll();
 		this.serverNetworkHandler = null;
-		this.placementHistory = new BlockPlacementHistory();
+		this.placementHistory = null;
+		TickingPhase.removeAllEvents();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.logger.archiveLogs();

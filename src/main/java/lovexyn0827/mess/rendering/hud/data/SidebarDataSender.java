@@ -17,8 +17,12 @@ import net.minecraft.server.world.ServerWorld;
 public interface SidebarDataSender extends HudDataSender {
 	void updateData(TickingPhase phase, @Nullable ServerWorld world);
 	
-	static boolean shouldUpdate(SidebarLine line, TickingPhase phase, ServerWorld world) {
-		return line.canGet() && line.updatePhase == phase && (line.entity.world == world || world == null);
+	default void registerTickingEvents() {
+		TickingPhase.addEventToAll(this::updateData);
+	}
+	
+	static boolean shouldUpdate(SidebarLine line, TickingPhase phase, @Nullable ServerWorld world) {
+		return line.canGet() && line.updatePhase == phase && (line.entity.world == world || phase == TickingPhase.SERVER_TASKS);
 	}
 
 	static SidebarDataSender create(MinecraftServer server) {

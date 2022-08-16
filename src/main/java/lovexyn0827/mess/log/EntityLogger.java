@@ -29,6 +29,7 @@ import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.util.CarpetUtil;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
@@ -39,7 +40,7 @@ import net.minecraft.server.MinecraftServer;
 // TODO Support for specifying a TickingPhase
 public final class EntityLogger {
 	Int2ObjectMap<EntityHolder> entities = new Int2ObjectOpenHashMap<>();
-	private Map<String, ListenedField> customFields = new HashMap<>();
+	private Map<String, ListenedField.Phased> customFields = new HashMap<>();
 	private Path logPath;
 	private final Set<EntityType<?>> autoSubTypes = Sets.newHashSet();
 	private long lastSessionStart;
@@ -83,7 +84,7 @@ public final class EntityLogger {
 		this.entities.clear();
 	}
 
-	public void listenToField(String field, EntityType<?> type, String name, AccessingPath path) {
+	public void listenToField(String field, EntityType<?> type, String name, AccessingPath path, TickingPhase phase) {
 		Int2ObjectMap<EntityHolder> temp = new Int2ObjectOpenHashMap<>(this.entities);
 		this.closeAll();
 		if(this.customFields.containsKey(name)) {
@@ -92,7 +93,7 @@ public final class EntityLogger {
 		
 		Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), field);
 		if(f != null) {
-			ListenedField lf = new ListenedField(f, path, name);
+			ListenedField.Phased lf = new ListenedField.Phased(f, path, name, phase);
 			if(!this.customFields.containsValue(lf)) {
 				this.customFields.put(lf.getCustomName(), lf);
 			} else {
@@ -205,7 +206,7 @@ public final class EntityLogger {
 		return ImmutableSet.copyOf(this.autoSubTypes);
 	}
 
-	public Map<String, ListenedField> getListenedFields() {
+	public Map<String, ListenedField.Phased> getListenedFields() {
 		return this.customFields;
 	}
 

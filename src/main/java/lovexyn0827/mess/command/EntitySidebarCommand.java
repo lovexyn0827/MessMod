@@ -37,14 +37,7 @@ public class EntitySidebarCommand {
 										})
 										.then(argument("name",StringArgumentType.string())
 												.executes(EntitySidebarCommand::addSidebar)
-												.then(argument("whereToUpdate",StringArgumentType.string())
-														.suggests((ct, b) -> {
-															for(TickingPhase phase : TickingPhase.values()) {
-																b.suggest(phase.name());
-															}
-															
-															return b.buildFuture();
-														})
+												.then(TickingPhase.commandArg()
 														.executes(EntitySidebarCommand::addSidebarWithPoint)
 														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 																.executes((EntitySidebarCommand::addSidebarWithPointAndPath))))))))

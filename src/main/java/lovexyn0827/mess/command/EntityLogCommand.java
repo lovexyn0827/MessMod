@@ -13,6 +13,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.log.EntityLogger;
+import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import lovexyn0827.mess.util.i18n.I18N;
@@ -46,7 +47,7 @@ public class EntityLogCommand {
 													.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 											String field = StringArgumentType.getString(ct, "field");
 											try {
-												l.listenToField(field, type, null, null);
+												l.listenToField(field, type, null, null, TickingPhase.SERVER_TASKS);
 												CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 											} catch (Exception e) {
 												CommandUtil.errorRaw(ct, e.getMessage(), e);
@@ -63,7 +64,7 @@ public class EntityLogCommand {
 													String field = StringArgumentType.getString(ct, "field");
 													String name = StringArgumentType.getString(ct, "name");
 													try {
-														l.listenToField(field, type, name, null);
+														l.listenToField(field, type, name, null, TickingPhase.SERVER_TASKS);
 														CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 													} catch (Exception e) {
 														CommandUtil.errorRaw(ct, e.getMessage(), e);
@@ -81,14 +82,51 @@ public class EntityLogCommand {
 															String name = StringArgumentType.getString(ct, "name");
 															AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 															try {
-																l.listenToField(field, type, name, path);
+																l.listenToField(field, type, name, path, TickingPhase.SERVER_TASKS);
 																CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
 															} catch (Exception e) {
 																CommandUtil.errorRaw(ct, e.getMessage(), e);
 															}
 															
 															return Command.SINGLE_SUCCESS;
-														}))))))
+														}))
+												.then(TickingPhase.commandArg()
+														.executes((ct) -> {
+															sendRestartWarnings(ct);
+															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
+															EntityType<?> type = Registry.ENTITY_TYPE
+																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+															String field = StringArgumentType.getString(ct, "field");
+															String name = StringArgumentType.getString(ct, "name");
+															TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
+															try {
+																l.listenToField(field, type, name, null, phase);
+																CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
+															} catch (Exception e) {
+																CommandUtil.errorRaw(ct, e.getMessage(), e);
+															}
+															
+															return Command.SINGLE_SUCCESS;
+														})
+														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+																.executes((ct) -> {
+																	sendRestartWarnings(ct);
+																	EntityLogger l = MessMod.INSTANCE.getEntityLogger();
+																	EntityType<?> type = Registry.ENTITY_TYPE
+																			.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+																	String field = StringArgumentType.getString(ct, "field");
+																	String name = StringArgumentType.getString(ct, "name");
+																	AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
+																	TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
+																	try {
+																		l.listenToField(field, type, name, path, phase);
+																		CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
+																	} catch (Exception e) {
+																		CommandUtil.errorRaw(ct, e.getMessage(), e);
+																	}
+																	
+																	return Command.SINGLE_SUCCESS;
+																})))))))
 				.then(literal("stopListenField")
 						.then(argument("field", StringArgumentType.word())
 								.suggests((ct, b) -> {
