@@ -39,6 +39,10 @@
 		"cmd.fixedentityhud.add" : "向Sidebar中添加了一行数据", 
 		"cmd.fixedentityhud.remove" : "移除了Sidebar中名为%s的数据", 
 		
+		//***** freezentity *****
+		"cmd.freezentity.sub" : "找到了%d个实体，并冻结了其中的%d个实体", 
+		"cmd.freezentity.unsub" : "找到了%d个实体，并恢复了对其中的%d个实体的运算", 
+		
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "需要1个目标，但是找到了%d个", 
 		

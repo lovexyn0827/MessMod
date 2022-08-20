@@ -58,6 +58,7 @@ public class CommandUtil {
 			EntityConfigCommand.reset();
 			SetExplosionBlockCommand.reset();
 			LogMovementCommand.reset();
+			FreezeEntityCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}

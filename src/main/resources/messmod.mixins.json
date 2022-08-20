@@ -28,7 +28,8 @@
     "FormattingAccessor", 
     "ChunkStatusMixin", 
     "ServerPlayerInteractionManagerMixin", 
-    "BlockItemMixin"
+    "BlockItemMixin",
+    "WorldMixin"
   ],
   "client": [
     "MinecraftClientMixin",
