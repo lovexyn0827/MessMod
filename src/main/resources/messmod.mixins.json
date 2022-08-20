@@ -29,7 +29,9 @@
     "ChunkStatusMixin", 
     "ServerPlayerInteractionManagerMixin", 
     "BlockItemMixin",
-    "WorldMixin"
+    "WorldMixin",
+    "EntitySelectorReaderMixin",
+    "EntitySelectorOptionsMixin"
   ],
   "client": [
     "MinecraftClientMixin",

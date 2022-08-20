@@ -162,6 +162,11 @@
 		"opt.tntChunkLoading.desc" : "允许TNT实体在其运算过程中自动加载区块。注意该功能可能会在TNT以极高的速度飞行时造成极大的卡顿。", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT在tntChunkLoading启用时永久加载区块。", 
 		"opt.tntChunkLoadingRange.desc" : "设置tntChunkLoading功能中创建的强加载范围的半径。", 
-		"opt.vanillaDebugRenderers.desc" : "启用一些原版调试渲染器。"
+		"opt.vanillaDebugRenderers.desc" : "启用一些原版调试渲染器。",
+		
+		//***** Misc *****
+		"misc.negativeid" : "id不能为负值", 
+		"misc.idopt.desc" : "NetworkId"
+	}
 	}
 }

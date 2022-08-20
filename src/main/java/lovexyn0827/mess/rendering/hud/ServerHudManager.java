@@ -34,7 +34,8 @@ public class ServerHudManager implements HudManager {
 
 	public void tick(MinecraftServer server) {
 		List<ServerPlayerEntity> players = server.getPlayerManager().getPlayerList();
-		if(!players.isEmpty() && this.getServerPlayerHudTarget() == null) {
+		GameProfile subscribed = this.getServerPlayerHudTarget();
+		if(!players.isEmpty() && subscribed == null) {
 			this.setServerPlayerHudTarget(players.get(0).getGameProfile());
 		}
 		
