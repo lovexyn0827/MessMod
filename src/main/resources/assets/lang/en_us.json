@@ -140,6 +140,7 @@
 		"opt.hudAlignMode.desc" : "Move the HUDs to a given location.", 
 		"opt.hudStyles.desc" : "The style of the HUDs, containing zero or more flags below: \n - B: Render a gray background\n - L: Align the headers on the left and the data on the right\n - R: Change the color of headers to red", 
 		"opt.hudTextSize.desc" : "Set the size of the text in the HUDs.", 
+		"opt.interactableB36.desc" : "Allow players to break block-36s and place things against it.", 
 		"opt.language.desc" : "The main language of the Mod.", 
 		"opt.maxClientTicksPerFrame.desc" : "Set the maximum number of ticks can be processed within a single frame when the FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot toggle the flying state when the FPS is too low. ", 
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleporting with endEyeTeleport.", 

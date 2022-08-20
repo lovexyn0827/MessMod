@@ -140,6 +140,7 @@
 		"opt.hudAlignMode.desc" : "设置实体信息HUD的位置。", 
 		"opt.hudStyles.desc" : "HUD的渲染样式, 包括了下面的零个至多个标志: \n - B：渲染背景\n - L：左对齐行标题并右对齐数据\n - R：将行标题改为红色", 
 		"opt.hudTextSize.desc" : "调节HUD字体大小。", 
+		"opt.interactableB36.desc" : "允许玩家破坏36号方块或对准它放置物品", 
 		"opt.language.desc" : "该Mod的主要语言", 
 		"opt.maxClientTicksPerFrame.desc" : "FPS低于20时每帧客户端可以运行几个游戏刻，将其设为一个较小值可能修复低FPS时无法切换飞行状态的Bug。", 
 		"opt.maxEndEyeTpRadius.desc" : "设置endEyeTeleport功能的最远传送距离。", 

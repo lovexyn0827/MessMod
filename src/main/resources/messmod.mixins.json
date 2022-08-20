@@ -31,7 +31,8 @@
     "BlockItemMixin",
     "WorldMixin",
     "EntitySelectorReaderMixin",
-    "EntitySelectorOptionsMixin"
+    "EntitySelectorOptionsMixin",
+    "PistonExtensionBlockMixin"
   ],
   "client": [
     "MinecraftClientMixin",

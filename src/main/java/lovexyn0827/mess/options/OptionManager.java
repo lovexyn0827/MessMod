@@ -165,6 +165,10 @@ public class OptionManager{
 			parserClass = FloatParser.Positive.class)
 	public static float hudTextSize;
 	
+	@Option(defaultValue = "1.0", 
+			parserClass = BooleanParser.class)
+	public static boolean interactableB36;
+	
 	@Option(defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 
 			parserClass = Language.Parser.class)
 	public static String language;
