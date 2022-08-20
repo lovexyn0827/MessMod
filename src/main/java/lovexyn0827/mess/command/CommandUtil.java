@@ -55,6 +55,9 @@ public class CommandUtil {
 			noreplyPlayerSource = null;
 			commandManager = null;
 			firstPlayerJoined = false;
+			EntityConfigCommand.reset();
+			SetExplosionBlockCommand.reset();
+			LogMovementCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}

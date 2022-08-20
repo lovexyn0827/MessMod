@@ -23,6 +23,10 @@ public class EntityConfigCommand {
 	public static boolean shouldDisableStepHeight(Entity entity) {
 		return noStepHeightEntities.contains(entity);
 	}
+	
+	public static void reset() {
+		noStepHeightEntities.clear();
+	}
 
 	@SuppressWarnings("resource")
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
