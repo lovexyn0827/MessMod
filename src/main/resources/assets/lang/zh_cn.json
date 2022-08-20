@@ -167,7 +167,8 @@
 		
 		//***** Misc *****
 		"misc.negativeid" : "id不能为负值", 
-		"misc.idopt.desc" : "NetworkId"
+		"misc.idopt.desc" : "实体的一个数字ID", 
+		"misc.side.desc" : "指定从何处选取实体。注意该特性不是线程安全的，所以它只应用于一些简单的没有其他作用的指令中。"
 	}
 	}
 }

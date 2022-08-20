@@ -43,7 +43,8 @@
     "ClientPlayerEntityMixin",
     "AbstractRedstoneGateBlockMixin",
     "LanguageManagerMixin", 
-    "DebugRendererMixin"
+    "DebugRendererMixin",
+    "EntitySelectorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

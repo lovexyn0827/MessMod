@@ -167,6 +167,7 @@
 		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 
-		"misc.idopt.desc" : "NetworkId"
+		"misc.idopt.desc" : "A numberic ID of entities", 
+		"misc.side.desc" : "Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects."
 	}
 }
