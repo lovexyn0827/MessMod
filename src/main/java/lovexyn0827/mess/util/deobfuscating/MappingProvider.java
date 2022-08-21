@@ -23,7 +23,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.util.Util;
 
-// TODO Support for non-Yarn mappings.
+// TODO Support for non-tiny mappings.
 /**
  * The mapping loader
  * @author lovexyn0827

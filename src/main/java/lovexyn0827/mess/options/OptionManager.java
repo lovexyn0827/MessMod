@@ -165,7 +165,7 @@ public class OptionManager{
 			parserClass = FloatParser.Positive.class)
 	public static float hudTextSize;
 	
-	@Option(defaultValue = "1.0", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean interactableB36;
 	

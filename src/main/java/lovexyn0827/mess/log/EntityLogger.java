@@ -37,7 +37,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 
 // TODO Support for EnderDragonPart, whose EntityType is not specified
-// TODO Support for specifying a TickingPhase
 public final class EntityLogger {
 	Int2ObjectMap<EntityHolder> entities = new Int2ObjectOpenHashMap<>();
 	private Map<String, ListenedField.Phased> customFields = new HashMap<>();

@@ -12,6 +12,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import lovexyn0827.mess.MessMod;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -40,7 +41,8 @@ public class EntityConfigCommand {
 					noStepHeightEntities.removeAll(getEntities(ct));
 					return 1;
 				});	
-		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityconfig").requires(CommandUtil.COMMAND_REQUMENT).
+		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityconfig").
+				requires(CommandUtil.COMMAND_REQUMENT).requires((s) -> !MessMod.isDedicatedEnv()).
 				then(argument("targets",EntityArgumentType.entities()).then(dsh).then(esh)).
 				then(literal("localPlayer").
 						then(literal("disableStepHeight").

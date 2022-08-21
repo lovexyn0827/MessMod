@@ -24,9 +24,8 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(EntitySelectorOptions.class)
-// TODO side
 public class EntitySelectorOptionsMixin {
-	// Fixme Dynamic translation
+	// FIXME Dynamic translation
 	private static final SimpleCommandExceptionType NEGATIVE_ID_EXCEPTION = 
 			new SimpleCommandExceptionType(new LiteralText(I18N.translate("misc.negativeid")));
 	private static final SimpleCommandExceptionType UNDEFINED_EXCEPTION = 
@@ -79,6 +78,6 @@ public class EntitySelectorOptionsMixin {
 			}
 		}, (selectorReader) -> {
 			return !MessMod.isDedicatedEnv() && ((EntitySelectorReaderInterface) selectorReader).getSide() == null;
-		}, new LiteralText(I18N.translate("misc.side.desc")));	// TODO
+		}, new LiteralText(I18N.translate("misc.side.desc")));
     }
 }
