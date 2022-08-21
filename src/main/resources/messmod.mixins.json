@@ -44,7 +44,9 @@
     "AbstractRedstoneGateBlockMixin",
     "LanguageManagerMixin", 
     "DebugRendererMixin",
-    "EntitySelectorMixin"
+    "EntitySelectorMixin", 
+    "WorldListWidgetMixin", 
+    "WorldListWidgetEntryAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -34,7 +34,9 @@ import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.i18n.Language;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
@@ -152,6 +154,12 @@ public class OptionManager{
 			experimental = true, 
 			parserClass = FloatParser.Positive.class)
 	public static float getEntityRangeExpansion;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class, 
+			globalOnly = true, 
+			environment = EnvType.CLIENT)
+	public static boolean hideSuvivalSaves;
 	
 	@Option(defaultValue = "TOP_RIGHT", 
 			parserClass = AlignMode.Parser.class)
@@ -434,7 +442,7 @@ public class OptionManager{
 		set(f, obj, null);
 	}
 
-	public static void set(Field f, Object obj, CommandContext<ServerCommandSource> ct) {
+	public static void set(Field f, Object obj, @Nullable CommandContext<ServerCommandSource> ct) {
 		try {
 			f.set(null, obj);
 			@SuppressWarnings("deprecation")
@@ -537,6 +545,21 @@ public class OptionManager{
 			MessMod.LOGGER.warn(msg);
 		}
 	}
+
+	public static boolean isSupportedInCurrentEnv(Option o) {
+		EnvType currentEnv = FabricLoader.getInstance().getEnvironmentType();
+		for(EnvType env : o.environment()) {
+			if(env == currentEnv) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	public static String getDescription(String name) {
+		return I18N.translate("opt." + name + ".desc");
+	}
 	
 	static{
 		registerCustomApplicationBehavior("enabledTools", (val, ct) -> {
@@ -586,5 +609,10 @@ public class OptionManager{
 			}
 		});
 		loadGlobal();
+		OPTIONS.forEach((o) -> {
+			if(!I18N.EN_US.containsKey(String.format("opt.%s.desc", o.getName()))) {
+				MessMod.LOGGER.warn("The description of option {} is missing!", o.getName());
+			}
+		});
 	}
 }

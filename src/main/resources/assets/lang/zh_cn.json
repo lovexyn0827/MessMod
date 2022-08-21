@@ -61,6 +61,7 @@
 		"cmd.messcfg.default" : "\n默认值：%s", 
 		"cmd.messcfg.set" : "选项%s的值现在已被设为%s", 
 		"cmd.messcfg.setglobal" : "全局作用域中选项%s的值现在已被设为%s", 
+		"cmd.messcfg.globalonly" : "存档局部设置中不支持选项%s，请点击这里以在全局作用域中设置该选项", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -137,6 +138,7 @@
 		"opt.entityExplosionRaysLifetime.desc" : "设置实体爆炸射线的显示时长，单位为刻。", 
 		"opt.entityLogAutoArchiving.desc" : "自动存档一个会话内产生的实体数据记录", 
 		"opt.getEntityRangeExpansion.desc" : "在原版的getEntity()方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。", 
+		"opt.hideSuvivalSaves.desc" : "隐藏可能的生存存档以防止其被意外地打开", 
 		"opt.hudAlignMode.desc" : "设置实体信息HUD的位置。", 
 		"opt.hudStyles.desc" : "HUD的渲染样式, 包括了下面的零个至多个标志: \n - B：渲染背景\n - L：左对齐行标题并右对齐数据\n - R：将行标题改为红色", 
 		"opt.hudTextSize.desc" : "调节HUD字体大小。", 
