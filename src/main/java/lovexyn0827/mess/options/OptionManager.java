@@ -203,6 +203,10 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean projectileChunkLoadingPermanence;
 	
+	@Option(defaultValue = "1.0", 
+			parserClass = FloatParser.class)
+	public static float projectileRandomnessScale;
+	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
