@@ -26,7 +26,6 @@ import com.mojang.brigadier.context.CommandContext;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.fakes.DebugRendererEnableState;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
@@ -38,7 +37,6 @@ import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -269,8 +267,8 @@ public class OptionManager{
 	public static int tntChunkLoadingRange;
 	
 	@Option(defaultValue = "[]", 
-			parserClass = StringParser.class)
-	public static String vanillaDebugRenderers;
+			parserClass = ListParser.DebugRender.class)
+	public static List<Object> vanillaDebugRenderers;
 	
 	private static void loadFromProperties(Properties options) {
 		for(Field f : OPTIONS) {
@@ -594,18 +592,8 @@ public class OptionManager{
 			}
 		});
 		registerCustomApplicationBehavior("hudStyles", (val, ct) -> {
-			if (!MessMod.isDedicatedEnv() && MessMod.INSTANCE.getClientHudManager() != null) {
+			if (!MessMod.isDedicatedServerEnv() && MessMod.INSTANCE.getClientHudManager() != null) {
 				MessMod.INSTANCE.getClientHudManager().updateStyle(val);
-			}
-		});
-		registerCustomApplicationBehavior("vanillaDebugRenderers", (val, ct) -> {
-			if (!MessMod.isDedicatedEnv()) {
-				MinecraftClient mc = MinecraftClient.getInstance();
-				try {
-					((DebugRendererEnableState) (mc.debugRenderer)).setEnabledRenderers(new ListParser.DebugRender().tryParse((String) val));
-				} catch (InvaildOptionException e) {
-					sendErrorOrWarn(ct, e.getMessage());
-				}
 			}
 		});
 		loadGlobal();

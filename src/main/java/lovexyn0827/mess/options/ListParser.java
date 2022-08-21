@@ -94,15 +94,24 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 
 	@SuppressWarnings("resource")
 	@Environment(EnvType.CLIENT)
-	public static class DebugRender extends ListParser<DebugRenderer.Renderer> {
-		private static final ImmutableBiMap<String, DebugRenderer.Renderer> VANILLA_DEBUG_RENDERERS;
+	public static class DebugRender extends ListParser<Object> {
+		private static final ImmutableBiMap<String, Object> VANILLA_DEBUG_RENDERERS;
 		
 		public DebugRender() {
 			super(VANILLA_DEBUG_RENDERERS);
 		}
+		
+		@Override
+		public List<Object> tryParse(String str) throws InvaildOptionException {
+			if(MessMod.isDedicatedServerEnv()) {
+				return null;
+			} else {
+				return super.tryParse(str);
+			}
+		}
 
 		static {
-			ImmutableBiMap.Builder<String, DebugRenderer.Renderer> builder = ImmutableBiMap.builder();
+			ImmutableBiMap.Builder<String, Object> builder = ImmutableBiMap.builder();
 			Stream.of(DebugRenderer.class.getDeclaredFields())
 					.filter((f) -> DebugRenderer.Renderer.class.isAssignableFrom(f.getType()))
 					.forEach((f) -> {

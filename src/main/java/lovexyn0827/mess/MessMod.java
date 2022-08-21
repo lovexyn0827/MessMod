@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.fakes.DebugRendererEnableState;
 import lovexyn0827.mess.log.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.network.MessClientNetworkHandler;
@@ -183,7 +182,6 @@ public class MessMod implements ModInitializer {
 		this.clientNetworkHandler.sendVersion();
 		ClientPlayerEntity player = mc.player;
 		ShapeRenderer sr = new ShapeRenderer(mc);
-		((DebugRendererEnableState) (mc.debugRenderer)).update();
         this.shapeRenderer = sr;
         this.shapeCache = sr.getShapeCache();
 		this.hudManagerC = new ClientHudManager();
@@ -271,5 +269,9 @@ public class MessMod implements ModInitializer {
 
 	public BlockPlacementHistory getPlacementHistory() {
 		return this.placementHistory;
+	}
+	
+	public static boolean isDedicatedServerEnv() {
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
 	}
 }
