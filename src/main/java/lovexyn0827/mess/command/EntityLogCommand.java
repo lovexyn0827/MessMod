@@ -131,7 +131,7 @@ public class EntityLogCommand {
 						.then(argument("field", StringArgumentType.word())
 								.suggests((ct, b) -> {
 									MessMod.INSTANCE.getEntityLogger().getListenedFields().values().forEach((f) -> {
-										b.suggest(f.getCustomName());
+										b.suggest(f.getName());
 									});
 									return b.buildFuture();
 								})

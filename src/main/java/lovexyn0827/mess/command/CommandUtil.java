@@ -40,6 +40,7 @@ public class CommandUtil {
 		EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 		Reflection.getAvailableFields(clazz).forEach(builder::suggest);
+		builder.suggest("-THIS-");
 		return builder.buildFuture();
 	};
 	private static CommandOutput noreplyOutput;
@@ -59,6 +60,7 @@ public class CommandUtil {
 			SetExplosionBlockCommand.reset();
 			LogMovementCommand.reset();
 			FreezeEntityCommand.reset();
+			LogPacketCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}

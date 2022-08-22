@@ -12,7 +12,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
@@ -26,7 +25,8 @@ public class EntityHolder {
 	private final int entityId;;
 	private final CsvWriter writer;
 	private int age;
-	private Map<ListenedField.Phased, Object> listenedFields = Maps.newHashMap();
+	private Map<EntityLogColumn, Object> listenedFields = Maps.newHashMap();
+	private boolean closed;
 	
 	public EntityHolder(Entity e, EntityLogger logger) {
 		this.entity = e;
@@ -47,7 +47,7 @@ public class EntityHolder {
 			Mapping map = MessMod.INSTANCE.getMapping();
 			logger.getListenedFields().values().forEach((field) -> {
 				if(field.canGetFrom(e)) {
-					builder.addColumn(map.namedField(field.getCustomName()));
+					builder.addColumn(map.namedField(field.getName()));
 					this.listenedFields.put(field, ToBeReplaced.INSTANCE);
 				}
 			});
@@ -80,11 +80,17 @@ public class EntityHolder {
 	}
 	
 	public void updateData(TickingPhase phase, World world) {
+		if(this.closed) {
+			return;
+		}
+		
 		this.listenedFields.entrySet().forEach((e) -> {
-			if(e.getKey().phase == phase && (phase == TickingPhase.TICKED_ALL_WORLDS || world == this.entity.world)) {
-//				if(e.getValue() != ToBeReplaced.INSTANCE) {
-//					throw new IllegalStateException();
-//				}
+			boolean isEntityWorld = e.getKey().getPhase() == TickingPhase.TICKED_ALL_WORLDS || world == this.entity.world;
+			if(e.getKey().getPhase() == phase && isEntityWorld) {
+				if(e.getValue() != ToBeReplaced.INSTANCE) {
+					throw new IllegalStateException();
+				}
+				MessMod.LOGGER.info(phase);
 				MessMod.LOGGER.info(e.getValue());
 //				Thread.dumpStack();
 				
@@ -109,6 +115,7 @@ public class EntityHolder {
 	public void close() {
 		try {
 			this.writer.close();
+			this.closed = true;
 		} catch (IOException e) {
 			MessMod.LOGGER.warn("Failed to close: " + this.entityId);
 			e.printStackTrace();

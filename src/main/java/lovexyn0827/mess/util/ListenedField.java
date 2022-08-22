@@ -3,6 +3,7 @@ package lovexyn0827.mess.util;
 import java.lang.reflect.Field;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.log.EntityLogColumn;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingFailureException;
@@ -42,10 +43,6 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 			return e.getShortenedMsg();
 		}
 		
-	}
-
-	public String getCustomName() {
-		return this.name;
 	}
 
 	@Override
@@ -95,10 +92,10 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 
 	@Override
 	public String getName() {
-		return this.getCustomName();
+		return this.name;
 	}
 
-	public static class Phased extends ListenedField {
+	public static class Phased extends ListenedField implements EntityLogColumn {
 		public final TickingPhase phase;
 
 		public Phased(Field field, AccessingPath path, String customName, TickingPhase phase) {
@@ -135,6 +132,11 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 		@Override
 		public String toString() {
 			return this.name + '(' + this.field.getName() + '.' + this.path + '@' + this.phase + ')';
+		}
+
+		@Override
+		public TickingPhase getPhase() {
+			return this.phase;
 		}
 	}
 }

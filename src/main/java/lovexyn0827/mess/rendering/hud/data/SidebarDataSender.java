@@ -9,6 +9,7 @@ import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
+import lovexyn0827.mess.util.WrappedPath;
 import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -34,9 +35,13 @@ public interface SidebarDataSender extends HudDataSender {
 	}
 
 	default boolean addLine(Entity e, String fieldName, String name, TickingPhase phase, AccessingPath path) {
+		if ("-THIS-".equals(fieldName)) {
+			return this.addCustomLine(new SidebarLine(new WrappedPath(path, name), e, phase));
+		}
+		
 		Field f = Reflection.getFieldFromNamed(e.getClass(), fieldName);
 		if (f == null) {
-			throw new TranslatableException("exp.nofield", name, e.getClass().getSimpleName());
+			throw new TranslatableException("exp.nofield", fieldName, e.getClass().getSimpleName());
 		}
 		
 		return this.addCustomLine(new SidebarLine(new ListenedField(f, path, name), e, phase));
