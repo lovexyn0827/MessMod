@@ -32,7 +32,8 @@
     "WorldMixin",
     "EntitySelectorReaderMixin",
     "EntitySelectorOptionsMixin",
-    "PistonExtensionBlockMixin"
+    "PistonExtensionBlockMixin", 
+    "PlayerInventoryMixin_Server"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -46,7 +47,10 @@
     "DebugRendererMixin",
     "EntitySelectorMixin", 
     "WorldListWidgetMixin", 
-    "WorldListWidgetEntryAccessor"
+    "WorldListWidgetEntryAccessor", 
+    "InGameHudMixin", 
+    "PlayerInventoryMixin_Client", 
+    "CreativeInventoryScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

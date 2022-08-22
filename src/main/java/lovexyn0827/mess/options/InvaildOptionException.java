@@ -13,7 +13,7 @@ public class InvaildOptionException extends Exception {
 	
 	public String getMessageWithoutArgs() {
 		if(this.args != null && this.args.length != 0) {
-			throw new IllegalStateException("Some args is given, use getMessage() instead!");
+			throw new IllegalStateException("Some args are given, use getMessage() instead!");
 		}
 		
 		return I18N.translate(super.getMessage());

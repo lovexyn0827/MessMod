@@ -22,7 +22,13 @@ public abstract class DebugRendererMixin {
 		}
 	
 		if(OptionManager.vanillaDebugRenderers != null) {
-			OptionManager.vanillaDebugRenderers.forEach((renderer) -> ((DebugRenderer.Renderer) renderer).render(matrices, vertexConsumers, cameraX, cameraY, cameraZ));
+			OptionManager.vanillaDebugRenderers.forEach((renderer) -> {
+				try {
+					((DebugRenderer.Renderer) renderer.get(this)).render(matrices, vertexConsumers, cameraX, cameraY, cameraZ);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
 		}
 	}
 }

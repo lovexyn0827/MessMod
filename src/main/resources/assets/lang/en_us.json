@@ -142,6 +142,7 @@
 		"opt.hudAlignMode.desc" : "Move the HUDs to a given location.", 
 		"opt.hudStyles.desc" : "The style of the HUDs, containing zero or more flags below: \n - B: Render a gray background\n - L: Align the headers on the left and the data on the right\n - R: Change the color of headers to red", 
 		"opt.hudTextSize.desc" : "Set the size of the text in the HUDs.", 
+		"opt.hotbarLength.desc" : "The number of item stacks the hotbar can contain", 
 		"opt.interactableB36.desc" : "Allow players to break block-36s and place things against it.", 
 		"opt.language.desc" : "The main language of the Mod.", 
 		"opt.maxClientTicksPerFrame.desc" : "Set the maximum number of ticks can be processed within a single frame when the FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot toggle the flying state when the FPS is too low. ", 
@@ -167,9 +168,16 @@
 		"opt.tntChunkLoadingRange.desc" : "Set the radius of entity processing chunks created by tntChunkLoading.", 
 		"opt.vanillaDebugRenderers.desc" : "Enable some vanilla debugging renderers",
 		
+		//***** Errors in options
+		"opt.err.rpositive" : "Requires a positive number", 
+		"opt.err.rnonnegative" : "Requires a non-negative number", 
+		"opt.err.rnum" : "The given value is not a number", 
+		"opt.err.rhotbar" : "Requires a number between 1 and 36", 
+		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 
 		"misc.idopt.desc" : "A numberic ID of entities", 
-		"misc.side.desc" : "Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects."
+		"misc.side.desc" : "Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects.", 
+		"misc.cancelhotbarstorage" : "Hotbars can only be loaded/saved when the value of option hotbarLength is 9."
 	}
 }

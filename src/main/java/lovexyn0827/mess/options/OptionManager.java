@@ -168,8 +168,13 @@ public class OptionManager{
 	public static String hudStyles;
 	
 	@Option(defaultValue = "1.0", 
-			parserClass = FloatParser.Positive.class)
+			parserClass = FloatParser.Positive.class, 
+			experimental = true)
 	public static float hudTextSize;
+	
+	@Option(defaultValue = "9", 
+			parserClass = IntegerParser.HotbarLength.class)
+	public static int hotbarLength;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -272,7 +277,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "[]", 
 			parserClass = ListParser.DebugRender.class)
-	public static List<Object> vanillaDebugRenderers;
+	public static List<Field> vanillaDebugRenderers;
 	
 	private static void loadFromProperties(Properties options) {
 		for(Field f : OPTIONS) {
@@ -354,8 +359,8 @@ public class OptionManager{
 		sendOptionsToClientsIfNeeded();
 	}
 
-	// Only calls from <clinit> are permitted
-	private static void loadGlobal() {
+	// Only calls from MessMod.onInitialize() are permitted
+	public static void loadGlobal() {
 		if(GLOBAL_OPTION_FILE.exists()) {
 			try (FileInputStream in = new FileInputStream(GLOBAL_OPTION_FILE)) {
 				GLOBAL_OPTION_SERIALIZER.load(in);
@@ -562,6 +567,19 @@ public class OptionManager{
 	public static String getDescription(String name) {
 		return I18N.translate("opt." + name + ".desc");
 	}
+
+	@SuppressWarnings("deprecation")
+	private static void loadDefaults() {
+		OPTIONS.forEach((f) -> {
+			Option o = f.getAnnotation(Option.class);
+			try {
+				f.set(null, o.parserClass().newInstance().tryParse(o.defaultValue()));
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		});
+	}
 	
 	static{
 		registerCustomApplicationBehavior("enabledTools", (val, ct) -> {
@@ -600,11 +618,11 @@ public class OptionManager{
 				MessMod.INSTANCE.getClientHudManager().updateStyle(val);
 			}
 		});
-		loadGlobal();
 		OPTIONS.forEach((o) -> {
 			if(!I18N.EN_US.containsKey(String.format("opt.%s.desc", o.getName()))) {
 				MessMod.LOGGER.warn("The description of option {} is missing!", o.getName());
 			}
 		});
+		loadDefaults();
 	}
 }

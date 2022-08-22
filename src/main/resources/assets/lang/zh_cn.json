@@ -142,6 +142,7 @@
 		"opt.hudAlignMode.desc" : "设置实体信息HUD的位置。", 
 		"opt.hudStyles.desc" : "HUD的渲染样式, 包括了下面的零个至多个标志: \n - B：渲染背景\n - L：左对齐行标题并右对齐数据\n - R：将行标题改为红色", 
 		"opt.hudTextSize.desc" : "调节HUD字体大小。", 
+		"opt.hotbarLength.desc" : "物品栏可包含的物品堆叠数量", 
 		"opt.interactableB36.desc" : "允许玩家破坏36号方块或对准它放置物品", 
 		"opt.language.desc" : "该Mod的主要语言", 
 		"opt.maxClientTicksPerFrame.desc" : "FPS低于20时每帧客户端可以运行几个游戏刻，将其设为一个较小值可能修复低FPS时无法切换飞行状态的Bug。", 
@@ -167,10 +168,16 @@
 		"opt.tntChunkLoadingRange.desc" : "设置tntChunkLoading功能中创建的强加载范围的半径。", 
 		"opt.vanillaDebugRenderers.desc" : "启用一些原版调试渲染器。",
 		
+		//***** Errors in options
+		"opt.err.rpositive" : "需要一个整数", 
+		"opt.err.rnonnegative" : "需要一个非负数", 
+		"opt.err.rnum" : "给定的值不是一个数字", 
+		"opt.err.rhotbar" : "需要1～36之间的一个整数", 
+		
 		//***** Misc *****
 		"misc.negativeid" : "id不能为负值", 
 		"misc.idopt.desc" : "实体的一个数字ID", 
-		"misc.side.desc" : "指定从何处选取实体。注意该特性不是线程安全的，所以它只应用于一些简单的没有其他作用的指令中。"
-	}
+		"misc.side.desc" : "指定从何处选取实体。注意该特性不是线程安全的，所以它只应用于一些简单的没有其他作用的指令中。", 
+		"misc.cancelhotbarstorage" : "只能在选项hotbarLength的值为9时存取物品栏"
 	}
 }
