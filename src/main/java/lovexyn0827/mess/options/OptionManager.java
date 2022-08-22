@@ -153,7 +153,7 @@ public class OptionManager{
 			parserClass = FloatParser.Positive.class)
 	public static float getEntityRangeExpansion;
 	
-	@Option(defaultValue = "true", 
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			globalOnly = true, 
 			environment = EnvType.CLIENT)

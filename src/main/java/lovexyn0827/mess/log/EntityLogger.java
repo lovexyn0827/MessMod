@@ -126,6 +126,7 @@ public final class EntityLogger {
 	 * @return The number of newly subscribed entities
 	 */
 	public int subscribe(Collection<? extends Entity> entities) {
+		this.hasCreatedAnyLog = true;
 		MutableInt i = new MutableInt();
 		entities.stream()
 				.forEach((e) -> {
