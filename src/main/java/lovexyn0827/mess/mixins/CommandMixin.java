@@ -21,6 +21,7 @@ import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
+import lovexyn0827.mess.command.LogPacketCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
 import lovexyn0827.mess.command.MoveEntityCommand;
@@ -64,6 +65,7 @@ public abstract class CommandMixin {
         RideCommand.register(this.dispatcher);
         LagCommand.register(this.dispatcher);
         FreezeEntityCommand.register(this.dispatcher);
+        LogPacketCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", at = @At(

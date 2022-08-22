@@ -33,7 +33,8 @@
     "EntitySelectorReaderMixin",
     "EntitySelectorOptionsMixin",
     "PistonExtensionBlockMixin", 
-    "PlayerInventoryMixin_Server"
+    "PlayerInventoryMixin_Server", 
+    "ClientConnectionMixin"
   ],
   "client": [
     "MinecraftClientMixin",
