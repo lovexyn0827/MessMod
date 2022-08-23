@@ -106,7 +106,7 @@
 
 - TILE_ENTITY：方块实体运算完成时
 
-- SERVER_TASKS：玩家输入等异步事件处理完成时
+- TICKED_ALL_WORLDS：所有维度运算完成且玩家输入等异步处理未开始时
 
 ##### `/entitysidebar remove <name>`
 
@@ -115,6 +115,10 @@
 ##### `/explode <pos> <power> [<fire>]`
 
 在`<pos>`处产生一个威力为`<power>`的爆炸，可以指定`<fire>`为`true`使爆炸生成火焰。爆炸威力可以是任意单精度浮点数，包括无穷大甚至NaN。
+
+##### `/freezentity freeze|resume <entities>`
+
+冻结或恢复被选中的实体的运算。
 
 ##### `/hud subField target <entityType> <field> [<name> [<path>]]`
 
@@ -143,6 +147,10 @@
 ##### `/logmovement unsub <target>`
 
 停止监听实体受推动影响的情况。
+
+##### `/logpacket sub|unsub <type>`
+
+监听|取消监听客户端和服务端之间传输的数据包。因为一些原因，结果只会被输出到日志中。
 
 ##### `/messcfg`
 
@@ -432,6 +440,22 @@ TNT可以被玩家的攻击杀死。
 
 默认值：false
 
+##### `hideSuvivalSaves`
+
+隐藏可能的生存存档以防止其被意外地打开。
+
+允许取值：true或false
+
+默认值：false
+
+##### `hotbarLength`
+
+物品栏可包含的物品堆叠数量。目前该功能并未完全完成，如原版物品栏材质和物品栏的保存等特性暂不可用。
+
+允许取值：1～36
+
+默认值：9
+
 ##### `hudAlignMode`
 
 设置实体信息HUD的位置。
@@ -461,6 +485,14 @@ HUD的渲染样式，包括下面的零个至多个标志：
 允许取值：0-10间任意实数
 
 默认值：1
+
+##### `interactableB36`
+
+允许玩家破坏36号方块或对准它放置物品。
+
+允许取值：true或false
+
+默认值：false
 
 ##### `language`
 
@@ -517,6 +549,14 @@ FPS低于20时每帧客户端可以运行的游戏刻数量，将其设为一个较小值可能修复低FPS时无法
 允许取值：任意整数（包括零和负数）
 
 默认值：3
+
+##### `projectileRandomnessScale`
+
+弹射物的随机性大小。
+
+允许取值：任意实数（包括零和负数）
+
+默认值：1.0
 
 ##### `railNoAutoConnection`
 
@@ -654,9 +694,9 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 **`F3 + S`**：开关显示服务端玩家信息的HUD。
 
-**Ctrl + Z**：撤销方块放置/破坏操作（需要`blockPlacementHistory`）
+**`Ctrl + Z`**：撤销方块放置/破坏操作（需要`blockPlacementHistory`）
 
-**Ctrl+ Y**：重做方块放置/破坏操作（需要`blockPlacementHistory`）
+**`Ctrl+ Y`**：重做方块放置/破坏操作（需要`blockPlacementHistory`）
 
 ## 渲染器
 
@@ -764,6 +804,20 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 ## Accessing Path
 
 见Wiki。
+
+## 实体选择器选项
+
+##### `id`
+
+允许取值：一个整数或区间，和原版的level选项类似
+
+选择数字ID（对应entityId或networkId字段）为指定值或属于指定区间的实体。
+
+##### `side`
+
+允许取值：`client`或`server`
+
+指定从何处选取实体。注意该特性不是线程安全的，所以它只应用于一些简单的没有其他影响（一般为只有读操作）的指令中。
 
 ## 其他特性
 

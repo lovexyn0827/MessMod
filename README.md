@@ -103,7 +103,7 @@ Supported ticking phases:
 - BLOCK_EVENT: Just after all block events got processed.
 - ENTITY: Just after all entities got processed.
 - TILE_ENTITY: Just after all block entities got processed.
-- SERVER_TASKS: After asynchronized tasks like inputs of players got processed.
+- SERVER_TASKS: When all worlds got ticked and the asynchronized tasks like inputs of players haven't got processed.
 
 ##### `/entitysidebar remove <name>`
 
@@ -112,6 +112,10 @@ Remove a line from the entity information sidebar.
 ##### `/explode <pos> <power> [<fire>`] 
 
 Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single preciseness floating-point number, including Infinities and even `NaN`.
+
+##### `/freezentity freeze|resume <entities>`
+
+Pause|continue processing selected entities.
 
 ##### `/hud subField target <entityType> <field> [<name> [<path>]]`
 
@@ -140,6 +144,10 @@ Subscribe some entities to see how they are pushed by pistons, shulker boxes and
 ##### `/logmovement unsub <target>`
 
 Unsubscribe the entities.
+
+##### `/logpacket sub|unsub <type>`
+
+Start|stop listening to packets between the server and the client(s). For some reason, the results are only printed in the log.
 
 ##### `/messcfg` 
 
@@ -343,6 +351,12 @@ Default value: false
 
 ##### `disableChunkLoadingCheckInCommands`
 
+Just as its name says.
+
+Possible values: true or false
+
+Default value: false
+
 ##### `disableExplosionExposureCalculation` 
 
 Disable the calculation of explosion exposure to reduce the lag caused by stacked TNT explosions. This will also mean that blocks cannot prevent entities from being influenced by explosions.
@@ -411,6 +425,22 @@ Default value: false
 
 <font color=#FF0000>**[TODO]**</font>In the vanilla `getEntities()` method, only entities which are in subchunks whose Cheshev distance to the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especially when the entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.
 
+##### `hideSuvivalSaves`
+
+Hide worlds that is likely to be suvivial saves to prevent it to be opened accidently.
+
+Possible values: true or false
+
+Default value: false
+
+##### `hotbarLength`
+
+物品栏可包含的物品堆叠数量。目前该功能并未完全完成，如原版物品栏材质和物品栏的保存等特性暂不可用。
+
+Possible values: 1~36
+
+Default value: 9
+
 ##### `hudAlignMode` 
 
 Move the HUDs to a given location. 
@@ -438,6 +468,14 @@ Set the size of the text in the HUDs.
 Possible values: Any real number between 0 and 10.
 
 Default value: 1
+
+##### `interactableB36`
+
+Allow players to break block-36s and place things against it.
+
+Possible values: true or false
+
+Default value: false
 
 ##### `language`
 
@@ -486,6 +524,14 @@ Projectiles load the chunks they are in permanently when `projectileChunkLoading
 Possible values: true or false
 
 Default value: false
+
+##### `projectileRandomnessScale`
+
+The amount of the randomness of projectiles.
+
+Possible values: Any real number.
+
+Default value: 1.0
 
 ##### `projectileChunkLoadingRange` 
 
@@ -746,6 +792,20 @@ Default value: `[]`
 ### Accessing Paths
 
 See the wiki.
+
+### Options In Entity Selectors
+
+##### `id`
+
+Possible values: An integer or a range, just like the `level` option in the vanilla entity selector.
+
+Select entities with given numberic ID (field `entityId`, `networkId`).
+
+##### `side`
+
+Possible values: `client` or `server`
+
+Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects (in other words, commands that only reads stuff but doesn't writes).
 
 ### Other Features
 
