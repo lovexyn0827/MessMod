@@ -34,7 +34,6 @@ public class IntegerParser implements OptionParser<Integer> {
 			if(i >= 0) {
 				return i;
 			} else {
-				Thread.dumpStack();
 				throw new InvaildOptionException("Use a non-negative number here");
 			}
 		}
@@ -47,7 +46,6 @@ public class IntegerParser implements OptionParser<Integer> {
 			if(i > 0 && i <= 36) {
 				return i;
 			} else {
-				Thread.dumpStack();
 				throw new InvaildOptionException("Use a number between 1 and 36 here");
 			}
 		}
