@@ -32,7 +32,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
@@ -69,7 +68,6 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
 		this.logger = new EntityLogger();
 		this.reloadMapping();
-		InGameHud.class.getAnnotatedInterfaces();
 	}
 
 	public void reloadMapping() {

@@ -34,7 +34,8 @@
     "EntitySelectorOptionsMixin",
     "PistonExtensionBlockMixin", 
     "PlayerInventoryMixin_Server", 
-    "ClientConnectionMixin"
+    "ClientConnectionMixin", 
+    "NetworkStateAccessor"
   ],
   "client": [
     "MinecraftClientMixin",

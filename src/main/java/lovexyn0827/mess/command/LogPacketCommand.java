@@ -3,8 +3,6 @@ package lovexyn0827.mess.command;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,10 +13,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
-import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.util.deobfuscating.Mapping;
+import lovexyn0827.mess.mixins.NetworkStateAccessor;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.NetworkState;
+import net.minecraft.network.NetworkState.PacketHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -75,26 +73,15 @@ public class LogPacketCommand {
 	}
 	
 	static {
-		Mapping mapping = MessMod.INSTANCE.getMapping();
-		Field handlers;
 		try {
-			handlers = NetworkState.class.getDeclaredField(mapping.srgField(NetworkState.class.getName(), "packetHandlers"));
-			Class<?> handlerClass = Class.forName(mapping.srgClass("net.minecraft.network.NetworkState$PacketHandler"));
-			Method packets = handlerClass.getMethod("getPacketTypes");
-			handlers.setAccessible(true);
-			packets.setAccessible(true);
 			for(NetworkState state : NetworkState.values()) {
-				@SuppressWarnings("unchecked")
-				Map<NetworkSide, Object> handlerMap = 
-						(Map<NetworkSide, Object>) handlers.get(state);
+				Map<NetworkSide, ? extends PacketHandler<?>> handlerMap = 
+						((NetworkStateAccessor)(Object) state).getHandlerMap();
 				handlerMap.values().forEach((handler) -> {
 					try {
-						@SuppressWarnings("unchecked")
-						Iterable<Class<?>> classes = (Iterable<Class<?>>) packets.invoke(handler);
-						if(classes instanceof Iterable) {
-							for(Class<?> clazz : classes) {
-								PACKET_TYPES.put(clazz.getSimpleName(), clazz);
-							}
+						Iterable<Class<? extends Packet<?>>> classes = handler.getPacketTypes();
+						for(Class<?> clazz : classes) {
+							PACKET_TYPES.put(clazz.getSimpleName(), clazz);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

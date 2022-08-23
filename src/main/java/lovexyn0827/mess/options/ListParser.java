@@ -12,8 +12,6 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.MessMod;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ChunkTicketType;
@@ -91,7 +89,6 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 		}
 	}
 	
-	@Environment(EnvType.CLIENT)
 	public static class DebugRender extends ListParser<Field> {
 		private static final ImmutableBiMap<String, Field> VANILLA_DEBUG_RENDERERS;
 		
