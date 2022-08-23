@@ -13,6 +13,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.LogPacketCommand;
+import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.Packet;
@@ -44,10 +45,11 @@ public class ClientConnectionMixin {
 	
 	private static String getFields(Packet<?> packet) {
 		StringBuilder sb = new StringBuilder();
+		Mapping mapping = MessMod.INSTANCE.getMapping();
 		for(Field f : packet.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			try {
-				sb.append(f.getName()).append('=').append(f.get(packet)).append(',');
+				sb.append(mapping.namedField(f.getName())).append('=').append(f.get(packet)).append(',');
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

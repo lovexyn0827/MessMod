@@ -13,7 +13,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.mixins.NetworkStateAccessor;
+import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.NetworkState;
 import net.minecraft.network.NetworkState.PacketHandler;
@@ -74,6 +76,7 @@ public class LogPacketCommand {
 	
 	static {
 		try {
+			Mapping mapping = MessMod.INSTANCE.getMapping();
 			for(NetworkState state : NetworkState.values()) {
 				Map<NetworkSide, ? extends PacketHandler<?>> handlerMap = 
 						((NetworkStateAccessor)(Object) state).getHandlerMap();
@@ -81,7 +84,8 @@ public class LogPacketCommand {
 					try {
 						Iterable<Class<? extends Packet<?>>> classes = handler.getPacketTypes();
 						for(Class<?> clazz : classes) {
-							PACKET_TYPES.put(clazz.getSimpleName(), clazz);
+							String named = mapping.namedClass(clazz.getName());
+							PACKET_TYPES.put(named.substring(named.lastIndexOf('.') + 1, named.length()), clazz);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

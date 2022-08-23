@@ -1,6 +1,10 @@
 package lovexyn0827.mess.util.deobfuscating;
 
 public interface Mapping {
+	/**
+	 * Get the deobfuscated name of a class from its srg name
+	 * @param named The deobfuscated binary name of the class
+	 */
 	String namedClass(String srg);
 	/**
 	 * Get the srg name of a class from its deobfuscated name
@@ -16,7 +20,6 @@ public interface Mapping {
 	String namedMethod(String srg, String desc);
 	
 	/**
-	 * @implSpec 
 	 * @param clazz
 	 * @param named
 	 * @param desc
