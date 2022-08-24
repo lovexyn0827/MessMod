@@ -103,7 +103,7 @@ Supported ticking phases:
 - BLOCK_EVENT: Just after all block events got processed.
 - ENTITY: Just after all entities got processed.
 - TILE_ENTITY: Just after all block entities got processed.
-- SERVER_TASKS: When all worlds got ticked and the asynchronized tasks like inputs of players haven't got processed.
+- TICKED_ALL_WORLDS: When all worlds got ticked and the asynchronized tasks like inputs of players haven't got processed.
 
 ##### `/entitysidebar remove <name>`
 
@@ -111,7 +111,7 @@ Remove a line from the entity information sidebar.
 
 ##### `/explode <pos> <power> [<fire>`] 
 
-Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single preciseness floating-point number, including Infinities and even `NaN`.
+Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single-precise floating-point number, including Infinities and even `NaN`.
 
 ##### `/freezentity freeze|resume <entities>`
 
