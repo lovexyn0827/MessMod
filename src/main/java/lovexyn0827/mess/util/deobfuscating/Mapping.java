@@ -66,4 +66,9 @@ public interface Mapping {
 	default boolean isDummy() {
 		return this instanceof DummyMapping;
 	}
+	
+	default String simpleNamedClass(String srg) {
+		String named = this.namedClass(srg);
+		return named.substring(named.lastIndexOf('.') + 1, named.length());
+	}
 }

@@ -179,6 +179,7 @@
 		"misc.negativeid" : "The value of id cannot be negative", 
 		"misc.idopt.desc" : "A numberic ID of entities", 
 		"misc.side.desc" : "Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects.", 
-		"misc.cancelhotbarstorage" : "Hotbars can only be loaded/saved when the value of option hotbarLength is 9."
+		"misc.cancelhotbarstorage" : "Hotbars can only be loaded/saved when the value of option hotbarLength is 9.", 
+		"misc.protver.err" : "The protcol version of the MessMod installed on the server is different from the one on your client,it is recommended to install MessMod with the same version as the server."
 	}
 }

@@ -129,6 +129,7 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 							throw new RuntimeException(e);
 						}
 					})
+					.filter((status) -> status != ChunkStatus.BIOMES && status != ChunkStatus.FULL)
 					.map((status) -> new ChunkStatusSorter(status, status.getIndex()))
 					.forEach((wrapped) -> builder.put(wrapped.status.getId(), wrapped));
 			VANILLA_CHUNK_STATUSES = builder.build();

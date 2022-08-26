@@ -104,6 +104,7 @@ Supported ticking phases:
 - ENTITY: Just after all entities got processed.
 - TILE_ENTITY: Just after all block entities got processed.
 - TICKED_ALL_WORLDS: When all worlds got ticked and the asynchronized tasks like inputs of players haven't got processed.
+- SERVER_TASKS: After all asynchronized  tasks got processed.
 
 ##### `/entitysidebar remove <name>`
 
@@ -607,7 +608,7 @@ Default value: false
 
 ##### `skippedGenerationStages`
 
-Skip some stages in the world generation.
+Skip some stages in the world generation. Skipping stage `biomes` and stage `full` is not supported, as the absence of them makes the server crash.
 
 Possible values: `[]`(empty list) or a list in the form of a,b,c, containing some IDs of chunk statuses and `...` (three dots).
 

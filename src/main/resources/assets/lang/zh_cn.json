@@ -179,6 +179,7 @@
 		"misc.negativeid" : "id不能为负值", 
 		"misc.idopt.desc" : "实体的一个数字ID", 
 		"misc.side.desc" : "指定从何处选取实体。注意该特性不是线程安全的，所以它只应用于一些简单的没有其他影响的指令中。", 
-		"misc.cancelhotbarstorage" : "只能在选项hotbarLength的值为9时存取物品栏"
+		"misc.cancelhotbarstorage" : "只能在选项hotbarLength的值为9时存取物品栏", 
+		"misc.protver.err" : "服务端上安装的MessMod的协议版本与您客户端上的不同，建议安装与服务端版本一致的MessMod。"
 	}
 }

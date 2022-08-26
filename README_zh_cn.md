@@ -93,20 +93,14 @@
 向实体信息侧边栏中增加由实体`<target>`提供的一行信息，可以指定更新时机和AccessingPath。支持的更新时机：
 
 - WEATHER_CYCLE：天气和时间运算完成时
-
 - CHUNK：区块加载卸载和区块刻运算完成时
-
 - SCHEDULED_TICK：计划刻运算完成时
-
 - VILLAGE：袭击运算完成时
-
 - BLOCK_EVENT：方块事件运算完成时
-
 - ENTITY：实体运算完成时
-
 - TILE_ENTITY：方块实体运算完成时
-
 - TICKED_ALL_WORLDS：所有维度运算完成且玩家输入等异步处理未开始时
+- SERVER_TASKS：玩家输入等异步处理完成时
 
 ##### `/entitysidebar remove <name>`
 
@@ -616,7 +610,7 @@ FPS低于20时每帧客户端可以运行的游戏刻数量，将其设为一个较小值可能修复低FPS时无法
 
 ##### `skippedGenerationStages`
 
-跳过一些世界生成阶段。
+跳过一些世界生成阶段。不支持跳过biomes和full两个阶段，因为这两个阶段的缺失会导致服务端崩溃。
 
 允许取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一些ChunkStatus或`...`。
 

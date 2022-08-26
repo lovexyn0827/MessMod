@@ -35,4 +35,9 @@ public abstract class MinecraftServerMixin {
 	private void onServerShutdown(CallbackInfo ci) {
 		MessMod.INSTANCE.onServerShutdown((MinecraftServer)(Object)this);
 	}
+	
+	@Inject(method = "method_16208",at = @At(value = "RETURN"))
+	private void onAsyncTasksExecuted(CallbackInfo ci) {
+		TickingPhase.SERVER_TASKS.triggerEvents(null);
+	}
 }

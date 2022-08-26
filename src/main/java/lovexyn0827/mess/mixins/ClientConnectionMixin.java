@@ -26,26 +26,25 @@ public class ClientConnectionMixin {
 	@Inject(method = "sendImmediately", at = @At("HEAD"))
 	private void onPacketBeingSended(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> callback, CallbackInfo ci) {
 		if(LogPacketCommand.isSubscribed(packet)) {
-			MessMod.LOGGER.info("{}: Sended Packet: {} [{}]", 
+			MessMod.LOGGER.info("{}: Sended Packet: {}", 
 					this.side == NetworkSide.CLIENTBOUND ? "CLIENT" : "SERVER", 
-					packet.getClass().getSimpleName(), 
-					getFields(packet));
+					toString(packet));
 		}
 	}
 	
 	@Inject(method = "channelRead0", at = @At("HEAD"))
 	private void onPacketBeingSended(ChannelHandlerContext channelHandlerContext, Packet<?> packet, CallbackInfo ci) {
 		if(LogPacketCommand.isSubscribed(packet)) {
-			MessMod.LOGGER.info("{}: Received Packet: {} [{}]", 
+			MessMod.LOGGER.info("{}: Received Packet: {}", 
 					this.side == NetworkSide.CLIENTBOUND ? "CLIENT" : "SERVER", 
-					packet.getClass().getSimpleName(), 
-					getFields(packet));
+					toString(packet));
 		}
 	}
 	
-	private static String getFields(Packet<?> packet) {
-		StringBuilder sb = new StringBuilder();
+	private static String toString(Packet<?> packet) {
 		Mapping mapping = MessMod.INSTANCE.getMapping();
+		StringBuilder sb = new StringBuilder(mapping.simpleNamedClass(packet.getClass().getName()));
+		sb.append('[');
 		for(Field f : packet.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			try {
@@ -55,6 +54,7 @@ public class ClientConnectionMixin {
 			}
 		}
 		
+		sb.append(']');
 		return sb.toString();
 	}
 }

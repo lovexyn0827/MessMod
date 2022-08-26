@@ -12,18 +12,23 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 
-// TODO Event system
 public enum TickingPhase {
-	WEATHER_CYCLE,
-	CHUNK,
-	SCHEDULED_TICK,
-	VILLAGE,
-	BLOCK_EVENT,
-	ENTITY,
-	TILE_ENTITY,
-	TICKED_ALL_WORLDS;
+	WEATHER_CYCLE(false),
+	CHUNK(false),
+	SCHEDULED_TICK(false),
+	VILLAGE(false),
+	BLOCK_EVENT(false),
+	ENTITY(false),
+	TILE_ENTITY(false),
+	TICKED_ALL_WORLDS(true), 
+	SERVER_TASKS(true);
 	
 	private final List<Event> events = Lists.newArrayList();
+	public final boolean notInAnyWorld;
+	
+	private TickingPhase(boolean notInAnyWorld) {
+		this.notInAnyWorld = notInAnyWorld;
+	}
 	
 	public void triggerEvents(@Nullable ServerWorld world) {
 		this.events.forEach((e) -> e.trigger(this, world));

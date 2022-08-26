@@ -10,6 +10,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.datafixers.util.Either;
 
 import lovexyn0827.mess.MessMod;
 import net.minecraft.client.render.debug.DebugRenderer;
@@ -30,15 +31,21 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 			return Collections.emptyList();
 		}
 		
-		List<T> types = Lists.newArrayList();
-		for(String typeName : str.split(",")) {
-			T type = this.elements.get(typeName);
-			if(type != null) {
-				types.add(type);
+		List<T> result = Lists.newArrayList();
+		for(String elementStr : str.split(",")) {
+			T element = this.parseElement(elementStr);
+			if(element != null) {
+				result.add(element);
+			} else {
+				throw new InvaildOptionException("cmd.general.nodef", elementStr);
 			}
 		}
 		
-		return types;
+		return result;
+	}
+
+	protected T parseElement(String elementStr) throws InvaildOptionException {
+		return this.elements.get(elementStr);
 	}
 
 	@Override
@@ -89,30 +96,35 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 		}
 	}
 	
-	public static class DebugRender extends ListParser<Field> {
-		private static final ImmutableBiMap<String, Field> VANILLA_DEBUG_RENDERERS;
+	public static class DebugRender extends ListParser<Either<Field, String>> {
+		private static final ImmutableBiMap<String, Either<Field, String>> VANILLA_DEBUG_RENDERERS;
 		
 		public DebugRender() {
 			super(VANILLA_DEBUG_RENDERERS);
 		}
 		
 		@Override
-		public List<Field> tryParse(String str) throws InvaildOptionException {
+		public List<Either<Field, String>> tryParse(String str) throws InvaildOptionException {
+			return super.tryParse(str);
+		}
+		
+		@Override
+		protected Either<Field, String> parseElement(String elementStr) throws InvaildOptionException {
 			if(MessMod.isDedicatedServerEnv()) {
-				return null;
+				return Either.right(elementStr);
 			} else {
-				return super.tryParse(str);
+				return super.parseElement(elementStr);
 			}
 		}
 
 		static {
-			ImmutableBiMap.Builder<String, Field> builder = ImmutableBiMap.builder();
+			ImmutableBiMap.Builder<String, Either<Field, String>> builder = ImmutableBiMap.builder();
 			if(!MessMod.isDedicatedServerEnv()) {
 				Stream.of(DebugRenderer.class.getDeclaredFields())
 						.filter((f) -> DebugRenderer.Renderer.class.isAssignableFrom(f.getType()))
 						.forEach((f) -> {
 							try {
-								builder.put(MessMod.INSTANCE.getMapping().namedField(f.getName()), f);
+								builder.put(MessMod.INSTANCE.getMapping().namedField(f.getName()), Either.left(f));
 							} catch (IllegalArgumentException e) {
 								e.printStackTrace();
 								throw new RuntimeException(e);

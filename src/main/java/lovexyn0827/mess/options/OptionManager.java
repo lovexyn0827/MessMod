@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.datafixers.util.Either;
 
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
@@ -277,7 +278,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "[]", 
 			parserClass = ListParser.DebugRender.class)
-	public static List<Field> vanillaDebugRenderers;
+	public static List<Either<Field, String>> vanillaDebugRenderers;
 	
 	private static void loadFromProperties(Properties options) {
 		for(Field f : OPTIONS) {

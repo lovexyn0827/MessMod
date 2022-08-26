@@ -85,7 +85,7 @@ public class EntityHolder {
 		}
 		
 		this.listenedFields.entrySet().forEach((e) -> {
-			boolean isEntityWorld = e.getKey().getPhase() == TickingPhase.TICKED_ALL_WORLDS || world == this.entity.world;
+			boolean isEntityWorld = e.getKey().getPhase().notInAnyWorld || world == this.entity.world;
 			if(e.getKey().getPhase() == phase && isEntityWorld) {
 				if(e.getValue() != ToBeReplaced.INSTANCE) {
 					throw new IllegalStateException();

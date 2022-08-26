@@ -23,7 +23,7 @@ public interface SidebarDataSender extends HudDataSender {
 	}
 	
 	static boolean shouldUpdate(SidebarLine line, TickingPhase phase, @Nullable ServerWorld world) {
-		return line.canGet() && line.updatePhase == phase && (line.entity.world == world || phase == TickingPhase.TICKED_ALL_WORLDS);
+		return line.canGet() && line.updatePhase == phase && (line.entity.world == world || phase.notInAnyWorld);
 	}
 
 	static SidebarDataSender create(MinecraftServer server) {

@@ -84,8 +84,7 @@ public class LogPacketCommand {
 					try {
 						Iterable<Class<? extends Packet<?>>> classes = handler.getPacketTypes();
 						for(Class<?> clazz : classes) {
-							String named = mapping.namedClass(clazz.getName());
-							PACKET_TYPES.put(named.substring(named.lastIndexOf('.') + 1, named.length()), clazz);
+							PACKET_TYPES.put(mapping.simpleNamedClass(clazz.getName()), clazz);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();

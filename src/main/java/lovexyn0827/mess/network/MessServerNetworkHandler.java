@@ -9,6 +9,7 @@ import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
+import lovexyn0827.mess.util.FormattedText;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
@@ -61,6 +62,7 @@ public class MessServerNetworkHandler {
 					player.getName().asString(), ver, protocol);
 			if(protocol != Channels.CHANNEL_VERSION) {
 				MessMod.LOGGER.warn("But note that the protocol version of the client differs from the one here.");
+				player.sendMessage(new FormattedText("misc.protver.err", "c").asMutableText(), false);
 			}
 		});
 		register(Channels.UNDO, (player, channel, buf) -> {
