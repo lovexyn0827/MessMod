@@ -1,17 +1,24 @@
 package lovexyn0827.mess.network;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
+import lovexyn0827.mess.util.FormattedText;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class MessServerNetworkHandler {
-	@SuppressWarnings("unused")
+	private static final Map<Identifier, PacketHandler> PACKET_HANDLERS = Maps.newHashMap();
 	private final MinecraftServer server;
 
 	public MessServerNetworkHandler(MinecraftServer server) {
@@ -23,24 +30,9 @@ public class MessServerNetworkHandler {
 			CustomPayloadC2SPacketAccessor accessor = (CustomPayloadC2SPacketAccessor) packet;
 			Identifier channel = accessor.getMessChannel();
 			PacketByteBuf buf = accessor.getMessData();
-			if(channel.equals(Channels.HUD)) {
-				HudType type = buf.readEnumConstant(HudType.class);
-				if (buf.readBoolean()) {
-					((HudDataSubscribeState) player.networkHandler).subscribe(type);
-				} else {
-					((HudDataSubscribeState) player.networkHandler).subscribe(type);
-				}
-				
-				return true;
-			} else if (channel.equals(Channels.VERSION)) {
-				int protocol = buf.readInt();
-				String ver = buf.readString(32767);
-				MessMod.LOGGER.info("Player {} joined the game with MessMod {} (Protocol Version: {})", 
-						player.getName().asString(), ver, protocol);
-				if(protocol != Channels.CHANNEL_VERSION) {
-					MessMod.LOGGER.warn("But note that the protocol version of the client differs from the one here.");
-				}
-				
+			PacketHandler handler = PACKET_HANDLERS.get(channel);
+			if(handler != null) {
+				handler.onPacket(player, channel, buf);
 				return true;
 			}
 		} catch (Exception e) {
@@ -48,5 +40,48 @@ public class MessServerNetworkHandler {
 		}
 		
 		return false;
+	}
+
+	private static void register(Identifier hud, PacketHandler handler) {
+		PACKET_HANDLERS.put(hud, handler);
+	}
+	
+	static {
+		register(Channels.HUD, (player, channel, buf) -> {
+			HudType type = buf.readEnumConstant(HudType.class);
+			if (buf.readBoolean()) {
+				((HudDataSubscribeState) player.networkHandler).subscribe(type);
+			} else {
+				((HudDataSubscribeState) player.networkHandler).subscribe(type);
+			}
+		});
+		register(Channels.VERSION, (player, channel, buf) -> {
+			int protocol = buf.readInt();
+			String ver = buf.readString(32767);
+			MessMod.LOGGER.info("Player {} joined the game with MessMod {} (Protocol Version: {})", 
+					player.getName().asString(), ver, protocol);
+			if(protocol != Channels.CHANNEL_VERSION) {
+				MessMod.LOGGER.warn("But note that the protocol version of the client differs from the one here.");
+				player.sendMessage(new FormattedText("misc.protver.err", "c").asMutableText(), false);
+			}
+		});
+		register(Channels.UNDO, (player, channel, buf) -> {
+			if(OptionManager.blockPlacementHistory) {
+				MessMod.INSTANCE.getPlacementHistory().undo(player);
+			}
+		});
+		register(Channels.REDO, (player, channel, buf) -> {
+			if(OptionManager.blockPlacementHistory) {
+				MessMod.INSTANCE.getPlacementHistory().redo(player);
+			}
+		});
+	}
+	
+	public interface PacketHandler {
+		void onPacket(ServerPlayerEntity player, Identifier channel, PacketByteBuf buf);
+	}
+
+	public void sendToEveryone(CustomPayloadS2CPacket packet) {
+		this.server.getPlayerManager().sendToAll(packet);
 	}
 }

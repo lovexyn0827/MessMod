@@ -1,7 +1,5 @@
 package lovexyn0827.mess.rendering;
 
-import lovexyn0827.mess.rendering.hud.data.HudLine.Unknown;
-
 public class ShapeSpace {
 	/**
 	 * Default space, which can only be managed by the ShapeRenderer class automatically.
@@ -23,8 +21,8 @@ public class ShapeSpace {
 		if (obj == null) {
 			return false;
 		} else {
-			if(obj.getClass() == Unknown.class) {
-				Unknown other = (Unknown) obj;
+			if(obj.getClass() == ShapeSpace.class) {
+				ShapeSpace other = (ShapeSpace) obj;
 				return this.name.equals(other.name);
 			} else {
 				return false;

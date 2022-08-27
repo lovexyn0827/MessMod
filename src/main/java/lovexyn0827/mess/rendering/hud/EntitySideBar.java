@@ -5,7 +5,6 @@ import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
 import lovexyn0827.mess.rendering.hud.data.RemoteHudDataStorage;
 import net.minecraft.client.util.math.MatrixStack;
 
-// TODO
 public class EntitySideBar extends EntityHud {
 	public EntitySideBar(ClientHudManager clientHudManager) {
 		super(clientHudManager, HudType.SIDEBAR);

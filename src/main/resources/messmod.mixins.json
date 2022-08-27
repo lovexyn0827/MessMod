@@ -25,7 +25,16 @@
     "ServerPlayNetworkHandlerMixin", 
     "CustomPayloadC2SPacketAccessor", 
     "FormattingAccessor", 
-    "ChunkStatusMixin"
+    "ChunkStatusMixin", 
+    "ServerPlayerInteractionManagerMixin", 
+    "BlockItemMixin",
+    "WorldMixin",
+    "EntitySelectorReaderMixin",
+    "EntitySelectorOptionsMixin",
+    "PistonExtensionBlockMixin", 
+    "PlayerInventoryMixin_Server", 
+    "ClientConnectionMixin", 
+    "NetworkStateAccessor"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -36,8 +45,14 @@
     "ClientPlayerEntityMixin",
     "AbstractRedstoneGateBlockMixin",
     "LanguageManagerMixin", 
-    "DebugRendererMixin", 
-    "StructureBlockBlockEntityRendererMixin"
+    "StructureBlockBlockEntityRendererMixin", 
+    "DebugRendererMixin",
+    "EntitySelectorMixin", 
+    "WorldListWidgetMixin", 
+    "WorldListWidgetEntryAccessor", 
+    "InGameHudMixin", 
+    "PlayerInventoryMixin_Client", 
+    "CreativeInventoryScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -10,6 +10,7 @@ import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.rendering.hud.LookingAtEntityHud;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.WrappedPath;
 import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
@@ -45,6 +46,10 @@ public interface HudDataSender {
 	}
 	
 	default boolean addField(Class<?> cl, String field, String name, AccessingPath path) {
+		if ("-THIS-".equals(field)) {
+			return this.addCustomLine(new WrappedPath(path, name));
+		}
+		
 		Field f = Reflection.getFieldFromNamed(cl, field);
 		ListenedField lf = new ListenedField(f, path, name);
 		return this.addCustomLine(lf);

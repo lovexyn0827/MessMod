@@ -13,6 +13,7 @@ import net.minecraft.util.Lazy;
  */
 @SuppressWarnings("deprecation")
 public class CarpetUtil {
+	// FIXME Not working with dedicated servers
 	private static final Lazy<BooleanSupplier> IS_TICK_FROZEN = new Lazy<>(() -> {
 		if(FabricLoader.getInstance().isModLoaded("carpet")) {
 			try {

@@ -46,6 +46,6 @@ public abstract class ProjectileEntityMixin extends Entity {
 			at = @At("HEAD"), 
 			ordinal = 1)
 	private float tryRemoveRandomness(float dIn) {
-		return OptionManager.disableProjectileRandomness ? 0.0F : dIn;
+		return OptionManager.disableProjectileRandomness ? 0.0F : dIn * OptionManager.projectileRandomnessScale;
 	}
 }

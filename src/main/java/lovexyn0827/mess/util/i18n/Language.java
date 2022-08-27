@@ -81,6 +81,10 @@ public class Language {
 			}
 		}
 	}
+
+	public boolean containsKey(String mayKey) {
+		return this.translations.containsKey(mayKey);
+	}
 	
 	public static class Parser implements OptionParser<String> {
 
