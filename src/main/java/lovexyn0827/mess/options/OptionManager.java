@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,21 +22,27 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.datafixers.util.Either;
 
+import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.fakes.DebugRendererEnableState;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.i18n.Language;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
@@ -45,6 +53,7 @@ import net.minecraft.util.crash.CrashReport;
  * @author lovexyn0827
  * Date: April 2, 2022
  */
+// TODO Now the option manager is pretty messy!
 public class OptionManager{
 	private static final File GLOBAL_OPTION_FILE = new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop");
 	private static final Properties GLOBAL_OPTION_SERIALIZER = new Properties();
@@ -75,6 +84,10 @@ public class OptionManager{
 	@Option(defaultValue = "NORMALLY", 
 			parserClass = BlockInfoRenderer.FrozenUpdateMode.Parser.class)
 	public static BlockInfoRenderer.FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean blockPlacementHistory;
 	
 	@Option(defaultValue = "COLLISION", 
 			parserClass = ShapeType.Parser.class)
@@ -141,17 +154,32 @@ public class OptionManager{
 			parserClass = FloatParser.Positive.class)
 	public static float getEntityRangeExpansion;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			globalOnly = true, 
+			environment = EnvType.CLIENT)
+	public static boolean hideSuvivalSaves;
+	
 	@Option(defaultValue = "TOP_RIGHT", 
 			parserClass = AlignMode.Parser.class)
 	public static AlignMode hudAlignMode;
 	
-	@Option(defaultValue = "", 
+	@Option(defaultValue = "(BL)^2/(mR)", 
 			parserClass = StringParser.class)
 	public static String hudStyles;
 	
 	@Option(defaultValue = "1.0", 
-			parserClass = FloatParser.Positive.class)
+			parserClass = FloatParser.Positive.class, 
+			experimental = true)
 	public static float hudTextSize;
+	
+	@Option(defaultValue = "9", 
+			parserClass = IntegerParser.HotbarLength.class)
+	public static int hotbarLength;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean interactableB36;
 	
 	@Option(defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 
 			parserClass = Language.Parser.class)
@@ -180,6 +208,10 @@ public class OptionManager{
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean projectileChunkLoadingPermanence;
+	
+	@Option(defaultValue = "1.0", 
+			parserClass = FloatParser.class)
+	public static float projectileRandomnessScale;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -245,8 +277,68 @@ public class OptionManager{
 	public static int tntChunkLoadingRange;
 	
 	@Option(defaultValue = "[]", 
-			parserClass = StringParser.class)
-	public static String vanillaDebugRenderers;
+			parserClass = ListParser.DebugRender.class)
+	public static List<Either<Field, String>> vanillaDebugRenderers;
+	
+	private static void loadFromProperties(Properties options) {
+		for(Field f : OPTIONS) {
+			String serialized;
+			String name = f.getName();
+			Option o = f.getAnnotation(Option.class);
+			try {
+				@SuppressWarnings("deprecation")
+				OptionParser<?> parser = o.parserClass().newInstance();
+				try {
+					options.computeIfAbsent(name, 
+							(t) -> GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (key) -> o.defaultValue()));
+					serialized = (String) options.get(name);
+					f.set(null, parser.tryParse(serialized));
+					saveGlobal();
+				} catch (InvaildOptionException e) {
+					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", name, e.getMessage());
+					String dV;
+					if(isVaild(parser, (String) GLOBAL_OPTION_SERIALIZER.get(name))) {
+						dV = GLOBAL_OPTION_SERIALIZER.getProperty(name);
+						options.put(name, dV);
+					} else {
+						dV = o.defaultValue();
+						GLOBAL_OPTION_SERIALIZER.put(name, dV);
+						options.put(name, dV);
+					}
+
+					serialized = dV;
+					try {
+						f.set(null, parser.tryParse(dV));
+					} catch (IllegalArgumentException | IllegalAccessException | InvaildOptionException e1) {
+						e1.printStackTrace();
+					}
+				}
+
+				BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
+				if(behavior != null) {
+					behavior.accept(serialized, null);
+				}
+			} catch (SecurityException | IllegalAccessException | InstantiationException e1) {
+				e1.printStackTrace();
+				
+			}
+		}
+		
+		if(MessMod.LOGGER.isDebugEnabled()) {
+			MessMod.LOGGER.debug("Loaded {} MessMod config from {}", OPTIONS.size(), localOptionFile.getAbsolutePath());
+			OPTIONS.stream()
+			.map((f) -> {
+				return f.getName() + ": " + getString(f);
+			})
+			.forEach(MessMod.LOGGER::debug);
+		}
+	}
+	
+	public static void loadFromServer(InputStream in) throws IOException {
+		Properties options = new Properties();
+		options.load(in);
+		loadFromProperties(options);
+	}
 	
 	/**
 	 * Refresh the save-local option storage
@@ -264,52 +356,12 @@ public class OptionManager{
 			writeDefault();
 		}
 		
-		for(Field f : OPTIONS) {
-			String name = f.getName();
-			try {
-				Option o = f.getAnnotation(Option.class);
-				@SuppressWarnings("deprecation")
-				OptionParser<?> parser = o.parserClass().newInstance();
-				try {
-					localOptionSerializer.computeIfAbsent(name, 
-							(t) -> GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (key) -> o.defaultValue()));
-					f.set(null, parser.tryParse((String) localOptionSerializer.get(name)));
-					saveGlobal();
-				} catch (InvaildOptionException e) {
-					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", name, e.getMessage());
-					String dV;
-					if(isVaild(parser, (String) GLOBAL_OPTION_SERIALIZER.get(name))) {
-						dV = GLOBAL_OPTION_SERIALIZER.getProperty(name);
-						localOptionSerializer.put(name, dV);
-					} else {
-						dV = o.defaultValue();
-						GLOBAL_OPTION_SERIALIZER.put(name, dV);
-						localOptionSerializer.put(name, dV);
-					}
-					
-					try {
-						f.set(null, parser.tryParse(dV));
-					} catch (IllegalArgumentException | IllegalAccessException | InvaildOptionException e1) {
-						e1.printStackTrace();
-					}
-				}
-			} catch (SecurityException | IllegalAccessException | InstantiationException e1) {
-				e1.printStackTrace();
-			}
-		}
-		
-		if(MessMod.LOGGER.isDebugEnabled()) {
-			MessMod.LOGGER.debug("Loaded {} MessMod config from {}", OPTIONS.size(), localOptionFile.getAbsolutePath());
-			OPTIONS.stream()
-			.map((f) -> {
-				return f.getName() + ": " + getString(f);
-			})
-			.forEach(MessMod.LOGGER::debug);
-		}
+		loadFromProperties(localOptionSerializer);
+		sendOptionsToClientsIfNeeded();
 	}
 
-	// Only calls from <clinit> are permitted
-	private static void loadGlobal() {
+	// Only calls from MessMod.onInitialize() are permitted
+	public static void loadGlobal() {
 		if(GLOBAL_OPTION_FILE.exists()) {
 			try (FileInputStream in = new FileInputStream(GLOBAL_OPTION_FILE)) {
 				GLOBAL_OPTION_SERIALIZER.load(in);
@@ -324,23 +376,32 @@ public class OptionManager{
 		
 		for(Field f : OPTIONS) {
 			String name = f.getName();
+			String serialized;
+			Option o = f.getAnnotation(Option.class);
 			try {
-				Option o = f.getAnnotation(Option.class);
 				@SuppressWarnings("deprecation")
 				OptionParser<?> parser = o.parserClass().newInstance();
 				try {
 					GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (k) -> o.defaultValue());
-					f.set(null, parser.tryParse((String) GLOBAL_OPTION_SERIALIZER.get(name)));
+					serialized = (String) GLOBAL_OPTION_SERIALIZER.get(name);
+					f.set(null, parser.tryParse(serialized));
 					saveGlobal();
 				} catch (InvaildOptionException e) {
 					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", name, e.getMessage());
 					String dV = o.defaultValue();
+					serialized = dV;
 					GLOBAL_OPTION_SERIALIZER.put(name, dV);
 					try {
 						f.set(null, parser.tryParse(dV));
 					} catch (IllegalArgumentException | IllegalAccessException | InvaildOptionException e1) {
 						e1.printStackTrace();
 					}
+				}
+				
+
+				BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
+				if(behavior != null) {
+					behavior.accept(serialized, null);
 				}
 			} catch (SecurityException | IllegalAccessException | InstantiationException e1) {
 				e1.printStackTrace();
@@ -369,7 +430,7 @@ public class OptionManager{
 
 	public static synchronized void save() {
 		try (FileOutputStream in = new FileOutputStream(localOptionFile)) {
-			localOptionSerializer.store(in,"MessMod Options");
+			localOptionSerializer.store(in, "MessMod Options");
 		} catch (IOException e) {
 			LogManager.getLogger().fatal("Failed to write mcwmem.prop!");
 			e.printStackTrace();
@@ -378,20 +439,31 @@ public class OptionManager{
 
 	private static void saveGlobal() {
 		try (FileOutputStream in = new FileOutputStream(GLOBAL_OPTION_FILE)) {
-			GLOBAL_OPTION_SERIALIZER.store(in,"MessMod Options");
+			GLOBAL_OPTION_SERIALIZER.store(in, "MessMod Options");
 		} catch (IOException e) {
 			LogManager.getLogger().fatal("Failed to write mcwmem.prop!");
 			e.printStackTrace();
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public static void set(Field f, Object obj) {
+		set(f, obj, null);
+	}
+
+	public static void set(Field f, Object obj, @Nullable CommandContext<ServerCommandSource> ct) {
 		try {
 			f.set(null, obj);
-			localOptionSerializer.put(f.getName(), f.getAnnotation(Option.class).parserClass()
-					.newInstance().serializeObj(obj));
+			@SuppressWarnings("deprecation")
+			String serialized = f.getAnnotation(Option.class).parserClass()
+					.newInstance().serializeObj(obj);
+			localOptionSerializer.put(f.getName(), serialized);
 			save();
+			BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
+			if(behavior != null) {
+				behavior.accept(serialized, ct);
+			}
+			
+			sendOptionsToClientsIfNeeded();
 		} catch (IllegalArgumentException e) {
 			MessMod.LOGGER.fatal("Couldn't set the value of option {}, that shouldn't happed!", f.getName());
 			e.printStackTrace();
@@ -401,7 +473,7 @@ public class OptionManager{
 	}
 
 	@SuppressWarnings("deprecation")
-	public static void setGolbal(Field f, Object obj) {
+	public static void setGlobal(Field f, Object obj) {
 		try {
 			GLOBAL_OPTION_SERIALIZER.put(f.getName(), f.getAnnotation(Option.class).parserClass()
 					.newInstance().serializeObj(obj));
@@ -413,11 +485,33 @@ public class OptionManager{
 		set(f, obj);
 	}
 
+	private static void sendOptionsToClientsIfNeeded() {
+		if(MessMod.isDedicatedEnv() && MessMod.INSTANCE.getServerNetworkHandler() != null) {
+			MessMod.INSTANCE.getServerNetworkHandler().sendToEveryone(toPacket());
+		}
+	}
+
+	public static void sendOptionsTo(ServerPlayerEntity player) {
+		player.networkHandler.sendPacket(toPacket());
+	}
+	
+	private static CustomPayloadS2CPacket toPacket() {
+		try {
+			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+			StringWriter sw = new StringWriter();
+			localOptionSerializer.store(sw, "MessMod Options");
+			buf.writeString(sw.toString());
+			return new CustomPayloadS2CPacket(Channels.OPTIONS, buf);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static String getString(Field f) {
 		return localOptionSerializer.get(f.getName()).toString();
 	}
 	
-	public static String getGolbalString(Field f) {
+	public static String getGlobalString(Field f) {
 		return GLOBAL_OPTION_SERIALIZER.get(f.getName()).toString();
 	}
 
@@ -459,9 +553,41 @@ public class OptionManager{
 			MessMod.LOGGER.warn(msg);
 		}
 	}
+
+	public static boolean isSupportedInCurrentEnv(Option o) {
+		EnvType currentEnv = FabricLoader.getInstance().getEnvironmentType();
+		for(EnvType env : o.environment()) {
+			if(env == currentEnv) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	public static String getDescription(String name) {
+		return I18N.translate("opt." + name + ".desc");
+	}
+
+	@SuppressWarnings("deprecation")
+	private static void loadDefaults() {
+		OPTIONS.forEach((f) -> {
+			Option o = f.getAnnotation(Option.class);
+			try {
+				f.set(null, o.parserClass().newInstance().tryParse(o.defaultValue()));
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		});
+	}
 	
 	static{
 		registerCustomApplicationBehavior("enabledTools", (val, ct) -> {
+			if(ct == null) {
+				return;
+			}
+			
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
 				sendErrorOrWarn(ct, "Please install the carpet mod!");
 			}
@@ -489,20 +615,15 @@ public class OptionManager{
 			}
 		});
 		registerCustomApplicationBehavior("hudStyles", (val, ct) -> {
-			if (!MessMod.isDedicatedEnv()) {
+			if (!MessMod.isDedicatedServerEnv() && MessMod.INSTANCE.getClientHudManager() != null) {
 				MessMod.INSTANCE.getClientHudManager().updateStyle(val);
 			}
 		});
-		registerCustomApplicationBehavior("vanillaDebugRenderers", (val, ct) -> {
-			if (!MessMod.isDedicatedEnv()) {
-				MinecraftClient mc = MinecraftClient.getInstance();
-				try {
-					((DebugRendererEnableState) (mc.debugRenderer)).setEnabledRenderers(new ListParser.DebugRender().tryParse((String) val));
-				} catch (InvaildOptionException e) {
-					sendErrorOrWarn(ct, e.getMessage());
-				}
+		OPTIONS.forEach((o) -> {
+			if(!I18N.EN_US.containsKey(String.format("opt.%s.desc", o.getName()))) {
+				MessMod.LOGGER.warn("The description of option {} is missing!", o.getName());
 			}
 		});
-		loadGlobal();
+		loadDefaults();
 	}
 }

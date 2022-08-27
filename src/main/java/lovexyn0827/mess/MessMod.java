@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.fakes.DebugRendererEnableState;
 import lovexyn0827.mess.log.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.network.MessClientNetworkHandler;
@@ -24,6 +23,8 @@ import lovexyn0827.mess.rendering.ShapeSender;
 import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
+import lovexyn0827.mess.util.BlockPlacementHistory;
+import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
 import net.fabricmc.api.EnvType;
@@ -61,6 +62,7 @@ public class MessMod implements ModInitializer {
 	@Environment(EnvType.CLIENT)
 	private MessClientNetworkHandler clientNetworkHandler;
 	private MessServerNetworkHandler serverNetworkHandler;
+	private BlockPlacementHistory placementHistory;
 
 	private MessMod() {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
@@ -74,6 +76,7 @@ public class MessMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		OptionManager.loadGlobal();
 	}
 	
 	public Mapping getMapping() {
@@ -119,6 +122,7 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer.setServer(server);
 		this.blockInfoRederer.initializate(server);
 		this.hudManagerS = new ServerHudManager(server);
+		this.placementHistory = new BlockPlacementHistory();
 		try {
 			this.logger.initialize(server);
 		} catch (IOException e) {
@@ -133,6 +137,8 @@ public class MessMod implements ModInitializer {
 		this.hudManagerS = null;
 		this.logger.closeAll();
 		this.serverNetworkHandler = null;
+		this.placementHistory = null;
+		TickingPhase.removeAllEvents();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.logger.archiveLogs();
@@ -156,6 +162,7 @@ public class MessMod implements ModInitializer {
 							"/script load tool global");
 				}
 			}
+			OptionManager.sendOptionsTo(player);
 		} catch (IOException e) {
 			LOGGER.error("Scarpet scripts couldn't be loaded.");
 			e.printStackTrace();
@@ -176,7 +183,6 @@ public class MessMod implements ModInitializer {
 		this.clientNetworkHandler.sendVersion();
 		ClientPlayerEntity player = mc.player;
 		ShapeRenderer sr = new ShapeRenderer(mc);
-		((DebugRendererEnableState) (mc.debugRenderer)).update();
         this.shapeRenderer = sr;
         this.shapeCache = sr.getShapeCache();
 		this.hudManagerC = new ClientHudManager();
@@ -260,5 +266,13 @@ public class MessMod implements ModInitializer {
 	@Environment(EnvType.CLIENT)
 	public MessClientNetworkHandler getClientNetworkHandler() {
 		return this.clientNetworkHandler;
+	}
+
+	public BlockPlacementHistory getPlacementHistory() {
+		return this.placementHistory;
+	}
+	
+	public static boolean isDedicatedServerEnv() {
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
 	}
 }

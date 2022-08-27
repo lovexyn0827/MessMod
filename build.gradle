@@ -16,6 +16,14 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	maven {
+		name = "lss233-repo"
+		url = "https://lss233.littleservice.cn/repositories/minecraft"
+    }
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/messmod.accesswidener")
 }
 
 dependencies {

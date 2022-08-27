@@ -5,7 +5,7 @@ import lovexyn0827.mess.util.i18n.I18N;
 public class AccessingFailureException extends Exception {
 	private static final long serialVersionUID = -4184399838031396060L;
 	private final String shortenedMsg;
-	final Cause cause;
+	public final Cause cause;
 	final Object[] args;
 
 	AccessingFailureException(Cause cause, Node node, Throwable e, Object ... args) {
@@ -42,7 +42,7 @@ public class AccessingFailureException extends Exception {
 		return shortenedMsg;
 	}
 	
-	static enum Cause {
+	public static enum Cause {
 		NO_FIELD("exp.nofield"), 
 		NO_METHOD("exp.nomethod"), 
 		NO_KEY("exp.nokey"), 

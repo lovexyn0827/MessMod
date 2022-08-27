@@ -37,14 +37,7 @@ public class EntitySidebarCommand {
 										})
 										.then(argument("name",StringArgumentType.string())
 												.executes(EntitySidebarCommand::addSidebar)
-												.then(argument("whereToUpdate",StringArgumentType.string())
-														.suggests((ct, b) -> {
-															for(TickingPhase phase : TickingPhase.values()) {
-																b.suggest(phase.name());
-															}
-															
-															return b.buildFuture();
-														})
+												.then(TickingPhase.commandArg()
 														.executes(EntitySidebarCommand::addSidebarWithPoint)
 														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 																.executes((EntitySidebarCommand::addSidebarWithPointAndPath))))))))
@@ -74,7 +67,7 @@ public class EntitySidebarCommand {
 		String name = StringArgumentType.getString(ct, "name");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
-			if (sender.addLine(e, field, name, TickingPhase.SERVER_TASKS, AccessingPath.DUMMY)) {
+			if (sender.addLine(e, field, name, TickingPhase.TICKED_ALL_WORLDS, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
 			} else {
 				CommandUtil.error(ct, "exp.dupname");

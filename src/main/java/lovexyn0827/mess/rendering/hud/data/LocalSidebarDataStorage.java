@@ -18,6 +18,10 @@ public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorag
 	private TreeMap<HudLine, Object> data = new TreeMap<>();
 	private List<HudLine> lines = new ArrayList<>();
 	
+	public LocalSidebarDataStorage() {
+		this.registerTickingEvents();
+	}
+	
 	@Override
 	public void updateData(Entity entity) {
 		throw new UnsupportedOperationException();

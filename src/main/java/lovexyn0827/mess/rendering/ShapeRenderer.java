@@ -53,8 +53,12 @@ public class ShapeRenderer {
 		this.client = mc;
     }
     
+    public void close() {
+    	this.shapes.close();
+    }
+    
     public ShapeCache getShapeCache() {
-		return shapes;
+		return this.shapes;
 	}
 
     public void render(MatrixStack matrices, Camera camera, float partialTick) {
@@ -96,9 +100,7 @@ public class ShapeRenderer {
         	shapesInDim.forEach((space, set) -> {
             	set.forEach((s) -> {
             		if(s.shouldRender(dimensionType)) {
-            			if(s instanceof RenderedText) {
-            				s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
-            			} else {
+            			if(!(s instanceof RenderedText)) {
             				MatrixStack matrixStack = RenderSystem.getModelViewStack();
             				matrixStack.push();
                             matrixStack.method_34425(matrices.peek().getModel());
@@ -107,6 +109,15 @@ public class ShapeRenderer {
                 			s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
                 			matrixStack.pop();
                             RenderSystem.applyModelViewMatrix();
+            			}
+            		}
+            	});
+            });
+        	shapesInDim.forEach((space, set) -> {
+            	set.forEach((s) -> {
+            		if(s.shouldRender(dimensionType)) {
+            			if(s instanceof RenderedText) {
+                			s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
             			}
             		}
             	});

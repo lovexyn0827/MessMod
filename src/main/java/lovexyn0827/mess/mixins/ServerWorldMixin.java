@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.TickingPhase;
 import net.minecraft.block.BlockState;
@@ -55,7 +54,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=chunkSource")
 			)
 	private void startChunkTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.WEATHER_CYCLE, (ServerWorld)(Object) this);
+		TickingPhase.WEATHER_CYCLE.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -64,7 +63,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=tickPending")
 			)
 	private void startScheduledTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.CHUNK, (ServerWorld)(Object) this);
+		TickingPhase.CHUNK.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -73,7 +72,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=raid")
 			)
 	private void startVillageTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.SCHEDULED_TICK, (ServerWorld)(Object) this);
+		TickingPhase.SCHEDULED_TICK.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -82,7 +81,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=blockEvents")
 			)
 	private void startBlockEventTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.VILLAGE, (ServerWorld)(Object) this);
+		TickingPhase.VILLAGE.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -91,20 +90,20 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=entities")
 			)
 	private void startEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.BLOCK_EVENT, (ServerWorld)(Object) this);
+		TickingPhase.BLOCK_EVENT.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V")
 			)
 	private void startBlockEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.ENTITY, (ServerWorld)(Object) this);
+		TickingPhase.ENTITY.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
 			at = @At("RETURN")
 			)
 	private void endTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		MessMod.INSTANCE.getServerHudManager().sidebar.updateData(TickingPhase.TILE_ENTITY, (ServerWorld)(Object) this);
+		TickingPhase.TILE_ENTITY.triggerEvents((ServerWorld)(Object) this);
 	}
 }

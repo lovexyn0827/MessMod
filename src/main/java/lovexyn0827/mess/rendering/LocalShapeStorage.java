@@ -25,11 +25,6 @@ public class LocalShapeStorage extends ShapeCache implements ShapeSender {
 	}
 
 	@Override
-	public synchronized Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> getAllShapes() {
-		return this.backend;
-	}
-
-	@Override
 	public synchronized void clearSpaceFromServer(ShapeSpace space) {
 		this.clearSpace(space);
 	}
@@ -37,10 +32,5 @@ public class LocalShapeStorage extends ShapeCache implements ShapeSender {
 	@Override
 	public void updateClientTime(long gt) {
 		this.time = gt;
-	}
-
-	@Override
-	public long getTime() {
-		return time;
 	}
 }

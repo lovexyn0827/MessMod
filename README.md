@@ -17,8 +17,8 @@ In other languages:
 
 - Fabric Loader 0.7.4+. 
 - The fabric-carpet by gnembon. (Strongly recommended, but not necessary) 
-- Minecraft 1.16.4 or 1.16.5. 
-- Everything Minecraft 1.16.x requires. 
+- Minecraft 1.16.4/1.16.5/1.17.1/1.18.2
+- Everything the Minecraft requires. 
 
 ### Commands
 
@@ -26,7 +26,7 @@ Names of arguments are wrapped by pointy semicolons, and optional components are
 
 ##### `/ensure <pos>` 
 
-Obtain the information of block state and block entity data (if exists) at `<pos>` to check if the block is rendered wrongly or is a ghost block.
+Get the information of block state and block entity data (if exists) at `<pos>` to check if the block is rendered wrongly or is a ghost block.
 
 ##### `/entityconfig <targets> enableStepHeight|disableStepHeight` 
 
@@ -38,7 +38,7 @@ Similar to the last, but the target is always the local player.
 
 ##### `/entityfield <target> get <fieldName> [<path>]` 
 
-Get the value of `<field>` in the object which corresponds to `<target>`. Note that the names are intermediary names like `field_18276`, please use a mapping to translate them. 
+Get the value of `<field>` in the object which corresponds to `<target>`, an accessing path can be specified if needed. Note that if the mapping is not loaded, the names here are intermediary names like `field_18276`, which are hard to be understood, please use a mapping to translate them to readable names. 
 
 ##### `/entityfield <target> listAvailableFields` 
 
@@ -46,14 +46,13 @@ List all fields defined or inherited by the class of `<target>`.
 
 ##### `/entityfield <target> set <fieldName> <newValue>` 
 
-Set the value of `<field>` in the object which represents `<target>` to `<newValue>`.Supported types : int, float, double, boolean(may fail to be set now),String, Vec3d(use "," as delimiter between components).
+Set the value of `<field>` in the object which represents `<target>` to `<newValue>`.Supported types : int, float, double, boolean(may fail to be set now),String, Vec3d(use "," as delimiter between components, must be quoted).
 
 ##### `/entitylog sub <target>` 
 
 Start recording the Motion, position, and listened fields of `<target>` every tick and save them to a CSV file. Note that some of the records will temporarily be saved to a buffer rather than being written to the file immediately, `/entity flush` could be used instead. 
-Logs are saved to the entitylog folder in the world folder. 
 
-##### `/entitylog autoSub <entityType>`
+Logs are saved to the `entitylog` folder in the world folder. 
 
 ##### `/entitylog unsub <target>` 
 
@@ -63,13 +62,93 @@ Stop monitoring `<target>` and save the records in the buffer to the disk.
 
 Mark `<field>` as 'listened' so that its value will be recorded if any entity containing this field is subscribed by using `/entitylog sub <target>`, execution of this command will restart all recording processes. Currently, `<type>` wouldn't restrict the scope of influence of this command. 
 
+##### `/entitylog stopListenField <field>`
+
+Stop listening a field.
+
+##### `/entitylog listListenedFields`
+
+List all listened fields.
+
+##### `/entitylog autoSub <entityType>`
+
+Start monitoring a kind of entities automatically.
+
+##### `/entitylog stopAutoSub <entityType>`
+
+Stop monitoring a kind of entities automatically.
+
+##### `/entitylog autoSubName <name>`
+
+Start monitoring entities with the given `<name>` automatically.
+
+##### `/entitylog stopAutoSubName <name>`
+
+Stop monitoring entities with the given `<name>` automatically.
+
 ##### `/entitylog flush` 
 
 Save the records in the buffer to the disk without stopping recording.
 
+##### `/entitysidebar add <target> <field> <name> [<whereToUpdate> [<path>]]`
+
+Add a new line to the entity information sidebar. You can specify where the data get updated and an accessing path if necessary.
+
+Supported ticking phases: 
+
+- WEATHER_CYCLE: Just after the calculation of weather cycle was completed and the game time was updated.
+- CHUNK: Just after most stuff related to chunks (including unloading, spawning, freezing , snowing, random ticks and many other tasks) get processed.
+- SCHEDULED_TICK: Just after the calculating of scheduled tick finished.
+- VILLAGE: Just after the states of raids got updated.
+- BLOCK_EVENT: Just after all block events got processed.
+- ENTITY: Just after all entities got processed.
+- TILE_ENTITY: Just after all block entities got processed.
+- TICKED_ALL_WORLDS: When all worlds got ticked and the asynchronized tasks like inputs of players haven't got processed.
+- SERVER_TASKS: After all asynchronized  tasks got processed.
+
+##### `/entitysidebar remove <name>`
+
+Remove a line from the entity information sidebar.
+
 ##### `/explode <pos> <power> [<fire>`] 
 
-Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single preciseness floating-point number, including Infinities and even `NaN`.
+Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single-precise floating-point number, including Infinities and even `NaN`.
+
+##### `/freezentity freeze|resume <entities>`
+
+Pause|continue processing selected entities.
+
+##### `/hud subField target <entityType> <field> [<name> [<path>]]`
+
+Mark `<field>` as 'listened' so that its value will be included in the looking at entity HUD. Currently, `<type>` make no difference to the execution but being used in resolution of the field name and providing suggestions.
+
+##### `/hud subField client|server <field> [<name> [<path>]]`
+
+Add a listened field to the client-side/server-side player information HUD. You can specift a custom name and an accessing path for the field if necessary.
+
+##### `/hud unsubField target|client|server <name>`
+
+Remove a listened field from a HUD.
+
+##### `/hud setHudTarget <profile>`
+
+Set the player used in getting the data in the server-side player information HUD and the looking at entity HUD in multiplayer games.
+
+##### `/lag nanoseconds [<thread>]`
+
+Make the a thread of the game sleep for a while. If the thread is not specified explicitly, the server thread will sleep.
+
+##### `/logmovement sub <target>`
+
+Subscribe some entities to see how they are pushed by pistons, shulker boxes and shulkers.
+
+##### `/logmovement unsub <target>`
+
+Unsubscribe the entities.
+
+##### `/logpacket sub|unsub <type>`
+
+Start|stop listening to packets between the server and the client(s). For some reason, the results are only printed in the log.
 
 ##### `/messcfg` 
 
@@ -81,11 +160,15 @@ Get the current value of `<option>` and related helping information about it.
 
 ##### `/messcfg <option> <value>` 
 
-Set the value of `<option>` to `<value>`. See the next section of the document.
+Set the save-specific value of `<option>` to `<value>`. See the next section of the document.
 
 ##### `/messcfg reloadConfig` 
 
-Update options from `mcwmem.prop`. 
+Read options from `mcwmem.prop`. 
+
+##### `/messcfg setGlobal <option> <value>`
+
+Set the global value (used as the default value of options for new saves) and the save-specific value of `<option>` to `<value>`.
 
 ##### `/modify <targets> <key> <val>` 
 
@@ -143,6 +226,10 @@ Example:
 
 Repeat executing a command for given times, the argument can be used to indicate if the feedback of the command is output.
 
+##### `/ride <passengers> <vehicle> <force>`
+
+Make `<passengers>` ride `<vehicle>`。
+
 ##### `/rng world setSeed <seed>` 
 
 Get the current seed of the RNG of the dimension. 
@@ -179,13 +266,49 @@ Remove the block entity at <pos>.In the current version of the mod, if a block n
 
 The following options could be set with the command `/messcfg`, and the format of the command is `/messcfg <option> <value>`. For example, to enable the entity boundary box renderer, the command `/messcfg serverSyncedBox true` could be used.
 
+##### `accessingPathInitStrategy`
+
+There are there initializing strategies available: 
+
+- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances, will be used to access all subsequent inputs.
+- Standard strategy: Accessing paths are parsed for every different inputs, and the parsed copies are cached until the inputs are discarded by the garbage collector.
+- Strict Strategy: Accessing paths are reinitialized each time they are used.
+
+Possible values: LEGACY|STANDARD|STRICT
+
+Default value: STANDARD
+
+##### `antiHostCheating`
+
+Enable anti-cheating for host player in SP & LAN game.
+
+Possible values: true or false
+
+Default value: false
+
+##### `attackableTnt`
+
+TNTs could be killed by attacking.
+
+Possible values: true or false
+
+Default value: false
+
 ##### `blockInfoRendererUpdateInFrozenTicks`
 
-<font color=#FF0000>**[TODO]**</font>What the block information renderers will do in ticks frozen by the Carpet. Hope it works.
+What the block information renderers will do in ticks frozen by the Carpet. Hope it works.
 
 Possible values: NORMALLY|PAUSE|NO_REMOVAL
 
 Default value: NORMALLY
+
+##### `blockPlacementHistory`
+
+Record what the players has placed recently so that you may undo or redo these operations later.
+
+Possible values: true or false
+
+Default value: false
 
 ##### `blockShapeToBeRendered` 
 
@@ -203,6 +326,14 @@ Possible values: true or false
 
 Default value: false
 
+##### `craftingTableBUD`
+
+Detect the block updates around crafting tables.
+
+Possible values: true or false
+
+Default value: false
+
 ##### `creativeUpwardsSpeed` 
 
 Set the speed at which the player is flying upwards in the creative mode.
@@ -214,6 +345,14 @@ Default value: 0.05
 ##### `debugStickSkipsInvaildState` 
 
 Prevent debug sticks change blocks to an invalid state. By now, the option *doesn't work* in some cases, like changing the shape property of a rail can still turn the rail into an illegal state and get broken. 
+
+Possible values: true or false
+
+Default value: false
+
+##### `disableChunkLoadingCheckInCommands`
+
+Just as its name says.
 
 Possible values: true or false
 
@@ -283,13 +422,45 @@ Possible values: true or false
 
 Default value: false
 
+##### `getEntityRangeExpansion`
+
+<font color=#FF0000>**[TODO]**</font>In the vanilla `getEntities()` method, only entities which are in subchunks whose Cheshev distance to the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especially when the entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.
+
+##### `hideSuvivalSaves`
+
+Hide worlds that is likely to be suvivial saves to prevent it to be opened accidently.
+
+Possible values: true or false
+
+Default value: false
+
+##### `hotbarLength`
+
+物品栏可包含的物品堆叠数量。目前该功能并未完全完成，如原版物品栏材质和物品栏的保存等特性暂不可用。
+
+Possible values: 1~36
+
+Default value: 9
+
 ##### `hudAlignMode` 
 
-Move the HUDs to the given location. 
+Move the HUDs to a given location. 
 
 Possible values: BOTTOM_LEFT|BOTTOM_RIGHT|TOP_LEFT|TOP_RIGHT
 
 Default value: TOP_RIGHT
+
+##### `hudStyles`
+
+The style of the HUDs, containing zero or more flags below: 
+
+- B: Render a gray background
+- L: Align the headers on the left and the data on the right
+- R: Change the color of headers to red
+
+Possible values: Any string
+
+Default value: (BL)^2/(mR)
 
 ##### `hudTextSize` 
 
@@ -298,6 +469,22 @@ Set the size of the text in the HUDs.
 Possible values: Any real number between 0 and 10.
 
 Default value: 1
+
+##### `interactableB36`
+
+Allow players to break block-36s and place things against it.
+
+Possible values: true or false
+
+Default value: false
+
+##### `language`
+
+The main language of the Mod.
+
+Possible values: `zh_cn|en_us|zh_cn_FORCELOAD|en_us_FORCELOAD|-FOLLOW_SYSTEM_SETTINGS-`
+
+Default value: `-FOLLOW_SYSTEM_SETTINGS-`
 
 ##### `maxClientTicksPerFrame` 
 
@@ -339,6 +526,14 @@ Possible values: true or false
 
 Default value: false
 
+##### `projectileRandomnessScale`
+
+The amount of the randomness of projectiles.
+
+Possible values: Any real number.
+
+Default value: 1.0
+
 ##### `projectileChunkLoadingRange` 
 
 Set the radius of entity processing chunks created by `projectileChunkLoading`.
@@ -349,11 +544,19 @@ Default value: 3
 
 ##### `railNoAutoConnection`
 
-<font color=#FF0000>**[TODO]**</font>Prevent the shape of rails from being changed by surrounding blocks.
+Prevent the shape of rails from being changed by surrounding blocks.
 
 Possible values: true or false
 
 Default value: false
+
+##### `rejectChunkTicket`
+
+Prevent the chunks from being loaded in some ways.
+
+Possible values: `[]`(empty list) or a list in the form of a,b,c, containing some IDs of chunk tickets.
+
+Default value: `[]`
 
 ##### `renderBlockShape` 
 
@@ -382,6 +585,46 @@ Default value: false
 ##### `serverSyncedBox` 
 
 Enable or disable the server-side hitbox renderer. 
+
+Possible values: true or false
+
+Default value: false
+
+##### `serverSyncedBoxRenderRange`
+
+Enable or disable the server-side hitbox renderer.
+
+Possible values: Any real number.
+
+Default value: -1
+
+##### `skipUnloadedChunkInRaycasting`
+
+Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long distance raycasts.
+
+Possible values: true or false
+
+Default value: false
+
+##### `skippedGenerationStages`
+
+Skip some stages in the world generation. Skipping stage `biomes` and stage `full` is not supported, as the absence of them makes the server crash.
+
+Possible values: `[]`(empty list) or a list in the form of a,b,c, containing some IDs of chunk statuses and `...` (three dots).
+
+Default value: `[]`
+
+##### `stableHudLocation`
+
+Make the location of huds more stable when the length of lines change frequently.
+
+Possible values: true or false
+
+Default value: false
+
+##### `strictAccessingPathParsing`
+
+<font color=#FF0000>**[TODO]**</font>Treat accessing paths strictly, to make them more relyable. Disable it may make accessing processes more likely to fail in varible environments.
 
 Possible values: true or false
 
@@ -419,6 +662,14 @@ Possible values: Any integer.
 
 Default value: 3
 
+##### `vanillaDebugRenderers`
+
+Enable some vanilla debugging renderers
+
+Possible values: `[]`(empty list) or a list in the form of a,b,c, containing some names of debug renderers.
+
+Default value: `[]`
+
 ### Key Binds
 
 **F3 + E**: Toggle the HUD that displays the information of the entity which the player is looking at. 
@@ -426,6 +677,10 @@ Default value: 3
 **F3 + M** : Toggle the HUD that displays the information of the local player. 
 
 **F3 + S**: Toggle the HUD that displays the information of the server-side player. 
+
+**Ctrl + Z**: Undo block placement or breaking. (Requires `blockPlacementHistory`)
+
+**Ctrl+ Y**: Redo block placement or breaking. (Requires `blockPlacementHistory`)
 
 ### Renderers
 
@@ -535,9 +790,23 @@ Default value: 3
 
 **`Dead`**: The entity's health is zero or lower, meaning the entity is dead. 
 
-#### Listened Fields
+### Accessing Paths
 
-<font color=#FF0000>**[WIP]**</font>
+See the wiki.
+
+### Options In Entity Selectors
+
+##### `id`
+
+Possible values: An integer or a range, just like the `level` option in the vanilla entity selector.
+
+Select entities with given numberic ID (field `entityId`, `networkId`).
+
+##### `side`
+
+Possible values: `client` or `server`
+
+Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects (in other words, commands that only reads stuff but doesn't writes).
 
 ### Other Features
 
@@ -549,6 +818,6 @@ Default value: 3
 
 - The mod is still in development, some feature is not available or buggy, please tell me if you find something wrong. 
 
-- Dedicated servers are not supported currently, so only use the mod in single-player mode or a LAN server. 
+- Dedicated servers are not supported well currently and there are many unsolved bugs related to the connection between the server and the client, so only use the mod in single-player mode or the host client of a LAN server. 
 
 - Some commands like /explode ~ ~ ~ 2147483647 true can freeze the server, be careful.

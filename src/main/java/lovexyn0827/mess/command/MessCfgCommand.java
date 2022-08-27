@@ -40,7 +40,7 @@ public class MessCfgCommand {
 						ClickEvent event = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/messcfg " + n);
 						MutableText text = new LiteralText(n + ": " + v)
 								.fillStyle(Style.EMPTY.withClickEvent(event)
-										.withHoverEvent((new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(getDescription(n))))))
+										.withHoverEvent((new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(OptionManager.getDescription(n))))))
 								.formatted(Formatting.GRAY);
 						boolean modified = !v.equals(f.getAnnotation(Option.class).defaultValue());
 						s.sendFeedback(modified ? text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText()) : text, false);
@@ -62,6 +62,10 @@ public class MessCfgCommand {
 		OptionManager.OPTIONS.forEach((f) -> {
 			try {
 				Option o = f.getAnnotation(Option.class);
+				if(!OptionManager.isSupportedInCurrentEnv(o)) {
+					return;
+				}
+				
 				@SuppressWarnings("deprecation")
 				OptionParser<?> parser = o.parserClass().newInstance();
 				SuggestionProvider<ServerCommandSource> sp = parser.createSuggestions();
@@ -76,7 +80,7 @@ public class MessCfgCommand {
 								text.append(new FormattedText("cmd.messcfg.exp", "rcl").asMutableText());
 							}
 							
-							text.append(new LiteralText("\n" + getDescription(f.getName()) + "\n").formatted(Formatting.GRAY));
+							text.append(new LiteralText("\n" + OptionManager.getDescription(f.getName()) + "\n").formatted(Formatting.GRAY));
 							String value = OptionManager.getString(f);
 							text.append(new FormattedText("cmd.messcfg.current", "f", true, value).asMutableText());
 							if(!o.defaultValue().equals(value)) {
@@ -91,10 +95,19 @@ public class MessCfgCommand {
 						.then(argument("value", StringArgumentType.greedyString())
 								.suggests(sp)
 								.executes((ct) -> {
+									String value = StringArgumentType.getString(ct, "value");
+									if(o.globalOnly()) {
+										MutableText errMsg = new LiteralText(I18N.translate("cmd.messcfg.globalonly"))
+												.fillStyle(Style.EMPTY
+														.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, 
+																"/messcfg setGlobal " + f.getName() + ' ' + value)));
+										ct.getSource().sendError(errMsg);
+										return -1;
+									}
+									
 									try {
-										String value = StringArgumentType.getString(ct, "value");
 										Object obj = parser.tryParse(value);
-										OptionManager.set(f, obj);
+										OptionManager.set(f, obj, ct);
 										CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.set", f.getName(), value);
 										return Command.SINGLE_SUCCESS;
 									} catch (InvaildOptionException e) {
@@ -110,7 +123,7 @@ public class MessCfgCommand {
 											try {
 												String value = StringArgumentType.getString(ct, "value");
 												Object obj = parser.tryParse(value);
-												OptionManager.setGolbal(f, obj);
+												OptionManager.setGlobal(f, obj);
 												CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.setglobal", f.getName(), value);
 												return Command.SINGLE_SUCCESS;
 											} catch (InvaildOptionException e) {
@@ -124,9 +137,5 @@ public class MessCfgCommand {
 			}
 		});
 		dispatcher.register(command);
-	}
-	
-	private static String getDescription(String name) {
-		return I18N.translate("opt." + name + ".desc");
 	}
 }

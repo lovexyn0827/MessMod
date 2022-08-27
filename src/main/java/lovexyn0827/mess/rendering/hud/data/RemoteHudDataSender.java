@@ -101,6 +101,7 @@ public class RemoteHudDataSender implements HudDataSender {
 	public static class Sidebar extends RemoteHudDataSender implements SidebarDataSender {
 		public Sidebar(MinecraftServer server) {
 			super(server, HudType.SIDEBAR);
+			this.registerTickingEvents();
 		}
 
 		public void updateData(TickingPhase phase, @Nullable ServerWorld world) {

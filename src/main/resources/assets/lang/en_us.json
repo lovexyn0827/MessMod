@@ -39,6 +39,10 @@
 		"cmd.fixedentityhud.add" : "Added a new line to the sidebar.", 
 		"cmd.fixedentityhud.remove" : "Removed the line named %s from the sidebar.", 
 		
+		//***** freezentity *****
+		"cmd.freezentity.sub" : "Found %d entities, and frozen %d entities among them", 
+		"cmd.freezentity.unsub" : "Found %d entities, and resumed %d entities among them", 
+		
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "Epected 1 targets, but %d targets were found.", 
 		
@@ -57,6 +61,7 @@
 		"cmd.messcfg.default" : "\nDefault Value: %s", 
 		"cmd.messcfg.set" : "Option %s is now set to %s", 
 		"cmd.messcfg.setglobal" : "Option %s is now set to %s globally", 
+		"cmd.messcfg.globalonly" : "Option %s isn't supported in save-local storage, please click here to set it globally.", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -114,12 +119,13 @@
 		
 		//***** Options *****
 		"opt.accessingPathInitStrategy.desc" : "There are there initializing strategies available: n- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances, will be used to access all subsequent inputs.n- Standard strategy: Accessing paths are parsed for every different inputs, and the parsed copies are cached until the inputs are discarded by the garbage collector.n- Strict Strategy: Accessing paths are reinitialized each time they are used.", 
-		"opt.antiHostCheating.desc" : "Enable anti-cheating for host player in SP & LAN game", 
+		"opt.antiHostCheating.desc" : "Enable anti-cheating for host player in SP & LAN game.", 
 		"opt.attackableTnt.desc" : "TNTs could be killed by attacking.", 
 		"opt.blockInfoRendererUpdateInFrozenTicks.desc" : "What will the block information renderers do in ticks frozen by the Carpet.", 
+		"opt.blockPlacementHistory.desc" : "Record what the players has placed recently so that you may undo or redo these operations later.", 
 		"opt.blockShapeToBeRendered.desc" : "Specify the type of block shape rendered when `renderBlockShape` is enabled. The COLLIDER shape is the  shape used to do calculations about collisions, while the OUTLINE shape is the shape used to determine which block the player is looking at.", 
 		"opt.commandExecutionRequirment.desc" : "Whether or not execution of commands defined by this mod require OP permission.", 
-		"opt.craftingTableBUD.desc" : "Detect the block updates of crafting tables.", 
+		"opt.craftingTableBUD.desc" : "Detect the block updates around crafting tables.", 
 		"opt.creativeUpwardsSpeed.desc" : "Set the speed which the player is flying upwards at in the creative mode.", 
 		"opt.debugStickSkipsInvaildState.desc" : "Prevent debug sticks change blocks to a invalid state. By now, the option doesn't work in some cases, like changing the `shape` property of a rail can still turn the rail in to an illegal state and get broken. ", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "As described by its name.", 
@@ -131,17 +137,21 @@
 		"opt.entityExplosionRaysVisiblity.desc" : "Explosion ray (used to calculate the exposure of entities) renderer.", 
 		"opt.entityExplosionRaysLifetime.desc" : "The number of ticks the rendered rays remains. ", 
 		"opt.entityLogAutoArchiving.desc" : "Archive the entity log produced within a single session automatically.", 
-		"opt.getEntityRangeExpansion.desc" : "In the vanilla getEntities() method, only entities which are in subchunks whose Cheshev distanceto the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especally whenthe entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.", 
-		"opt.hudAlignMode.desc" : "Move the HUDs to the given location.  ", 
+		"opt.getEntityRangeExpansion.desc" : "In the vanilla getEntities() method, only entities which are in subchunks whose Cheshev distance to the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especially when the entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.", 
+		"opt.hideSuvivalSaves.desc" : "Hide worlds that is likely to be suvivial saves to prevent it to be opened accidently.", 
+		"opt.hotbarLength.desc" : "The number of item stacks the hotbar can contain. Note that this feature is not finished currently, some features like saving hotbars and vanilla hotbat texture is not aviilable.", 
+		"opt.hudAlignMode.desc" : "Move the HUDs to a given location.", 
 		"opt.hudStyles.desc" : "The style of the HUDs, containing zero or more flags below: \n - B: Render a gray background\n - L: Align the headers on the left and the data on the right\n - R: Change the color of headers to red", 
 		"opt.hudTextSize.desc" : "Set the size of the text in the HUDs.", 
-		"opt.language.desc" : "The main language of the Mod", 
+		"opt.interactableB36.desc" : "Allow players to break block-36s and place things against it.", 
+		"opt.language.desc" : "The main language of the Mod.", 
 		"opt.maxClientTicksPerFrame.desc" : "Set the maximum number of ticks can be processed within a single frame when the FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot toggle the flying state when the FPS is too low. ", 
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleporting with endEyeTeleport.", 
 		"opt.mobFastKill.desc" : "/kill kill mobs by removes them directly instead of damaging them.", 
 		"opt.projectileChunkLoading.desc" : "Allow projectiles to load chunks in their processing, maybe helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.", 
 		"opt.projectileChunkLoadingRange.desc" : "Set the radius of entity processing chunks created by projectileChunkLoading.", 
 		"opt.projectileChunkLoadingPermanence.desc" : "Projectiles load the chunks they are in permanently when projectileChunkLoading is enabled.", 
+		"opt.projectileRandomnessScale.desc" : "The amount of the randomness of projectiles.", 
 		"opt.railNoAutoConnection.desc" : "Prevent the shape of rails from being changed by sorrounding rails.", 
 		"opt.rejectChunkTicket.desc" : "Prevent the chunks from being loaded in some ways.", 
 		"opt.renderBlockShape.desc" : "Enable or disable block boundary box renderer.", 
@@ -157,6 +167,19 @@
 		"opt.tntChunkLoading.desc" : "Allow or disallow TNT entities to load chunks in their processing, maybe helpful in making some kind of TNT canons. Note that if an TNT entity flies at a extremely high speed when the option is set to true.", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT entities load the chunks they are in permanently when tntChunkLoading is enabled.", 
 		"opt.tntChunkLoadingRange.desc" : "Set the radius of entity processing chunks created by tntChunkLoading.", 
-		"opt.vanillaDebugRenderers.desc" : "Enable some vanilla debugging renderers"
+		"opt.vanillaDebugRenderers.desc" : "Enable some vanilla debugging renderers",
+		
+		//***** Errors in options
+		"opt.err.rpositive" : "Requires a positive number", 
+		"opt.err.rnonnegative" : "Requires a non-negative number", 
+		"opt.err.rnum" : "The given value is not a number", 
+		"opt.err.rhotbar" : "Requires a number between 1 and 36", 
+		
+		//***** Misc *****
+		"misc.negativeid" : "The value of id cannot be negative", 
+		"misc.idopt.desc" : "A numberic ID of entities", 
+		"misc.side.desc" : "Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects.", 
+		"misc.cancelhotbarstorage" : "Hotbars can only be loaded/saved when the value of option hotbarLength is 9.", 
+		"misc.protver.err" : "The protcol version of the MessMod installed on the server is different from the one on your client,it is recommended to install MessMod with the same version as the server."
 	}
 }

@@ -17,6 +17,10 @@ import net.minecraft.server.command.ServerCommandSource;
 public class LogMovementCommand {
 	public static final Set<Entity> SUBSCRIBED_ENTITIES = Sets.newHashSet();
 	
+	public static void reset() {
+		SUBSCRIBED_ENTITIES.clear();
+	}
+	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("logmovement").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("sub")

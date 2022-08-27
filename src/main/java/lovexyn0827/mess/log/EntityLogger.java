@@ -29,7 +29,9 @@ import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.util.CarpetUtil;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
+import lovexyn0827.mess.util.WrappedPath;
 import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -38,7 +40,7 @@ import net.minecraft.server.MinecraftServer;
 // TODO Support for EnderDragonPart, whose EntityType is not specified
 public final class EntityLogger {
 	Int2ObjectMap<EntityHolder> entities = new Int2ObjectOpenHashMap<>();
-	private Map<String, ListenedField> customFields = new HashMap<>();
+	private Map<String, EntityLogColumn> customFields = new HashMap<>();
 	private Path logPath;
 	private final Set<EntityType<?>> autoSubTypes = Sets.newHashSet();
 	private long lastSessionStart;
@@ -82,23 +84,29 @@ public final class EntityLogger {
 		this.entities.clear();
 	}
 
-	public void listenToField(String field, EntityType<?> type, String name, AccessingPath path) {
+	public void listenToField(String field, EntityType<?> type, String name, AccessingPath path, TickingPhase phase) {
 		Int2ObjectMap<EntityHolder> temp = new Int2ObjectOpenHashMap<>(this.entities);
 		this.closeAll();
 		if(this.customFields.containsKey(name)) {
 			throw new TranslatableException("exp.dupname");
 		}
 		
-		Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), field);
-		if(f != null) {
-			ListenedField lf = new ListenedField(f, path, name);
-			if(!this.customFields.containsValue(lf)) {
-				this.customFields.put(lf.getCustomName(), lf);
-			} else {
-				throw new TranslatableException("exp.dupfield");
-			}
+		EntityLogColumn column;
+		if ("-THIS-".equals(field)) {
+			column = new WrappedPath.Phased(path, name, phase);
 		} else {
-			throw new TranslatableException("exp.nofield", field, type.getName().getString());
+			Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), field);
+			if(f != null) {
+				column = new ListenedField.Phased(f, path, name, phase);
+			} else {
+				throw new TranslatableException("exp.nofield", field, type.getName().getString());
+			}
+		}
+		
+		if(!this.customFields.containsValue(column)) {
+			this.customFields.put(column.getName(), column);
+		} else {
+			throw new TranslatableException("exp.dupfield");
 		}
 		
 		temp.values().forEach((h) -> this.entities.put(h.getId(), new EntityHolder(h.entity, this)));
@@ -118,6 +126,7 @@ public final class EntityLogger {
 	 * @return The number of newly subscribed entities
 	 */
 	public int subscribe(Collection<? extends Entity> entities) {
+		this.hasCreatedAnyLog = true;
 		MutableInt i = new MutableInt();
 		entities.stream()
 				.forEach((e) -> {
@@ -149,6 +158,8 @@ public final class EntityLogger {
 	public void initialize(MinecraftServer server) throws IOException {
 		this.lastSessionStart = System.currentTimeMillis();
 		this.logPath = server.getSavePath(WorldSavePathMixin.create("entitylog")).toAbsolutePath();
+		this.entities.clear();
+		this.customFields.clear();
 		if(!Files.exists(this.logPath)) {
 			Files.createDirectory(this.logPath);
 		}
@@ -204,7 +215,7 @@ public final class EntityLogger {
 		return ImmutableSet.copyOf(this.autoSubTypes);
 	}
 
-	public Map<String, ListenedField> getListenedFields() {
+	public Map<String, EntityLogColumn> getListenedFields() {
 		return this.customFields;
 	}
 

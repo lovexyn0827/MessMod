@@ -79,7 +79,7 @@ public class FormattedText {
 		return mt;
 	}
 	
-	// XXX Copied from Formatting.byCode()
+	// Copied from Formatting.byCode()
 	private static Formatting byCode(char code) {
 		char c = Character.toString(code).toLowerCase(Locale.ROOT).charAt(0);
 		Formatting[] var2 = Formatting.values();
