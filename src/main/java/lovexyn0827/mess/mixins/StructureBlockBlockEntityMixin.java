@@ -6,7 +6,10 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
 
-@Mixin(StructureBlockBlockEntity.class)
+/**
+ * Loaded only when the Carpet mod is not loaded or the version is 1.4.24 or below.
+ */
+@Mixin(value = StructureBlockBlockEntity.class, priority = 1001)
 public abstract class StructureBlockBlockEntityMixin extends BlockEntity {
 	public StructureBlockBlockEntityMixin(BlockEntityType<?> type) {
 		super(type);
