@@ -116,12 +116,18 @@ public class CommandUtil {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(I18N.translate(string) + ": " + I18N.translate(e.getMessage()))
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
+		if(OptionManager.superSuperSecretSetting) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, @NotNull Exception e) {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(str == null ? "[null]" : str)
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
+		if(OptionManager.superSuperSecretSetting) {
+			e.printStackTrace();
+		}
 	}
 
 	public static ServerCommandSource noreplySource() {
