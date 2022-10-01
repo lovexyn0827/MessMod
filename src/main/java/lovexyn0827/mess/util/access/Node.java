@@ -23,6 +23,8 @@ import lovexyn0827.mess.util.Reflection;
  *  - identityHash: The identity hash code of an object, which is usually the 
  *  	same as the one returned by the default {@code hashcode()} method.
  *  
+ *  - size: The size of a list, map, array, etc.
+ *  
  * @author lovexyn0827
  * Date: April 22, 2022
  */
@@ -35,6 +37,7 @@ abstract class Node {
 	private boolean initialized;
 	/** Shouldn't be modified twice */
 	int ordinary;
+	protected Type inputType;
 	
 	boolean canFollow(Node n) {
 		return n.outputType != null && !Reflection.isPrimitive(n.outputType);
@@ -57,6 +60,7 @@ abstract class Node {
 	final void initialize(Type lastOutClass) throws AccessingFailureException {
 		this.prepare(lastOutClass);
 		this.initialized = true;
+		this.inputType = lastOutClass;
 	}
 	
 	void uninitialize() {
@@ -73,5 +77,13 @@ abstract class Node {
 	/** Nodes obtained this way must maintain its original position in the path */
 	Node createCopyForInput(Object input) {
 		return this;
+	}
+
+	boolean isWrittable() {
+		return false;
+	}
+	
+	void write(Object writeTo, Object newValue) throws AccessingFailureException {
+		throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
 	}
 }

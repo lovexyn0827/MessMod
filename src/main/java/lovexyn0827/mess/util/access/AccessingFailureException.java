@@ -2,6 +2,9 @@ package lovexyn0827.mess.util.access;
 
 import lovexyn0827.mess.util.i18n.I18N;
 
+/**
+ * FIXME: Being the direct cause of the mess in this package.
+ */
 public class AccessingFailureException extends Exception {
 	private static final long serialVersionUID = -4184399838031396060L;
 	private final String shortenedMsg;
@@ -25,8 +28,8 @@ public class AccessingFailureException extends Exception {
 	}
 	
 	public AccessingFailureException(Cause cause, Object ... args) {
-		super();
-		this.shortenedMsg = null;
+		super(I18N.translate(cause.translationKey, args));
+		this.shortenedMsg = cause.name();
 		this.cause = cause;
 		this.args = args;
 	}
@@ -56,7 +59,9 @@ public class AccessingFailureException extends Exception {
 		BAD_ARG("exp.badarg"), 
 		MULTI_TARGET("exp.multitarget"), 
 		INV_STATIC("exp.staticl.format"), 
-		ERROR("exp.unexc");
+		ERROR("exp.unexc"), 
+		NO_FIELD_BAD_LITERAL("exp.nofieldbadliteral"), 
+		NOT_WRITTABLE("exp.nowrite");
 		
 		final String translationKey;
 		

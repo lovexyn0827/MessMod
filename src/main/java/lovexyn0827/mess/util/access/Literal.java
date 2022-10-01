@@ -16,7 +16,7 @@ import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 import net.minecraft.util.math.BlockPos;
 
-abstract class Literal<T> {
+public abstract class Literal<T> {
 	@NotNull
 	protected final String stringRepresentation;
 	/**
@@ -61,9 +61,9 @@ abstract class Literal<T> {
 	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
 	 */
 	@Nullable
-	abstract T get(Type type) throws AccessingFailureException;
+	public abstract T get(Type type) throws AccessingFailureException;
 	
-	static Literal<?> parse(String strRep) throws CommandSyntaxException {
+	public static Literal<?> parse(String strRep) throws CommandSyntaxException {
 		switch(strRep.charAt(0)) {
 		case '\"' : 
 			return new StringL(new StringReader(strRep.substring(1)).readStringUntil('"'));
@@ -75,6 +75,10 @@ abstract class Literal<T> {
 			if(strRep.charAt(1) == '+') {
 				return new StaticFieldL(strRep.substring(2));
 			}
+		case 'C' : 
+			if(strRep.charAt(1) == '+') {
+				return new ClassL(strRep.substring(2));
+			}
 		case '[' : 
 			return new BlockPosL(strRep);
 		case '(' : 
@@ -82,7 +86,7 @@ abstract class Literal<T> {
 		default : 
 			if("null".equals(strRep)) {
 				return new NullL();
-			} else if (strRep.matches("[0-9]*(?:\\.[0-9]*)?")) {
+			} else if (strRep.matches("(\\+|-)?[0-9]*(?:\\.[0-9]*)?(D|F|L|I)?")) {
 				switch(strRep.charAt(strRep.length() - 1)) {
 				case 'D' : 
 					return new DoubleL(strRep);
@@ -111,7 +115,7 @@ abstract class Literal<T> {
 				
 				return new Literal<Boolean>(strRep) {
 					@Override
-					Boolean get(Type type) throws AccessingFailureException {
+					public Boolean get(Type type) throws AccessingFailureException {
 						return bool;
 					}
 				};
@@ -132,7 +136,7 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		String get(Type clazz) {
+		public String get(Type clazz) {
 			return this.stringRepresentation;
 		}
 	}
@@ -146,7 +150,7 @@ abstract class Literal<T> {
 
 		@Override
 		@NotNull
-		Object get(Type clazz) throws AccessingFailureException {
+		public Object get(Type clazz) throws AccessingFailureException {
 			if(this.compiled && this.fieldVal != null) {
 				return this.fieldVal;
 			}
@@ -164,7 +168,7 @@ abstract class Literal<T> {
 						return f.get(null);
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						e.printStackTrace();
-						throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e);
+						throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e, e);
 					}
 				} else {
 					String[] clAndF = this.stringRepresentation.split("#");
@@ -212,7 +216,7 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		Enum<?> get(Type clazz) throws AccessingFailureException {
+		public Enum<?> get(Type clazz) throws AccessingFailureException {
 			if(this.compiled && this.enumConstant != null) {
 				return this.enumConstant;
 			}
@@ -260,7 +264,7 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		Integer get(Type clazz) {
+		public Integer get(Type clazz) {
 			return this.integer;
 		}
 	}
@@ -283,7 +287,7 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		BlockPos get(Type clazz) {
+		public BlockPos get(Type clazz) {
 			return this.pos;
 		}
 	}
@@ -296,7 +300,7 @@ abstract class Literal<T> {
 
 		@Override
 		@Nullable
-		Void get(Type clazz) {
+		public Void get(Type clazz) {
 			return null;
 		}
 		
@@ -316,7 +320,7 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		Double get(Type clazz) {
+		public Double get(Type clazz) {
 			return this.number;
 		}
 	}
@@ -335,7 +339,7 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		Float get(Type clazz) {
+		public Float get(Type clazz) {
 			return this.number;
 		}
 	}
@@ -354,8 +358,26 @@ abstract class Literal<T> {
 		}
 
 		@Override
-		Long get(Type clazz) {
+		public Long get(Type clazz) {
 			return this.number;
 		}
+	}
+	
+
+	public static class ClassL extends Literal<Class<?>> {
+		protected ClassL(String strRep) {
+			super(strRep);
+		}
+
+		@Override
+		public Class<?> get(Type type) throws AccessingFailureException {
+			String className = this.stringRepresentation.replace('/', '.');
+			try {
+				return Class.forName(className);
+			} catch (ClassNotFoundException e) {
+				throw new AccessingFailureException(AccessingFailureException.Cause.NO_CLASS, className);
+			}
+		}
+
 	}
 }

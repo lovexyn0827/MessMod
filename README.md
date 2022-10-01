@@ -11,7 +11,7 @@ Just like what the name says, the Mod contains functions in many fields, therefo
 
 In other languages:
 
-[简体中文](https://github.com/lovexyn0827/MessMod/blob/master/README_zh_cn.md)
+[��������](https://github.com/lovexyn0827/MessMod/blob/master/README_zh_cn.md)
 
 ### Requirements
 
@@ -112,7 +112,7 @@ Remove a line from the entity information sidebar.
 
 ##### `/explode <pos> <power> [<fire>`] 
 
-Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single-precise floating-point number, including Infinities and even `NaN`.
+Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single preciseness floating-point number, including Infinities and even `NaN`.
 
 ##### `/freezentity freeze|resume <entities>`
 
@@ -228,7 +228,7 @@ Repeat executing a command for given times, the argument can be used to indicate
 
 ##### `/ride <passengers> <vehicle> <force>`
 
-Make `<passengers>` ride `<vehicle>`。
+Make `<passengers>` ride `<vehicle>`
 
 ##### `/rng world setSeed <seed>` 
 
@@ -436,7 +436,7 @@ Default value: false
 
 ##### `hotbarLength`
 
-物品栏可包含的物品堆叠数量。目前该功能并未完全完成，如原版物品栏材质和物品栏的保存等特性暂不可用。
+The number of item stacks the hotbar can contain. Note that this feature is not finished currently, some features like saving hotbars and vanilla hotbat texture is not aviilable.
 
 Possible values: 1~36
 

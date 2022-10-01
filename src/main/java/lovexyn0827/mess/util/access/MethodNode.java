@@ -66,7 +66,7 @@ class MethodNode extends Node implements Cloneable {
 			Literal<?>[] argsL = this.args;
 			Object[] argObjs = new Object[argsL.length];
 			for(int i = 0; i < argsL.length; i++) {
-				argObjs[i] = argsL[i].get(previous.getClass());	// XXX Generic type
+				argObjs[i] = argsL[i].get(this.inputType);	// XXX Generic type
 			}
 
 			try {

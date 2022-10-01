@@ -67,6 +67,9 @@
 		"cmd.modify.usags" : "TODO", 
 		"cmd.modify.result" : "找到了%d个实体，其中有%d个实体的属性被修改", 
 		
+		//***** partlykill *****
+		"cmd.partlykill.result" : "找到了%d个实体，并实际杀死了其中%d", 
+		
 		//***** poi *****
 		"cmd.poi.usage" : "TODO", 
 		"cmd.poi.modify" : "修改了(%d, %d, %d)处的POI", 
@@ -111,6 +114,7 @@
 		"exp.badarg" : "参数%s对%s不合法", 
 		"exp.reqnum" : "需要数字， 但是出现了%s", 
 		"exp.invliteral" : "不支持的字面值：%s", 
+		"exp.nowrite" : "不支持写入", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 

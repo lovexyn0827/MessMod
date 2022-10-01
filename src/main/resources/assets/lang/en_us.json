@@ -20,8 +20,6 @@
 		"cmd.entityfield.unexpected" : "Unexpected exception in getting the field", 
 		"cmd.entityfield.modify.success" : "Field was modified successfully", 
 		"cmd.entityfield.modify.failure" : "Failed to modify the field", 
-		"cmd.entityfield.modify.vectorsyntax" : "Too many or too few components given! Example: 15.05,67,-211.125", 
-		"cmd.entityfield.modify.unsupported" : "Unsupported field given", 
 		
 		//***** entitylog *****
 		"cmd.entitylog.usage" : "TODO", 
@@ -67,6 +65,9 @@
 		"cmd.modify.usags" : "TODO", 
 		"cmd.modify.result" : "Found %d entities, and %d entities among them was affected.", 
 		
+		//***** partlykill *****
+		"cmd.partlykill.result" : "Found %d entities, and %d of them are actually killed.", 
+		
 		//***** poi *****
 		"cmd.poi.usage" : "TODO", 
 		"cmd.poi.modify" : "Modified POI at (%d, %d, %d)", 
@@ -111,6 +112,7 @@
 		"exp.badarg" : "Argument %s is illegal for %s", 
 		"exp.reqnum" : "Requires a number, but found %s", 
 		"exp.invliteral" : "Unrecognized literal: %s", 
+		"exp.nowrite" : "Writting is not available.", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

@@ -1,6 +1,7 @@
 package lovexyn0827.mess.util.access;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -26,7 +27,7 @@ class FieldNode extends Node {
 					this.fieldName, previous.getClass().getSimpleName());
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, this);
+			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, this, e);
 		}
 	}
 	
@@ -93,5 +94,24 @@ class FieldNode extends Node {
 		FieldNode node = new FieldNode(this.fieldName);
 		node.ordinary = this.ordinary;
 		return node;
+	}
+	
+	@Override
+	boolean isWrittable() {
+		return (this.field != null) && !Modifier.isFinal(this.field.getModifiers());
+	}
+	
+	@Override
+	void write(Object writeTo, Object newValue) throws AccessingFailureException {
+		try {
+			this.field.set(writeTo, newValue);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD_BAD_LITERAL, this, e, 
+					this.fieldName, writeTo.getClass().getSimpleName());
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, this, e);
+		}
 	}
 }

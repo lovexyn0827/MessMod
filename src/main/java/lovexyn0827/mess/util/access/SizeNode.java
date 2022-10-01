@@ -25,7 +25,7 @@ public class SizeNode extends Node {
 			Map<?, ?> m = (Map<?, ?>) previous;
 			return m.size();
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
+			throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this, this);
 		}
 	}
 

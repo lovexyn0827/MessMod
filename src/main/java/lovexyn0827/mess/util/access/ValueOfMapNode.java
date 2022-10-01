@@ -4,12 +4,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import com.ibm.icu.impl.locale.XCldrStub.ImmutableMap;
+
 import lovexyn0827.mess.util.Reflection;
 
 class ValueOfMapNode extends Node {
 
 	private Literal<?> keyLiteral;
 	private Object key;
+	private Type keyType;
 	
 	ValueOfMapNode(Literal<?> key) {
 		this.keyLiteral = key;
@@ -73,6 +76,7 @@ class ValueOfMapNode extends Node {
 				Type keyType = pt.getActualTypeArguments()[0];
 				this.key = this.keyLiteral.get(keyType);
 				Type valType = void.class;
+				this.keyType = keyType;
 				this.outputType = valType;
 				return valType;
 			} else if(isPrimitive2ObjectMap(lastCl, pt.getActualTypeArguments().length)){
@@ -80,17 +84,20 @@ class ValueOfMapNode extends Node {
 				this.key = this.keyLiteral.get(keyType);
 				Type valType = pt.getActualTypeArguments()[0];
 				this.outputType = valType;
+				this.keyType = keyType;
 				return valType;
 			} else {
 				Type keyType = pt.getActualTypeArguments()[0];
 				this.key = this.keyLiteral.get(keyType);
 				Type valType = ((ParameterizedType) lastOutType).getActualTypeArguments()[1];
 				this.outputType = valType;
+				this.keyType = keyType;
 				return valType;
 			}
 		} else {
 			this.key = this.keyLiteral.get(Object.class);
 			this.outputType = Object.class;
+			this.keyType = Object.class;
 			return Object.class;
 		}
 	}
@@ -119,5 +126,38 @@ class ValueOfMapNode extends Node {
 		ValueOfMapNode node = new ValueOfMapNode(this.keyLiteral.recreate());
 		node.ordinary = this.ordinary;
 		return node;
+	}
+	
+	@Override
+	boolean isWrittable() {
+		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	void write(Object writeTo, Object newValue) throws AccessingFailureException {
+		if(ImmutableMap.class.isAssignableFrom(Reflection.getRawType(inputType))) {
+			throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
+		} else {
+			if(writeTo instanceof Map) {
+				@SuppressWarnings("rawtypes")
+				Map m = (Map) writeTo;
+				boolean keyTypeMatched = (this.keyType == void.class || this.key == null) ? true : 
+						Reflection.getRawType(this.keyType).isAssignableFrom(this.key.getClass());
+				boolean valTypeMatched = (this.outputType == void.class || newValue == null) ? true : 
+						Reflection.getRawType(this.outputType).isAssignableFrom(newValue.getClass());
+				if(keyTypeMatched && valTypeMatched) {
+					try {
+						m.put(this.key, newValue);
+					} catch (UnsupportedOperationException e) {
+						throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
+					}
+				} else {
+					throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this, this);
+				}
+			} else {
+				throw new AccessingFailureException(AccessingFailureException.Cause.NOT_MAP, this);
+			}
+		}
 	}
 }

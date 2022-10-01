@@ -5,6 +5,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import com.google.common.collect.ImmutableCollection;
+import lovexyn0827.mess.util.Reflection;
 
 public class ElementNode extends Node {
 
@@ -39,7 +42,7 @@ public class ElementNode extends Node {
 				throw new AccessingFailureException(AccessingFailureException.Cause.OUT_OF_BOUND, this);
 			}
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
+			throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this, this);
 		}
 	}
 	
@@ -100,4 +103,47 @@ public class ElementNode extends Node {
 		return node;
 	}
 
+	@Override
+	boolean isWrittable() {
+		return true;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	void write(Object writeTo, Object newValue) throws AccessingFailureException {
+		if(ImmutableCollection.class.isAssignableFrom(Reflection.getRawType(inputType))) {
+			throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
+		} else {
+			if(writeTo.getClass().isArray()) {
+				try {
+					if(this.index >= 0) {
+						Array.set(writeTo, this.index, newValue);
+					} else {
+						Array.set(writeTo, Array.getLength(writeTo) + this.index, newValue);
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					throw new AccessingFailureException(AccessingFailureException.Cause.OUT_OF_BOUND, this);
+				}
+			} else if(writeTo instanceof Collection<?>) {
+				if(writeTo instanceof List<?>) {
+					if(newValue == null
+							|| Reflection.getRawType(this.outputType).isAssignableFrom(newValue.getClass())) {
+						try {
+							((List) writeTo).add(this.index, newValue);
+						} catch (IndexOutOfBoundsException e) {
+							throw new AccessingFailureException(AccessingFailureException.Cause.OUT_OF_BOUND, this);
+						} catch (UnsupportedOperationException e) {
+							throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE, this);
+						}
+					} else {
+						throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this, this);
+					}
+				} else {
+					throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
+				}
+			} else {
+				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
+			}
+		}
+	}
 }
