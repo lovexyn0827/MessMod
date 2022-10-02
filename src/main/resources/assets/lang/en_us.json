@@ -113,6 +113,7 @@
 		"exp.reqnum" : "Requires a number, but found %s", 
 		"exp.invliteral" : "Unrecognized literal: %s", 
 		"exp.nowrite" : "Writting is not available.", 
+		"exp.invalidvec3" : "%s is not a valid representation of a Vec3d", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

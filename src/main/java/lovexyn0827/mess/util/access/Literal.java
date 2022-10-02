@@ -15,6 +15,7 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public abstract class Literal<T> {
 	@NotNull
@@ -82,6 +83,7 @@ public abstract class Literal<T> {
 		case '[' : 
 			return new BlockPosL(strRep);
 		case '(' : 
+			return new Vec3dL(strRep);
 		case '<' : 
 		default : 
 			if("null".equals(strRep)) {
@@ -275,7 +277,7 @@ public abstract class Literal<T> {
 		protected BlockPosL(String strRep) {
 			super(strRep);
 			try {
-				String[] comp = strRep.substring(1, strRep.length()).split(",");
+				String[] comp = strRep.substring(1, strRep.length() - 1).split(",");
 				int x = Integer.parseInt(comp[0]);
 				int y = Integer.parseInt(comp[1]);
 				int z = Integer.parseInt(comp[2]);
@@ -377,6 +379,30 @@ public abstract class Literal<T> {
 			} catch (ClassNotFoundException e) {
 				throw new AccessingFailureException(AccessingFailureException.Cause.NO_CLASS, className);
 			}
+		}
+
+	}
+	
+	public static class Vec3dL extends Literal<Vec3d> {
+		private final Vec3d vec3d;
+		
+		protected Vec3dL(String strRep) {
+			super(strRep);
+			try {
+				String[] comp = strRep.substring(1, strRep.length() - 1).split(",");
+				double x = Double.parseDouble(comp[0]);
+				double y = Double.parseDouble(comp[1]);
+				double z = Double.parseDouble(comp[2]);
+				this.vec3d = new Vec3d(x, y, z);
+				this.compiled = true;
+			} catch (Exception e) {
+				throw new TranslatableException("exp.invalidvec3", strRep);
+			}
+		}
+
+		@Override
+		public Vec3d get(Type type) throws AccessingFailureException {
+			return this.vec3d;
 		}
 
 	}
