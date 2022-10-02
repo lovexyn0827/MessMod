@@ -156,6 +156,7 @@
 		"opt.projectileChunkLoadingRange.desc" : "Set the radius of entity processing chunks created by projectileChunkLoading.", 
 		"opt.projectileChunkLoadingPermanence.desc" : "Projectiles load the chunks they are in permanently when projectileChunkLoading is enabled.", 
 		"opt.projectileRandomnessScale.desc" : "The amount of the randomness of projectiles.", 
+		"opt.quickMobMounting.desc" : "Placing mobs into vehicles.", 
 		"opt.railNoAutoConnection.desc" : "Prevent the shape of rails from being changed by sorrounding rails.", 
 		"opt.rejectChunkTicket.desc" : "Prevent the chunks from being loaded in some ways.", 
 		"opt.renderBlockShape.desc" : "Enable or disable block boundary box renderer.", 

@@ -31,7 +31,7 @@ public abstract class MinecartItemMixin {
 					target = "Lnet/minecraft/block/enums/RailShape;isAscending()Z", 
 					shift = At.Shift.BEFORE
 					),
-			name = "d"
+			index = 7
 	)
 	private double adjustHeight(double d, ItemUsageContext context) {
 		if(OptionManager.minecartPlacementOnNonRailBlocks) {
