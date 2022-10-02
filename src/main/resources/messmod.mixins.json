@@ -35,7 +35,8 @@
     "PistonExtensionBlockMixin", 
     "PlayerInventoryMixin_Server", 
     "ClientConnectionMixin", 
-    "NetworkStateAccessor"
+    "NetworkStateAccessor", 
+    "MinecartItemMixin"
   ],
   "client": [
     "MinecraftClientMixin",

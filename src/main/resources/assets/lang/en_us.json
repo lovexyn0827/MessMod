@@ -150,6 +150,7 @@
 		"opt.language.desc" : "The main language of the Mod.", 
 		"opt.maxClientTicksPerFrame.desc" : "Set the maximum number of ticks can be processed within a single frame when the FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot toggle the flying state when the FPS is too low. ", 
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleporting with endEyeTeleport.", 
+		"opt.minecartPlacementOnNonRailBlocks.desc" : "Allow players to place minecarts directly on the ground.", 
 		"opt.mobFastKill.desc" : "/kill kill mobs by removes them directly instead of damaging them.", 
 		"opt.projectileChunkLoading.desc" : "Allow projectiles to load chunks in their processing, maybe helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.", 
 		"opt.projectileChunkLoadingRange.desc" : "Set the radius of entity processing chunks created by projectileChunkLoading.", 

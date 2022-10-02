@@ -195,6 +195,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean minecartPlacementOnNonRailBlocks;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean mobFastKill;
 	
 	@Option(defaultValue = "false", 
