@@ -219,6 +219,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean quickMobMounting;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
 	
 	@Option(defaultValue = "[]", 

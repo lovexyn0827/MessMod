@@ -36,7 +36,8 @@
     "PlayerInventoryMixin_Server", 
     "ClientConnectionMixin", 
     "NetworkStateAccessor", 
-    "MinecartItemMixin"
+    "MinecartItemMixin", 
+    "SpawnEggItemMixin"
   ],
   "client": [
     "MinecraftClientMixin",
