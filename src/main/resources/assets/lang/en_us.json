@@ -108,7 +108,7 @@
 		"exp.dupfield" : "The field has already been listened in such a way.", 
 		"exp.dupname" : "The name has already been used", 
 		"exp.null" : "A NullPointerException was thrown, possibly because the output of the last node is null.", 
-		"exp.multitarget" : "Multiple targets are found", 
+		"exp.multitarget" : "Multiple targets were found", 
 		"exp.badarg" : "Argument %s is illegal for %s", 
 		"exp.reqnum" : "Requires a number, but found %s", 
 		"exp.invliteral" : "Unrecognized literal: %s", 

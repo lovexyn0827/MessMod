@@ -3,71 +3,54 @@ package lovexyn0827.mess.util.access;
 import lovexyn0827.mess.util.i18n.I18N;
 
 /**
- * FIXME: Being the direct cause of the mess in this package.
+ * FIXME: Being the direct failureCause of the mess in this package.
  */
 public class AccessingFailureException extends Exception {
 	private static final long serialVersionUID = -4184399838031396060L;
 	private final String shortenedMsg;
-	public final Cause cause;
-	final Object[] args;
+	public final FailureCause failureCause;
+	private final Object[] args;
+	
+	/**
+	 * Whether or not the node from which the exception arose is specified.
+	 */
+	private boolean raw;
 
-	AccessingFailureException(Cause cause, Node node, Throwable e, Object ... args) {
-		super(I18N.translate(cause.translationKey, args) 
-				+ '(' + "Node#" + node.ordinary + ',' + node.toString() + ')' , e);
-		this.shortenedMsg = cause.name() + '@' + node.ordinary;
-		this.cause = cause;
+	private AccessingFailureException(FailureCause failureCause, Node node, Throwable e, Object ... args) {
+		super(I18N.translate(failureCause.translationKey, args) 
+				+ '(' + "Node#" + (node == null ? '?' : node.ordinary) + ','
+				+ (node == null ? '?' : node.ordinary) + ')' , e);
+		this.shortenedMsg = failureCause.name() + '@' + (node == null ? '?' : node.ordinary);
+		this.failureCause = failureCause;
 		this.args = args;
-	}
-
-	public AccessingFailureException(Cause cause, Node node, Object ... args) {
-		super(I18N.translate(cause.translationKey, args) 
-				+ '(' + "Node#" + node.ordinary + ',' + node.toString() + ')');
-		this.shortenedMsg = cause.name() + '@' + node.ordinary;
-		this.cause = cause;
-		this.args = args;
+		this.raw = false;
 	}
 	
-	public AccessingFailureException(Cause cause, Object ... args) {
-		super(I18N.translate(cause.translationKey, args));
-		this.shortenedMsg = cause.name();
-		this.cause = cause;
-		this.args = args;
+	static AccessingFailureException create(FailureCause failureCause, Node node) {
+		return new AccessingFailureException(failureCause, node, null);
 	}
 	
-	public AccessingFailureException(Cause cause, Throwable e, Object ... args) {
-		super(e);
-		this.shortenedMsg = null;
-		this.cause = cause;
-		this.args = args;
+	static AccessingFailureException create(InvalidLiteralException e, Node node) {
+		return new AccessingFailureException(e.failureCause, node, e.getCause(), e.args);
+	}
+	
+	static AccessingFailureException create(FailureCause failureCause, Node node, Throwable e) {
+		return new AccessingFailureException(failureCause, node, e);
+	}
+	
+	static AccessingFailureException createWithArgs(FailureCause failureCause, Node node, Throwable e, Object ... args) {
+		return new AccessingFailureException(failureCause, node, e, args);
 	}
 
 	public String getShortenedMsg() {
-		return shortenedMsg;
+		return this.shortenedMsg;
+	}
+
+	public boolean isRaw() {
+		return this.raw;
 	}
 	
-	public static enum Cause {
-		NO_FIELD("exp.nofield"), 
-		NO_METHOD("exp.nomethod"), 
-		NO_KEY("exp.nokey"), 
-		OUT_OF_BOUND("exp.outbound"), 
-		NULL("exp.null"), 
-		INVOKE_FAIL("exp.failexec"), 
-		BAD_INPUT("exp.invalidlast"), 
-		UNCERTAIN_CLASS("exp.unboundedclass"), 
-		NO_CLASS("exp.noclass"), 
-		NOT_MAP("exp.notmap"), 
-		BAD_ARG("exp.badarg"), 
-		MULTI_TARGET("exp.multitarget"), 
-		INV_STATIC("exp.staticl.format"), 
-		ERROR("exp.unexc"), 
-		NO_FIELD_BAD_LITERAL("exp.nofieldbadliteral"), 
-		NOT_WRITTABLE("exp.nowrite");
-		
-		final String translationKey;
-		
-		Cause(String translationKey) {
-			this.translationKey = translationKey;
-			
-		}
+	public AccessingFailureException withNode(Node node) {
+		return AccessingFailureException.createWithArgs(failureCause, node, this.getCause(), args);
 	}
 }

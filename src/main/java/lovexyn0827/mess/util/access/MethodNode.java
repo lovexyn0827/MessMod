@@ -72,17 +72,19 @@ class MethodNode extends Node implements Cloneable {
 			try {
 				return this.method.invoke(previous, argObjs);
 			} catch (IllegalArgumentException e) {
-				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_ARG, e, Arrays.toString(argObjs), this.method.toString());
+				throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
+						Arrays.toString(argObjs), this.method.toString());
 			}
 		} catch (InvocationTargetException e) {
-			throw new AccessingFailureException(AccessingFailureException.Cause.INVOKE_FAIL, this, 
-					this.name, e);
+			
+			throw AccessingFailureException.createWithArgs(FailureCause.INVOKE_FAIL, this, e.getCause(), 
+					this.name, e.getCause());
 		} catch (AccessingFailureException e) {
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
 			MessMod.LOGGER.info("Failed to invoke " + this.method);
-			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e, e);
+			throw AccessingFailureException.createWithArgs(FailureCause.ERROR, this, e, e);
 		}
 	}
 	
@@ -124,10 +126,10 @@ class MethodNode extends Node implements Cloneable {
 		if(candidates.size() == 1) {
 			this.method = candidates.get(0);
 		} else if(candidates.size() == 0) {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NO_METHOD, this, 
+			throw AccessingFailureException.createWithArgs(FailureCause.NO_METHOD, this, null, 
 					srg.getValue(), clazz.getSimpleName());	// XXX Deobfusciation
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.MULTI_TARGET, this);
+			throw AccessingFailureException.create(FailureCause.MULTI_TARGET, this);
 		}
 	}
 
@@ -150,7 +152,7 @@ class MethodNode extends Node implements Cloneable {
 		}
 		
 		MethodNode other = (MethodNode) obj;
-		return this.method.equals(other.method) 
+		return (this.method != null ? this.method.equals(other.method) : this.name.equals(other.name)) 
 				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType))
 				&& Arrays.equals(this.args, args)
 				&& Arrays.equals(this.types, this.types);

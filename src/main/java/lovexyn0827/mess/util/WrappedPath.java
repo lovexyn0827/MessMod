@@ -66,7 +66,7 @@ public class WrappedPath implements HudLine {
 			Object ob = this.path.access(in, in.getClass());
 			return ob != null ? ob.toString() : "null";
 		} catch (AccessingFailureException e) {
-			return e.cause.name();
+			return e.failureCause.name();
 		}
 	}
 

@@ -23,11 +23,11 @@ class FieldNode extends Node {
 			return this.field.get(previous);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, this, e, 
+			throw AccessingFailureException.createWithArgs(FailureCause.NO_FIELD, this, e, 
 					this.fieldName, previous.getClass().getSimpleName());
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, this, e);
+			throw AccessingFailureException.create(FailureCause.ERROR, this, e);
 		}
 	}
 	
@@ -84,7 +84,7 @@ class FieldNode extends Node {
 			this.outputType = f.getGenericType();
 			return this.outputType;
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, this, 
+			throw AccessingFailureException.createWithArgs(FailureCause.NO_FIELD, this, null, 
 					this.fieldName, lastOutType.getTypeName());
 		}
 	}
@@ -107,11 +107,11 @@ class FieldNode extends Node {
 			this.field.set(writeTo, newValue);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD_BAD_LITERAL, this, e, 
-					this.fieldName, writeTo.getClass().getSimpleName());
+			throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
+					newValue == null ? "null" : newValue, this.fieldName);
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, this, e);
+			throw AccessingFailureException.create(FailureCause.ERROR, this, e);
 		}
 	}
 }

@@ -21,6 +21,7 @@ import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
+import lovexyn0827.mess.util.access.InvalidLiteralException;
 import lovexyn0827.mess.util.access.Literal;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
@@ -174,7 +175,12 @@ public class EntityFieldCommand {
 
 			field.setAccessible(true);
 			if(path == null) {
-				field.set(entity, Literal.parse(newValue).get(field.getGenericType()));
+				try {
+					field.set(entity, Literal.parse(newValue).get(field.getGenericType()));
+				} catch (InvalidLiteralException e) {
+					String msg = e.getMessage();
+					CommandUtil.error(ct, msg == null ? "~null~" : msg, e);
+				}
 				return true;
 			} else {
 				obj = field.get(entity);

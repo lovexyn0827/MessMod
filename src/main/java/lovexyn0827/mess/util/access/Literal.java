@@ -58,11 +58,11 @@ public abstract class Literal<T> {
 	}
 
 	/**
-	 * @throws AccessingFailureException 
+	 * @throws InvalidLiteralException 
 	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
 	 */
 	@Nullable
-	public abstract T get(Type type) throws AccessingFailureException;
+	public abstract T get(Type type) throws InvalidLiteralException;
 	
 	public static Literal<?> parse(String strRep) throws CommandSyntaxException {
 		switch(strRep.charAt(0)) {
@@ -117,7 +117,7 @@ public abstract class Literal<T> {
 				
 				return new Literal<Boolean>(strRep) {
 					@Override
-					public Boolean get(Type type) throws AccessingFailureException {
+					public Boolean get(Type type) {
 						return bool;
 					}
 				};
@@ -152,13 +152,14 @@ public abstract class Literal<T> {
 
 		@Override
 		@NotNull
-		public Object get(Type clazz) throws AccessingFailureException {
+		public Object get(Type clazz) throws InvalidLiteralException {
 			if(this.compiled && this.fieldVal != null) {
 				return this.fieldVal;
 			}
 			
 			if(clazz == null) {
-				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
+				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null,  
+						this.stringRepresentation);
 			}
 			
 			Class<?> cl = Reflection.getRawType(clazz);
@@ -170,7 +171,7 @@ public abstract class Literal<T> {
 						return f.get(null);
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						e.printStackTrace();
-						throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e, e);
+						throw InvalidLiteralException.createWithArgs(FailureCause.ERROR, this, e, e);
 					}
 				} else {
 					String[] clAndF = this.stringRepresentation.split("#");
@@ -186,21 +187,23 @@ public abstract class Literal<T> {
 								return this.fieldVal;
 							}
 						} catch (ClassNotFoundException e) {
-							throw new AccessingFailureException(AccessingFailureException.Cause.NO_CLASS, clAndF[0]);
+							throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, e, 
+									clAndF[0]);
 							
 						} catch (IllegalArgumentException | IllegalAccessException e) {
 							e.printStackTrace();
-							throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, e);
+							throw InvalidLiteralException.createWithArgs(FailureCause.ERROR, this, e, e);
 						}
 					} else {
-						throw new AccessingFailureException(AccessingFailureException.Cause.INV_STATIC);
+						throw InvalidLiteralException.create(FailureCause.INV_STATIC, this);
 					}
 					
-					throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, 
+					throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
 							clAndF[1], clAndF[0]);
 				}
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
+				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, 
+						this.stringRepresentation);
 			}
 		}
 
@@ -218,13 +221,14 @@ public abstract class Literal<T> {
 		}
 
 		@Override
-		public Enum<?> get(Type clazz) throws AccessingFailureException {
+		public Enum<?> get(Type clazz) throws InvalidLiteralException {
 			if(this.compiled && this.enumConstant != null) {
 				return this.enumConstant;
 			}
 			
 			if(clazz == null) {
-				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
+				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, 
+						this.stringRepresentation);
 			}
 			
 			Class<?> cl = Reflection.getRawType(clazz);
@@ -239,10 +243,10 @@ public abstract class Literal<T> {
 					}
 				}
 
-				throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, 
+				throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
 						this.stringRepresentation, clazz.getTypeName());
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.UNCERTAIN_CLASS, this.stringRepresentation);
+				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, this.stringRepresentation);
 			}
 		}
 
@@ -372,12 +376,12 @@ public abstract class Literal<T> {
 		}
 
 		@Override
-		public Class<?> get(Type type) throws AccessingFailureException {
+		public Class<?> get(Type type) throws InvalidLiteralException {
 			String className = this.stringRepresentation.replace('/', '.');
 			try {
 				return Class.forName(className);
 			} catch (ClassNotFoundException e) {
-				throw new AccessingFailureException(AccessingFailureException.Cause.NO_CLASS, className);
+				throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, null, className);
 			}
 		}
 
@@ -401,7 +405,7 @@ public abstract class Literal<T> {
 		}
 
 		@Override
-		public Vec3d get(Type type) throws AccessingFailureException {
+		public Vec3d get(Type type) {
 			return this.vec3d;
 		}
 

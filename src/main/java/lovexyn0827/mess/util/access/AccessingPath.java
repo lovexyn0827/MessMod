@@ -74,16 +74,16 @@ public final class AccessingPath {
 				intermediate = n.access(intermediate);
 			} catch (NullPointerException e) {
 				e.printStackTrace();
-				throw new AccessingFailureException(AccessingFailureException.Cause.NULL, n, e);
+				throw AccessingFailureException.create(FailureCause.NULL, n, e);
 			} catch (AccessingFailureException e2) {
-				if(e2.getShortenedMsg() == null) {
-					throw new AccessingFailureException(e2.cause, n, e2.getCause(), e2.args);
+				if(e2.isRaw()) {
+					throw e2.withNode(n);
 				} else {
 					throw e2;
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, n, e1, e1);
+				throw AccessingFailureException.createWithArgs(FailureCause.ERROR, n, e1, e1);
 			}
 		}
 		
@@ -105,7 +105,7 @@ public final class AccessingPath {
 		Iterator<Node> itr = this.nodes.iterator();
 		Node last = this.nodes.getLast();
 		if(!last.isWrittable()) {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE, last);
+			throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, last);
 		}
 		
 		while(itr.hasNext()) {
@@ -118,20 +118,24 @@ public final class AccessingPath {
 				intermediate = n.access(intermediate);
 			} catch (NullPointerException e) {
 				e.printStackTrace();
-				throw new AccessingFailureException(AccessingFailureException.Cause.NULL, n, e);
+				throw AccessingFailureException.create(FailureCause.NULL, n, e);
 			} catch (AccessingFailureException e2) {
-				if(e2.getShortenedMsg() == null) {
-					throw new AccessingFailureException(e2.cause, n, e2.getCause(), e2.args);
+				if(e2.isRaw()) {
+					throw e2.withNode(n);
 				} else {
 					throw e2;
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, n, e1, e1);
+				throw AccessingFailureException.createWithArgs(FailureCause.ERROR, n, e1, e1);
 			}
 		}
 		
-		last.write(intermediate, value.get(last.inputType));
+		try {
+			last.write(intermediate, value.get(last.inputType));
+		} catch (InvalidLiteralException e) {
+			throw AccessingFailureException.create(e, null);
+		}
 	}
 
 	@Override
@@ -174,8 +178,8 @@ public final class AccessingPath {
 					n.initialize(lastType);
 					lastType = n.outputType;
 				} catch (AccessingFailureException e) {
-					if(e.getShortenedMsg() == null) {
-						throw new AccessingFailureException(e.cause, n, e.getCause(), e.args);
+					if(e.isRaw()) {
+						throw e.withNode(n);
 					} else {
 						throw e;
 					}

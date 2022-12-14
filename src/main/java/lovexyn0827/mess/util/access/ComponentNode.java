@@ -65,7 +65,7 @@ abstract class ComponentNode extends Node {
 			} else if(previous instanceof BlockEntity) {
 				return ((BlockEntity) previous).getPos().getX();
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this, this);
+				throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
 			}
 		}
 		
@@ -93,7 +93,7 @@ abstract class ComponentNode extends Node {
 			} else if(previous instanceof BlockEntity) {
 				return ((BlockEntity) previous).getPos().getY();
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
+				throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
 			}
 		}
 		
@@ -118,7 +118,7 @@ abstract class ComponentNode extends Node {
 			} else if(previous instanceof BlockEntity) {
 				return ((BlockEntity) previous).getPos().getZ();
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
+				throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
 			}
 		}
 		

@@ -25,10 +25,10 @@ class ValueOfMapNode extends Node {
 			if(m.containsKey(this.key)) {
 				return m.get(this.key);
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.NO_KEY, this);
+				throw AccessingFailureException.create(FailureCause.NO_KEY, this);
 			}
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NOT_MAP, this);
+			throw AccessingFailureException.createWithArgs(FailureCause.NOT_MAP, this, null, this);
 		}
 	}
 	
@@ -68,7 +68,7 @@ class ValueOfMapNode extends Node {
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException {
+	protected Type prepare(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
 		if(lastOutType instanceof ParameterizedType) {
 			ParameterizedType pt = ((ParameterizedType) lastOutType);
 			Class<?> lastCl = Reflection.getRawType(lastOutType);
@@ -137,7 +137,7 @@ class ValueOfMapNode extends Node {
 	@Override
 	void write(Object writeTo, Object newValue) throws AccessingFailureException {
 		if(ImmutableMap.class.isAssignableFrom(Reflection.getRawType(inputType))) {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
+			throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
 		} else {
 			if(writeTo instanceof Map) {
 				@SuppressWarnings("rawtypes")
@@ -150,13 +150,13 @@ class ValueOfMapNode extends Node {
 					try {
 						m.put(this.key, newValue);
 					} catch (UnsupportedOperationException e) {
-						throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
+						throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
 					}
 				} else {
-					throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this, this);
+					throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
 				}
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.NOT_MAP, this);
+				throw AccessingFailureException.createWithArgs(FailureCause.NOT_MAP, this, null, this);
 			}
 		}
 	}

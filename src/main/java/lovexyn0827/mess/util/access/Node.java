@@ -58,7 +58,12 @@ abstract class Node {
 	}
 
 	final void initialize(Type lastOutClass) throws AccessingFailureException {
-		this.prepare(lastOutClass);
+		try {
+			this.prepare(lastOutClass);
+		} catch (InvalidLiteralException e) {
+			throw AccessingFailureException.create(e, this);
+		}
+		
 		this.initialized = true;
 		this.inputType = lastOutClass;
 	}
@@ -70,9 +75,10 @@ abstract class Node {
 
 	/**
 	 * @throws AccessingFailureException 
+	 * @throws InvalidLiteralException 
 	 * @implNote outputType field shouldn't be null after initialization.
 	 */
-	protected abstract Type prepare(Type lastOutType) throws AccessingFailureException;
+	protected abstract Type prepare(Type lastOutType) throws AccessingFailureException, InvalidLiteralException;
 	
 	/** Nodes obtained this way must maintain its original position in the path */
 	Node createCopyForInput(Object input) {
@@ -84,6 +90,6 @@ abstract class Node {
 	}
 	
 	void write(Object writeTo, Object newValue) throws AccessingFailureException {
-		throw new AccessingFailureException(AccessingFailureException.Cause.NOT_WRITTABLE);
+		throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
 	}
 }
