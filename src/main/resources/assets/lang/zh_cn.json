@@ -20,8 +20,6 @@
 		"cmd.entityfield.unexpected" : "获取字段的过程中发生了未知错误", 
 		"cmd.entityfield.modify.success" : "成功地修改了字段", 
 		"cmd.entityfield.modify.failure" : "字段修改失败", 
-		"cmd.entityfield.modify.vectorsyntax" : "给出的分量数目不合适！示例：15.05,67,-211.125", 
-		"cmd.entityfield.modify.unsupported" : "暂不支持修改此字段", 
 		
 		//***** entitylog *****
 		"cmd.entitylog.usage" : "TODO", 

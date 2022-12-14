@@ -29,7 +29,8 @@ public abstract class SpawnEggItemMixin {
 	
 	@Inject(method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;"
 					+ "Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;", 
-			at = @At(value = "HEAD")
+			at = @At(value = "HEAD"), 
+			cancellable = true
 	)
 	public void mountIfNeeded(World world, PlayerEntity user, Hand hand, 
 			CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
@@ -47,6 +48,7 @@ public abstract class SpawnEggItemMixin {
 				}
 				
 				cir.setReturnValue(TypedActionResult.consume(stack));
+				cir.cancel();
 			}
 		}
 	}
