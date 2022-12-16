@@ -8,11 +8,12 @@
 		"cmd.general.notfound" : "未找到", 
 		"cmd.general.nodef" : "%s未被定义", 
 		"cmd.general.unexpected" : "发生了未知错误", 
+		"cmd.general.success" : "完成", 
+		"cmd.general.dupname" : "名称已被占用", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "无法加载保存的自定义节点：%s", 
 		"cmd.accessingpath.undef" : "给定的节点尚未被定义",
-		"cmd.accessingpath.dupname" : "名称已被占用",  
 		"cmd.accessingpath.invname" : "名称只能包含字母、数字和下划线", 
 		
 		//***** ensure *****
@@ -38,6 +39,10 @@
 		"cmd.general.stopautosubname" : "不再自动监听名为%s的实体", 
 		"cmd.general.flush" : "已将新内容保存到磁盘", 
 		"cmd.general.count" : "共有%d个被监视实体", 
+		
+		//***** exportsave *****
+		"cmd.exportsave.failexp" : "导出存档失败", 
+		"cmd.exportsave.success" : "已导出存档，耗时%f秒",
 		
 		//***** fixedentityhud *****
 		"cmd.fixedentityhud.add" : "向Sidebar中添加了一行数据", 

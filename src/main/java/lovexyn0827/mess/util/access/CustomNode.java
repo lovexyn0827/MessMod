@@ -49,7 +49,7 @@ public class CustomNode extends Node {
 	public static void define(String name, String path, boolean permanent, MinecraftServer server)
 			throws CommandSyntaxException {
 		if(NODES_BY_NAME.containsKey(name)) {
-			throw new TranslatableException("cmd.accessingpath.dupname");
+			throw new TranslatableException("cmd.general.dupname");
 		} else {
 			// Validate the given accessing path. 
 			AccessingPathArgumentType.accessingPathArg().parse(new StringReader(path));

@@ -171,9 +171,10 @@ public class CommandUtil {
 				entity);
 	}
 	
-	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(String ... args) {
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(Object ... args) {
 		return (ct, builder) -> {
 			Stream.of(args)
+					.map(Object::toString)
 					.forEach(builder::suggest);
 			return builder.buildFuture();
 		};

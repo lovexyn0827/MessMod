@@ -37,7 +37,10 @@
     "ClientConnectionMixin", 
     "NetworkStateAccessor", 
     "MinecartItemMixin", 
-    "SpawnEggItemMixin"
+    "SpawnEggItemMixin", 
+    "MinecraftServerAccessor", 
+    "ServerCommandSourceAccessor", 
+    "RegionBasedStorageAccessor"
   ],
   "client": [
     "MinecraftClientMixin",

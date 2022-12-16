@@ -17,6 +17,7 @@ import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
+import lovexyn0827.mess.command.ExportSaveCommand;
 import lovexyn0827.mess.command.FreezeEntityCommand;
 import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
@@ -70,6 +71,7 @@ public abstract class CommandMixin {
         LogPacketCommand.register(this.dispatcher);
         PartlyKillCommand.register(this.dispatcher);
         AccessingPathCommand.register(this.dispatcher);
+        ExportSaveCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", at = @At(

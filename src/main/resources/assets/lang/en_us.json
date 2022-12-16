@@ -8,11 +8,12 @@
 		"cmd.general.notfound" : "Not found", 
 		"cmd.general.nodef" : "%s was not defined", 
 		"cmd.general.unexpected" : "Unexpected error", 
+		"cmd.general.success" : "Success", 
+		"cmd.general.dupname" : "The name has already been used.", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 
 		"cmd.accessingpath.undef" : "The given node hasn't been defined yet.", 
-		"cmd.accessingpath.dupname" : "The name has already been used.", 
 		"cmd.accessingpath.invname" : "Only letters, numbers and underscores are permitted in the name.", 
 		
 		//***** ensure *****
@@ -38,6 +39,10 @@
 		"cmd.general.stopautosubname" : "Entity with name %s won't be subscribed automatically", 
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
+		
+		//***** exportsave *****
+		"cmd.exportsave.failexp" : "Failed to export the save.", 
+		"cmd.exportsave.success" : "Exported the save, %f seconds elapsed.", 
 		
 		//***** fixedentityhud *****
 		"cmd.fixedentityhud.add" : "Added a new line to the sidebar.", 
