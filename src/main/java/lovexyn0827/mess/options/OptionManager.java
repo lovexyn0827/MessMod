@@ -148,6 +148,10 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean entityLogAutoArchiving;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean generateChunkGrid;
+	
 	// TODO Assess the performance cost
 	@Option(defaultValue = "2.0", 
 			experimental = true, 
