@@ -69,11 +69,12 @@ public class EntitySidebarCommand {
 		try {
 			if (sender.addLine(e, field, name, TickingPhase.TICKED_ALL_WORLDS, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
+				CommandUtil.feedback(ct, "cmd.general.success");
+				return 0;
 			}
-			
-			return Command.SINGLE_SUCCESS;
 		} catch (TranslatableException e1) {
 			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
 			return 0;
@@ -89,11 +90,12 @@ public class EntitySidebarCommand {
 		try {
 			if (sender.addLine(e, field, name, phase, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
+				CommandUtil.feedback(ct, "cmd.general.success");
+				return 0;
 			}
-			
-			return Command.SINGLE_SUCCESS;
 		} catch (TranslatableException e1) {
 			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
 			return 0;
@@ -110,11 +112,12 @@ public class EntitySidebarCommand {
 		try {
 			if (sender.addLine(e, field, name, phase, path)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
+				CommandUtil.feedback(ct, "cmd.general.success");
+				return 0;
 			}
-			
-			return Command.SINGLE_SUCCESS;
 		} catch (TranslatableException e1) {
 			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
 			return 0;

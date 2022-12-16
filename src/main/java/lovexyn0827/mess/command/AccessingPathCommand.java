@@ -24,6 +24,7 @@ public class AccessingPathCommand {
 													String name = StringArgumentType.getString(ct, "name");
 													if(!CustomNode.NAME_PATTERN.matcher(name).matches()) {
 														CommandUtil.error(ct, "cmd.accessingpath.invname");
+														return 0;
 													}
 													
 													String backendStr = StringArgumentType.getString(ct, "backend");
@@ -32,8 +33,10 @@ public class AccessingPathCommand {
 																, ct.getSource().getMinecraftServer());
 													} catch (TranslatableException e) {
 														CommandUtil.errorRaw(ct, e.getMessage(), e);
+														return 0;
 													}
-													
+
+													CommandUtil.feedback(ct, "cmd.general.success");
 													return Command.SINGLE_SUCCESS;
 												})))))
 				.then(literal("undefineNode")
@@ -48,8 +51,10 @@ public class AccessingPathCommand {
 										CustomNode.undefine(name, ct.getSource().getMinecraftServer());
 									} catch (TranslatableException e) {
 										CommandUtil.errorRaw(ct, e.getMessage(), e);
+										return 0;
 									}
-									
+
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);

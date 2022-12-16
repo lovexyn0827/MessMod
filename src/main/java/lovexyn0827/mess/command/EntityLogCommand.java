@@ -226,10 +226,10 @@ public class EntityLogCommand {
 		try {
 			l.unlistenToField(name);
 			CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.unlisten", name);
+			return Command.SINGLE_SUCCESS;
 		} catch (Exception e) {
 			CommandUtil.error(ct, e.getMessage());
+			return 0;
 		}
-		
-		return Command.SINGLE_SUCCESS;
 	}
 }

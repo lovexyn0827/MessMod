@@ -47,6 +47,7 @@ public class TileEntityCommand {
 											BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
 											BlockEntity be = getBlockEntity(ct);;
 											ct.getSource().getWorld().setBlockEntity(pos, be);
+											CommandUtil.feedback(ct, "cmd.general.success");
 											return 1;
 										}).
 										then(argument("tag",NbtTagArgumentType.nbtTag()).
@@ -56,12 +57,14 @@ public class TileEntityCommand {
 													be.fromTag(ct.getSource().getWorld().getBlockState(pos), 
 															(CompoundTag) NbtTagArgumentType.getTag(ct, "tag"));
 													ct.getSource().getWorld().setBlockEntity(pos, be);
+													CommandUtil.feedback(ct, "cmd.general.success");
 													return 1;
 											}))))).
 				then(literal("remove").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								executes((ct)->{
 									ct.getSource().getWorld().removeBlockEntity(BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return 1;
 								})));
 		dispatcher.register(command);

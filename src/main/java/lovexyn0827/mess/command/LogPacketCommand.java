@@ -37,12 +37,13 @@ public class LogPacketCommand {
 									Class<?> type = PACKET_TYPES.get(StringArgumentType.getString(ct, "type"));
 									if(type != null) {
 										SUBSCRIBED_TYPES.add(type);
+										CommandUtil.feedback(ct, "cmd.general.success");
+										return Command.SINGLE_SUCCESS;
 									} else {
 										CommandUtil.errorWithArgs(ct, "cmd.general.nodef", 
 												StringArgumentType.getString(ct, "type"));
+										return 0;
 									}
-									
-									return Command.SINGLE_SUCCESS;
 								})))
 				.then(literal("unsub")
 						.then(argument("type", StringArgumentType.word())
@@ -54,12 +55,13 @@ public class LogPacketCommand {
 									Class<?> type = PACKET_TYPES.get(StringArgumentType.getString(ct, "type"));
 									if(type != null) {
 										SUBSCRIBED_TYPES.remove(type);
+										CommandUtil.feedback(ct, "cmd.general.success");
+										return Command.SINGLE_SUCCESS;
 									} else {
 										CommandUtil.errorWithArgs(ct, "cmd.general.nodef", 
 												StringArgumentType.getString(ct, "type"));
+										return 0;
 									}
-									
-									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
 	}

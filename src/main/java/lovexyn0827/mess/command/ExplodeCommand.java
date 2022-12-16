@@ -23,6 +23,7 @@ public class ExplodeCommand {
 										ServerWorld world = ct.getSource().getWorld();
 										Vec3d pos = Vec3ArgumentType.getVec3(ct, "pos");
 										createExplosion(world,pos,ExtendedFloatArgumentType.getFloat(ct, "power"), false);
+										CommandUtil.feedback(ct, "cmd.general.success");
 										return 1;
 								}).
 								then(argument("fire",BoolArgumentType.bool()).
@@ -32,6 +33,7 @@ public class ExplodeCommand {
 											createExplosion(world, pos, 
 													ExtendedFloatArgumentType.getFloat(ct, "power"),
 													BoolArgumentType.getBool(ct, "fire"));
+											CommandUtil.feedback(ct, "cmd.general.success");
 											return 1;
 										}))));
 		dispatcher.register(command);

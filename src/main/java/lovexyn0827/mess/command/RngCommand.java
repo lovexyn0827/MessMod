@@ -27,6 +27,7 @@ public class RngCommand {
 				then(argument("seed",LongArgumentType.longArg()).
 						executes((ct)->{
 							getRandom(ct).setSeed(LongArgumentType.getLong(ct, "seed"));
+							CommandUtil.feedback(ct, "cmd.general.success");
 							return 1;
 						}));
 		LiteralArgumentBuilder<ServerCommandSource> branchNext = literal("next").
