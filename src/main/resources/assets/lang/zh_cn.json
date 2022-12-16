@@ -9,6 +9,12 @@
 		"cmd.general.nodef" : "%s未被定义", 
 		"cmd.general.unexpected" : "发生了未知错误", 
 		
+		//***** accessingpath *****
+		"cmd.accessingpath.filefail" : "无法加载保存的自定义节点：%s", 
+		"cmd.accessingpath.undef" : "给定的节点尚未被定义",
+		"cmd.accessingpath.dupname" : "名称已被占用",  
+		"cmd.accessingpath.invname" : "名称只能包含字母、数字和下划线", 
+		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
 		"cmd.ensure.blockat" : "%s处的方块为: %s",

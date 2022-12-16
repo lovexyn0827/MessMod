@@ -9,6 +9,12 @@
 		"cmd.general.nodef" : "%s was not defined", 
 		"cmd.general.unexpected" : "Unexpected error", 
 		
+		//***** accessingpath *****
+		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 
+		"cmd.accessingpath.undef" : "The given node hasn't been defined yet.", 
+		"cmd.accessingpath.dupname" : "The name has already been used.", 
+		"cmd.accessingpath.invname" : "Only letters, numbers and underscores are permitted in the name.", 
+		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
 		"cmd.ensure.blockat" : "Block at %s: %s",

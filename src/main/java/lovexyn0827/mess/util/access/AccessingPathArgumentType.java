@@ -88,6 +88,13 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
 			if(matcher.matches()) {
 				return new MethodNode(matcher.group("name"), matcher.group("types"), matcher.group("args"));
+			} else if(CustomNode.NAME_PATTERN.matcher(nodeStr).matches()) {
+				CustomNode node = CustomNode.create(nodeStr);
+				if(node != null) {
+					return node;
+				} else {
+					throw new TranslatableException("exp.unknownnode");
+				}
 			} else {
 				switch(nodeStr) {
 				case "x" : 
