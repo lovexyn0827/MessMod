@@ -162,7 +162,7 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			globalOnly = true, 
 			environment = EnvType.CLIENT)
-	public static boolean hideSuvivalSaves;
+	public static boolean hideSurvivalSaves;
 	
 	@Option(defaultValue = "TOP_RIGHT", 
 			parserClass = AlignMode.Parser.class)

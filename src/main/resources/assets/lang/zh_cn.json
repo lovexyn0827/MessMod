@@ -153,7 +153,7 @@
 		"opt.entityLogAutoArchiving.desc" : "自动存档一个会话内产生的实体数据记录，存档文件可在`世界文件夹/entitylog/archives`找到", 
 		"opt.generateChunkGrid.desc" : "在地表生层一层玻璃来标记区块", 
 		"opt.getEntityRangeExpansion.desc" : "在原版的getEntity()方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。", 
-		"opt.hideSuvivalSaves.desc" : "隐藏可能的生存存档以防止其被意外地打开。只能在全局范围内设置。", 
+		"opt.hideSurvivalSaves.desc" : "隐藏可能的生存存档以防止其被意外地打开。只能在全局范围内设置。", 
 		"opt.hotbarLength.desc" : "物品栏可包含的物品堆叠数量。目前该功能并未完全完成，如原版物品栏材质和物品栏的保存等特性暂不可用。", 
 		"opt.hudAlignMode.desc" : "设置实体信息HUD的位置。", 
 		"opt.hudStyles.desc" : "HUD的渲染样式, 包括了下面的零个至多个标志: \n - B：渲染背景\n - L：左对齐行标题并右对齐数据\n - R：将行标题改为红色", 
