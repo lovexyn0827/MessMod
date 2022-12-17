@@ -11,7 +11,7 @@ Just like what the name says, the Mod contains functions in many fields, therefo
 
 In other languages:
 
-[¼òÌåÖÐÎÄ](https://github.com/lovexyn0827/MessMod/blob/master/README_zh_cn.md)
+[ç®€ä½“ä¸­æ–‡](https://github.com/lovexyn0827/MessMod/blob/master/README_zh_cn.md)
 
 ### Requirements
 
@@ -270,183 +270,220 @@ The following options could be set with the command `/messcfg`, and the format o
 
 There are there initializing strategies available: 
 
-- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances, will be used to access all subsequent inputs.
+- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances and so on, will be used to handle all subsequent inputs.
 - Standard strategy: Accessing paths are parsed for every different inputs, and the parsed copies are cached until the inputs are discarded by the garbage collector.
 - Strict Strategy: Accessing paths are reinitialized each time they are used.
 
-Possible values: LEGACY|STANDARD|STRICT
+Available values: 
+
+- `LEGACY`
+- `STANDARD`
+- `STRICT`
 
 Default value: STANDARD
 
 ##### `antiHostCheating`
 
-Enable anti-cheating for host player in SP & LAN game.
+Enable anti-cheating for the host player in SP & LAN game.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
 ##### `attackableTnt`
 
-TNTs could be killed by attacking.
+TNT entities can be killed by players' attacking.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
 ##### `blockInfoRendererUpdateInFrozenTicks`
 
-What the block information renderers will do in ticks frozen by the Carpet. Hope it works.
+What should the block information renderers do in ticks frozen by the Carpet.
 
-Possible values: NORMALLY|PAUSE|NO_REMOVAL
+Available values: 
+
+- `NORMALLY`
+- `PAUSE`
+- `NO_REMOVAL`
 
 Default value: NORMALLY
 
 ##### `blockPlacementHistory`
 
-Record what the players has placed recently so that you may undo or redo these operations later.
+Record what the players has placed recently so that you may undo or redo these operations later. Note that if the blocks are changed by something other than the player, undoing these related operations may result in unexpected behaviors.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `blockShapeToBeRendered` 
+##### `blockShapeToBeRendered`
 
-Specify the type of block shape rendered when `renderBlockShape` is enabled. The `COLLIDER` shape is the shape used to do calculations about collisions, while the `OUTLINE` shape is the shape used to determine which block the player is looking at.
+The type of block shape rendered when `renderBlockShape` is enabled. The COLLIDER shape is the  shape used to do calculations about collisions, while the OUTLINE shape is the shape used to let the game know which block the player is looking at. See the wiki on Github for details.
 
-Possible values: COLLIDER|OUTLINE|RAYSAST|SIDES|VISUAL
+Available values: 
 
-Default value: COLLIDER
+- `OUTLINE`
+- `SIDES`
+- `VISUAL`
+- `RAYCAST`
+- `COLLISION`
 
-##### `commandExecutionRequirment` 
+Default value: COLLISION
 
-Whether or not the execution of commands defined by this mod requires OP permission.
+##### `commandExecutionRequirment`
 
-Possible values: true or false
+Whether or not execution of commands defined by this mod require OP permission.
+
+Available values: true/false
 
 Default value: false
 
 ##### `craftingTableBUD`
 
-Detect the block updates around crafting tables.
+Detect the block updates received by crafting tables.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `creativeUpwardsSpeed` 
+##### `creativeUpwardsSpeed`
 
-Set the speed at which the player is flying upwards in the creative mode.
+Set the speed which the player is flying upwards at in the creative mode.
 
-Possible values: Real number between 0 and 1024
+Available values: Any positive real number
 
 Default value: 0.05
 
-##### `debugStickSkipsInvaildState` 
+##### `debugStickSkipsInvaildState`
 
-Prevent debug sticks change blocks to an invalid state. By now, the option *doesn't work* in some cases, like changing the shape property of a rail can still turn the rail into an illegal state and get broken. 
+Prevent debug sticks from changing blocks to an invalid state. By now, the option doesn't work in many cases, for example, changing the `shape` property of a rail can still turn the rail in to an illegal state and have the rail broken. 
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
 ##### `disableChunkLoadingCheckInCommands`
 
-Just as its name says.
+As the name says, you can fill some blocks in unloaded chunks.
 
-Possible values: true or false
-
-Default value: false
-
-##### `disableExplosionExposureCalculation` 
-
-Disable the calculation of explosion exposure to reduce the lag caused by stacked TNT explosions. This will also mean that blocks cannot prevent entities from being influenced by explosions.
-
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `disableProjectileRandomness` 
+##### `disableExplosionExposureCalculation`
 
-Remove the random speed of projectiles. It could be used in testing, but don't forget to disable it if not needed.
+Disable the calculation of explosion exposure to reduce the lag caused by stacked TNT explosions, especially when the TNTs are at the same spot. This will also mean that blocks cannot prevent entities from be influenced by explosions. 
+This feature may not work properly if the Lithium is loaded.
 
-Possible values: true or false
-
-Default value: false
-
-##### `enabledTools` 
-
-Enable or disable item tools (See below). 
-
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `endEyeTeleport` 
+##### `disableProjectileRandomness`
+
+Remove the random speed of projectiles. It could be used to test pearl cannons, but don't forget to disable it if not needed.
+
+Available values: true/false
+
+Default value: false
+
+##### `enabledTools`
+
+Item tools, which makes bone and bricks useful. Requires carpet-fabric.
+
+- Bone: /tick step <countOfBones> 
+- Brick: /tick freeze 
+- Netherier Ingot: /kill @e[type!=player]
+
+Available values: true/false
+
+Default value: false
+
+##### `endEyeTeleport`
 
 When the player uses ender eyes, teleport it to where it looks at.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `entityExplosionInfluence` 
+##### `entityExplosionInfluence`
 
-Send how entities are affected by explosions. This feature may not work properly if Lithium is loaded.
+Tell you how entities are affected by explosions. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.
+Incompatible with Lithium.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `entityExplosionRaysLifetime` 
+##### `entityExplosionRaysLifetime`
 
-Set how many ticks the rendered rays remain. 
+The number of ticks the rendered rays remains. 
 
-Possible values: Any positive integer.
+Available values: Any integer
 
 Default value: 300
 
-##### `entityExplosionRaysVisiblity` 
+##### `entityExplosionRaysVisiblity`
 
-Enable or disable explosion ray (used to calculate the exposure of entities) renderer. 
+Explosion ray (used in the calculation the exposure of entities) renderer. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
 ##### `entityLogAutoArchiving`
 
-Archive the entity log produced within a single session automatically.
+Archive the entity log produced within a single session automatically. These archives can be found in folder `World Folder/entitylog/archives`.
 
-Possible values: true or false
+Available values: true/false
+
+Default value: true
+
+##### `generateChunkGrid`
+
+Generate a layer of glass on the ground to show the chunks.
+
+Available values: true/false
 
 Default value: false
 
 ##### `getEntityRangeExpansion`
 
-<font color=#FF0000>**[TODO]**</font>In the vanilla `getEntities()` method, only entities which are in subchunks whose Cheshev distance to the given AABB is smaller than 2 blocks is could be seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can cause some issues, especially when the entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.
+[TODO]In the vanilla getEntities() method, only entities which are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.
 
-##### `hideSuvivalSaves`
+Available values: Any positive real number
 
-Hide worlds that is likely to be suvivial saves to prevent it to be opened accidently.
+Default value: 2.0
 
-Possible values: true or false
+##### `hideSurvivalSaves`
+
+Hide worlds that is likely to be survival saves to prevent it to be opened accidentally. Can only be set globally.
+
+Available values: true/false
 
 Default value: false
 
 ##### `hotbarLength`
 
-The number of item stacks the hotbar can contain. Note that this feature is not finished currently, some features like saving hotbars and vanilla hotbat texture is not aviilable.
+The number of item stacks the hotbar can contain. Note that this feature is not finished currently, some features like saving hotbars and vanilla hotbat texture is not available.
 
-Possible values: 1~36
+Available values: Any integer between 1 and 36 (inclusive)
 
 Default value: 9
 
-##### `hudAlignMode` 
+##### `hudAlignMode`
 
-Move the HUDs to a given location. 
+Move the HUDs to a given location.
 
-Possible values: BOTTOM_LEFT|BOTTOM_RIGHT|TOP_LEFT|TOP_RIGHT
+Available values: 
+
+- `TOP_LEFT`
+- `TOP_RIGHT`
+- `BOTTIM_LEFT`
+- `BOTTOM_RIGHT`
 
 Default value: TOP_RIGHT
 
@@ -458,23 +495,23 @@ The style of the HUDs, containing zero or more flags below:
 - L: Align the headers on the left and the data on the right
 - R: Change the color of headers to red
 
-Possible values: Any string
+Available values: Any string
 
 Default value: (BL)^2/(mR)
 
-##### `hudTextSize` 
+##### `hudTextSize`
 
 Set the size of the text in the HUDs.
 
-Possible values: Any real number between 0 and 10.
+Available values: Any positive real number
 
-Default value: 1
+Default value: 1.0
 
 ##### `interactableB36`
 
-Allow players to break block-36s and place things against it.
+Allow players to break block-36s and place something against it.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
@@ -482,71 +519,92 @@ Default value: false
 
 The main language of the Mod.
 
-Possible values: `zh_cn|en_us|zh_cn_FORCELOAD|en_us_FORCELOAD|-FOLLOW_SYSTEM_SETTINGS-`
+Available values: - -FOLLOW_SYSTEM_SETTINGS-
 
-Default value: `-FOLLOW_SYSTEM_SETTINGS-`
+- zh_cn
+- zh_cn_FORCELOAD
+- en_us
+- en_us_FORCELOAD
 
-##### `maxClientTicksPerFrame` 
+Default value: -FOLLOW_SYSTEM_SETTINGS-
 
-Set the maximum number of ticks that can be processed within a single frame when the FPS is lower than 20, setting it to a low value may fix the bug which makes players cannot toggle the flying state when the FPS is too low. 
+##### `maxClientTicksPerFrame`
 
-Possible values: Any positive integer.
+The maximum number of ticks can be processed within a single frame when the FPS is lower than 20.
+
+Available values: Any positive integer
 
 Default value: 10
 
-##### `maxEndEyeTpRadius` 
+##### `maxEndEyeTpRadius`
 
-Set the maximum range of teleporting with `endEyeTeleport`. 
+Set the maximum range of teleportation with endEyeTeleport.
 
-Possible values: Any positive real number.
+Available values: Any positive real number
 
 Default value: 180
 
-##### `mobFastKill` 
+##### `minecartPlacementOnNonRailBlocks`
 
-`/kill` removes mobs directly instead of damaging them. In other words, the death amination of mobs killed by the command will be disabled.
+Allow players to place minecarts directly on the ground.
 
-Possible values: true or false
-
-Default value: false
-
-##### `projectileChunkLoading` 
-
-Projectiles load chunks in their processing. It may be helpful in testing pearl canons. Note that if a projectile flies at an extremely high speed when the option is set to true.
-
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `projectileChunkLoadingPermanentence` 
+##### `mobFastKill`
 
-Projectiles load the chunks they are in permanently when `projectileChunkLoading` is enabled.
+/kill kill mobs by removes them directly instead of damaging them.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
+
+##### `projectileChunkLoading`
+
+Allow projectiles to load chunks for themselves in their calculations, which maybe helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.
+
+Available values: true/false
+
+Default value: false
+
+##### `projectileChunkLoadingPermanence`
+
+Projectiles load the chunks permanently when projectileChunkLoading is enabled.
+
+Available values: true/false
+
+Default value: false
+
+##### `projectileChunkLoadingRange`
+
+Set the radius of entity processing chunks loaded by projectileChunkLoading.
+
+Available values: Any non-negative integer
+
+Default value: 3
 
 ##### `projectileRandomnessScale`
 
 The amount of the randomness of projectiles.
 
-Possible values: Any real number.
+Available values: Any real number
 
 Default value: 1.0
 
-##### `projectileChunkLoadingRange` 
+##### `quickMobMounting`
 
-Set the radius of entity processing chunks created by `projectileChunkLoading`.
+Placing mobs into vehicles.
 
-Possible values: Any integer.
+Available values: true/false
 
-Default value: 3
+Default value: false
 
 ##### `railNoAutoConnection`
 
-Prevent the shape of rails from being changed by surrounding blocks.
+Prevent the shape of rails from being changed by surrounding rails.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
@@ -554,47 +612,56 @@ Default value: false
 
 Prevent the chunks from being loaded in some ways.
 
-Possible values: `[]`(empty list) or a list in the form of a,b,c, containing some IDs of chunk tickets.
+Available values: Some of the following elements, separated by ',': 
 
-Default value: `[]`
+- start
+- dragon
+- player
+- forced
+- light
+- portal
+- post_teleport
+- unknown
 
-##### `renderBlockShape` 
+Default value: []
 
-Enable or disable block outline rendering.
+##### `renderBlockShape`
 
-Possible values: true or false
+Enhanced block outline renderer.
+
+Available values: true/false
 
 Default value: false
 
-##### `renderFluidShape` 
+##### `renderFluidShape`
 
-Enable or disable the renderer of outlines, heights, and vectors of flowing directions of target fluids.
+Display the outlines, heights, and vectors describing the flowing directions of the target fluid blocks.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `renderRedstoneGateInfo` 
+##### `renderRedstoneGateInfo`
 
 Display the output level of repeaters and comparators the player looks at.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `serverSyncedBox` 
+##### `serverSyncedBox`
 
-Enable or disable the server-side hitbox renderer. 
+Enable or disable the server-side hitbox renderer.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
 ##### `serverSyncedBoxRenderRange`
 
-Enable or disable the server-side hitbox renderer.
+The maximum Cheshev distance between the player and the entities with their bounding boxes rendered. All non-positive values are considered as positive infinite.
 
-Possible values: Any real number.
+Available values: Any real number
 
 Default value: -1
 
@@ -602,73 +669,104 @@ Default value: -1
 
 Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long distance raycasts.
 
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
 ##### `skippedGenerationStages`
 
-Skip some stages in the world generation. Skipping stage `biomes` and stage `full` is not supported, as the absence of them makes the server crash.
+Skip some stages in the world generation. Skipping stage `biome` and `full` is not supported, as the absense of them will make the server crash.
 
-Possible values: `[]`(empty list) or a list in the form of a,b,c, containing some IDs of chunk statuses and `...` (three dots).
+Available values: Some of the following elements, separated by ',': 
 
-Default value: `[]`
+- empty
+- structure_starts
+- structure_references
+- noise
+- surface
+- carvers
+- liquid_carvers
+- features
+- light
+- spawn
+- heightmaps
+
+Default value: []
 
 ##### `stableHudLocation`
 
-Make the location of huds more stable when the length of lines change frequently.
+Make the location of HUDs more stable when the length of lines change frequently.
 
-Possible values: true or false
+Available values: true/false
 
-Default value: false
+Default value: true
 
 ##### `strictAccessingPathParsing`
 
-<font color=#FF0000>**[TODO]**</font>Treat accessing paths strictly, to make them more relyable. Disable it may make accessing processes more likely to fail in varible environments.
+Parse accessing paths in a more strict way, to make them more reliable. Currently the strictly checking system is not completed, so it is not recommended to enable it.
 
-Possible values: true or false
-
-Default value: false
-
-##### `superSuperSecretSetting` 
-
-<font color=#FF0000>**[TODO]**</font>wlujkgfdhlqcmyfdhj...Anyway, never turn this on!
-
-Possible values: true or false
+Available values: true/false
 
 Default value: false
 
-##### `tntChunkLoading` 
+##### `superSuperSecretSetting`
 
-TNT entities load chunks in their processing. It may help make some kind of TNT canons. Note that if a TNT entity flies at an extremely high speed when the option is set to true.
+wlujkgfdhlqcmyfdhj...Never turn it on!
 
-Possible values: true or false
-
-Default value: false
-
-##### `tntChunkLoadingPermanence` 
-
-TNT entities load the chunks they are in permanently when `tntChunkLoading` is enabled.
-
-Possible values: Any non-negative integer.
+Available values: true/false
 
 Default value: false
 
-##### `tntChunkLoadingRange` 
+##### `tntChunkLoading`
 
-Set the radius of entity processing chunks created by `tntChunkLoading`.
+Allow TNT entities to load chunks for themselves in their ticking, which maybe helpful in designing some kinds of TNT canons.
 
-Possible values: Any integer.
+Available values: true/false
+
+Default value: false
+
+##### `tntChunkLoadingPermanence`
+
+TNT entities load the chunks permanently when tntChunkLoading is enabled.
+
+Available values: true/false
+
+Default value: false
+
+##### `tntChunkLoadingRange`
+
+The radius of entity processing chunks loaded by tntChunkLoading.
+
+Available values: Any non-negative integer
 
 Default value: 3
 
 ##### `vanillaDebugRenderers`
 
-Enable some vanilla debugging renderers
+Enable some vanilla debugging renderers, some of which won't actually work.
 
-Possible values: `[]`(empty list) or a list in the form of a,b,c, containing some names of debug renderers.
+Available values: Some of the following elements, separated by ',': 
 
-Default value: `[]`
+- pathfindingDebugRenderer
+- waterDebugRenderer
+- chunkBorderDebugRenderer
+- heightmapDebugRenderer
+- collisionDebugRenderer
+- neighborUpdateDebugRenderer
+- caveDebugRenderer
+- structureDebugRenderer
+- skyLightDebugRenderer
+- worldGenAttemptDebugRenderer
+- blockOutlineDebugRenderer
+- chunkLoadingDebugRenderer
+- villageDebugRenderer
+- villageSectionsDebugRenderer
+- beeDebugRenderer
+- raidCenterDebugRenderer
+- goalSelectorDebugRenderer
+- gameTestDebugRenderer
+
+Default value: []
 
 ### Key Binds
 

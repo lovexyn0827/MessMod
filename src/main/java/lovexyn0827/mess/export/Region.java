@@ -49,7 +49,7 @@ public class Region {
 				CompoundTag tag = ChunkSerializer.serialize(this.dimension, this.dimension.getChunk(x, z));
 				ChunkPos pos = new ChunkPos(x, z);
 				((RegionBasedStorageAccessor)(Object) storage).writeChunk(pos, tag);
-				// FIXME: Exporting POIs & Raids
+				// FIXME: Exporting raids & maps
 				poiStorage.getInChunk((poi) -> true, pos, OccupationStatus.ANY).forEach((poi) -> {
 					poiDst.add(poi.getPos(), poi.getType());
 				});;

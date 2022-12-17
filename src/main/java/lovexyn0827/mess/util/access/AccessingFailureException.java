@@ -2,9 +2,6 @@ package lovexyn0827.mess.util.access;
 
 import lovexyn0827.mess.util.i18n.I18N;
 
-/**
- * FIXME: Being the direct failureCause of the mess in this package.
- */
 public class AccessingFailureException extends Exception {
 	private static final long serialVersionUID = -4184399838031396060L;
 	private final String shortenedMsg;
