@@ -96,7 +96,7 @@ Add a new line to the entity information sidebar. You can specify where the data
 
 Supported ticking phases: 
 
-- WEATHER_CYCLE: Just after the calculation of weather cycle was completed and the game time was updated.
+- WEATHER_CYCLE: Just after the calculation of weather cycling was completed and the game time was updated.
 - CHUNK: Just after most stuff related to chunks (including unloading, spawning, freezing , snowing, random ticks and many other tasks) get processed.
 - SCHEDULED_TICK: Just after the calculating of scheduled tick finished.
 - VILLAGE: Just after the states of raids got updated.
@@ -112,19 +112,19 @@ Remove a line from the entity information sidebar.
 
 ##### `/explode <pos> <power> [<fire>`] 
 
-Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single preciseness floating-point number, including Infinities and even `NaN`.
+Create an explosion with the power of `<power>` at `<pos>`, and create fire if the optional argument `<fire>` is true. The power of explosions can be any single-precise floating-point number, including Infinities and even `NaN`.
 
 ##### `/freezentity freeze|resume <entities>`
 
-Pause|continue processing selected entities.
+Pause|continue processing selected entities. It can be used to simulate lazy chunks.
 
 ##### `/hud subField target <entityType> <field> [<name> [<path>]]`
 
-Mark `<field>` as 'listened' so that its value will be included in the looking at entity HUD. Currently, `<type>` make no difference to the execution but being used in resolution of the field name and providing suggestions.
+Mark `<field>` as 'listened' so that its value will be included in the looking at entity HUD. Currently, `<type>` make no difference to the execution but being used in the resolution of the field name and providing suggestions.You can specify a custom name and an accessing path for the field if necessary.
 
 ##### `/hud subField client|server <field> [<name> [<path>]]`
 
-Add a listened field to the client-side/server-side player information HUD. You can specift a custom name and an accessing path for the field if necessary.
+Add a listened field to the client-side/server-side player information HUD. You can specify a custom name and an accessing path for the field if necessary.
 
 ##### `/hud unsubField target|client|server <name>`
 
@@ -152,7 +152,7 @@ Start|stop listening to packets between the server and the client(s). For some r
 
 ##### `/messcfg` 
 
-Display the version and current config of the mod.
+Display the version and the current configurationsof the mod.
 
 ##### `/messcfg <option>` 
 
@@ -172,7 +172,7 @@ Set the global value (used as the default value of options for new saves) and th
 
 ##### `/modify <targets> <key> <val>` 
 
-Change the value `<key>` in the entities with to `<val>`. Much simpler than using `/entityfield`. 
+Change the value `<key>` in the entities with to `<val>`. Much simpler than `/entityfield`. 
 
 ##### `/modify <target> remove` 
 
@@ -180,11 +180,11 @@ Remove `<target>` from the world.
 
 ##### `/moventity <targets> <delta> entity self|piston|shulkerBox|player|shulker` 
 
-Move the entity using `Entity.move()`. The displacement  is determined by `<delta>`. Usually, "self" should be used as the last argument. After the execution, the actual displacement of the entity is outputted.
+Move the entity using `Entity.move()`. The displacement is given in argument `<delta>`. Usually, "self" should be used as the last argument. After the execution, the actual displacement of the entity is outputted.
 
 ##### `/moventity <targets> <delta> projectile`
 
-Move the entity in the way projectile entities moves. The distance is determined by `<delta>`. The command seems to be buggy now.
+Move the entity in the way projectile entities moves. The displacement is given in argument `<delta>`. The command seems to be buggy now.
 
 ##### `/poi get <pos>` 
 
@@ -192,7 +192,7 @@ Get the type of the POI at `<pos>`.
 
 ##### `/poi getDistanceToNearestOccupied <pos>` 
 
-Get the distance (Maybe the Manhattan distance, and the unit may be a subchunk) to the nearest working station.
+Get the distance (Maybe the Manhattan distance, and the unit may be a subchunk) to the nearest working site of villagers.
 
 ##### `/poi scan <center> <radius> <type>` 
 
@@ -204,11 +204,11 @@ Find POIs with the given type in a Cube whose two opposite corners are given in 
 
 ##### `/poi set <pos> <type> <replace>` 
 
-Set the POI(Point of Interest) at `<pos>`to `<type>` if there is not a POI at `<pos>` or `<replace>` is true. 
+Set the POI(Point of Interest) at `<pos>`to `<type>` if there is no POI at `<pos>` or `<replace>` is true. 
 
 ##### `/raycast blocks <from> <to> [visual]` 
 
-Check if the direction-ed segment whose two vertexes are given in the command is blocked by any block, just like the collision checking of projectiles and the raycasts in the calculations of exposure of explosions. After execution, the coordination of checked blocks will be output (there may be duplication), and if the line was blocked, the coordination of the block that blocked the line, the face that blocked the line, and the coordination of the point where the line was blocked is output. If visual is present, the process of the checking will be visualized, that is, all grids which checked blocks are in is displayed in light green, the colliding shape of the block which blocked the line is displayed in orange, while the grid the block is in is displayed in purple, the part of the unblocked line is displayed in magenta while the blocked part is displayed in red.
+Check if the direction-ed line between two points given in the command is blocked by any block, in the way most projectiles check for collisions. After execution, the coordination of checked blocks will be output, and if the line was blocked, the coordination of the block that blocked the line, the face that blocked the line, and the coordination of the point where the line was blocked will be output. If visual is present, the process of the checking will be visualized, that is, all grids which checked blocks are in is displayed in light green, the colliding shape of the block which blocked the line is displayed in orange, the grid the block is in is displayed in purple, the part of the unblocked line is displayed in magenta and the blocked part is displayed in red.
 
 Here is an example: 
 
@@ -216,7 +216,7 @@ Here is an example:
 
 ##### `/raycast entities <from> <to> <expand> <excludeSender> [visual]` 
 
-Check if the direction-ed line segment whose two vertexes are given in the command is blocked by any entity, just like the collision checking of projectiles. After the execution, if the line was blocked, the type or the custom name of the entity which blocked the line and the coordination of the point where the line was blocked will be output. The argument `<expand>` determines the range of checking, which should be one-half of the width of the bounding box of the projectile add 1 in projectile collision checking simulations.
+Check if the direction-ed line between two points given in the command is blocked by any entity, in the way most projectiles check for collisions. After the execution, if the line was blocked, the type or the custom name of the entity which blocked the line and the coordination of the point where the line was blocked will be output. The argument `<expand>` determines the range of checking, which should be one-half of the width of the bounding box of the projectile plus 1 in projectile collision checking simulations.
 
 Example: 
 
@@ -224,7 +224,7 @@ Example:
 
 ##### `/repeat <times> <feedbacks> ...` 
 
-Repeat executing a command for given times, the argument can be used to indicate if the feedback of the command is output.
+Repeat executing a command for a given number of times, the argument `<feedback>` can be used to indicate if the feedback of the command is enabled.
 
 ##### `/ride <passengers> <vehicle> <force>`
 
@@ -236,7 +236,7 @@ Get the current seed of the RNG of the dimension.
 
 ##### `/rng world next int <bounds>` 
 
-Get the next integer in the range [0, bounds) generated by the RNG of the dimension.
+Get the next integer generated by the RNG of the dimension in the range [0, bounds).
 
 ##### `/rng world next int|float|double|boolean|gaussian` 
 
@@ -244,15 +244,15 @@ Get the next value generated by the RNG of the dimension.
 
 ##### `/rng <target> ...` 
 
-Do something on the RNG of `<target>` (some entities), just like the last two commands. 
+Do something with the RNGs of `<target>` (some entities), just like the last three commands. 
 
 ##### `/setexplosionblock <blockState> <fireState>` 
 
-Make explosions place `<blockState>` instead of air, `<fireState>` instead of fire. 
+Make explosions place `<blockState>` instead of air and `<fireState>` instead of fire. 
 
 ##### `/tileentity get <pos>` 
 
-Get the information of the block entity at `<pos>`.
+Get the information about the block entity at `<pos>`.
 
 ##### `/tileentity set <pos> <type> <tag>` 
 
@@ -260,11 +260,11 @@ Set the block entity at `<pos>` to `<type>`. Optionally, you can specify a `<tag
 
 ##### `/tileentity remove <pos>` 
 
-Remove the block entity at <pos>.In the current version of the mod, if a block needs a block entity, the block entity will be reset after removing(that is a bug). 
+Remove the block entity at `<pos>`.In the current version of the mod, if a block needs a block entity, the block entity will be recreated after its removal that is a bug). 
 
 ### Options
 
-The following options could be set with the command `/messcfg`, and the format of the command is `/messcfg <option> <value>`. For example, to enable the entity boundary box renderer, the command `/messcfg serverSyncedBox true` could be used.
+The following options could be set with the command `/messcfg <option> <value>`. For example, to enable the entity boundary box renderer, enter `/messcfg serverSyncedBox true`.
 
 ##### `accessingPathInitStrategy`
 
@@ -393,7 +393,7 @@ Default value: false
 
 Item tools, which makes bone and bricks useful. Requires carpet-fabric.
 
-- Bone: /tick step <countOfBones> 
+- Bone: /tick step `<countOfBones>` 
 - Brick: /tick freeze 
 - Netherier Ingot: /kill @e[type!=player]
 
@@ -770,11 +770,11 @@ Default value: []
 
 ### Key Binds
 
-**F3 + E**: Toggle the HUD that displays the information of the entity which the player is looking at. 
+**F3 + E**: Toggle the HUD containing the information of the entity which the player is looking at. 
 
-**F3 + M** : Toggle the HUD that displays the information of the local player. 
+**F3 + M** : Toggle the HUD containing the information of the local player. 
 
-**F3 + S**: Toggle the HUD that displays the information of the server-side player. 
+**F3 + S**: Toggle the HUD containing the information of the server-side player. 
 
 **Ctrl + Z**: Undo block placement or breaking. (Requires `blockPlacementHistory`)
 
@@ -790,7 +790,7 @@ Default value: []
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/explosion-ray-demo.png)
 
-***Server-side hitboxes***: Don't always believe the hitboxes provided by F3 + B because they are adjusted by the client to make movements smoother and don't "keep up with" the server-side when the entity is moving. Sometimes vanilla hitboxes could even be missing if the server has experienced a very long tick but the client hasn't.
+***Server-side hitboxes***: Don't always believe the hitboxes provided by F3 + B because they are adjusted by the client to make movements smoother and move slower than the one on the server when the entity is moving. Sometimes vanilla hitboxes could even be missing if the server has experienced a very long tick but the client hasn't.
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/server-synced-box-demo-0.png)
 
@@ -808,7 +808,7 @@ Default value: []
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/redstone-gate-demo.png)
 
-### Tool Items 
+### Tool Items (requires fabric-carpet and enabledTools)
 
 ***Brick***: Pause or continue ticking using /tick freeze provided by the Carpet
 
@@ -820,33 +820,35 @@ Default value: []
 
 #### Predefined Data
 
-**`Header line`**: Include the ID(equals to the number of Entity instances created before the entity is loaded), name(custom name or the type in /summon), and age(ticks since the entity is loaded).  
+**`Header line`**: Include the ID (usually equals to the number of Entity instances created before the entity is loaded), name (custom name or the type used in /summon), and age (ticks since the entity is loaded).  
 
 **`Pos`**: The position of the entity.
 
-**`Motion`**: The value of field motion (MCP), velocity(Yarn), or deltaMovement (Offical) in the entity's object. 
+**`Motion`**: The value of field motion (MCP), velocity (Yarn), or deltaMovement (Offical) of the entity. 
 
-**`Delta`**: The distance the entity moved in the last update. It can be treated as velocity.
+**`Delta`**: The displacement of the entity in the last tick. It can be treated as the velocity.
 
-**`Yaw, Pitch`**: Nothing, but the facing of the entity.
+**`Yaw, Pitch`**:The direction the entity is facing.
 
-**`Fall Distance`**: The distance the entity has fallen since the entity left the ground, but may be influenced by various factors like updating in lava.
+**`Fall Distance`**: The distance the entity has fallen since the last time the entity left the ground, but it can be influenced by various factors like water and lava.
 
-**`General State`**: Some boolean states that all are available in all entities. More information can be found below.
+**`General State`**: Some boolean states that are available in all entities. More information can be found below.
 
-**`Health`**: LivingEntity(including players, armor stands, and mobs)'s health.
+**`Health`**: LivingEntity (including players, armor stands, and mobs)s' health.
 
 **`Forward, Sideways, Upward`**: Some values related to mob's AI or player's input.
 
-**`Speed`**: Two values representing how fast a LivingEntity moves.
+**`Speed`**: Two values determining how fast a LivingEntity moves.
 
 **`Living State`**: Some boolean states that only exist in LivingEntity. More information can be found below.
 
-**`Fuse`**: The length of a TNT's fuse, or the number of ticks before the explosion.
+**`Fuse`**: The length of a TNT's fuse, or the number of ticks before its explosion.
 
-**`Power`**: The acceleration of a fireball. Note: A fireball has a drag of 0.05gt^-1, so the fireball won't accelerate forever.
+**`Pose`**: The pose of the entity, usually standing.
 
-**`Velocity Decay`**: The value of a boat's drag, which can be a different value when the boat is on different grounds. 
+**`Power`**: The acceleration of a fireball. Note: A fireball has a drag of 0.05gt^(-1), so the fireball won't accelerate forever.
+
+**`Velocity Decay`**: The drag of a boat, which varies when the boat is on different grounds. 
 
 #### Shorten States
 
@@ -866,7 +868,7 @@ Default value: []
 
 **`Wet`**: Some parts of the entity are in water.
 
-**`Sbm`**: The entity is seen as fully submerged in water by the game. <font color=#FF0000>**[WIP]**</font>
+**`Sbm`**: The entity is seen as submerged in water by the game. 
 
 **`Sp`**: Sprinting.
 
@@ -880,7 +882,7 @@ Default value: []
 
 ##### Living Entity Only
 
-**`Hurt`**: Represents the entity has taken any damage(including 0 and negative amounts) in the last tick.  
+**`Hurt`**: The entity has taken any damage(including 0 and negative amounts) in the last tick.  
 
 **`Fly`**: The entity is fall flying, using an elytra.
 
@@ -898,23 +900,33 @@ See the wiki.
 
 Possible values: An integer or a range, just like the `level` option in the vanilla entity selector.
 
-Select entities with given numberic ID (field `entityId`, `networkId`).
+Select entities with numeric IDs (field `entityId`, `networkId`) that match the given one or are within the given range.
 
 ##### `side`
 
 Possible values: `client` or `server`
 
-Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects (in other words, commands that only reads stuff but doesn't writes).
+Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects (in other words, commands that only reads something but doesn't writes).
+
+Only available in single player games.
+
+### Mapping Loading
+
+1. If the minecraft is deobfuscated, the mapping won't be loaded.
+2. Check `mapping` folder for corresponding mapping (i.e.`<mcversion>.ting`, like `1.16.4.tiny`).
+3. Otherwise, if the TIS Carpet Addition is loaded, try to load its bundled mapping.
+4. Otherwise, try to download the latest compatible mapping form fabric's official maven repository.
+5. Otherwise, the mapping won't be loaded.
 
 ### Other Features
 
-- Structure blocks can be seen when the player is very far from the block.
+- Structure blocks can be seen when the player is very far from them, if the version of fabric-carpet is lower than 1.4.25.
 
 - Stacktrace will be printed when the Carpet Mod is not loaded. If the Carpet Mod is loaded, enabling the `superSecretSetting` has the same effect.
 
 ### Notice
 
-- The mod is still in development, some feature is not available or buggy, please tell me if you find something wrong. 
+- The mod is still in development, some feature is not available or buggy, please tell me if you find something working not properly. 
 
 - Dedicated servers are not supported well currently and there are many unsolved bugs related to the connection between the server and the client, so only use the mod in single-player mode or the host client of a LAN server. 
 
