@@ -142,7 +142,7 @@ public class RaycastCommand {
 				e = toCheck;
 				pos = opt.get();
 				CommandUtil.feedbackWithArgs(ct, "cmd.raycast.result.entity", 
-						e.hasCustomName() ? e.getCustomName() : e.getType().getTranslationKey().replaceFirst("^.+\\u002e", ""), e.getEntityId(), 
+						e.hasCustomName() ? e.getCustomName().asString() : e.getType().getTranslationKey().replaceFirst("^.+\\u002e", ""), e.getEntityId(), 
 						pos.x, pos.y, pos.z
 				);
 			}
