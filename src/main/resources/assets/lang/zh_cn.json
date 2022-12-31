@@ -127,6 +127,7 @@
 		"exp.invalidvec3" : "%s不是一个有效的三维向量", 
 		"exp.mapper.format" : "给定的映射器格式有误，应类似于>java/lang/Long::toBinaryString", 
 		"exp.descriptor" : "给定的方法签名（descriptor）格式有误", 
+		"exp.cast" : "%s不能被转换为%s", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 

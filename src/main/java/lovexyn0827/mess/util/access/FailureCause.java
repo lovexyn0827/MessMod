@@ -68,6 +68,11 @@ public enum FailureCause {
 	INV_STATIC("exp.staticl.format"), 
 	
 	/**
+	 * %s couldn't be casted to %s.
+	 */
+	CAST("exp.cast"), 
+	
+	/**
 	 * Unexpected exception: %s
 	 */
 	ERROR("exp.unexc"), 

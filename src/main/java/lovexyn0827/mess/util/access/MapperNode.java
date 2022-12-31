@@ -130,8 +130,8 @@ public class MapperNode extends Node {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(arguments);
-		result = prime * result + Objects.hash(method, mode);
+		result = prime * result + Arrays.hashCode(this.arguments);
+		result = prime * result + Objects.hash(this.method, this.mode);
 		return result;
 	}
 
@@ -150,12 +150,13 @@ public class MapperNode extends Node {
 		}
 		
 		MapperNode other = (MapperNode) obj;
-		return Arrays.equals(arguments, other.arguments) && Objects.equals(method, other.method) && mode == other.mode;
+		return Arrays.equals(this.arguments, other.arguments) 
+				&& Objects.equals(this.method, other.method) && this.mode == other.mode;
 	}
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(this.method.getDeclaringClass().getCanonicalName().replace('/', '/'));
+		StringBuilder sb = new StringBuilder(this.method.getDeclaringClass().getCanonicalName().replace('.', '/'));
 		sb.append("::");
 		sb.append(this.method.getName());
 		if(this.mode != Mode.SIMPLE) {

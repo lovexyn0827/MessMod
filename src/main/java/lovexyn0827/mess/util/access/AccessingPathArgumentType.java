@@ -87,6 +87,11 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			sr.skip();
 			String nodeStr = sr.readStringUntil('.');
 			return new MapperNode(nodeStr);
+		} else if(sr.peek() == '(') {
+			sr.skip();
+			String nodeStr = sr.readStringUntil(')');
+			sr.skip();
+			return new ClassCastNode(nodeStr);
 		} else {
 			String nodeStr = sr.readStringUntil('.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
