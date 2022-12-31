@@ -46,13 +46,13 @@ public interface Mapping {
 		return fieldName;
 	}
 	
-	default String srgMethodRecursively(Class<?> targetClass, String fieldName, String desc) {
+	default String srgMethodRecursively(Class<?> targetClass, String name, String desc) {
 		if(this.isDummy()) {
-			return fieldName;
+			return name;
 		}
 		
 		while(targetClass != Object.class) {
-			String srg = this.srgMethod(targetClass.getName(), fieldName, desc);
+			String srg = this.srgMethod(targetClass.getName(), name, desc);
 			if(srg != null) {
 				return srg;
 			}
@@ -60,7 +60,7 @@ public interface Mapping {
 			targetClass = targetClass.getSuperclass();
 		}
 		
-		return fieldName;
+		return name;
 	}
 	
 	default boolean isDummy() {

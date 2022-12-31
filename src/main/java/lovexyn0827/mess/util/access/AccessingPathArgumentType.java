@@ -83,12 +83,17 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			String nodeStr = sr.readStringUntil('>');
 			sr.skip();
 			return new ValueOfMapNode(Literal.parse(nodeStr));
+		} else if(sr.peek() == '>') {
+			sr.skip();
+			String nodeStr = sr.readStringUntil('.');
+			return new MapperNode(nodeStr);
 		} else {
 			String nodeStr = sr.readStringUntil('.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
 			if(matcher.matches()) {
 				return new MethodNode(matcher.group("name"), matcher.group("types"), matcher.group("args"));
 			} else if(CustomNode.NAME_PATTERN.matcher(nodeStr).matches()) {
+				// FIXME
 				CustomNode node = CustomNode.create(nodeStr);
 				if(node != null) {
 					return node;

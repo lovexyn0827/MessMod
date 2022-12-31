@@ -199,14 +199,20 @@ class MethodNode extends Node implements Cloneable {
 		return this.outputType;
 	}
 
-	public static @Nullable Class<?>[] parseDescriptor(String descriptor) {
+	public static Class<?>[] parseDescriptor(String descriptor) {
 		Mapping map = MessMod.INSTANCE.getMapping();
-		org.objectweb.asm.Type[] args = org.objectweb.asm.Type.getArgumentTypes(descriptor);
+		org.objectweb.asm.Type[] args;
+		try {
+			args = org.objectweb.asm.Type.getArgumentTypes(descriptor);
+		} catch (RuntimeException e) {
+			throw new TranslatableException("exp.descriptor");
+		}
+		
 		Class<?>[] result = new Class<?>[args.length];
 		for(int i = 0; i < args.length; i++) {
 			String clName = map.srgClass(args[i].getClassName());	// XXX Srg or named
 			try {
-				result[i] = Class.forName(clName);
+				result[i] = Reflection.getClassIncludingPrimitive(clName);
 			} catch (ClassNotFoundException e) {
 				TranslatableException e1 = new TranslatableException("exp.noclass", clName);
 				e1.initCause(e);

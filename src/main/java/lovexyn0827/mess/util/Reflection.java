@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -31,6 +32,8 @@ import net.minecraft.entity.EntityType;
 public class Reflection {
 	public static final Map<EntityType<?>, Class<?>> ENTITY_TYPE_TO_CLASS = Maps.newHashMap();
 	private static final Pattern GERERIC_TYPE_EXTRACTOR = Pattern.compile("<([0-9a-zA-Z_.]*)>");
+	private static final ImmutableMap<String, Class<?>> PRIMITIVE_CLASSES;
+	
 	
 	public static boolean hasField(Class<?> clazz, final Field field) {
 		return hasField(clazz, field.getName());
@@ -149,6 +152,15 @@ public class Reflection {
 			return null;
 		}
 	}
+	
+	public static Class<?> getClassIncludingPrimitive(String name) throws ClassNotFoundException {
+		Class<?> priC = PRIMITIVE_CLASSES.get(name);
+		if(priC != null) {
+			return priC;
+		} else {
+			return Class.forName(name);
+		}
+	}
 
 	static {
 		Stream.of(EntityType.class.getFields())
@@ -166,5 +178,15 @@ public class Reflection {
 						e.printStackTrace();
 					}
 				});
+		PRIMITIVE_CLASSES = ImmutableMap.<String, Class<?>>builder()
+				.put("int", int.class)
+				.put("long", long.class)
+				.put("float", float.class)
+				.put("double", double.class)
+				.put("boolean", boolean.class)
+				.put("short", short.class)
+				.put("byte", byte.class)
+				.put("void", void.class)
+				.build();
 	}
 }
