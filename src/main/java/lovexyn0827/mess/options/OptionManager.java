@@ -112,6 +112,11 @@ public class OptionManager{
 	public static boolean debugStickSkipsInvaildState;
 	
 	@Option(defaultValue = "false", 
+			experimental = true, 
+			parserClass = BooleanParser.class)
+	public static boolean dedicatedServerCommands;
+	
+	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean disableChunkLoadingCheckInCommands;
 	

@@ -114,7 +114,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					if(node != null) {
 						return node;
 					} else {
-						throw new TranslatableException("exp.unknownnode");
+						throw new TranslatableException("exp.unknownnode", nodeStr);
 					}
 				}
 			}

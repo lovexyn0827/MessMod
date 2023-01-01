@@ -36,6 +36,7 @@ import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -74,12 +75,27 @@ public abstract class CommandMixin {
         ExportSaveCommand.register(this.dispatcher);
     }
     
-    @Redirect(method = "execute", at = @At(
-    		value = "INVOKE",
-    		target = "org/apache/logging/log4j/Logger.isDebugEnabled()V", 
-    		remap = false),
-    		require = 0)
+    @Redirect(method = "execute", 
+    		at = @At(
+    				value = "INVOKE",
+    				target = "org/apache/logging/log4j/Logger.isDebugEnabled()V", 
+    				remap = false
+    		),
+    		require = 0
+    )
     private boolean alwaysOutputStackTrace(Logger l) {
     	return true;
+    }
+    
+    @Redirect(method = "<init>", 
+    		at = @At(
+    				value = "INVOKE", 
+    				target = "net/minecraft/server/command/CommandManager$RegistrationEnvironment."
+    						+ "isDedicated(Lnet/minecraft/server/command/CommandManager$RegistrationEnvironment;)Z"
+    		)
+    )
+    private boolean modifyDedicated(CommandManager.RegistrationEnvironment env) {
+    	return ((CommandManagerRegistrationEnvironmentAccessor)(Object) env).isDedicated() 
+    			|| OptionManager.dedicatedServerCommands;
     }
 }

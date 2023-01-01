@@ -101,7 +101,7 @@
 		//***** Exceptions *****
 		"exp.reqint" : "Requires an integer, but found %s", 
 		"exp.invaildInvocation" : "%s is not a valid method invocation", 
-		"exp.unknownnode" : "Unknown path node given", 
+		"exp.unknownnode" : "Unknown path node given: %s", 
 		"exp.invalidlast" : "Properity %s couldn't be gotten from the last node", 
 		"exp.outbound" : "Out of bound!", 
 		"exp.nofield" : "Field %s couldn't be found in %s", 
@@ -145,6 +145,7 @@
 		"opt.craftingTableBUD.desc" : "Detect the block updates received by crafting tables.", 
 		"opt.creativeUpwardsSpeed.desc" : "Set the speed which the player is flying upwards at in the creative mode.", 
 		"opt.debugStickSkipsInvaildState.desc" : "Prevent debug sticks from changing blocks to an invalid state. By now, the option doesn't work in many cases, for example, changing the `shape` property of a rail can still turn the rail in to an illegal state and have the rail broken. ", 
+		"opt.dedicatedServerCommands.desc" : "Enable commands for dedicated servers in single player.", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "As the name says, you can fill some blocks in unloaded chunks.", 
 		"opt.disableExplosionExposureCalculation.desc" : "Disable the calculation of explosion exposure to reduce the lag caused by stacked TNT explosions, especially when the TNTs are at the same spot. This will also mean that blocks cannot prevent entities from be influenced by explosions. \nThis feature may not work properly if the Lithium is loaded.", 
 		"opt.disableProjectileRandomness.desc" : "Remove the random speed of projectiles. It could be used to test pearl cannons, but don't forget to disable it if not needed.", 

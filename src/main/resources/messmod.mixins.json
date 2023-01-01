@@ -40,7 +40,8 @@
     "SpawnEggItemMixin", 
     "MinecraftServerAccessor", 
     "ServerCommandSourceAccessor", 
-    "RegionBasedStorageAccessor"
+    "RegionBasedStorageAccessor", 
+    "CommandManagerRegistrationEnvironmentAccessor"
   ],
   "client": [
     "MinecraftClientMixin",
