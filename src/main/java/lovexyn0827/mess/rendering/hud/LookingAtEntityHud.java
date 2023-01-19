@@ -36,7 +36,7 @@ public class LookingAtEntityHud extends EntityHud {
 		Entity target = null;
 		double minDistance = 18;
 		for(Entity entity : player.world.getEntitiesByClass((Class<? extends Entity>) Entity.class, 
-				player.getBoundingBox().expand(direction.x, direction.y, direction.z),  
+				player.getBoundingBox().expand(10),  
 				(e) -> true)) {
 			if(entity.getUuid() == player.getUuid()) continue;
 			Optional<Vec3d> result = entity.getBoundingBox().raycast(pos, max);
@@ -48,6 +48,7 @@ public class LookingAtEntityHud extends EntityHud {
 				}
 			}
 		}
+		
 		return target;
 	}
 }
