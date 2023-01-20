@@ -50,17 +50,27 @@ public class BlockInfoRenderer {
 				BlockPos pos = world.raycast(new RaycastContext(from, from.add(e.getRotationVector().multiply(16)), type.mjType, RaycastContext.FluidHandling.ANY, e))
 						.getBlockPos();
 				FluidState fluid = world.getFluidState(pos);
-				if(!fluid.isEmpty() && OptionManager.renderFluidShape) {		
-					String info = Float.toString(fluid.getHeight())  + '(' + fluid.getLevel() + ')'+ '\n' + fluid.getVelocity(world, pos);
-					sr.addShape(new RenderedBox(fluid.getShape(world, pos).getBoundingBox().offset(pos), 0xFF0000FF, 0, 1, world.getTime()), 
+				long time = world.getTime();
+				if(!fluid.isEmpty() && OptionManager.renderFluidShape) {
+					Vec3d flow = fluid.getVelocity(world, pos);
+					float fluidHeight = fluid.getHeight();
+					String info = Float.toString(fluidHeight)  + '(' + fluid.getLevel() + ')'+ '\n' + flow;
+					sr.addShape(new RenderedBox(fluid.getShape(world, pos).getBoundingBox().offset(pos), 0xFF0000FF, 0, 1, time), 
 							world.getRegistryKey(), BLOCK_INFO_SPACE);
-					sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, world.getTime()), 
-							world.getRegistryKey(), BLOCK_INFO_SPACE);;
+					sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, time), 
+							world.getRegistryKey(), BLOCK_INFO_SPACE);
+					if(flow.length() != 0) {
+						Vec3d displayedFlow = flow.multiply(-0.5D)
+								.add(pos.getX() + 0.5D, pos.getY() + fluidHeight / 2, pos.getZ() + 0.5D);
+						sr.addShape(new RenderedLine(displayedFlow, displayedFlow.add(flow), 
+										0x000000FF, 1, time), 
+								world.getRegistryKey(), BLOCK_INFO_SPACE);
+					}
 				} else {
 					BlockState block = world.getBlockState(pos);
 					VoxelShape voxels = type.getter.getFrom(block, world, pos);
 					if(!voxels.isEmpty() && OptionManager.renderBlockShape) {
-						voxels.getBoundingBoxes().forEach((b) -> sr.addShape(new RenderedBox(b.offset(pos), 0xFF8800FF, 0, 1, world.getTime()), 
+						voxels.getBoundingBoxes().forEach((b) -> sr.addShape(new RenderedBox(b.offset(pos), 0xFF8800FF, 0, 1, time), 
 								world.getRegistryKey(), BLOCK_INFO_SPACE));
 					}
 					
@@ -74,7 +84,7 @@ public class BlockInfoRenderer {
 						}
 						
 						String info = "Output :" + Integer.toString(out);
-						sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, world.getTime()), 
+						sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, time), 
 								world.getRegistryKey(), BLOCK_INFO_SPACE);;
 					}
 				}
