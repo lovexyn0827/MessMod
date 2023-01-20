@@ -47,7 +47,7 @@ public interface Mapping {
 	}
 	
 	default String srgMethodRecursively(Class<?> targetClass, String name, String desc) {
-		if(this.isDummy()) {
+		if(this.isDummy() || !this.isClassMapped(targetClass)) {
 			return name;
 		}
 		

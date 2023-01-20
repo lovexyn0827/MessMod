@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -60,6 +62,7 @@ class TinyMapping implements Mapping {
 	}
 	
 	@Override
+	@Nullable
 	public String srgClass(String named) {
 		return this.classes.inverse().getOrDefault(named, named);
 	}
@@ -71,10 +74,17 @@ class TinyMapping implements Mapping {
 
 	/**
 	 * @param clazz The srg name of the class
+	 * @return The srg name of the given field, or {@code null} if the mapping doesn't contain it.
 	 */
 	@Override
+	@Nullable
 	public String srgField(String clazz, String named) {
-		return this.fieldsByClass.get(clazz).inverse().getOrDefault(named, named);
+		BiMap<String, String> classMap = this.fieldsByClass.get(clazz);
+		if(classMap == null) {
+			return null;
+		}
+		
+		return classMap.inverse().getOrDefault(named, named);
 	}
 
 	@Override
@@ -86,12 +96,18 @@ class TinyMapping implements Mapping {
 	 * @param clazz The srg name of the class
 	 */
 	@Override
+	@Nullable
 	public String srgMethod(String clazz, String named, String desc) {
-		return this.methodsByClass.get(clazz).stream()
-				.filter((m) -> m.name.equals(named) && m.descriptor.equals(desc))
-				.map((m) -> m.srgName)
-				.findFirst()
-				.orElse(null);
+		Set<MethodInfo> classMap = this.methodsByClass.get(clazz);
+		if(classMap != null) {
+			return classMap.stream()
+					.filter((m) -> m.name.equals(named) && m.descriptor.equals(desc))
+					.map((m) -> m.srgName)
+					.findFirst()
+					.orElse(null);
+		} else {
+			return null;
+		}
 	}
 
 	// Maybe unused

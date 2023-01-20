@@ -107,7 +107,7 @@
 		"exp.nofield" : "字段%s在%s中没有被找到", 
 		"exp.unexc" : "意外错误：%s", 
 		"exp.unboundedclass" : "声明字段%s的类不能被确定", 
-		"exp.noclass" : "找不到类%", 
+		"exp.noclass" : "找不到类%s", 
 		"exp.staticl.format" : "用#作为类名与字段名的界限，用/分割包名，就像“java/lang/Float#MAX_VALUE”", 
 		"exp.invalidbp" : "%s不是一个有效的方块坐标",
 		"exp.nomethod" : "方法%s在类%s中未被找到", 
@@ -128,6 +128,8 @@
 		"exp.mapper.format" : "给定的映射器格式有误，应类似于>java/lang/Long::toBinaryString", 
 		"exp.descriptor" : "给定的方法签名（descriptor）格式有误", 
 		"exp.cast" : "%s不能被转换为%s", 
+		"exp.argcount" : "需要%d个参数，但找到了%d个", 
+		"exp.emptyarg" : "某个参数为空", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 

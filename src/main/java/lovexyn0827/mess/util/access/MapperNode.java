@@ -11,9 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableObject;
-
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
@@ -35,6 +32,7 @@ public class MapperNode extends Node {
 	
 	public MapperNode(String toParse) throws CommandSyntaxException {
 		//Class::method<...>(...)
+		// XXX Currently, the method lookup is performed on the client, which may have some valid paths rejected.
 		Matcher matcher = PATTERN.matcher(toParse);
 		if(matcher.matches()) {
 			String name = matcher.group("name");
@@ -43,78 +41,26 @@ public class MapperNode extends Node {
 				throw new TranslatableException("exp.mapper.format");
 			}
 			
-			Mutable<String> srg = new MutableObject<>();
-			Mapping map = MessMod.INSTANCE.getMapping();
 			String typesStr = matcher.group("types");
 			String argsStr = matcher.group("args");
 			try {
-				Optional<Method> mayMethod;
-				Class<?> clazz = Class.forName(className);
-				if(typesStr == null) {
-					// Class::method, only methods with a single parameter and returns something.
-					mayMethod = Reflection.listMethods(clazz).stream()
-							.filter((m) -> {
-								String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
-								srg.setValue(map.srgMethodRecursively(m.getDeclaringClass(), name, descriptor));
-								return m.getName().equals(srg.getValue()) && m.getParameterCount() == 1 
-										&& !m.isSynthetic() && m.getReturnType() != Void.TYPE;
-							})
-							.findFirst();
-					this.arguments = new Literal<?>[] { null };
-					this.mode = Mode.SIMPLE;
-				} else if(typesStr != null && argsStr != null) {
-					// Class::method<types>(args)
-					if(typesStr.matches("[0-9]+")) {
-						// The number of parameters is given
-						int argNum = Integer.parseInt(typesStr);
-						List<Method> targets = Reflection.listMethods(clazz).stream()
-								.filter((m) -> m.getParameterCount() == argNum)
-								.collect(Collectors.toList());
-						if(targets.size() > 1) {
-							throw new TranslatableException("exp.multitarget");
-						} else if (targets.size() == 0) {
-							mayMethod = Optional.empty();
-						} else {
-							mayMethod = Optional.ofNullable(targets.get(0));
-						}
-					} else {
-						// The descriptor is given
-						// TODO Handle overriding / overridden methods better.
-						Class<?>[] types = MethodNode.parseDescriptor(typesStr);
-						mayMethod = Reflection.listMethods(clazz).stream()
-								.filter((m) -> {
-									String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
-									srg.setValue(map.srgMethodRecursively(m.getDeclaringClass(), name, descriptor));
-									return m.getName().equals(srg.getValue()) && Arrays.equals(types, m.getParameterTypes()) 
-											&& !m.isSynthetic();
-								})
-								.findFirst();
-					}
-					
-					String[] argLS = argsStr.split(",");
-					Literal<?>[] argL = new Literal<?>[argLS.length];
-					for(int i = 0; i < argLS.length; i++) {
-						String str = argLS[i];
-						if("_".equals(str)) {
-							argL[i] = null;
-							continue;
-						} else {
-							argL[i] = Literal.parse(str);
-						}
-					}
-					
-					this.arguments = argL;
-					this.mode = Mode.NORMAL;
-				} else {
-					throw new TranslatableException("exp.mapper.format");
-				}
-				
+				Optional<Method> mayMethod = resloveMethod(className, name, typesStr);
 				if(mayMethod.isPresent()) {
 					this.method = mayMethod.get();
 				} else {
 					String mS = name + ((typesStr == null) ? "" : '<' + typesStr + ">");
 					throw new TranslatableException("exp.nomethod", 
-							mS, clazz.getCanonicalName());
+							mS, className);
+				}
+				
+				if(typesStr == null) {
+					this.arguments = new Literal<?>[] { null };
+					this.mode = Mode.SIMPLE;
+				} else if(typesStr != null && argsStr != null) {
+					this.arguments = this.parseArgs(argsStr);;
+					this.mode = Mode.NORMAL;
+				} else {
+					throw new TranslatableException("exp.mapper.format");
 				}
 			} catch (ClassNotFoundException e) {
 				TranslatableException e1 = new TranslatableException("exp.noclass", className);
@@ -123,6 +69,84 @@ public class MapperNode extends Node {
 			}
 		} else {
 			throw new TranslatableException("exp.mapper.format");
+		}
+	}
+
+	public Literal<?>[] parseArgs(String argsStr) throws CommandSyntaxException {
+		if (!argsStr.isEmpty()) {
+			String[] argLS = argsStr.split(",\\b?");
+			int givenArgCount = argLS.length;
+			
+			if(givenArgCount != this.method.getParameterCount()) {
+				throw new TranslatableException("exp.argcount", this.method.getParameterCount(), givenArgCount);
+			}
+			
+			Literal<?>[] argL = new Literal<?>[givenArgCount];
+			for (int i = 0; i < givenArgCount; i++) {
+				String str = argLS[i];
+				if ("_".equals(str)) {
+					// Not necessary, but to make it more clear.
+					argL[i] = null;
+					continue;
+				} else if (str.isEmpty()) {
+					throw new TranslatableException("exp.emptyarg");
+				} else {
+					argL[i] = Literal.parse(str);
+				}
+			}
+			
+			return argL;
+		} else {
+			return new Literal<?>[0];
+		}
+	}
+	
+	private static Optional<Method> resloveMethod(String className, String name, String typesStr) 
+			throws ClassNotFoundException {
+		Mapping map = MessMod.INSTANCE.getMapping();
+		Class<?> clazz = Class.forName(className);
+		if(typesStr == null) {
+			// Class::method, only methods with a single parameter and returns something.
+			return Reflection.listMethods(clazz).stream()
+					.filter((m) -> {
+						String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
+						Class<?> declaringClass = m.getDeclaringClass();
+						String srg = map.srgMethodRecursively(declaringClass, name, descriptor);
+						// Matched name, single parameter, non synthetic and non void
+						return m.getName().equals(srg) && m.getParameterCount() == 1 
+								&& !m.isSynthetic() && m.getReturnType() != Void.TYPE;
+					})
+					.findFirst();
+		} else {
+			// Class::method<types>(args)
+			if(typesStr.matches("[0-9]+")) {
+				// The number of parameters is given
+				int argNum = Integer.parseInt(typesStr);
+				List<Method> targets = Reflection.listMethods(clazz).stream()
+						.filter((m) -> m.getName().equals(name))
+						.filter((m) -> m.getParameterCount() == argNum)
+						.collect(Collectors.toList());
+				if(targets.size() > 1) {
+					throw new TranslatableException("exp.multitarget");
+				} else if (targets.size() == 0) {
+					return Optional.empty();
+				} else {
+					return Optional.ofNullable(targets.get(0));
+				}
+			} else {
+				// The descriptor is given
+				// TODO Handle overriding / overridden methods better.
+				Class<?>[] types = MethodNode.parseDescriptor(typesStr);
+				return Reflection.listMethods(clazz).stream()
+						.filter((m) -> {
+							String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
+							String srg = map.srgMethodRecursively(m.getDeclaringClass(), name, descriptor);
+							return m.getName().equals(srg) 
+									&& Arrays.equals(types, m.getParameterTypes()) 
+									&& !m.isSynthetic();
+						})
+						.findFirst();
+			}
 		}
 	}
 
@@ -201,13 +225,12 @@ public class MapperNode extends Node {
 					return this.method.invoke(previous, argObjs);
 				} catch (IllegalArgumentException e) {
 					throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
-							"[]", this.method.toString());
+							Arrays.toString(this.arguments), this.method.toString());
 				}
 			} else {
 				throw new IllegalStateException();
 			}
 		} catch (InvocationTargetException e) {
-			
 			throw AccessingFailureException.createWithArgs(FailureCause.INVOKE_FAIL, this, e.getCause(), 
 					this.method.getName(), e.getCause());
 		} catch (AccessingFailureException e) {

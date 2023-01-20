@@ -228,10 +228,14 @@ class MethodNode extends Node implements Cloneable {
 			return new Literal<?>[0];
 		}
 		
-		String[] args = argsStr.split(",\b?");
+		String[] args = argsStr.split(",\\b?");
 		Literal<?>[] result = new Literal[args.length];
 		for(int i = 0; i < args.length; i++) {
-			result[i] = Literal.parse(args[i]);
+			if (!args[i].isEmpty()) {
+				result[i] = Literal.parse(args[i]);
+			} else {
+				throw new TranslatableException("exp.emptyarg");
+			}
 		}
 		
 		return result;
