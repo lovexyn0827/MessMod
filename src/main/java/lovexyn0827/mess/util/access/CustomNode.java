@@ -128,5 +128,15 @@ public class CustomNode extends Node {
 	public static void listSuggestions(SuggestionsBuilder b) {
 		NODES_BY_NAME.keySet().forEach(b::suggest);
 	}
-
+	
+	public static String listDefinitions() {
+		StringBuilder sb = new StringBuilder();
+		NODES_BY_NAME.forEach((name, path) -> {
+			sb.append(name);
+			sb.append(": ");
+			sb.append(path);
+			sb.append('\n');
+		});
+		return sb.toString();
+	}
 }

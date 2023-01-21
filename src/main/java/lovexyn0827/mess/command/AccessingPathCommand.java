@@ -56,7 +56,12 @@ public class AccessingPathCommand {
 
 									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
-								})));
+								})))
+				.then(literal("list")
+						.executes((ct) -> {
+							CommandUtil.feedback(ct, CustomNode.listDefinitions());
+							return Command.SINGLE_SUCCESS;
+						}));
 		dispatcher.register(command);
 	}
 }
