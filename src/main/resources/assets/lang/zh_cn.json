@@ -101,7 +101,7 @@
 		//***** Exceptions *****
 		"exp.reqint" : "需要整数， 但是出现了%s", 
 		"exp.invaildInvocation" : "%s不是一个有效的方法调用", 
-		"exp.unknownnode" : "未知的访问路径节点", 
+		"exp.unknownnode" : "未知的访问路径节点%s", 
 		"exp.invalidlast" : "属性%s无法从上一个节点的返回值中获取", 
 		"exp.outbound" : "索引越界", 
 		"exp.nofield" : "字段%s在%s中没有被找到", 
@@ -144,7 +144,7 @@
 		"opt.blockPlacementHistory.desc" : "记录玩家最近放置的方块用于撤销/重做。如果期间方块被玩家以外的事物更改，那么撤销操作可能会引起不可预料的后果。", 
 		"opt.blockShapeToBeRendered.desc" : "选项renderBlockShape为true时被渲染的方块轮廓类型。COLLIDER对应方块的碰撞箱，OUTLINE对应方块在玩家对准时显示的边界。详见Github中Wiki。", 
 		"opt.chunkLoadingInfoRenderer.desc" : "手持鹦鹉螺壳时显示区块加载状态。可能会被移至区块加载小地图（ChunkMap）中。", 
-				"opt.chunkLoadingInfoRenderRadius.desc" : "区块加载状态显示半径，以区块计。", 
+		"opt.chunkLoadingInfoRenderRadius.desc" : "区块加载状态显示半径，以区块计。", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 
 		"opt.creativeUpwardsSpeed.desc" : "调节创造模式下玩家向上飞行（加）速度大小。", 

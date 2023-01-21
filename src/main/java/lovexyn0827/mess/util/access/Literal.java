@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +20,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public abstract class Literal<T> {
+	private static final Pattern NUMBER_PATTERN = Pattern
+			.compile("^((?:\\+|-)?[0-9]*(?:\\.[0-9]*)?|(?:\\+|-)?Infinity|NaN)(?:D|F|L|I)?$");
 	@NotNull
 	protected final String stringRepresentation;
 	/**
@@ -65,6 +69,7 @@ public abstract class Literal<T> {
 	public abstract T get(Type type) throws InvalidLiteralException;
 	
 	public static Literal<?> parse(String strRep) throws CommandSyntaxException {
+		// I & N are reserved for special floating-point numbers.
 		switch(strRep.charAt(0)) {
 		case '\"' : 
 			return new StringL(new StringReader(strRep.substring(1)).readStringUntil('"'));
@@ -86,18 +91,25 @@ public abstract class Literal<T> {
 			return new Vec3dL(strRep);
 		case '<' : 
 		default : 
+			Matcher matcher = NUMBER_PATTERN.matcher(strRep);
 			if("null".equals(strRep)) {
 				return new NullL();
-			} else if (strRep.matches("(\\+|-)?[0-9]*(?:\\.[0-9]*)?(D|F|L|I)?")) {
+			} else if (matcher.matches()) {
+				int gc = matcher.groupCount();
+				for(int i = 0; i < gc; i++) {
+					System.out.format("%d: %s\n", i, matcher.group(i));
+				}
+				
+				String numStr = matcher.group(1);
 				switch(strRep.charAt(strRep.length() - 1)) {
 				case 'D' : 
-					return new DoubleL(strRep);
+					return new DoubleL(numStr);
 				case 'F' : 
-					return new FloatL(strRep);
+					return new FloatL(numStr);
 				case 'L' :  
-					return new LongL(strRep);
+					return new LongL(numStr);
 				case 'I' : 
-					return new IntL(strRep);
+					return new IntL(numStr);
 				default : 
 					if(strRep.contains(".")) {
 						return new DoubleL(strRep);
