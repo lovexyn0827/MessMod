@@ -176,9 +176,13 @@ class MethodNode extends Node implements Cloneable {
 		}
 		
 		StringBuilder sb2 = new StringBuilder("(");
-		for(Literal<?> l : this.args) {
-			sb2.append(l.stringRepresentation);
-			sb2.append(',');
+		if (this.args != null) {
+			for (Literal<?> l : this.args) {
+				sb2.append(l.stringRepresentation);
+				sb2.append(',');
+			}
+		} else {
+			sb2.append("???");
 		}
 		
 		sb2.append(')');

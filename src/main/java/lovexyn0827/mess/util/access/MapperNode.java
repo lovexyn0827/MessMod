@@ -182,17 +182,20 @@ public class MapperNode extends Node {
 	public String toString() {
 		StringBuilder sb = new StringBuilder(this.method.getDeclaringClass().getCanonicalName().replace('.', '/'));
 		sb.append("::");
-		sb.append(this.method.getName());
+		sb.append(this.method != null ? this.method.getName() : "???");
 		if(this.mode != Mode.SIMPLE) {
 			sb.append('<');
-			sb.append(org.objectweb.asm.Type.getMethodDescriptor(this.method));
+			sb.append(this.method != null ? org.objectweb.asm.Type.getMethodDescriptor(this.method) : "???");
 			sb.append('>');
 			sb.append('(');
-			for(Literal<?> l : this.arguments) {
-				sb.append(l.stringRepresentation);
-				sb.append(',');
+			if (this.arguments != null) {
+				for (Literal<?> l : this.arguments) {
+					sb.append(l.stringRepresentation);
+					sb.append(',');
+				} 
+			} else {
+				sb.append("???");
 			}
-			
 			sb.append(')');
 		}
 		
