@@ -143,6 +143,8 @@
 		"opt.blockInfoRendererUpdateInFrozenTicks.desc" : "What should the block information renderers do in ticks frozen by the Carpet.", 
 		"opt.blockPlacementHistory.desc" : "Record what the players has placed recently so that you may undo or redo these operations later. Note that if the blocks are changed by something other than the player, undoing these related operations may result in unexpected behaviors.", 
 		"opt.blockShapeToBeRendered.desc" : "The type of block shape rendered when `renderBlockShape` is enabled. The COLLIDER shape is the  shape used to do calculations about collisions, while the OUTLINE shape is the shape used to let the game know which block the player is looking at. See the wiki on Github for details.", 
+		"opt.chunkLoadingInfoRenderer.desc" : "Display the loading status when holding a nautilus shell. May be moved to the ChunkMap later.", 
+		"opt.chunkLoadingInfoRenderRadius.desc" : "The radius of the area where chunk loading status are displayed, in chunks.", 
 		"opt.commandExecutionRequirment.desc" : "Whether or not execution of commands defined by this mod require OP permission.", 
 		"opt.craftingTableBUD.desc" : "Detect the block updates received by crafting tables.", 
 		"opt.creativeUpwardsSpeed.desc" : "Set the speed which the player is flying upwards at in the creative mode.", 

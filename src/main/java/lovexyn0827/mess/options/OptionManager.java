@@ -95,6 +95,14 @@ public class OptionManager{
 
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean chunkLoadingInfoRenderer;
+	
+	@Option(defaultValue = "4", 
+			parserClass = IntegerParser.NonNegative.class)
+	public static int chunkLoadingInfoRenderRadius;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;
 	
 	@Option(defaultValue = "false", 

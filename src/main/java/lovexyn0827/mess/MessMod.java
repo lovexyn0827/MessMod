@@ -16,6 +16,7 @@ import lovexyn0827.mess.network.MessClientNetworkHandler;
 import lovexyn0827.mess.network.MessServerNetworkHandler;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
+import lovexyn0827.mess.rendering.ChunkLoadingInfoRenderer;
 import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
 import lovexyn0827.mess.rendering.ShapeCache;
 import lovexyn0827.mess.rendering.ShapeRenderer;
@@ -64,6 +65,7 @@ public class MessMod implements ModInitializer {
 	private MessClientNetworkHandler clientNetworkHandler;
 	private MessServerNetworkHandler serverNetworkHandler;
 	private BlockPlacementHistory placementHistory;
+	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
 
 	private MessMod() {
 		this.boxRenderer = new ServerSyncedBoxRenderer();
@@ -125,6 +127,7 @@ public class MessMod implements ModInitializer {
 		this.hudManagerS = new ServerHudManager(server);
 		this.placementHistory = new BlockPlacementHistory();
 		CustomNode.reload(server);
+		this.chunkLoadingInfoRenderer = new ChunkLoadingInfoRenderer();
 		try {
 			this.logger.initialize(server);
 		} catch (IOException e) {
@@ -141,6 +144,8 @@ public class MessMod implements ModInitializer {
 		this.serverNetworkHandler = null;
 		this.placementHistory = null;
 		TickingPhase.removeAllEvents();
+		this.chunkLoadingInfoRenderer.close();
+		this.chunkLoadingInfoRenderer = null;
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.logger.archiveLogs();
