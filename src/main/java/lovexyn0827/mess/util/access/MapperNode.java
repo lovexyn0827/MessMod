@@ -74,7 +74,7 @@ public class MapperNode extends Node {
 
 	public Literal<?>[] parseArgs(String argsStr) throws CommandSyntaxException {
 		if (!argsStr.isEmpty()) {
-			String[] argLS = argsStr.split(",\\b?");
+			String[] argLS = new ArgumentListTokenizer(argsStr).toArray();
 			int givenArgCount = argLS.length;
 			
 			if(givenArgCount != this.method.getParameterCount()) {

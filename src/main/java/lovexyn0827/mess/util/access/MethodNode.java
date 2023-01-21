@@ -228,7 +228,7 @@ class MethodNode extends Node implements Cloneable {
 			return new Literal<?>[0];
 		}
 		
-		String[] args = argsStr.split(",\\b?");
+		String[] args = new ArgumentListTokenizer(argsStr).toArray();
 		Literal<?>[] result = new Literal[args.length];
 		for(int i = 0; i < args.length; i++) {
 			if (!args[i].isEmpty()) {
