@@ -7,12 +7,12 @@ import java.util.Map.Entry;
 
 import org.jetbrains.annotations.Nullable;
 
-import lovexyn0827.mess.util.TickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
 
 import java.util.TreeMap;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 
 public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorage {
 	private TreeMap<HudLine, Object> data = new TreeMap<>();
@@ -48,7 +48,7 @@ public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorag
 	}
 
 	@Override
-	public synchronized void updateData(TickingPhase phase, @Nullable ServerWorld world) {
+	public synchronized void updateData(TickingPhase phase, @Nullable World world) {
 		this.data.keySet().removeIf((l) -> !this.lines.contains(l));
 		this.lines.forEach((l) -> {
 			if(l instanceof SidebarLine) {

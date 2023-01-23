@@ -13,14 +13,11 @@ import net.minecraft.util.math.Vec3d;
 
 // FIXME Boxes are still rendered when the corresponding entities have already been removed
 public class ServerSyncedBoxRenderer {
-	private MinecraftServer server;
+	private final MinecraftServer server;
 	private long lastUpdated;
 	
-	public ServerSyncedBoxRenderer() {
-	}
-
-	public void setServer(MinecraftServer server) {
-		this.server = server ;
+	public ServerSyncedBoxRenderer(MinecraftServer server) {
+		this.server = server;
 	}
 	
 	private void updateBox(Vec3d pos, ServerWorld world) {
@@ -45,9 +42,5 @@ public class ServerSyncedBoxRenderer {
 		if(this.server == null || !OptionManager.serverSyncedBox) return;
 		for(PlayerEntity player : server.getPlayerManager().getPlayerList())
 		this.server.getWorlds().forEach((world) -> this.updateBox(player.getPos(), world));
-	}
-
-	public void uninitialize() {
-		this.server = null;
 	}
 }

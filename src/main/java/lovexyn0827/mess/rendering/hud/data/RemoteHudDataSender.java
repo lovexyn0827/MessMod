@@ -10,7 +10,7 @@ import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.rendering.hud.HudType;
-import lovexyn0827.mess.util.TickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -19,7 +19,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 
 public class RemoteHudDataSender implements HudDataSender {
 	/** Used to determine the delta */
@@ -104,7 +104,8 @@ public class RemoteHudDataSender implements HudDataSender {
 			this.registerTickingEvents();
 		}
 
-		public void updateData(TickingPhase phase, @Nullable ServerWorld world) {
+		@Override
+		public void updateData(TickingPhase phase, @Nullable World world) {
 			CompoundTag data = new CompoundTag();
 			List<String> unused = Lists.newArrayList(this.lastData.getKeys());
 			Stream<HudLine> lines = this.streamAllLines();
@@ -131,7 +132,7 @@ public class RemoteHudDataSender implements HudDataSender {
 			buffer.writeCompoundTag(data);
 			CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.HUD, buffer);
 			this.server.getPlayerManager().getPlayerList().stream()
-					//.filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(HudType.SIDEBAR))
+					//TODO .filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(HudType.SIDEBAR))
 					.forEach((p) -> p.networkHandler.sendPacket(packet));
 		}
 		

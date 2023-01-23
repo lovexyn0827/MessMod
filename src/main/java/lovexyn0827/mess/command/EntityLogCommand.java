@@ -13,10 +13,12 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.log.EntityLogger;
-import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import lovexyn0827.mess.util.i18n.I18N;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -47,7 +49,7 @@ public class EntityLogCommand {
 													.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 											String field = StringArgumentType.getString(ct, "field");
 											try {
-												l.listenToField(field, type, null, null, TickingPhase.TICKED_ALL_WORLDS);
+												l.listenToField(field, type, null, null, ServerTickingPhase.TICKED_ALL_WORLDS);
 												CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 											} catch (Exception e) {
 												CommandUtil.errorRaw(ct, e.getMessage(), e);
@@ -64,7 +66,7 @@ public class EntityLogCommand {
 													String field = StringArgumentType.getString(ct, "field");
 													String name = StringArgumentType.getString(ct, "name");
 													try {
-														l.listenToField(field, type, name, null, TickingPhase.TICKED_ALL_WORLDS);
+														l.listenToField(field, type, name, null, ServerTickingPhase.TICKED_ALL_WORLDS);
 														CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 													} catch (Exception e) {
 														CommandUtil.errorRaw(ct, e.getMessage(), e);
@@ -82,7 +84,7 @@ public class EntityLogCommand {
 															String name = StringArgumentType.getString(ct, "name");
 															AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 															try {
-																l.listenToField(field, type, name, path, TickingPhase.TICKED_ALL_WORLDS);
+																l.listenToField(field, type, name, path, ServerTickingPhase.TICKED_ALL_WORLDS);
 																CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
 															} catch (Exception e) {
 																CommandUtil.errorRaw(ct, e.getMessage(), e);
@@ -98,7 +100,7 @@ public class EntityLogCommand {
 																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 															String field = StringArgumentType.getString(ct, "field");
 															String name = StringArgumentType.getString(ct, "name");
-															TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
+															TickingPhase phase = TickingPhaseArgumentType.getPhase(ct, "whereToUpdate");
 															try {
 																l.listenToField(field, type, name, null, phase);
 																CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
@@ -117,7 +119,7 @@ public class EntityLogCommand {
 																	String field = StringArgumentType.getString(ct, "field");
 																	String name = StringArgumentType.getString(ct, "name");
 																	AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
-																	TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
+																	ServerTickingPhase phase = ServerTickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
 																	try {
 																		l.listenToField(field, type, name, path, phase);
 																		CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
