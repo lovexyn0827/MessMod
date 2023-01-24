@@ -2,7 +2,8 @@ package lovexyn0827.mess.rendering;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
-import lovexyn0827.mess.util.TickingPhase;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
@@ -15,14 +16,15 @@ import net.minecraft.world.chunk.WorldChunk;
 
 public class ChunkLoadingInfoRenderer {
 	private static final ShapeSpace CHUNK_LOADING = new ShapeSpace("chunk_loading");
-	private final TickingPhase.Event updateEvent;
+	private final ServerTickingPhase.Event updateEvent;
 	
 	public ChunkLoadingInfoRenderer() {
 		this.updateEvent = this::tick;
-		TickingPhase.CHUNK.addEvent(updateEvent);
+		ServerTickingPhase.CHUNK.addEvent(updateEvent);
 	}
 	
-	public void tick(TickingPhase phase, ServerWorld world) {
+	public void tick(TickingPhase phase, World worldIn) {
+		ServerWorld world = (ServerWorld) worldIn;
 		ShapeSender ss = MessMod.INSTANCE.shapeSender;
 		if(!OptionManager.chunkLoadingInfoRenderer || ss == null) {
 			return;
@@ -77,6 +79,6 @@ public class ChunkLoadingInfoRenderer {
 	}
 	
 	public void close() {
-		TickingPhase.CHUNK.addEvent(this.updateEvent);
+		ServerTickingPhase.CHUNK.addEvent(this.updateEvent);
 	}
 }

@@ -8,6 +8,7 @@ import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 
 public class ListenedField implements HudLine, Comparable<HudLine> {

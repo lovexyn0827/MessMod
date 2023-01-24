@@ -130,6 +130,7 @@
 		"exp.cast" : "%s couldn't be casted to %s.", 
 		"exp.argcount" : "Expected %d arguments, but found %d", 
 		"exp.emptyarg" : "One of the given arguments is empty!", 
+		"exp.unknownphase" : "Unknown ticking phase: %s", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

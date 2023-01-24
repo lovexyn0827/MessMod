@@ -11,47 +11,58 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap.Entry;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.util.CarpetUtil;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
-import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.WrappedPath;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 
 // TODO Support for EnderDragonPart, whose EntityType is not specified
 public final class EntityLogger {
-	Int2ObjectMap<EntityHolder> entities = new Int2ObjectOpenHashMap<>();
+	public static final Logger LOGGER = LogManager.getLogger();
+	// Log files containing fields updated on the server thread.
+	private Map<EntityIndex, EntityHolder> serverLoggingEntries = new HashMap<>();
+	// Log files containing fields updated on the client thread.
+	private Map<EntityIndex, EntityHolder> clientLoggingEntries = new HashMap<>();
 	private Map<String, EntityLogColumn> customFields = new HashMap<>();
 	private Path logPath;
 	private final Set<EntityType<?>> autoSubTypes = Sets.newHashSet();
 	private long lastSessionStart;
 	private boolean hasCreatedAnyLog;
 	private final Set<String> autoSubNames = Sets.newHashSet();
+	private final MinecraftServer server;
+	
+	public EntityLogger(MinecraftServer server) {
+		this.server = server;
+		this.initialize(server);
+	}
 
-	public void tick(MinecraftServer server) throws IOException {
+	public synchronized void serverTick() {
 		if(!this.autoSubTypes.isEmpty()) {
-			server.getWorlds().forEach((world) -> {
+			this.server.getWorlds().forEach((world) -> {
 				this.subscribe(world.getEntitiesByType(null, (e) -> {
-					return this.autoSubTypes.contains(e.getType()) || this.autoSubNames.contains(e.getName().asString());
+					return this.autoSubTypes.contains(e.getType()) || 
+							this.autoSubNames.contains(e.getName().asString());
 				}));
 			});
 		}
@@ -60,10 +71,26 @@ public final class EntityLogger {
 			return;
 		}
 		
-		this.entities.values().forEach(EntityHolder::tick);
-		Iterator<Entry<EntityHolder>> itr = this.entities.int2ObjectEntrySet().iterator();
+		this.serverLoggingEntries.values().forEach(EntityHolder::serverTick);
+		Iterator<Map.Entry<EntityIndex, EntityHolder>> itr = this.serverLoggingEntries.entrySet().iterator();
 		while(itr.hasNext()) {
-			Entry<EntityHolder> entry = itr.next();
+			Map.Entry<EntityIndex, EntityHolder> entry = itr.next();
+			if(entry.getValue().isInvaild()) {
+				try {
+					entry.getValue().close();
+					itr.remove();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public synchronized void clientTick() {
+		this.clientLoggingEntries.values().forEach(EntityHolder::clientTick);
+		Iterator<Map.Entry<EntityIndex, EntityHolder>> itr = this.clientLoggingEntries.entrySet().iterator();
+		while(itr.hasNext()) {
+			Map.Entry<EntityIndex, EntityHolder> entry = itr.next();
 			if(entry.getValue().isInvaild()) {
 				try {
 					entry.getValue().close();
@@ -76,16 +103,19 @@ public final class EntityLogger {
 	}
 
 	public void flushAll() {
-		this.entities.values().forEach(EntityHolder::flush);
+		this.serverLoggingEntries.values().forEach(EntityHolder::flush);
+		this.clientLoggingEntries.values().forEach(EntityHolder::flush);
 	}
 
 	public void closeAll() {
-		this.entities.values().forEach(EntityHolder::close);
-		this.entities.clear();
+		this.serverLoggingEntries.values().forEach(EntityHolder::close);
+		this.serverLoggingEntries.clear();
+		this.clientLoggingEntries.values().forEach(EntityHolder::close);
+		this.clientLoggingEntries.clear();
 	}
 
 	public void listenToField(String field, EntityType<?> type, String name, AccessingPath path, TickingPhase phase) {
-		Int2ObjectMap<EntityHolder> temp = new Int2ObjectOpenHashMap<>(this.entities);
+		Map<EntityIndex, EntityHolder> temp = new HashMap<>(this.serverLoggingEntries);
 		this.closeAll();
 		if(this.customFields.containsKey(name)) {
 			throw new TranslatableException("exp.dupname");
@@ -109,17 +139,25 @@ public final class EntityLogger {
 			throw new TranslatableException("exp.dupfield");
 		}
 		
-		temp.values().forEach((h) -> this.entities.put(h.getId(), new EntityHolder(h.entity, this)));
+		temp.values().forEach((h) -> {
+			EntityIndex idx = new EntityIndex(h.entity);
+			this.serverLoggingEntries.put(idx, new EntityHolder(h.entity, this, false));
+			this.clientLoggingEntries.put(idx, new EntityHolder(h.entity, this, true));
+		});
 	}
 
 	public void unlistenToField(String name) {
-		Int2ObjectMap<EntityHolder> temp = new Int2ObjectOpenHashMap<>(this.entities);
+		Map<EntityIndex, EntityHolder> temp = new HashMap<>(this.serverLoggingEntries);
 		this.closeAll();
 		if(this.customFields.remove(name) == null) {
 			throw new TranslatableException("exp.nofieldunlistend", name);
 		}
 		
-		temp.values().forEach((h) -> this.entities.put(h.getId(), new EntityHolder(h.entity, this)));
+		temp.values().forEach((h) -> {
+			EntityIndex idx = new EntityIndex(h.entity);
+			this.serverLoggingEntries.put(idx, new EntityHolder(h.entity, this, false));
+			this.clientLoggingEntries.put(idx, new EntityHolder(h.entity, this, true));
+		});
 	}
 
 	/**
@@ -128,11 +166,14 @@ public final class EntityLogger {
 	public int subscribe(Collection<? extends Entity> entities) {
 		this.hasCreatedAnyLog = true;
 		MutableInt i = new MutableInt();
-		entities.stream()
-				.forEach((e) -> {
-					this.entities.computeIfAbsent(e.getEntityId(), (id) -> {
+		entities.forEach((e) -> {
+					EntityIndex idx = new EntityIndex(e);
+					this.serverLoggingEntries.computeIfAbsent(idx, (id) -> {
 						i.increment();
-						return new EntityHolder(e, this);
+						return new EntityHolder(e, this, false);
+					});
+					this.clientLoggingEntries.computeIfAbsent(idx, (id) -> {
+						return new EntityHolder(e, this, true);
 					});
 				});
 		return i.intValue();
@@ -141,27 +182,37 @@ public final class EntityLogger {
 	/**
 	 * @return The number of successfully unsubscribed entities
 	 */
-	@SuppressWarnings("deprecation")
 	public int unsubscribe(Collection<? extends Entity> entities) {
 		MutableInt i = new MutableInt();
 		entities.stream()
-				.map(Entity::getEntityId)
-				.map(this.entities::remove)
+				.map(EntityIndex::new)
+				.map(this.serverLoggingEntries::remove)
 				.filter(Predicates.notNull())
 				.forEach((eh)-> {
 					eh.close();
 					i.increment();
 				});
+		entities.stream()
+				.map(EntityIndex::new)
+				.map(this.clientLoggingEntries::remove)
+				.filter(Predicates.notNull())
+				.forEach((eh)-> {
+					eh.close();
+				});
 		return i.intValue();
 	}
 
-	public void initialize(MinecraftServer server) throws IOException {
+	public void initialize(MinecraftServer server) {
 		this.lastSessionStart = System.currentTimeMillis();
 		this.logPath = server.getSavePath(WorldSavePathMixin.create("entitylog")).toAbsolutePath();
-		this.entities.clear();
-		this.customFields.clear();
 		if(!Files.exists(this.logPath)) {
-			Files.createDirectory(this.logPath);
+			try {
+				Files.createDirectory(this.logPath);
+			} catch (IOException e) {
+				LOGGER.fatal("Failed to create folder for entity logs!");
+				e.printStackTrace();
+				// XXX rethrow
+			}
 		}
 	}
 
@@ -228,6 +279,45 @@ public final class EntityLogger {
 	}
 	
 	public int countLoggedEntities() {
-		return this.entities.size();
+		return this.serverLoggingEntries.size();
+	}
+	
+// TODO	public static enum SideLogStoragePolicy {
+//		MIXED, 
+//		SEPARATED;
+//	}
+	
+	private static class EntityIndex {
+		private final int entityId;
+		private final boolean isClientSideEntity;
+		
+		private EntityIndex(Entity e) {
+			this.entityId = e.getEntityId();
+			this.isClientSideEntity = e.world.isClient;
+			
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(entityId, isClientSideEntity);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			
+			if (obj == null) {
+				return false;
+			}
+			
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			
+			EntityIndex other = (EntityIndex) obj;
+			return entityId == other.entityId && isClientSideEntity == other.isClientSideEntity;
+		}
 	}
 }
