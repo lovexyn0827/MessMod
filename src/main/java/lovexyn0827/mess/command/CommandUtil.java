@@ -179,4 +179,13 @@ public class CommandUtil {
 			return builder.buildFuture();
 		};
 	}
+	
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(Class<Enum<?>> enumClass) {
+		return (ct, builder) -> {
+			Stream.of(enumClass.getEnumConstants())
+					.map(Enum::name)
+					.forEach(builder::suggest);
+			return builder.buildFuture();
+		};
+	}
 }

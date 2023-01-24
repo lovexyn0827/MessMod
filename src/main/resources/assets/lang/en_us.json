@@ -128,6 +128,7 @@
 		"exp.mapper.format" : "The given mapper is incorrect in syntax. Expected something like > java/lang/Long::toBinaryString", 
 		"exp.descriptor" : "The given method descriptor is incorrect in syntax.", 
 		"exp.cast" : "%s couldn't be casted to %s.", 
+		"exp.unknownphase" : "Unknown ticking phase: %s", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

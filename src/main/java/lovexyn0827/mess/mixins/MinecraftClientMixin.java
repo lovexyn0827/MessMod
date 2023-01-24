@@ -28,8 +28,13 @@ public abstract class MinecraftClientMixin {
 		MessMod.INSTANCE.onRender(this.player, this.server);
 	}
 	
+	@Inject(method = "tick", at = @At(value = "HEAD"))
+	private void onTickStart(CallbackInfo ci) {
+		MessMod.INSTANCE.onClientTickStart();
+	}
+	
 	@Inject(method = "tick", at = @At(value = "RETURN"))
-	private void onTick(CallbackInfo ci) {
+	private void onTickEnd(CallbackInfo ci) {
 		MessMod.INSTANCE.onClientTicked();
 	}
 
