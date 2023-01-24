@@ -72,7 +72,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 	}
 	
-	private static BooleanSupplier isModloaded(String id, @Nullable String minVer, @Nullable String maxVer) {
+	private static BooleanSupplier isModLoaded(String id, @Nullable String minVer, @Nullable String maxVer) {
 		Optional<ModContainer> mayMod = FabricLoader.getInstance().getModContainer(id);
 		SemanticVersion minSemiVer;
 		SemanticVersion maxSemiVer;
@@ -108,7 +108,11 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		};
 	}
 	
+	private static BooleanSupplier isModNotLoaded(String id, @Nullable String minVer, @Nullable String maxVer) {
+		return () -> !isModLoaded(id, minVer, maxVer).getAsBoolean();
+	}
+	
 	static {
-		MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModloaded("carpet", null, "1.4.24"));
+		MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModNotLoaded("carpet", "1.4.25", null));
 	}
 }
