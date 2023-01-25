@@ -69,7 +69,7 @@ public class ChunkLoadingInfoRenderer {
 						}
 						
 						RenderedBox marker = new RenderedBox(blockX, height, blockZ, 
-								blockX + 2.0D, height + 0.5D, blockZ + 2.0D, 0x000000FF, color, 
+								blockX + 2.0D, height + 0.5D, blockZ + 2.0D, color | 0x000000FF, color, 
 								2, world.getTime());
 						ss.addShape(marker, worldKey, CHUNK_LOADING);
 					}
