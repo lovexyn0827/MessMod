@@ -53,7 +53,7 @@ public class EntitySidebarCommand {
 									String name = StringArgumentType.getString(ct, "name");
 									SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 									if (sender.removeCustomLine(name)) {
-										CommandUtil.feedbackWithArgs(ct, "Removed the line named %s from the sidebar.", name);
+										CommandUtil.feedbackWithArgs(ct, "cmd.fixedentityhud.remove", name);
 										return Command.SINGLE_SUCCESS;
 									} else {
 										CommandUtil.error(ct, "cmd.general.notfound");
