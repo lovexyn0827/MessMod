@@ -41,7 +41,8 @@
     "MinecraftServerAccessor", 
     "ServerCommandSourceAccessor", 
     "RegionBasedStorageAccessor", 
-    "CommandManagerRegistrationEnvironmentAccessor"
+    "CommandManagerRegistrationEnvironmentAccessor", 
+    "EntityPredicatesMixin"
   ],
   "client": [
     "MinecraftClientMixin",

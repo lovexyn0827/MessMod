@@ -173,6 +173,7 @@
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleportation with endEyeTeleport.", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "Allow players to place minecarts directly on the ground.", 
 		"opt.mobFastKill.desc" : "/kill kill mobs by removes them directly instead of damaging them.", 
+		"opt.optimizedEntityPushing.desc" : "Skip the calculation of cramming between entities which wouldn't be pushed. The damage caused by entity cramming will be influenced.", 
 		"opt.projectileChunkLoading.desc" : "Allow projectiles to load chunks for themselves in their calculations, which maybe helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.", 
 		"opt.projectileChunkLoadingRange.desc" : "Set the radius of entity processing chunks loaded by projectileChunkLoading.", 
 		"opt.projectileChunkLoadingPermanence.desc" : "Projectiles load the chunks permanently when projectileChunkLoading is enabled.", 

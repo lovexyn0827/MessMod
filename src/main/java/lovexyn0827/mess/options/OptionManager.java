@@ -220,6 +220,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean optimizedEntityPushing;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean projectileChunkLoading;
 	
 	@Option(defaultValue = "3", 

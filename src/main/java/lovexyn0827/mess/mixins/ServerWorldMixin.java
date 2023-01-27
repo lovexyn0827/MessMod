@@ -24,6 +24,7 @@ import net.minecraft.world.RaycastContext;
 public abstract class ServerWorldMixin implements BlockView {
 	@Override
 	public BlockHitResult raycast(RaycastContext context) {
+		// TODO Use better approach or copy newer code
 		return (BlockHitResult)BlockView.raycast(context, (raycastContext, blockPos) -> {
 			if(OptionManager.skipUnloadedChunkInRaycasting) {
 				if(!((ServerWorld)(Object) this).isChunkLoaded(blockPos)) {
