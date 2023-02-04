@@ -75,7 +75,7 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 		return result;
 	}
 	
-	public static class ChunkStatusRange extends RangeParser<ChunkStatusRange.ChunkStatusSorter> {
+	public static final class ChunkStatusRange extends RangeParser<ChunkStatusRange.ChunkStatusSorter> {
 		private static final ImmutableBiMap<String, ChunkStatusSorter> VANILLA_CHUNK_STATUSES;
 		
 		public ChunkStatusRange() {

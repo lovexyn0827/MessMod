@@ -63,6 +63,10 @@ public class ShapeRenderer {
     public void render(Camera camera, float partialTick) {
         //Camera camera = this.client.gameRenderer.getCamera();
         ClientWorld iWorld = this.client.world;
+        if(iWorld == null) {
+        	return;
+        }
+        
         RegistryKey<World> dimensionType = iWorld.getRegistryKey();
         Map<ShapeSpace, Set<Shape>> shapesInDim = this.shapes.getShapesInDimension(dimensionType);
         if (shapesInDim == null || shapesInDim.isEmpty()) {

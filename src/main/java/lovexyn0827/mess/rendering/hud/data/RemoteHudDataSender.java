@@ -68,7 +68,7 @@ public class RemoteHudDataSender implements HudDataSender {
 		if(l.canGetFrom(entity)) {
 			Tag last = this.lastData.get(name);
 			String value = l.getFrom(entity);
-			if(last == null || !last.asString().equals(value.toString())) {
+			if(last == null || !last.asString().equals(value)) {
 				data.putString(name, value);
 			}
 			

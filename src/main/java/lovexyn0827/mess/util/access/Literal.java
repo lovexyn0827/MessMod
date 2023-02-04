@@ -95,11 +95,6 @@ public abstract class Literal<T> {
 			if("null".equals(strRep)) {
 				return new NullL();
 			} else if (matcher.matches()) {
-				int gc = matcher.groupCount();
-				for(int i = 0; i < gc; i++) {
-					System.out.format("%d: %s\n", i, matcher.group(i));
-				}
-				
 				String numStr = matcher.group(1);
 				switch(strRep.charAt(strRep.length() - 1)) {
 				case 'D' : 
@@ -248,11 +243,9 @@ public abstract class Literal<T> {
 				String f = MessMod.INSTANCE.getMapping().srgField(cl.getName(), this.stringRepresentation);
 				if(f != null) {
 					Enum<?> e = Enum.valueOf(null, f);
-					if(e != null) {
-						this.enumConstant = e;
-						this.compiled = true;
-						return e;
-					}
+					this.enumConstant = e;
+					this.compiled = true;
+					return e;
 				}
 
 				throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 

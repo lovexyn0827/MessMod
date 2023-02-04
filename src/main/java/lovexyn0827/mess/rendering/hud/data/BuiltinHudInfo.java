@@ -48,10 +48,10 @@ public enum BuiltinHudInfo implements HudLine {
 	POSE("Pose", DataType.POSE, Entity::getPose);
 	
 	public static final Map<String, BuiltinHudInfo> BY_TITLE = Maps.newHashMap();
-	public String header;
-	public DataType type;
-	public Function<Entity, Object> getter;
-	public Class<? extends Entity> classRequirment;
+	public final String header;
+	public final DataType type;
+	public final Function<Entity, Object> getter;
+	public final Class<? extends Entity> classRequirment;
 	
 	private BuiltinHudInfo(String header, DataType type, Function<Entity, Object> getter, @Nullable Class<? extends Entity> classRequirment){
 		this.header = header;

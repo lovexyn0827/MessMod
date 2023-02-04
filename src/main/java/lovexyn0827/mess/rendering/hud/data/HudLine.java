@@ -14,7 +14,7 @@ public interface HudLine{
 	/**
 	 * Used on remote clients, to represent a custom field.
 	 */
-	public class Unknown implements HudLine, Comparable<HudLine> {
+	public static final class Unknown implements HudLine, Comparable<HudLine> {
 		public final String name;
 		
 		Unknown(String name) {

@@ -66,7 +66,11 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 			return true;
 		}
 		
-		if(obj instanceof ListenedField) {
+		if(obj == null) {
+			return false;
+		}
+		
+		if(obj.getClass() == ListenedField.class) {
 			ListenedField other = (ListenedField) obj;
 			return this.field.equals(other.field)
 					&& this.path.equals(other.path);
@@ -108,6 +112,10 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 		public boolean equals(Object obj) {
 			if(this == obj) {
 				return true;
+			}
+			
+			if(obj == null) {
+				return false;
 			}
 			
 			if(obj instanceof Phased) {

@@ -225,12 +225,16 @@ public class MessMod implements ModInitializer {
 	}
 
 	public void sendMessageToEveryone(Object... message) {
-		String merged = "";
-		for(Object ob : message) {
-			merged += ob;
+		if(this.server == null) {
+			throw new IllegalStateException("Called without a server started!");
 		}
 		
-		this.server.getPlayerManager().broadcastChatMessage(new LiteralText(merged), 
+		StringBuilder sb = new StringBuilder();
+		for(Object ob : message) {
+			sb.append(ob);
+		}
+		
+		this.server.getPlayerManager().broadcastChatMessage(new LiteralText(sb.toString()), 
 				MessageType.SYSTEM, 
 				new UUID(0x31f38bL,0x31f0b8L));
 	}

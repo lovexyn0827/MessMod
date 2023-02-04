@@ -89,7 +89,7 @@ public class RemoteShapeCache extends ShapeCache {
 		this.shapeHandler.close();
 	}
 	
-	protected class RemoteShapeTask implements Runnable {
+	protected static class RemoteShapeTask implements Runnable {
 		private final Runnable operation;
 
 		public RemoteShapeTask(Runnable runnable) {

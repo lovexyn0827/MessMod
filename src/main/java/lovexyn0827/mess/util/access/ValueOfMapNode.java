@@ -8,7 +8,7 @@ import com.ibm.icu.impl.locale.XCldrStub.ImmutableMap;
 
 import lovexyn0827.mess.util.Reflection;
 
-class ValueOfMapNode extends Node {
+final class ValueOfMapNode extends Node {
 
 	private Literal<?> keyLiteral;
 	private Object key;
@@ -49,7 +49,7 @@ class ValueOfMapNode extends Node {
 		
 		ValueOfMapNode other = (ValueOfMapNode) obj;
 		return this.key.equals(other.key) 
-				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType));
+				&& (this.outputType == null ? other.outputType == null : this.outputType.equals(other.outputType));
 	}
 	
 	@Override

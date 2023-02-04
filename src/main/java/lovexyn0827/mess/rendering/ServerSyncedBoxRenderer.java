@@ -38,9 +38,16 @@ public class ServerSyncedBoxRenderer {
 	}
 	
 	public void tick() {
-		if(this.server.getOverworld().getTime() == this.lastUpdated) return;
-		if(this.server == null || !OptionManager.serverSyncedBox) return;
-		for(PlayerEntity player : server.getPlayerManager().getPlayerList())
-		this.server.getWorlds().forEach((world) -> this.updateBox(player.getPos(), world));
+		if(this.server == null || !OptionManager.serverSyncedBox) {
+			return;
+		}
+		
+		if(this.server.getOverworld().getTime() == this.lastUpdated) {
+			return;
+		}
+		
+		for(PlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			this.server.getWorlds().forEach((world) -> this.updateBox(player.getPos(), world));
+		}
 	}
 }

@@ -19,7 +19,7 @@ import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 
-class MethodNode extends Node implements Cloneable {
+final class MethodNode extends Node implements Cloneable {
 	static final Pattern METHOD_PATTERN = Pattern.compile(
 			"^(?<name>[$_a-zA-Z0-9]+)(?:\\<(?<types>[^>]*)\\>)?\\((?<args>.*)\\)$");
 
@@ -61,6 +61,7 @@ class MethodNode extends Node implements Cloneable {
 	
 	@Override
 	Object access(Object previous) throws AccessingFailureException {
+		this.ensureInitialized();
 		try {
 			this.method.setAccessible(true);
 			Literal<?>[] argsL = this.args;
@@ -153,7 +154,7 @@ class MethodNode extends Node implements Cloneable {
 		
 		MethodNode other = (MethodNode) obj;
 		return (this.method != null ? this.method.equals(other.method) : this.name.equals(other.name)) 
-				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType))
+				&& (this.outputType == null ? other.outputType == null : this.outputType.equals(other.outputType))
 				&& Arrays.equals(this.args, args)
 				&& Arrays.equals(this.types, this.types);
 	}
@@ -199,7 +200,7 @@ class MethodNode extends Node implements Cloneable {
 	protected Type prepare(Type lastOutType) throws AccessingFailureException {
 		Class<?> cl = Reflection.getRawType(lastOutType);
 		this.resolveMethod(cl == null ? Object.class : cl);
-		this.outputType = method.getGenericReturnType();
+		this.outputType = this.method.getGenericReturnType();
 		return this.outputType;
 	}
 

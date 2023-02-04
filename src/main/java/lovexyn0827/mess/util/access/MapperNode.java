@@ -56,7 +56,7 @@ public class MapperNode extends Node {
 				if(typesStr == null) {
 					this.arguments = new Literal<?>[] { null };
 					this.mode = Mode.SIMPLE;
-				} else if(typesStr != null && argsStr != null) {
+				} else if(argsStr != null) {
 					this.arguments = this.parseArgs(argsStr);;
 					this.mode = Mode.NORMAL;
 				} else {
@@ -180,7 +180,8 @@ public class MapperNode extends Node {
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(this.method.getDeclaringClass().getCanonicalName().replace('.', '/'));
+		StringBuilder sb = new StringBuilder(this.method == null ? 
+				"???" : this.method.getDeclaringClass().getCanonicalName().replace('.', '/'));
 		sb.append("::");
 		sb.append(this.method != null ? this.method.getName() : "???");
 		if(this.mode != Mode.SIMPLE) {

@@ -23,9 +23,7 @@ public final class AccessingPath {
 	public static final AccessingPath DUMMY = new AccessingPath(Collections.emptyList());
 	private final LinkedList<Node> nodes;
 	private boolean initialized;
-	
-	@Nullable
-	private WeakHashMap<Object, AccessingPath> initializedSubPaths = new WeakHashMap<>();
+	private final WeakHashMap<Object, AccessingPath> initializedSubPaths = new WeakHashMap<>();
 	
 	AccessingPath(List<Node> nodes) {
 		this.nodes = new LinkedList<>();

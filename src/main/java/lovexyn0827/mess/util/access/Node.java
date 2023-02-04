@@ -92,4 +92,10 @@ abstract class Node {
 	void write(Object writeTo, Object newValue) throws AccessingFailureException {
 		throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
 	}
+
+	protected void ensureInitialized() {
+		if(!this.isInitialized()) {
+			throw new IllegalStateException("Called before initialization!");
+		}
+	}
 }

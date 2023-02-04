@@ -65,7 +65,6 @@ public class ExportTask {
 	}
 	
 	public boolean export(String name, WorldGenType wgType) throws IOException {
-		String fn = name + "-" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
 		Path archive = this.server.getSavePath(EXPORT_PATH);
 		if(!Files.exists(archive)) {
 			Files.createDirectories(archive);
@@ -107,6 +106,7 @@ public class ExportTask {
 		NbtIo.writeCompressed(level, temp.resolve("level.dat").toFile());
 		MutableBoolean success = new MutableBoolean(true);
 		Path saveRoot = this.server.getSavePath(EXPORT_PATH);
+		String fn = name + "-" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
 		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive.resolve(fn).toFile()))) {
 			Files.walkFileTree(temp, new SimpleFileVisitor<Path>() {
 				public FileVisitResult visitFile(Path path, BasicFileAttributes attr) throws IOException {

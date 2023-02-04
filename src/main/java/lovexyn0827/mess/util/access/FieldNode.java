@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 
 import lovexyn0827.mess.util.Reflection;
 
-class FieldNode extends Node {
+final class FieldNode extends Node {
 
 	private final String fieldName;
 	private Field field;
@@ -48,7 +48,7 @@ class FieldNode extends Node {
 		
 		FieldNode other = (FieldNode) obj;
 		return (this.field == null ? this.fieldName.equals(other.fieldName) : this.field.equals(other.field))
-				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType));
+				&& (this.outputType == null ? other.outputType == null : this.outputType.equals(other.outputType));
 	}
 	
 	@Override

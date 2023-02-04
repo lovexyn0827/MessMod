@@ -37,7 +37,7 @@ abstract class ComponentNode extends Node {
 			return true;
 		}
 		
-		if (obj == null || MethodNode.class != obj.getClass()) {
+		if (obj == null || this.getClass() != obj.getClass()) {
 			return false;
 		}
 		

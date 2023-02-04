@@ -1,6 +1,6 @@
 package lovexyn0827.mess.rendering;
 
-public class ShapeSpace {
+public final class ShapeSpace {
 	/**
 	 * Default space, which can only be managed by the ShapeRenderer class automatically.
 	 */

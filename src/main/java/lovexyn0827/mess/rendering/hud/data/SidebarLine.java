@@ -17,7 +17,6 @@ public final class SidebarLine implements HudLine, Comparable<HudLine> {
 	}
 
 	@Override
-	
 	public @NotNull String getFrom(Entity in) {
 		if(in != this.entity) {
 			throw new IllegalArgumentException();

@@ -9,7 +9,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableCollection;
 import lovexyn0827.mess.util.Reflection;
 
-public class ElementNode extends Node {
+final class ElementNode extends Node {
 
 	private int index;
 
@@ -63,7 +63,7 @@ public class ElementNode extends Node {
 		
 		ElementNode other = (ElementNode) obj;
 		return this.index == other.index
-				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType));
+				&& (this.outputType == null ? other.outputType == null : this.outputType.equals(other.outputType));
 	}
 	
 	@Override

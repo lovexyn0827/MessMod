@@ -9,8 +9,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
 public class LookingAtEntityHud extends EntityHud {
-	public Entity lastLookingAtEntity;
-	
 	public LookingAtEntityHud(ClientHudManager clientHudManager) {
 		super(clientHudManager, HudType.TARGET);
 	}
