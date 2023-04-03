@@ -33,11 +33,6 @@ public class InvalidLiteralException extends Exception {
 	static InvalidLiteralException createWithArgs(FailureCause failureCause, Literal<?> literal, Throwable e, Object ... args) {
 		return new InvalidLiteralException(failureCause, literal, e, args);
 	}
-	
-	@Override
-	public String getMessage() {
-		return shortenedMsg;
-	}
 
 	public String getShortenedMsg() {
 		return this.shortenedMsg;

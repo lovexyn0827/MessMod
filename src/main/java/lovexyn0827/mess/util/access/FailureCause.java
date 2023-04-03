@@ -80,7 +80,12 @@ public enum FailureCause {
 	/**
 	 * Writting is not available.
 	 */
-	NOT_WRITTABLE("exp.nowrite");
+	NOT_WRITTABLE("exp.nowrite"), 
+	
+	/**
+	 * %s couldn't be set to %s
+	 */
+	INV_LAST_W("exp.invalidlastw");
 	
 	final String translationKey;
 	

@@ -106,11 +106,9 @@ final class FieldNode extends Node {
 		try {
 			this.field.set(writeTo, newValue);
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
 			throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
 					newValue == null ? "null" : newValue, this.fieldName);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
 			throw AccessingFailureException.create(FailureCause.ERROR, this, e);
 		}
 	}

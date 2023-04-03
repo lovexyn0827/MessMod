@@ -153,7 +153,8 @@ final class ValueOfMapNode extends Node {
 						throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
 					}
 				} else {
-					throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
+					throw AccessingFailureException.createWithArgs(
+							FailureCause.INV_LAST, this, null, this);
 				}
 			} else {
 				throw AccessingFailureException.createWithArgs(FailureCause.NOT_MAP, this, null, this);

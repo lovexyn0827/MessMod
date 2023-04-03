@@ -27,6 +27,7 @@
 		"cmd.entityfield.unexpected" : "Unexpected exception in getting the field", 
 		"cmd.entityfield.modify.success" : "Field was modified successfully", 
 		"cmd.entityfield.modify.failure" : "Failed to modify the field", 
+		"cmd.entityfield.modify.dismatch" : "Failed to modify the field: Required %s", 
 		
 		//***** entitylog *****
 		"cmd.entitylog.usage" : "TODO", 
@@ -132,6 +133,7 @@
 		"exp.argcount" : "Expected %d arguments, but found %d", 
 		"exp.emptyarg" : "One of the given arguments is empty!", 
 		"exp.unknownphase" : "Unknown ticking phase: %s", 
+		"exp.invalidlastw" : "%s couldn't be set to %s", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

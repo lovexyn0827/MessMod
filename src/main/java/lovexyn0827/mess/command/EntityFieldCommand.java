@@ -180,7 +180,13 @@ public class EntityFieldCommand {
 				} catch (InvalidLiteralException e) {
 					String msg = e.getMessage();
 					CommandUtil.error(ct, msg == null ? "~null~" : msg, e);
+					return false;
+				} catch (IllegalArgumentException e) {
+					CommandUtil.errorWithArgs(ct, "cmd.entityfield.modify.dismatch", 
+							field.getType().getCanonicalName());
+					return false;
 				}
+				
 				return true;
 			} else {
 				obj = field.get(entity);
