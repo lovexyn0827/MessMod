@@ -130,13 +130,15 @@ public class MapperNode extends Node {
 				List<Method> targets = Reflection.listMethods(clazz).stream()
 						.filter((m) -> m.getName().equals(name))
 						.filter((m) -> m.getParameterCount() == argNum)
+						.map(Reflection::getDeepestOverridenMethod)
+						.distinct()
 						.collect(Collectors.toList());
 				if(targets.size() > 1) {
 					throw new TranslatableException("exp.multitarget");
 				} else if (targets.size() == 0) {
 					return Optional.empty();
 				} else {
-					return Optional.ofNullable(targets.get(0));
+					return Optional.of(targets.get(0));
 				}
 			} else {
 				// The descriptor is given
@@ -150,7 +152,8 @@ public class MapperNode extends Node {
 									&& Arrays.equals(types, m.getParameterTypes()) 
 									&& !m.isSynthetic();
 						})
-						.findFirst();
+						.findFirst()
+						.map(Reflection::getDeepestOverridenMethod);
 			}
 		}
 	}

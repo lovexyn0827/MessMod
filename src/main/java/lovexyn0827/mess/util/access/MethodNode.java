@@ -6,12 +6,12 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.collect.Lists;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
@@ -68,7 +68,11 @@ final class MethodNode extends Node implements Cloneable {
 			Object[] argObjs = new Object[argsL.length];
 			Type[] argTypes = this.method.getGenericParameterTypes();
 			for(int i = 0; i < argsL.length; i++) {
-				argObjs[i] = argsL[i].get(argTypes[i]);	// XXX Generic type
+				try {
+					argObjs[i] = argsL[i].get(argTypes[i]);	// XXX Generic type
+				} catch (InvalidLiteralException e) {
+					throw AccessingFailureException.create(e, this);
+				}
 			}
 
 			try {
@@ -78,7 +82,6 @@ final class MethodNode extends Node implements Cloneable {
 						Arrays.toString(argObjs), this.method.toString());
 			}
 		} catch (InvocationTargetException e) {
-			
 			throw AccessingFailureException.createWithArgs(FailureCause.INVOKE_FAIL, this, e.getCause(), 
 					this.name, e.getCause());
 		} catch (AccessingFailureException e) {
@@ -93,8 +96,7 @@ final class MethodNode extends Node implements Cloneable {
 	private void resolveMethod(Class<? extends Object> clazz) throws AccessingFailureException {
 		Mutable<String> srg = new MutableObject<>();
 		Mapping map = MessMod.INSTANCE.getMapping();
-		final List<Method> candidates = Lists.newArrayList();
-		Reflection.listMethods(clazz).stream()
+		final List<Method> candidates = Reflection.listMethods(clazz).stream()
 				.filter((m) -> {
 					String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
 					srg.setValue(map.srgMethodRecursively(clazz, this.name, descriptor));
@@ -111,22 +113,11 @@ final class MethodNode extends Node implements Cloneable {
 					}
 				})
 				.filter((m) -> !m.isSynthetic())
-				.forEach((target) -> {
-					boolean hasTheSame = false;
-					for(Method m : candidates) {
-						if(Arrays.equals(m.getParameterTypes(), target.getParameterTypes())
-								&& m.getReturnType().equals(target.getReturnType())) {
-							hasTheSame = true;
-							break;
-						}
-					}
-					
-					if(!hasTheSame) {
-						candidates.add(target);
-					}
-				});
+				.map(Reflection::getDeepestOverridenMethod)
+				.distinct()
+				.collect(Collectors.toList());
 		if(candidates.size() == 1) {
-			this.method = candidates.get(0);
+			this.method = candidates.iterator().next();
 		} else if(candidates.size() == 0) {
 			throw AccessingFailureException.createWithArgs(FailureCause.NO_METHOD, this, null, 
 					srg.getValue(), clazz.getSimpleName());	// XXX Deobfusciation

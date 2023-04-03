@@ -161,6 +161,19 @@ public class Reflection {
 			return Class.forName(name);
 		}
 	}
+	
+	public static Method getDeepestOverridenMethod(Method in) {
+		Class<?> clazz = in.getDeclaringClass();
+		String name = in.getName();
+		Class<?>[] paramTypes = in.getParameterTypes();
+		while((clazz = clazz.getSuperclass()) != null) {
+			try {
+				in = clazz.getDeclaredMethod(name, paramTypes);
+			} catch (NoSuchMethodException | SecurityException e) {}
+		}
+		
+		return in;
+	}
 
 	static {
 		Stream.of(EntityType.class.getFields())
