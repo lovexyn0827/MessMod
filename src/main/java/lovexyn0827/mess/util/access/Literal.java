@@ -62,6 +62,7 @@ public abstract class Literal<T> {
 	}
 
 	/**
+	 * @param type The type which the literal is expected to be parsed as.
 	 * @throws InvalidLiteralException 
 	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
 	 */
@@ -229,6 +230,7 @@ public abstract class Literal<T> {
 
 		@Override
 		public Enum<?> get(Type clazz) throws InvalidLiteralException {
+			// FIXME Non-necessary non-null check
 			if(this.compiled && this.enumConstant != null) {
 				return this.enumConstant;
 			}
@@ -241,15 +243,18 @@ public abstract class Literal<T> {
 			Class<?> cl = Reflection.getRawType(clazz);
 			if(cl != null && cl.isEnum()) {
 				String f = MessMod.INSTANCE.getMapping().srgField(cl.getName(), this.stringRepresentation);
-				if(f != null) {
-					Enum<?> e = Enum.valueOf(null, f);
+				try {
+					// XXX
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					Enum<?> e = Enum.valueOf((Class) cl, f);
 					this.enumConstant = e;
 					this.compiled = true;
 					return e;
+				} catch (IllegalArgumentException e) {
+					throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
+							this.stringRepresentation, clazz.getTypeName());
+					
 				}
-
-				throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
-						this.stringRepresentation, clazz.getTypeName());
 			} else {
 				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, this.stringRepresentation);
 			}

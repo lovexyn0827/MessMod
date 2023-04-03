@@ -54,6 +54,11 @@ public class MapperNode extends Node {
 				}
 				
 				if(typesStr == null) {
+					boolean hasArgs = argsStr == null || argsStr.isEmpty();
+					if(!hasArgs) {
+						throw new TranslatableException("exp.mapper.unsupportedargs");
+					}
+					
 					this.arguments = new Literal<?>[] { null };
 					this.mode = Mode.SIMPLE;
 				} else if(argsStr != null) {
@@ -211,25 +216,31 @@ public class MapperNode extends Node {
 				try {
 					return this.method.invoke(previous, previous);
 				} catch (IllegalArgumentException e) {
+					String argList = "[" + previous == null ? "null" : previous.getClass().getCanonicalName() + "]";
 					throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
-							"[]", this.method.toString());
+							argList, this.method.toString());
 				}
 			} else if(this.mode == Mode.NORMAL) {
-				try {
-					Object[] argObjs = new Object[this.arguments.length];
-					for(int i = 0; i < this.arguments.length; i++) {
-						Literal<?> l = this.arguments[i];
-						if(l != null) {
-							argObjs[i] = l.get(this.inputType);	// XXX Generic type
-						} else {
-							argObjs[i] = previous;
+				Object[] argObjs = new Object[this.arguments.length];
+				Type[] argTypes = this.method.getGenericParameterTypes();
+				for(int i = 0; i < this.arguments.length; i++) {
+					Literal<?> l = this.arguments[i];
+					if(l != null) {
+						try {
+							argObjs[i] = l.get(argTypes[i]);	// XXX Generic type
+						} catch (InvalidLiteralException e) {
+							throw AccessingFailureException.create(e, this);
 						}
+					} else {
+						argObjs[i] = previous;
 					}
-					
+				}
+				
+				try {
 					return this.method.invoke(previous, argObjs);
 				} catch (IllegalArgumentException e) {
 					throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
-							Arrays.toString(this.arguments), this.method.toString());
+							Arrays.toString(argObjs), this.method.toString());
 				}
 			} else {
 				throw new IllegalStateException();

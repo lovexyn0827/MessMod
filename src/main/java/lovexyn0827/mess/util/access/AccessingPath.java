@@ -130,7 +130,7 @@ public final class AccessingPath {
 		}
 		
 		try {
-			last.write(intermediate, value.get(last.inputType));
+			last.write(intermediate, value.get(last.outputType));
 		} catch (InvalidLiteralException e) {
 			throw AccessingFailureException.create(e, null);
 		}
