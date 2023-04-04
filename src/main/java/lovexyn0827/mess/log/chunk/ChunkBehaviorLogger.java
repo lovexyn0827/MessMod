@@ -43,7 +43,7 @@ public class ChunkBehaviorLogger extends AbstractAchivingLogger {
 				.addColumn("GameTime")
 				.addColumn("RealTime")
 				.addColumn("Thread")
-				.addColumn("Cause")
+				.addColumn("Cause")	// TODO
 				.addColumn("Addition")
 				.build(writer);
 		this.working = true;

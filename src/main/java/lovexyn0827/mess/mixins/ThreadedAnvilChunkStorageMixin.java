@@ -85,7 +85,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	}
 	
 	@Inject(method = "method_17256", 
-			at = @At(value = "HEAD")
+			at = @At(value = "HEAD"), 
+			remap = false
 	)
 	private void onChunkLoad(ChunkPos pos, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
@@ -110,7 +111,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	}
 	
 	@Inject(method = "method_20460", 
-			at = @At(value = "HEAD")
+			at = @At(value = "HEAD"), 
+			remap = false
 	)
 	private void onChunkGeneration(ChunkHolder holder, Either<?, ?> either, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
@@ -123,7 +125,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	}
 	
 	@Inject(method = "method_17225", 
-			at = @At(value = "HEAD")
+			at = @At(value = "HEAD"), 
+			remap = false
 	)
 	private void onChunkUpgrade(ChunkPos pos, ChunkHolder holder, ChunkStatus status, List<?> list, 
 			CallbackInfoReturnable<Boolean> cir) {

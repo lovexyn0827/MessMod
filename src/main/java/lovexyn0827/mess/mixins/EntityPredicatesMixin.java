@@ -15,8 +15,9 @@ import net.minecraft.scoreboard.AbstractTeam;
 public class EntityPredicatesMixin {
 	@Inject(method = "method_5915", 
 			at = @At("HEAD"), 
-			cancellable = true
-			)
+			cancellable = true, 
+			remap = false
+	)
 	private static void skipEntityIfNeeded(Entity entity, AbstractTeam team, AbstractTeam.CollisionRule rule, 
 			Entity entityBeingTicked, CallbackInfoReturnable<Boolean> cir) {
 		if(OptionManager.optimizedEntityPushing) {

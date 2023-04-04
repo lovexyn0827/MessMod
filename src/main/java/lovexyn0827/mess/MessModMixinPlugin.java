@@ -1,9 +1,13 @@
 package lovexyn0827.mess;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -13,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+
+import com.google.common.collect.ImmutableSet;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -28,7 +34,10 @@ import net.fabricmc.loader.api.VersionParsingException;
 public class MessModMixinPlugin implements IMixinConfigPlugin {
 	private static final Logger LOGGER = LogManager.getLogger();
 	private static final String MESSMOD_MIXINS = "lovexyn0827.mess.mixins.";
-	private static final Map<String, BooleanSupplier> MINIX_REQUIREMENTS = new HashMap<>();
+	private static final File ADVANCED_MIXINS_CONFIGURATION = new File("advanced_mixins.prop");
+	private static final Map<String, BooleanSupplier> CUSTOM_MINIX_REQUIREMENTS = new HashMap<>();
+	private static final ImmutableSet<String> ADVANCED_MIXINS;
+	private static final ImmutableSet<String> ACTIVIATED_ADVANCED_MIXINS;
 	
 	@Override
 	public void onLoad(String mixinPackage) {
@@ -41,10 +50,14 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if(ADVANCED_MIXINS.contains(mixinClassName) && !ACTIVIATED_ADVANCED_MIXINS.contains(mixinClassName)) {
+			return false;
+		}
+		
 		try {
 			mixinClassName = mixinClassName.replace(MESSMOD_MIXINS, "");
-			if(MINIX_REQUIREMENTS.containsKey(mixinClassName)) {
-				return MINIX_REQUIREMENTS.get(mixinClassName).getAsBoolean();
+			if(CUSTOM_MINIX_REQUIREMENTS.containsKey(mixinClassName)) {
+				return CUSTOM_MINIX_REQUIREMENTS.get(mixinClassName).getAsBoolean();
 			}
 			
 			return true;
@@ -111,8 +124,45 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	private static BooleanSupplier isModNotLoaded(String id, @Nullable String minVer, @Nullable String maxVer) {
 		return () -> !isModLoaded(id, minVer, maxVer).getAsBoolean();
 	}
+
+	private static ImmutableSet<String> getActiviatedAdvancedMixins(ImmutableSet<String> advancedMixins) {
+		try {
+			Properties config = new Properties();
+			if(!ADVANCED_MIXINS_CONFIGURATION.exists()) {
+				ADVANCED_MIXINS_CONFIGURATION.createNewFile();
+				advancedMixins.forEach((entry) -> {
+					config.put(entry, "false");
+				});
+				
+				try(FileWriter fw = new FileWriter(ADVANCED_MIXINS_CONFIGURATION)) {
+					config.store(fw, "Advanced Mixins of MessMod");
+				}
+				
+				return ImmutableSet.of();
+			}
+			
+			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+			try(FileReader fr = new FileReader(ADVANCED_MIXINS_CONFIGURATION)) {
+				config.load(fr);
+				config.forEach((k, v) -> {
+					if(Boolean.parseBoolean((String) v)) {
+						builder.add((String) k);
+					}
+				});
+			}
+			
+			return builder.build();
+		} catch (Exception e) {
+			LOGGER.fatal("Failed to load activation config of advanced mixins!");
+			e.printStackTrace();
+			return ImmutableSet.of();
+		}
+	}
 	
 	static {
-		MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModNotLoaded("carpet", "1.4.25", null));
+		CUSTOM_MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModNotLoaded("carpet", "1.4.25", null));
+		ADVANCED_MIXINS = ImmutableSet.<String>builder()
+				.build();
+		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);
 	}
 }
