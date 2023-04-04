@@ -12,7 +12,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.log.EntityLogger;
+import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import lovexyn0827.mess.util.i18n.I18N;

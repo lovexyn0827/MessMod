@@ -2,7 +2,7 @@ package lovexyn0827.mess.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import lovexyn0827.mess.log.EntityLogColumn;
+import lovexyn0827.mess.log.entity.EntityLogColumn;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;

@@ -3,7 +3,7 @@ package lovexyn0827.mess.util;
 import java.lang.reflect.Field;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.log.EntityLogColumn;
+import lovexyn0827.mess.log.entity.EntityLogColumn;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingFailureException;

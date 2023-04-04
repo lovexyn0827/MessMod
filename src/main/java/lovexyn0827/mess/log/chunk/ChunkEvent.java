@@ -1,0 +1,12 @@
+package lovexyn0827.mess.log.chunk;
+
+public enum ChunkEvent {
+	LOADING, 
+	UNLOADING, 
+	GENERATION, 
+	UPGARDE, 
+	SCHEDULER_LOADING, 
+	SCHEDULER_UNLOADING, 
+	SCHEDULER_GENERATION, 
+	SCHEDULER_UPGARDE;
+}

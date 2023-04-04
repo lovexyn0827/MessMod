@@ -4,6 +4,8 @@
 		//***** Generic translations in commands *****
 		"cmd.general.sub" : "找到了%d个实体，并开始了其中的%d个实体的记录", 
 		"cmd.general.unsub" : "找到了%d个实体，并取消了对其中的%d个实体的记录", 
+		"cmd.general.subgen" : "已开始监视%s", 
+		"cmd.general.unsubgen" : "取消监视%s", 
 		"cmd.general.found" : "在(%d, %d, %d)找到了POI", 
 		"cmd.general.notfound" : "未找到", 
 		"cmd.general.nodef" : "%s未被定义", 
@@ -59,6 +61,11 @@
 		//***** lag *****
 		"cmd.lag.unsupported" : "专用服务器环境下无法访问线程%s", 
 		"cmd.lag.done" : "卡顿完成", 
+		
+		//***** logchunkbehavior *****
+		"cmd.logchunkbehavior.reqidle" : "该操作仅在记录器空闲时可用", 
+		"cmd.logchunkbehavior.alreadystarted" : "记录器已被启用", 
+		"cmd.logchunkbehavior.alreadystopped" : "记录器已经停止工作", 
 		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "当前配置", 
@@ -149,6 +156,7 @@
 		"opt.blockShapeToBeRendered.desc" : "选项renderBlockShape为true时被渲染的方块轮廓类型。COLLIDER对应方块的碰撞箱，OUTLINE对应方块在玩家对准时显示的边界。详见Github中Wiki。", 
 		"opt.chunkLoadingInfoRenderer.desc" : "手持鹦鹉螺壳时显示区块加载状态。可能会被移至区块加载小地图（ChunkMap）中。", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "区块加载状态显示半径，以区块计。", 
+		"opt.chunkLogAutoArchiving.desc" : "自动存档一个会话内产生的区块行为记录，存档文件可在`世界文件夹/chunklog/archives`找到", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 
 		"opt.creativeUpwardsSpeed.desc" : "调节创造模式下玩家向上飞行（加）速度大小。", 

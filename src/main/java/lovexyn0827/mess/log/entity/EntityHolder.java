@@ -1,4 +1,4 @@
-package lovexyn0827.mess.log;
+package lovexyn0827.mess.log.entity;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.log.CsvWriter;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.phase.ClientTickingPhase;
@@ -23,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntityHolder {
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 	final Entity entity;
 	private final int entityId;;
 	private final CsvWriter writer;
@@ -36,7 +38,7 @@ public class EntityHolder {
 		this.entityId = entity.getEntityId();
 		this.isClient = isClient;
 		String entityName = e.getName().asString();
-		String name = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) 
+		String name = DATE_FORMAT.format(new Date()) 
 				+ "@" + this.entityId + '-' + (isClient ? 'C' : 'S') + '-'
 				+ (entityName.length() == 0 ? entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "") : 
 						entityName) + ".csv";

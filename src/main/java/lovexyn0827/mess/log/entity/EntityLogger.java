@@ -1,20 +1,12 @@
-package lovexyn0827.mess.log;
+package lovexyn0827.mess.log.entity;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
@@ -24,8 +16,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import lovexyn0827.mess.log.AbstractAchivingLogger;
 import lovexyn0827.mess.util.CarpetUtil;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
@@ -38,23 +29,18 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 
 // TODO Support for EnderDragonPart, whose EntityType is not specified
-public final class EntityLogger {
+public final class EntityLogger extends AbstractAchivingLogger {
 	public static final Logger LOGGER = LogManager.getLogger();
 	// Log files containing fields updated on the server thread.
-	private Map<EntityIndex, EntityHolder> serverLoggingEntries = new HashMap<>();
+	Map<EntityIndex, EntityHolder> serverLoggingEntries = new HashMap<>();
 	// Log files containing fields updated on the client thread.
-	private Map<EntityIndex, EntityHolder> clientLoggingEntries = new HashMap<>();
+	Map<EntityIndex, EntityHolder> clientLoggingEntries = new HashMap<>();
 	private Map<String, EntityLogColumn> customFields = new HashMap<>();
-	private Path logPath;
 	private final Set<EntityType<?>> autoSubTypes = Sets.newHashSet();
-	private long lastSessionStart;
-	private boolean hasCreatedAnyLog;
 	private final Set<String> autoSubNames = Sets.newHashSet();
-	private final MinecraftServer server;
 	
 	public EntityLogger(MinecraftServer server) {
-		this.server = server;
-		this.initialize(server);
+		super(server);
 	}
 
 	public synchronized void serverTick() {
@@ -101,7 +87,11 @@ public final class EntityLogger {
 			}
 		}
 	}
-
+	
+	protected String getLogFolderName() {
+		return "entitylog";
+	}
+	
 	public void flushAll() {
 		this.serverLoggingEntries.values().forEach(EntityHolder::flush);
 		this.clientLoggingEntries.values().forEach(EntityHolder::flush);
@@ -202,54 +192,6 @@ public final class EntityLogger {
 		return i.intValue();
 	}
 
-	public void initialize(MinecraftServer server) {
-		this.lastSessionStart = System.currentTimeMillis();
-		this.logPath = server.getSavePath(WorldSavePathMixin.create("entitylog")).toAbsolutePath();
-		if(!Files.exists(this.logPath)) {
-			try {
-				Files.createDirectory(this.logPath);
-			} catch (IOException e) {
-				LOGGER.fatal("Failed to create folder for entity logs!");
-				e.printStackTrace();
-				// XXX rethrow
-			}
-		}
-	}
-
-	public Path getLogPath() {
-		return this.logPath;
-	}
-	
-	public void archiveLogs() throws IOException {
-		Path archiveDir = this.logPath.resolve("archived");
-		if(!Files.exists(archiveDir)) {
-			Files.createDirectory(archiveDir);
-		}
-		
-		if(this.hasCreatedAnyLog) {
-			String fn = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
-			Path archive = archiveDir.resolve(fn);
-			try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive.toFile()))) {
-				Files.walk(this.logPath, 1)
-						.filter((f) -> f.getFileName().toString().endsWith(".csv"))
-						.filter((f) -> f.toFile().lastModified() >= this.lastSessionStart)
-						.forEach((f) -> {
-							try {
-								zos.putNextEntry(new ZipEntry(f.getFileName().toString()));
-								zos.write(Files.readAllBytes(f));
-								Files.delete(f);
-							} catch (IOException e) {
-								MessMod.LOGGER.warn("Failed to archive " + f.toString());
-								e.printStackTrace();
-							}
-						});
-				zos.finish();
-			}
-			
-			MessMod.LOGGER.info("Archived the entity logs to " + archive.toAbsolutePath().toString());
-		}
-	}
-	
 	public void addAutoSubEntityType(EntityType<?> type) {
 		this.autoSubTypes.add(type);
 	}

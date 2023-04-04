@@ -101,6 +101,10 @@ public class OptionManager{
 			parserClass = IntegerParser.NonNegative.class)
 	public static int chunkLoadingInfoRenderRadius;
 	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class)
+	public static boolean chunkLogAutoArchiving;
+	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;

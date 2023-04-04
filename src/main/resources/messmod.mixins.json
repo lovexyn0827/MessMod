@@ -42,7 +42,8 @@
     "ServerCommandSourceAccessor", 
     "RegionBasedStorageAccessor", 
     "CommandManagerRegistrationEnvironmentAccessor", 
-    "EntityPredicatesMixin"
+    "EntityPredicatesMixin", 
+    "ThreadedAnvilChunkStorageMixin"
   ],
   "client": [
     "MinecraftClientMixin",

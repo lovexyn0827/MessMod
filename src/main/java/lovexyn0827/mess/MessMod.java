@@ -11,7 +11,8 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.log.EntityLogger;
+import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
+import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.network.MessClientNetworkHandler;
 import lovexyn0827.mess.network.MessServerNetworkHandler;
@@ -70,6 +71,7 @@ public class MessMod implements ModInitializer {
 	private MessServerNetworkHandler serverNetworkHandler;
 	private BlockPlacementHistory placementHistory;
 	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
+	private ChunkBehaviorLogger chunkLogger;
 
 	private MessMod() {
 		this.reloadMapping();
@@ -127,6 +129,7 @@ public class MessMod implements ModInitializer {
 		this.chunkLoadingInfoRenderer = new ChunkLoadingInfoRenderer();
 		this.entityLogger = new EntityLogger(server);
 		this.shapeSender = ShapeSender.create(server);
+		this.chunkLogger = new ChunkBehaviorLogger(server);
 	}
 
 	public void onServerShutdown(MinecraftServer server) {
@@ -149,7 +152,17 @@ public class MessMod implements ModInitializer {
 			}
 		}
 		
+		if(OptionManager.chunkLogAutoArchiving) {
+			try {
+				this.chunkLogger.archiveLogs();
+			} catch (IOException e) {
+				LOGGER.error("Failed to archive entity logs!");
+				e.printStackTrace();
+			}
+		}
+		
 		this.entityLogger = null;
+		this.chunkLogger = null;
 		CommandUtil.updateServer(null);
 	}
 
@@ -298,5 +311,9 @@ public class MessMod implements ModInitializer {
 		} else {
 			return this.server != null ? this.server.isOnThread() : false;
 		}
+	}
+
+	public ChunkBehaviorLogger getChunkLogger() {
+		return this.chunkLogger;
 	}
 }
