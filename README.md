@@ -2,6 +2,8 @@
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/MessMod.png)
 
+![](https://img.shields.io/modrinth/dt/messmod?label=Total%20Modrinth%20Downloads)
+
 A Minecraft mod that contains many features ranging from world 
 manipulation and information providing to bug fixes and so on, allowing 
 you to take more control of the game, see more information, and do some 

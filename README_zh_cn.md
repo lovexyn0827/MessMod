@@ -2,825 +2,827 @@
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/MessMod.png)
 
-һ�������ṩ������������������һЩ��ǿ���ܵ�Minecraft Mod  
+![](https://img.shields.io/modrinth/dt/messmod?label=Total%20Modrinth%20Downloads)
 
-��������������˵�����Mod�����˺ܶ෽��Ĺ��ܣ�������ƣ���Ϣ��ʾ�����Ը����Լ�һЩBug�޸��ȣ�����Щ�������д�ģ��ǳ��ң�����������Ҳ���ҡ�
+一个用于提供额外的世界访问能力及一些增强功能的Minecraft Mod  
 
-�������ԣ� 
+正如其名字中所说，这个Mod包含了很多方面的功能（世界控制，信息显示，特性更改以及一些Bug修复等），有些还是随便写的，非常乱，就连代码风格也很乱。
+
+其他语言： 
 [English](/README.md)  
 
-## ����
+## 需求
 
 1. Fabric Loader 0.7.4+  
-2. gnembon�ĵ�̺Mod��fabric-carpet�������ֹ�����Ҫ������ǿ���Ƽ��������Ǳ��裩  
+2. gnembon的地毯Mod（fabric-carpet）（部分功能需要，所以强烈推荐，但并非必需）  
 3. Minecraft 1.16.4/1.16.5/1.17.1/1.18.2
-4. Minecraft��Ҫ�����ж��� 
+4. Minecraft需要的所有东西 
 
-## ����
+## 命令
 
-���������ü�������ס����������Ϊ��ѡ���֡�
+参数名称用尖括号括住，方括号中为可选部分。
 
 ##### `/ensure <pos>`
 
-��ȡ`<pos>`���ķ����Լ�����ʵ�壨���У���Ϣ������ȷ��ĳ�������Ƿ������Ⱦ����������鷽�顣
+获取`<pos>`处的方块以及方块实体（若有）信息，用以确认某个方块是否存在渲染错误或是幽灵方块。
 
 ##### `/entityconfig <targets> enableStepHeight|disableStepHeight`
 
-�������ֹ`<targets>`ָ����ʵ��ֱ�����Ϸ��顣  
+允许或禁止`<targets>`指定的实体直接走上方块。  
 
 ##### `/entityconfig localPlayer enableStepHeight|disableStepHeight`
 
-�������ֹ�ͻ������ֱ�����Ϸ��顣  
+允许或禁止客户端玩家直接走上方块。  
 
 ##### `/entityfield <target> get <fieldName> [<path>]`
 
-��ȡ����targetָ����ʵ��Ķ�������Ϊ`<fieldName>`���ֶΣ�����ָ��Accessing Path�����û�м��ػ���ӳ������˴���������������`field_827`��intermediary names����Ҫ�˹������Ա����⡣  
+获取代表target指定的实体的对象中名为`<fieldName>`的字段，可以指定Accessing Path。如果没有加载混淆映射表，此处的名称是类似于`field_827`的intermediary names，需要人工查阅以便理解。  
 
 ##### `/entityfield <target> listAvailableFields`
 
-��ȡ����`<target>`ָ����ʵ��Ķ����������ֶε������б���  
+获取代表`<target>`指定的实体的对象中所有字段的名称列表。  
 
 ##### `/entityfield <target> set <fieldName> <newValue>`
 
-������`<target>`ָ����ʵ��Ķ�������Ϊ`<fieldName>`���ֶε�ֵ��Ϊ`<newValue>`��֧�ֵ����ͣ�int��float��double��boolean�����ڿ�������ʧ�ܣ���Vec3d���硰1,2,3��������˫������ס����  
+将代表`<target>`指定的实体的对象中名为`<fieldName>`的字段的值设为`<newValue>`。支持的类型：int、float、double、boolean（现在可能设置失败）和Vec3d（如“1,2,3”，须用双引号括住）。  
 
 ##### `/entitylog sub <target>`
 
-��ʼ����`<target>`��ָ����ʵ�岢����ÿһ��Ϸ�̵�������Motion�Լ������ӵ��ֶδ洢��һ��CSV�����ļ��С�ע�ⲿ�ּ�¼�ᱻ��ʱ���浽һ������������������д�뵽�ļ����У�����ʹ��`/entitylog flush`����Щ��������д�롣
+开始监视`<target>`所指定的实体并将其每一游戏刻的坐标与Motion以及被监视的字段存储到一个CSV表格文件中。注意部分记录会被临时保存到一个缓冲区而不是立即写入到文件当中，可以使用`/entitylog flush`将那些内容立即写入。
 
-��¼�ļ��ᱻ���浽�����ļ����е�`entitylog`�ļ�����
+记录文件会被保存到世界文件夹中的`entitylog`文件夹中
 
 ##### `/entitylog unsub <target>`
 
-ֹͣ����`<target>`��ָ����ʵ�岢������������������д�뵽�ļ�����ֹͣ�����¿�ʼ��һ��ʵ����ӻ����´���һ����־�ļ����Ǽ���ԭ�ļ���
+停止监视`<target>`所指定的实体并将缓冲区中内容立即写入到文件。在停止后重新开始对一个实体监视会重新创建一个日志文件而非继续原文件。
 
 ##### `/entitylog listenField <type> <field> [<name> [<path>]]`
 
-����ָ����ʵ���һ���ֶΣ���ָ���Զ������ƺ�AccessingPath��`<type>`��ʱ���Ὣ��ָ���Ӱ�췶Χ���Ƶ����Ӧ��ʵ�����͡�
+监视指定的实体的一个字段，可指定自定义名称和AccessingPath。`<type>`暂时不会将该指令的影响范围限制到其对应的实体类型。
 
-ִ�и�ָ���ʹ��ǰ���ж��ض�ʵ��ļ������¿�ʼ��
+执行该指令会使当前所有对特定实体的监视重新开始。
 
 ##### `/entitylog flush`
 
-������������������д�뵽�ļ�����ֹͣ���ӡ�
+将缓冲区中内容立即写入到文件而不停止监视。
 
 ##### `/entitylog stopListenField <field>`
 
-ֹͣ����һ���ֶΡ�
+停止监视一个字段。
 
 ##### `/entitylog listListenedFields`
 
-�г��������������ֶΡ�
+列出被监听的所有字段。
 
 ##### `/entitylog autoSub <entityType>`
 
-��ʼ�Զ�����ĳһ���͵�ʵ�塣
+开始自动监视某一类型的实体。
 
 ##### `/entitylog stopAutoSub <entityType>`
 
-ֹͣ�Զ�����ĳһ���͵�ʵ�塣
+停止自动监视某一类型的实体。
 
 ##### `/entitylog autoSubName <name>`
 
-��ʼ�Զ�������Ϊ`<name>`��ָ�����Ƶ�ʵ�塣
+开始自动监视名为`<name>`所指定名称的实体。
 
 ##### `/entitylog stopAutoSubName <name>`
 
-ֹͣ�Զ�������Ϊ`<name>`��ָ�����Ƶ�ʵ�塣
+停止自动监视名为`<name>`所指定名称的实体。
 
 ##### `/entitysidebar add <target> <field> <name> [<whereToUpdate> [<path>]]`
 
-��ʵ����Ϣ�������������ʵ��`<target>`�ṩ��һ����Ϣ������ָ������ʱ����AccessingPath��֧�ֵĸ���ʱ����
+向实体信息侧边栏中增加由实体`<target>`提供的一行信息，可以指定更新时机和AccessingPath。支持的更新时机：
 
-- WEATHER_CYCLE��������ʱ���������ʱ
-- CHUNK���������ж�غ�������������ʱ
-- SCHEDULED_TICK���ƻ����������ʱ
-- VILLAGE��Ϯ���������ʱ
-- BLOCK_EVENT�������¼��������ʱ
-- ENTITY��ʵ���������ʱ
-- TILE_ENTITY������ʵ���������ʱ
-- TICKED_ALL_WORLDS������ά��������������������첽����δ��ʼʱ
-- SERVER_TASKS�����������첽�������ʱ
+- WEATHER_CYCLE：天气和时间运算完成时
+- CHUNK：区块加载卸载和区块刻运算完成时
+- SCHEDULED_TICK：计划刻运算完成时
+- VILLAGE：袭击运算完成时
+- BLOCK_EVENT：方块事件运算完成时
+- ENTITY：实体运算完成时
+- TILE_ENTITY：方块实体运算完成时
+- TICKED_ALL_WORLDS：所有维度运算完成且玩家输入等异步处理未开始时
+- SERVER_TASKS：玩家输入等异步处理完成时
 
 ##### `/entitysidebar remove <name>`
 
-��ʵ����Ϣ��������Ƴ�һ�С�
+从实体信息侧边栏中移除一行。
 
 ##### `/explode <pos> <power> [<fire>]`
 
-��`<pos>`������һ������Ϊ`<power>`�ı�ը������ָ��`<fire>`Ϊ`true`ʹ��ը���ɻ��档��ը�������������ⵥ���ȸ��������������������NaN��
+在`<pos>`处产生一个威力为`<power>`的爆炸，可以指定`<fire>`为`true`使爆炸生成火焰。爆炸威力可以是任意单精度浮点数，包括无穷大甚至NaN。
 
 ##### `/freezentity freeze|resume <entities>`
 
-�����ָ���ѡ�е�ʵ������㡣
+冻结或恢复被选中的实体的运算。
 
 ##### `/hud subField target <entityType> <field> [<name> [<path>]]`
 
-��Ŀ��ʵ����ϢHUD����һ���������ֶΣ���ָ���Զ������ƺ�AccessingPath��ʵ�����Ͳ���Ŀǰ�������ṩ��field�����Ľ���ͻ�ȡ��Ӧ�ֶΣ�Fieldʵ���������������á�
+向目标实体信息HUD加入一个被监听字段，可指定自定义名称和AccessingPath。实体类型参数目前除参与提供对field参数的建议和获取对应字段（Field实例）外无其他作用。
 
 ##### `/hud subField client|server <field> [<name> [<path>]]`
 
-��ͻ��˻����������ϢHUD����һ���������ֶΣ���ָ���Զ������ƺ�AccessingPath��
+向客户端或服务端玩家信息HUD加入一个被监听字段，可指定自定义名称和AccessingPath。
 
 ##### `/hud unsubField target|client|server <name>`
 
-��һ��HUD���Ƴ�һ���ֶμ����
+从一个HUD中移除一个字段监听项。
 
 ##### `/hud setHudTarget <profile>`
 
-���ö��˻����·���������ϢHUD��Ŀ��ʵ����ϢHUD�����ݻ�ȡ�����õ���ҡ�
+设置多人环境下服务端玩家信息HUD和目标实体信息HUD的数据获取中所用的玩家。
 
 ##### `/lag nanoseconds [<thread>]`
 
-����Ϸ��ĳһ�߳�`<thread>`����`<nonoseconds>`���룬������ĳЩ���ԡ���δָ���߳�����������̡߳�
+让游戏的某一线程`<thread>`卡死`<nonoseconds>`纳秒，可用于某些测试。如未指定线程则卡死服务端线程。
 
 ##### `/logmovement sub <target>`
 
-����ʵ���ܻ�����ǱӰ���Լ�ǱӰ�����ƶ�Ӱ��������
+监听实体受活塞，潜影盒以及潜影贝的推动影响的情况。
 
 ##### `/logmovement unsub <target>`
 
-ֹͣ����ʵ�����ƶ�Ӱ��������
+停止监听实体受推动影响的情况。
 
 ##### `/logpacket sub|unsub <type>`
 
-����|ȡ�������ͻ��˺ͷ����֮�䴫������ݰ�����ΪһЩԭ�򣬽��ֻ�ᱻ�������־�С�
+监听|取消监听客户端和服务端之间传输的数据包。因为一些原因，结果只会被输出到日志中。
 
 ##### `/messcfg`
 
-��ȡ��ǰMod�汾�����������  
+获取当前Mod版本和配置情况。  
 
 ##### `/messcfg reloadConfig`
 
-��`mcwmem.prop`��ȡ���µ�������Ϣ��
+从`mcwmem.prop`获取最新的配置信息。
 
 ##### `/messcfg setGlobal <option> <value>`
 
-��ѡ��`<option>`�Ķ����´򿪵Ĵ浵��Ĭ��ֵ����ǰ�浵�ľֲ�ȡֵ��Ϊ`<value>`��
+将选项`<option>`的对于新打开的存档的默认值及当前存档的局部取值设为`<value>`。
 
 ##### `/messcfg <option>`
 
-�鿴ѡ��`<option>`��ֵ�Լ���ذ�����Ϣ��
+查看选项`<option>`的值以及相关帮助信息。
 
 ##### `/messcfg <option> <value>`
 
-�ڵ�ǰ�浵��Χ�ڽ�ѡ��`<option>`��ֵ��Ϊ`<value>`������ĵ�����һ�ڡ�
+在当前存档范围内将选项`<option>`的值设为`<value>`，详见文档的下一节。
 
 ##### `/modify <targets> <key> <val>`
 
-�޸�`<targets>`ָ����ʵ������ԣ��ǲ���`/entityfield`�ļ���÷���  
+修改`<targets>`指定的实体的属性，是部分`/entityfield`的简便用法。  
 
 ##### `/modify <target> remove`
 
-�Ƴ�`<targets>`ָ����ʵ�塣  
+移除`<targets>`指定的实体。  
 
 ##### `/moventity <targets> <delta> entity self|piston|shulkerBox|player|shulker`
 
-ʹ��`Entity.move()`�ƶ�`<targets>`ָ����ʵ�壬������`<delta>`ָ����ͨ��ѡ��self����Ϊ���һ��������ִ����ɺ����ʵ��λ�ơ�  
+使用`Entity.move()`移动`<targets>`指定的实体，距离由`<delta>`指定，通常选择“self”作为最后一个参数。执行完成后输出实际位移。  
 
 ##### `/moventity <targets> <delta> projectile`
 
-ʹ�õ������ƶ��ķ�ʽ�ƶ�`<target>`ָ����ʵ�壬������`<delta>`ָ����Ŀǰ�ƺ�����һЩBug��  
+使用弹射物移动的方式移动`<target>`指定的实体，距离由`<delta>`指定。目前似乎存在一些Bug。  
 
 ##### `/namentity <entities> <name>`
 
-Ϊѡ����ʵ�����������
+为选定的实体进行命名。
 
 ##### `/poi get <pos>`
 
-ȡ`<pos>`����POI����Ȥ�㣩�� 
+取`<pos>`处的POI（兴趣点）。 
 
 ##### `/poi getDistanceToNearestOccupied <pos>`
 
-��������Ĵ�����վ����ĳ�ֳ߶��µľ��루������������Ϊ��λ�������پ��룩��
+返回最近的村民工作站点在某种尺度下的距离（可能是以区段为单位的曼哈顿距离）。
 
 ##### `/poi scan <center> <radius> <type>`
 
-Ѱ����`<center>`Ϊ���ģ��뾶Ϊ`<radius>`����������Ϊ`<type>`��POI����������ڷ������ꡣ
+寻找以`<center>`为中心，半径为`<radius>`的球中类型为`<type>`的POI，并输出所在方块坐标。
 
 ##### `/poi scanCobic <corner1> <corner2> <type>`
 
-Ѱ�Ҹ�������������䳤��������������Ϊ`<type>`��POI��
+寻找给定的两个角落间长方体区域内类型为`<type>`的POI。
 
 ##### `/poi set <pos> <type> <replace>`
 
-��`<pos>`����Ϊ`<type>`ָ����POI��������POI��`<replace>`Ϊfalse�򲻻����á� 
+将`<pos>`处设为`<type>`指定的POI，若已有POI且`<replace>`为false则不会设置。 
 
 ##### `/raycast blocks <from> <to> [visual]`
 
-����`<from>`��`<to>`�������߶��Ƿ񱻷����赲����ʽ�����ڵ��������ײ���ͱ�ը�Ӵ��ʼ����е�raycast��ִ�к�������������з������꣨�����ظ���������������赲������赲�߶εķ�������꼰���赲�߶ε����Լ���������꣬�������Missed�����������visual�������̻ᱻ���ӻ��������ܼ��ķ���������ʾΪǳ��ɫ���赲�߶εķ�����ײ��ᱻ��ʾ��ɫ����������ᱻ��ʾΪ��ɫ���߶εı��赲ǰ��Ĳ��ֱַ�Ϊ��ɫ�ͺ�ɫ��
+检查从`<from>`到`<to>`的有向线段是否被方块阻挡，方式类似于弹射物的碰撞检查和爆炸接触率计算中的raycast。执行后输出检查过的所有方块坐标（会有重复），如果发生了阻挡就输出阻挡线段的方块的坐标及其阻挡线段的面以及交点的坐标，否则输出Missed。如果给出了visual，检查过程会被可视化，即可能检查的方块网格被显示为浅绿色，阻挡线段的方块碰撞箱会被显示橙色，所在网格会被显示为紫色，线段的被阻挡前后的部分分别为青色和红色。
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/raycast-block.png)
 
 ##### `/raycast entities <from> <to> <expand> <excludeSender> [visual]`
 
-���`<from>`��`<to>`�������߶��Ƿ񱻷����赲����ʽ�����ڵ��������ײ��顣ִ�к�����赲�߶ε�ʵ�����ͣ����Զ������ƣ�����ID����ײ�����꣬�������Missed��`<expand>`����Ӱ���ȡʵ��ķ�Χ��ģ�ⵯ�������ײ���ʱ����ָ��Ϊ��������ײ����ȵ�һ�����1��
+检查`<from>`到`<to>`的有向线段是否被方块阻挡，方式类似于弹射物的碰撞检查。执行后输出阻挡线段的实体类型（或自定义名称）及其ID和碰撞点坐标，否则输出Missed。`<expand>`可以影响获取实体的范围，模拟弹射物的碰撞检查时可以指定为弹射物碰撞箱宽度的一半加上1。
 
 ##### `/repeat <times> <feedbacks> ...`
 
-�ظ�ִ��ĳ������`<times>`�Σ�������`<feedback>`��ָ���Ƿ��������������
+重复执行某个命令`<times>`次，可以在`<feedback>`中指定是否输出命令的输出。
 
 ##### `/ride <passengers> <vehicle> <force>`
 
-��`<passengers>`ָ����ʵ�����`<vehicle>`��
+让`<passengers>`指定的实体骑乘`<vehicle>`。
 
 ##### `/rng world setSeed <seed>`
 
-���õ�ǰά�ȵ�RNG�������������������Ϊ`<seed>`��  
+设置当前维度的RNG（随机数生成器）种子为`<seed>`。  
 
 ##### `/rng world next int <bounds>`
 
-ȡ��ǰά�ȵ���������������ɵ���һ��������[0,`<bounds>`)�ڵ�������
+取当前维度的随机数生成器生成的下一个在区间[0,`<bounds>`)内的整数。
 
 ##### `/rng world next int|float|double|boolean`
 
-ȡ��ǰά�ȵ���������������ɵ���һ��������� 
+取当前维度的随机数生成器生成的下一个随机数。 
 
 ##### `/rng <target> ...`
 
-��ǰ�����������ƣ�ֻ��RNG����`<target>`ָ����ʵ����Ǹ�ά�ȡ�  
+和前三条命令类似，只是RNG来自`<target>`指定的实体而非该维度。  
 
 ##### `/setexplosionblock <blockState> [<fireState>]`
 
-ʹ��ը���ƻ�����ʱ����`<blockState>`ָ���ķ�������ǿ�����������ը��Ҫ���õĻ�ȫ���滻��`<fireState>`ָ���ķ��顣  
+使爆炸在破坏方块时放置`<blockState>`指定的方块而不是空气，并将爆炸将要放置的火全部替换成`<fireState>`指定的方块。  
 
 ##### `/tileentity get <pos>`
 
-ȡ`<pos>`���ķ���ʵ����Ϣ��  
+取`<pos>`处的方块实体信息。  
 
 ##### `/tileentity set <pos> <type> [<tag>]`
 
-����`<pos>`����Ϊ`<type>`ָ���ķ���ʵ�塣����ָ��`<tag>`��Ϊ����ʵ��ĳ�ʼ���ݣ���ʱ����`<pos>`���ķ��鲻֧�ָ÷���ʵ�壬���û�ʧ�ܣ���  
+设置`<pos>`处的为`<type>`指定的方块实体。可以指定`<tag>`作为方块实体的初始数据（此时，若`<pos>`处的方块不支持该方块实体，设置会失败）。  
 
 ##### `/tileentity remove <pos>`
 
-�Ƴ�`<pos>`���ķ���ʵ�塣��Ŀǰ�汾�У�����ô�����һ����Ҫ����ʵ��ķ��飬���Ƴ���ô�����ʵ��ᱻ�÷����������ã�һ��Bug����  
+移除`<pos>`处的方块实体。在目前版本中，如果该处存在一个需要方块实体的方块，在移除后该处方块实体会被该方块重新设置（一个Bug）。  
 
-## ������
+## 配置项
 
-����ѡ���ͨ��`/messcfg`�������ã���ʽ��Ϊ`/messcfg <ѡ����> <ֵ>`��������ʵ����ײ����ʾ��ʹ��`/messcfg serverSyncedBox true`
+以下选项均通过`/messcfg`命令设置，格式均为`/messcfg <选项名> <值>`，如启用实体碰撞箱显示可使用`/messcfg serverSyncedBox true`
 
 ##### `accessingPathInitStrategy`
 
-����AccessingPath�ĳ�ʼ������
+设置AccessingPath的初始化策略
 
-����3�ֳ�ʼ�����ԣ� 
+共有3种初始化策略： 
 
-- �ɰ汾ģʽ��ÿ��Accessing Pathֻ�ڵ�һ�α�ʹ��ʱ���г�ʼ����Ȼ����һ������ڷ��ʺ���������������� 
+- 旧版本模式：每个Accessing Path只在第一次被使用时进行初始化，然后这一结果用于访问后续的所有输入对象 
 
-- ��׼ģʽ��Accessing Path���ÿ����ͬ������г�ʼ����Ȼ�����ᱻ����ֱ����Ӧ��������
+- 标准模式：Accessing Path会对每个不同对象进行初始化，然后结果会被缓存直到相应对象被清理
 
-- �ϸ�ģʽ��Accessing Pathÿ�α�ʹ��ʱ�������½��г�ʼ����
+- 严格模式：Accessing Path每次被使用时都会重新进行初始化。
 
-����ȡֵ��`LEGACY|STANDARD|STRICT`
+允许取值：`LEGACY|STANDARD|STRICT`
 
-Ĭ��ȡֵ��`STANDARD`
+默认取值：`STANDARD`
 
 ##### `antiHostCheating`
 
-�Ե�����Ϸ��һ��������Ϸ�ķ������÷����ס�
+对单人游戏玩家或局域网游戏的房主启用反作弊。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `attackableTnt`
 
-TNT���Ա���ҵĹ���ɱ����
+TNT可以被玩家的攻击杀死。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `blockInfoRendererUpdateInFrozenTicks`
 
-��Ϸ���㱻��̺����/tickָ����ͣʱ������Ϣ��Ⱦ������Ϊ��
+游戏运算被地毯端中/tick指令暂停时方块信息渲染器的行为。
 
-- NORMALLY���������и���
+- NORMALLY：正常进行更新
 
-- PAUSE����ͣ����
+- PAUSE：暂停更新
 
-- NO_REMOVAL�������������У����Ƴ���ͣ
+- NO_REMOVAL：添加正常进行，但移除暂停
 
-����ȡֵ��`NORMALLY|PAUSE|NO_REMOVAL`
+允许取值：`NORMALLY|PAUSE|NO_REMOVAL`
 
-Ĭ��ֵ��`NORMALLY`
+默认值：`NORMALLY`
 
 ##### `blockPlacementHistory`
 
-��¼���������õķ������ڳ���/������
+记录玩家最近放置的方块用于撤销/重做。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `blockShapeToBeRendered  `
 
-��ѡ��`renderBlockShape`Ϊtrueʱ����Ⱦ�ķ����������͡�`COLLIDER`��Ӧ�������ײ�䣬OUTLINE��Ӧ��������Ҷ�׼ʱ��ʾ�ı߽硣
+在选项`renderBlockShape`为true时被渲染的方块轮廓类型。`COLLIDER`对应方块的碰撞箱，OUTLINE对应方块在玩家对准时显示的边界。
 
-����ȡֵ��`COLLIDER|OUTLINE|RAYSAST|SIDES|VISUAL`
+允许取值：`COLLIDER|OUTLINE|RAYSAST|SIDES|VISUAL`
 
-Ĭ��ֵ��`COLLIDER`
+默认值：`COLLIDER`
 
 ##### `commandExecutionRequirment`
 
-��Mod�ж���������Ƿ���ҪOPȨ�ޡ�
+该Mod中定义的命令是否需要OP权限。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `craftingTableBUD`
 
-��������̨�յ��ķ�����¡�
+监听工作台收到的方块更新。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `creativeUpwardsSpeed`
 
-���ڴ���ģʽ��������Ϸ��У��ӣ��ٶȴ�С��
+调节创造模式下玩家向上飞行（加）速度大小。
 
-����ȡֵ��0-1024���ڵ�ʵ��
+允许取值：0-1024以内的实数
 
-Ĭ��ֵ��0.05
+默认值：0.05
 
 ##### `debugStickSkipsInvaildState`
 
-��ֹ���԰�������������Ƿ�״̬��Ŀǰ���ѡ����һЩ����²�������������������������shape����ʱ�Կ��Խ���������Ƿ�״̬ʹ����䡣
+防止调试棒将方块调整到非法状态。目前这个选项在一些情况下不能正常工作，例如调整铁轨的shape属性时仍可以将其调整到非法状态使其掉落。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `disableChunkLoadingCheckInCommands`
 
-����ָ���жԷ����Ƿ񱻼��صļ��
+禁用指令中对方块是否被加载的检查
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `disableExplosionExposureCalculation`
 
-���ñ�ը�Ӵ��ʼ��������̶ѵ�TNT�ı�ը����ʱ�䡣���ʹ�����޷���ֹ���ʵ�屻��ըӰ�졣�ڰ�װLithium����ܲ�������������
+禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。在安装Lithium后可能不能正常工作。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `disableProjectileRandomness`
 
-ȡ�������������ٶȣ����ڲ��ֲ��ԣ�������Ҫ���ǹرա�
+取消弹射物的随机速度，用于部分测试，不过不要忘记关闭。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `enabledTools`
 
-���û���ù�����Ʒ�������÷������ġ�  
+启用或禁用工具物品，具体用法见下文。  
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `endEyeTeleport`
 
-��ʹ��ĩӰ֮��ʱ����Ҵ��͵����ע�ӵĵط���
+在使用末影之眼时将玩家传送到玩家注视的地方。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `entityExplosionInfluence`
 
-��ըӰ�쵽ʵ��ʱ�����������ʵ�屻Ӱ���������ڰ�װLithium����ܲ�������������
+爆炸影响到实体时在聊天栏输出实体被影响的情况。在安装Lithium后可能不能正常工作。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `entityExplosionRaysVisiblity`
 
-���û����ʵ�屬ը������Ⱦ�� 
+启用或禁用实体爆炸射线渲染。 
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `entityExplosionRaysLifetime`
 
-����ʵ�屬ը���ߵ���ʾʱ������λΪ�̡�
+设置实体爆炸射线的显示时长，单位为刻。
 
-����ȡֵ������������
+允许取值：任意正整数
 
-Ĭ��ֵ��300
+默认值：300
 
 ##### `entityLogAutoArchiving`
 
-�Զ��浵һ���Ự�ڲ�����ʵ�����ݼ�¼��
+自动存档一个会话内产生的实体数据记录。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `getEntityRangeExpansion`
 
-<font color=red>[TODO]</font>��ԭ���getEntity()�����У�ֻ�������AABB���б�ѩ�����С��2m�������е�ʵ��ᱻ�������� ����ʱ��ᵼ��һЩ�ϴ�ʵ�������Ľ����������⡣����ѡ���Ϊһ���ϴ�ֵ�����޸���һBug��
+<font color=red>[TODO]</font>在原版的getEntity()方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `hideSuvivalSaves`
 
-���ؿ��ܵ�����浵�Է�ֹ�䱻����ش򿪡�
+隐藏可能的生存存档以防止其被意外地打开。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `hotbarLength`
 
-��Ʒ���ɰ�������Ʒ�ѵ�������Ŀǰ�ù��ܲ�δ��ȫ��ɣ���ԭ����Ʒ�����ʺ���Ʒ���ı���������ݲ����á�
+物品栏可包含的物品堆叠数量。目前该功能并未完全完成，如原版物品栏材质和物品栏的保存等特性暂不可用。
 
-����ȡֵ��1��36
+允许取值：1～36
 
-Ĭ��ֵ��9
+默认值：9
 
 ##### `hudAlignMode`
 
-����ʵ����ϢHUD��λ�á�
+设置实体信息HUD的位置。
 
-����ȡֵ��BOTTOM_LEFT|BOTTOM_RIGHT|TOP_LEFT|TOP_RIGHT
+允许取值：BOTTOM_LEFT|BOTTOM_RIGHT|TOP_LEFT|TOP_RIGHT
 
-Ĭ��ֵ��TOP_RIGHT
+默认值：TOP_RIGHT
 
 ##### `hudStyles`
 
-HUD����Ⱦ��ʽ���������������������־��
+HUD的渲染样式，包括下面的零个至多个标志：
 
-- B����Ⱦ����
+- B：渲染背景
 
-- L��������б��Ⲣ�Ҷ�������
+- L：左对齐行标题并右对齐数据
 
-- R�����б����Ϊ��ɫ
+- R：将行标题改为红色
 
-����ȡֵ�������ַ���
+允许取值：任意字符串
 
-Ĭ��ֵ��(BL)^2/(mR)
+默认值：(BL)^2/(mR)
 
 ##### `hudTextSize`
 
-����HUD�����С��
+调节HUD字体大小。
 
-����ȡֵ��0-10������ʵ��
+允许取值：0-10间任意实数
 
-Ĭ��ֵ��1
+默认值：1
 
 ##### `interactableB36`
 
-��������ƻ�36�ŷ�����׼��������Ʒ��
+允许玩家破坏36号方块或对准它放置物品。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `language`
 
-��Mod����Ҫ���ԡ�
+该Mod的主要语言。
 
-����ȡֵ��`zh_cn|en_us|zh_cn_FORCELOAD|en_us_FORCELOAD|-FOLLOW_SYSTEM_SETTINGS-`
+允许取值：`zh_cn|en_us|zh_cn_FORCELOAD|en_us_FORCELOAD|-FOLLOW_SYSTEM_SETTINGS-`
 
-Ĭ��ֵ��`-FOLLOW_SYSTEM_SETTINGS-`������ϵͳ���ã�
+默认值：`-FOLLOW_SYSTEM_SETTINGS-`（跟从系统设置）
 
 ##### `maxClientTicksPerFrame`
 
-FPS����20ʱÿ֡�ͻ��˿������е���Ϸ��������������Ϊһ����Сֵ�����޸���FPSʱ�޷��л�����״̬��Bug�� 
+FPS低于20时每帧客户端可以运行的游戏刻数量，将其设为一个较小值可能修复低FPS时无法切换飞行状态的Bug。 
 
-����ȡֵ������������
+允许取值：任意正整数
 
-Ĭ��ֵ��10
+默认值：10
 
 ##### `maxEndEyeTpRadius`
 
-`endEyeTeleport`���ܵ���Զ���;��롣
+`endEyeTeleport`功能的最远传送距离。
 
-����ȡֵ��������ʵ��
+允许取值：任意正实数
 
-Ĭ��ֵ��180
+默认值：180
 
 ##### `mobFastKill`
 
-�����ﱻ/kill ...ɱ��ʱ�Ƿ�ֱ���Ƴ����ǳ����˺���
+在生物被/kill ...杀死时是否被直接移除而非承受伤害。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `projectileChunkLoading`
 
-������������������������Զ��������飬������������ʱ���ܻ�����������ע��ù��ܿ��ܻ��ڵ������Լ��ߵ��ٶȷ���ʱ��ɼ���Ŀ��١�
+允许弹射物在其运算过程中自动加载区块，在制作珍珠炮时可能会有所帮助。注意该功能可能会在弹射物以极高的速度飞行时造成极大的卡顿。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `projectileChunkLoadingPermanence`
 
-��������`projectileChunkLoading`����ʱ���ü������顣
+弹射物在`projectileChunkLoading`启用时永久加载区块。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `projectileChunkLoadingRange`
 
-����`projectileChunkLoading`�����д�����ǿ���ط�Χ�İ뾶��
+设置`projectileChunkLoading`功能中创建的强加载范围的半径。
 
-����ȡֵ������������������͸�����
+允许取值：任意整数（包括零和负数）
 
-Ĭ��ֵ��3
+默认值：3
 
 ##### `projectileRandomnessScale`
 
-�����������Դ�С��
+弹射物的随机性大小。
 
-����ȡֵ������ʵ����������͸�����
+允许取值：任意实数（包括零和负数）
 
-Ĭ��ֵ��1.0
+默认值：1.0
 
 ##### `railNoAutoConnection`
 
-��ֹ�������̬���ٽ�������Ӱ�졣
+防止铁轨的形态被临近的铁轨影响。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `rejectChunkTicket`
 
-��ֹ���鱻��ĳ����ʽ���ء�
+防止区块被以某种形式加载。
 
-����ȡֵ��`[]`�����б�����һ��`a,b,c`��ʽ���б�������һ�������������ƱID
+允许取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一个或多个区块加载票ID
 
-Ĭ��ֵ��`[]`
+默认值：`[]`
 
 ##### `renderBlockShape`
 
-����������Ⱦ��
+方块轮廓渲染。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `renderFluidShape`
 
-�����������߶Ⱥ�������������Ⱦ��
+流体轮廓、高度和流向向量的渲染。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `renderRedstoneGateInfo`
 
-��ʾ���ע�ӵĺ�ʯ�м������ʯ�Ƚ������źŵȼ���
+显示玩家注视的红石中继器或红石比较器的信号等级。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `serverSyncedBox`
 
-�������ײ����ʾ��  
+服务端碰撞箱显示。  
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `serverSyncedBoxRenderRange`
 
-�������ײ�����Ⱦ��Χ����mΪ��λ���б�ѩ����룩���κηǸ�ֵ�ᱻ��Ϊ�������
+服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非负值会被认为是无穷大。
 
-����ȡֵ������ʵ����������͸�����
+允许取值：任意实数（包括零和负数）
 
-Ĭ��ֵ��-1
+默认值：-1
 
 ##### `skippedGenerationStages`
 
-����һЩ�������ɽ׶Ρ���֧������biomes��full�����׶Σ���Ϊ�������׶ε�ȱʧ�ᵼ�·���˱�����
+跳过一些世界生成阶段。不支持跳过biomes和full两个阶段，因为这两个阶段的缺失会导致服务端崩溃。
 
-����ȡֵ��`[]`�����б�����һ��`a,b,c`��ʽ���б�������һЩChunkStatus��`...`��
+允许取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一些ChunkStatus或`...`。
 
-Ĭ��ֵ��`[]`
+默认值：`[]`
 
 ##### `skipUnloadedChunkInRaycasting`
 
-����δ���������е�Ǳ����ײ�����Խ���Զ����raycast�Ŀ��١�
+忽略未加载区块中的潜在碰撞，可以降低远距离raycast的卡顿。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `stableHudLocation`
 
-ʹHUD��λ�������ݳ���Ƶ���仯�Ǹ����ȶ���
+使HUD的位置在数据长度频繁变化是更加稳定。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `strictAccessingPathParsing`
 
-<font color=red>[TODO]</font>���ͽ׶��ϸ���Accessing Path��������һ���ܿ�ʹAccessing Path�ڶ��Ļ����б��ָ��ȶ���
+<font color=red>[TODO]</font>解释阶段严格检查Accessing Path。启用这一功能可使Accessing Path在多变的环境中表现更稳定。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `superSuperSecretSetting`
 
-<font color=red>[TODO]</font>wlujkgfdhlqcmyfdhj...ǧ��Ҫ�򿪣�
+<font color=red>[TODO]</font>wlujkgfdhlqcmyfdhj...千万不要打开！
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `tntChunkLoading`
 
-����TNTʵ����������������Զ��������顣ע��ù��ܿ��ܻ���TNT�Լ��ߵ��ٶȷ���ʱ��ɼ���Ŀ��١�
+允许TNT实体在其运算过程中自动加载区块。注意该功能可能会在TNT以极高的速度飞行时造成极大的卡顿。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `tntChunkLoadingPermanence`
 
-TNT��`tntChunkLoading`����ʱ���ü������顣
+TNT在`tntChunkLoading`启用时永久加载区块。
 
-����ȡֵ��true��false
+允许取值：true或false
 
-Ĭ��ֵ��false
+默认值：false
 
 ##### `tntChunkLoadingRange`
 
-����`tntChunkLoading`�����д�����ǿ���ط�Χ�İ뾶��
+设置`tntChunkLoading`功能中创建的强加载范围的半径。
 
-����ȡֵ������������������͸�����
+允许取值：任意整数（包括零和负数）
 
-Ĭ��ֵ��3
+默认值：3
 
 ##### `vanillaDebugRenderers`
 
-����һЩԭ�������Ⱦ����
+启用一些原版调试渲染器。
 
-����ȡֵ��`[]`�����б�����һ��`a,b,c`��ʽ���б�������һ��������Ⱦ�����ơ�
+允许取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一个或多个渲染器名称。
 
-Ĭ��ֵ��`[]`
+默认值：`[]`
 
-## ��ݼ�
+## 快捷键
 
-**`F3 + E`**��������ʾ��ǰ���ע�ӵ�ʵ����Ϣ��HUD��  
+**`F3 + E`**：开关显示当前玩家注视的实体信息的HUD。  
 
-**`F3 + M`**��������ʾ�ͻ��������Ϣ��HUD����ͶӰ��Ĭ�����ó�ͻ�������ֶ��޸ġ�
+**`F3 + M`**：开关显示客户端玩家信息的HUD。与投影的默认设置冲突，可以手动修改。
 
-**`F3 + S`**��������ʾ����������Ϣ��HUD��
+**`F3 + S`**：开关显示服务端玩家信息的HUD。
 
-**`Ctrl + Z`**�������������/�ƻ���������Ҫ`blockPlacementHistory`��
+**`Ctrl + Z`**：撤销方块放置/破坏操作（需要`blockPlacementHistory`）
 
-**`Ctrl+ Y`**�������������/�ƻ���������Ҫ`blockPlacementHistory`��
+**`Ctrl+ Y`**：重做方块放置/破坏操作（需要`blockPlacementHistory`）
 
-## ��Ⱦ��
+## 渲染器
 
-**ʵ����ϢHUD**�����ݲο����ġ�ʵ�����������ȡ�Է������Ϸ��ĩβ,�ͻ��������Ϣȡ�Կͻ���tickĩ��
+**实体信息HUD**：内容参考下文。实体的所有数据取自服务端游戏刻末尾,客户端玩家信息取自客户端tick末。
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/HUD-demo.png)
 
-**ʵ�屬ը����**����ʾ��ը������ʵ����ײ����һЩѡ�еĵ������ھ���ʵ���ڱ�ըӰ��ĳ̶ȵ��߶Ρ������б��赲�Ĳ�����ʾΪ��ɫ������Ϊ��ɫ��   
+**实体爆炸射线**：显示爆炸中心与实体碰撞箱内一些选中的点间的用于决定实体内爆炸影响的程度的线段。射线中被阻挡的部分显示为红色，否则为绿色。   
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/explosion-ray-demo.png)
 
-**�����ʵ����ײ��**����Ҫ��������F3 + B�ṩ����ײ�䣬��Ϊ�����Ǿ��ͻ���Ϊʹ�˶���ƽ����������ģ����˶�ʱ���ܻᡰ�����ϡ�����ˡ�ʵ�����ײ��ᱻ��ȾΪ��ɫ��
+**服务端实体碰撞箱**：不要总是相信F3 + B提供的碰撞箱，因为它们是经客户端为使运动更平滑调整过后的，在运动时可能会“跟不上”服务端。实体的碰撞箱会被渲染为绿色。
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/server-synced-box-demo-0.png)
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/server-synced-box-demo-1.png)
 
-**���巽������**����ʾ��Ҷ�׼������ĵȼ����߶ȡ���Χ������������
+**流体方块数据**：显示玩家对准的流体的等级、高度、范围和流向向量。
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/fluid-info-demo.png)
 
-**����߽���**����ʾ��Ҷ�׼�ķ������ײ���OUTLINE Shape��
+**方块边界箱**：显示玩家对准的方块的碰撞箱或OUTLINE Shape。
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/block-box-demo.png)
 
-**��ʯװ���ź�����ȼ�**����ʾ��Ҷ�׼���м����ͱȽ���������ȼ���
+**红石装置信号输出等级**：显示玩家对准的中继器和比较器的输出等级。
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/redstone-gate-demo.png)
 
-## ������Ʒ��Scarpetʵ�֣�
+## 工具物品（Scarpet实现）
 
-**��ש**��ʹ��/tick freeze��ͣ�������Ϸ�̡� 
-**��ͷ**���ڷ������Ϸ�̱�/tick freeze��ͣʱ����ִ��һ��ʱ�䣬ִ�еĿ������ڸ����ͷ�ĸ����� 
-**�½�Ͻ�**��ֱ���Ƴ����з����ʵ�塣  
+**红砖**：使用/tick freeze暂停服务端游戏刻。 
+**骨头**：在服务端游戏刻被/tick freeze暂停时继续执行一段时间，执行的刻数等于该组骨头的个数。 
+**下界合金锭**：直接移除所有非玩家实体。  
 
-## HUD��Ϣ��
+## HUD信息项
 
-���а���ʵ��ID�����ڸ�ʵ����󴴽�ǰ������Entityʵ�������������ƣ�`/summon`��ʹ�õ�ʵ�����ͻ��Զ������ƣ������䣨ʵ�����һ�α����غ���ڵĿ������� 
-`Pos`��ʵ������ꡣ 
+首行包含实体ID（等于该实体对象创建前创建的Entity实例总数），名称（`/summon`中使用的实体类型或自定义名称），年龄（实体最近一次被加载后存在的刻数）。 
+`Pos`：实体的坐标。 
 
-`Motion`��Entity���������`motion`��MCP����`velocity`��Yarn����`deltaMovement`���ٷ�����ֵ,һ��ӽ������ʵ����ٶȡ� 
+`Motion`：Entity类中域变量`motion`（MCP），`velocity`（Yarn）或`deltaMovement`（官方）的值,一般接近或等于实体的速度。 
 
-`Delta`��ʵ����һ�̵�λ�ƣ�����Ϊ�ٶȡ� 
+`Delta`：实体上一刻的位移，可视为速度。 
 
-`Yaw,Pitch`��ʵ���ˮƽ����Ǻ����ǡ� 
+`Yaw,Pitch`：实体的水平方向角和仰角。 
 
-`Fall Distance`��ʵ������һ����½�����������ƶ��ĳ��ȣ���Ҳ�����ܵ�һЩ�������ص�Ӱ�죬�������ҽ��� 
+`Fall Distance`：实体自上一次着陆以来的向下移动的长度，但也可能受到一些其他因素的影响，如落入岩浆。 
 
-`General State`������ʵ�干�е�һЩ���������漴�٣����ԣ�������ġ� 
+`General State`：所有实体共有的一些布尔（非真即假）属性，详见下文。 
 
-`Health`��LivingEntity�������ҺͿ��׼ܣ�������ֵ�� 
+`Health`：LivingEntity（生物、玩家和盔甲架）的生命值。 
 
-`Forward,Sideways,Upward`����ʵ���˶�AI�йء� 
+`Forward,Sideways,Upward`：与实体运动AI有关。 
 
-`Speed`����ʵ���˶��ٶȣ��ֱ���·�ϺͿ��У�����ء� 
+`Speed`：与实体运动速度（分别是路上和空中）正相关。 
 
-`Living State`��`LivingEntity`���е�һЩ���������漴�٣����ԣ�������ġ� 
+`Living State`：`LivingEntity`共有的一些布尔（非真即假）属性，详见下文。 
 
-`Fuse`��TNT�����߳��ȣ���λΪ�̡��˹���ȼ��TNT��ֵ��Ϊ80�� 
+`Fuse`：TNT的引线长度，单位为刻。人工点燃的TNT中值总为80。 
 
-`Power`������ļ��ٶȡ�ע�⣬������0.05gt^-1�����������Բ���һֱ���١� 
+`Power`：火球的加速度。注意，火球有0.05gt^-1的阻力，所以不会一直加速。 
 
-`Velocity Decay`����������ϵ�����ڲ�ͬ�����ϲ�ͬ��  
+`Velocity Decay`：船的阻力系数，在不同地面上不同。  
 
-## ��д��״̬��state��
+## 缩写的状态（state）
 
-### ͨ��
+### 通用
 
-`Gl` :ӵ�и�״̬��ʵ����һ������������� 
+`Gl` :拥有该状态的实体有一个发光的轮廓。 
 
-`Inv` :ӵ�и�״̬��ʵ�����ߴ󲿷��˺��� 
+`Inv` :拥有该状态的实体免疫大部分伤害。 
 
-`Col` :ӵ�и�״̬��ʵ���������ʵ�巢����ײ�� 
+`Col` :拥有该状态的实体毁于其他实体发生碰撞。 
 
-`NG` :ӵ�и�״̬��ʵ�岻������Ӱ�졣 
+`NG` :拥有该状态的实体不受重力影响。 
 
-`HC` :��ʾʵ������һ���ƶ��з�����ˮƽ�������ײ�� 
+`HC` :表示实体在上一次移动中发生了水平方向的碰撞。 
 
-`VC` :��ʾʵ������һ���ƶ��з�������ֱ�������ײ�� 
+`VC` :表示实体在上一次移动中发生了竖直方向的碰撞。 
 
-`Wet` :��ʾʵ���һ���ִ���ˮ�С�
+`Wet` :表示实体的一部分处于水中。
 
-`Sbm`��ʵ���û��ˮ�� <font color=#FF0000>**[WIP]**</font>
+`Sbm`：实体浸没于水中 <font color=#FF0000>**[WIP]**</font>
 
-`Sp` :��ʾʵ���ڼ��ܡ� 
+`Sp` :表示实体在疾跑。 
 
-`Sn` :��ʾʵ����Ǳ�С� 
+`Sn` :表示实体在潜行。 
 
-`De` :��ʾʵ�����¶ף�������Ǳ��)�� 
+`De` :表示实体在下蹲（类似于潜行)。 
 
-`Sw` :��ʾʵ������Ӿ�� 
+`Sw` :表示实体在游泳。 
 
-`Og` :��ʾʵ���Ѿ��ŵء�
+`Og` :表示实体已经着地。
 
 ### Living
 
-`Hurt` :��ʾʵ������һ�����ܵ����˺��� 
+`Hurt` :表示实体在上一刻中受到了伤害。 
 
-`Fly` :��ʾʵ����ʹ���ʳ���С� 
+`Fly` :表示实体在使用鞘翅飞行。 
 
-`Slp` :��ʾʵ����˯�� 
+`Slp` :表示实体在睡觉 
 
-`Dead` :��ʾʵ�������ֵ��0����ͣ�����˵�Ѿ�������
+`Dead` :表示实体的生命值是0或更低，或者说已经死亡。
 
 ## Accessing Path
 
-��Wiki��
+见Wiki。
 
-## ʵ��ѡ����ѡ��
+## 实体选择器选项
 
 ##### `id`
 
-����ȡֵ��һ�����������䣬��ԭ���levelѡ������
+允许取值：一个整数或区间，和原版的level选项类似
 
-ѡ������ID����ӦentityId��networkId�ֶΣ�Ϊָ��ֵ������ָ�������ʵ�塣
+选择数字ID（对应entityId或networkId字段）为指定值或属于指定区间的实体。
 
 ##### `side`
 
-����ȡֵ��`client`��`server`
+允许取值：`client`或`server`
 
-ָ���Ӻδ�ѡȡʵ�塣ע������Բ����̰߳�ȫ�ģ�������ֻӦ����һЩ�򵥵�û������Ӱ�죨һ��Ϊֻ�ж���������ָ���С�
+指定从何处选取实体。注意该特性不是线程安全的，所以它只应用于一些简单的没有其他影响（一般为只有读操作）的指令中。
 
-## ��������
+## 其他特性
 
-1.�ṹ�������Ⱦ���뱻�ؿ��������ں�Զ����������
-2.��δ��װ��̺��ʱִ����������δ֪����ʱ�����Stacktrace���ڰ�װ��̺�˺�Ҳ����ͨ������`superSecretSetting`����������һ�㡣
+1.结构方块的渲染距离被拓宽，可以在很远处被看到。
+2.在未安装地毯端时执行命令遇到未知错误时会输出Stacktrace，在安装地毯端后也可以通过启用`superSecretSetting`规则做到这一点。
 
-## ע������
+## 注意事项
 
-1.��Mod���ڿ����У�һЩ���ܿ��ܲ����û����bug�����������������ҡ�  
-2.�ͻ��������`CilentPlayerEntity`�����Ƕ�Ӧ��`ServerPlayerEntity`����Ϊ����˶��Ĵ󲿷������ڿͻ��˽��С�
-3.�ð汾��ר�÷�������֧�ֺ��������ڴ����ȶ������⣬һ���������ֻ�ڵ�����Ϸ������������������ڿͻ��ˣ���ʹ�ø�Mod��  
-4.һЩ�����/explode \~ \~ \~ 2147483647 true������ɷ���˿�������ע�⡣
+1.该Mod仍在开发中，一些功能可能不可用或存在bug，如果发现了请告诉我。  
+2.客户端玩家是`CilentPlayerEntity`而不是对应的`ServerPlayerEntity`，因为玩家运动的大部分运算在客户端进行。
+3.该版本对专用服务器的支持很弱，存在大量稳定性问题，一般情况下请只在单人游戏或局域网（仅房主所在客户端）中使用该Mod。  
+4.一些命令，像/explode \~ \~ \~ 2147483647 true可能造成服务端卡死，请注意。
