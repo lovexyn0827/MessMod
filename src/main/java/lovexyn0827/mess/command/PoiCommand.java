@@ -1,17 +1,28 @@
 package lovexyn0827.mess.command;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+
+import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.rendering.RenderedBox;
+import lovexyn0827.mess.rendering.ShapeSender;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.poi.PointOfInterest;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
@@ -19,8 +30,10 @@ import net.minecraft.world.poi.PointOfInterestType;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class PoiCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -65,44 +78,58 @@ public class PoiCommand {
 													Iterable<BlockPos> iterator = BlockPos.iterate(BlockPosArgumentType.getLoadedBlockPos(ct, "corner1"), 
 															BlockPosArgumentType.getLoadedBlockPos(ct, "corner2"));
 													for(BlockPos pos : iterator) {
-														if(getPoi(ct.getSource().getWorld().getPointOfInterestStorage(),pos) == expectedType) {
+														if(getPoi(ct.getSource().getWorld().getPointOfInterestStorage(), pos) == expectedType) {
 															foundAny = true;
 															CommandUtil.feedbackWithArgs(ct, "cmd.general.found", pos.getX(), pos.getY(), pos.getZ());
 														}
 													}
-													if(!foundAny) CommandUtil.feedback(ct, "cmd.general.notfound");
+													
+													if(!foundAny) {
+														CommandUtil.feedback(ct, "cmd.general.notfound");
+													}
+													
 													return 1;
 												}))))).
 				then(literal("scan").
 						then(argument("center",BlockPosArgumentType.blockPos()).
 								then(argument("radius",IntegerArgumentType.integer(0)).
 										then(argument("type",StringArgumentType.word()).suggests(sp).
-												executes((ct) -> {
-													PointOfInterestType expectedType = Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
-													Stream<PointOfInterest> poiStream = ct.getSource().getWorld().getPointOfInterestStorage().getInCircle((type) -> type == expectedType, 
-															BlockPosArgumentType.getLoadedBlockPos(ct, "center"), 
-															IntegerArgumentType.getInteger(ct, "radius"), 
-															PointOfInterestStorage.OccupationStatus.ANY);
-
-													if(poiStream.count() == 0) {
-														CommandUtil.feedback(ct, "cmd.general.notfound");
-														return 0;
-													}
-													
-													poiStream.forEach((poi)->{
-														BlockPos pos = poi.getPos();
-														CommandUtil.feedbackWithArgs(ct, "cmd.general.found", pos.getX(), pos.getY(), pos.getZ());
-													});
-													return 1;
-												}))))).
+												executes((ct) -> forEachPoi(ct, (poi)->{
+													BlockPos pos = poi.getPos();
+													CommandUtil.feedbackWithArgs(ct, "cmd.general.found", pos.getX(), pos.getY(), pos.getZ());
+												})))))).
 				then(literal("getDistanceToNearestOccupied").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								executes((ct) -> {
 									int distance = ct.getSource().getWorld().getOccupiedPointOfInterestDistance(ChunkSectionPos.from(BlockPosArgumentType.getLoadedBlockPos(ct, "pos")));
 									CommandUtil.feedbackRaw(ct, distance);
 									return 0;
-								})));
+								}))).
+				then(literal("visualize").
+						then(argument("center",BlockPosArgumentType.blockPos()).
+								then(argument("radius",IntegerArgumentType.integer(0)).
+										then(argument("type",StringArgumentType.word()).suggests(sp).
+												executes((ct) -> forEachPoi(ct, (poi) -> visualize(poi, ct.getSource().getWorld())))))));
 		dispatcher.register(command);
+	}
+
+	private static int forEachPoi(CommandContext<ServerCommandSource> ct, Consumer<PointOfInterest> action) throws CommandSyntaxException {
+		PointOfInterestType expectedType = Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
+		List<PointOfInterest> poiList = ct.getSource()
+				.getWorld()
+				.getPointOfInterestStorage()
+				.getInCircle((type) -> type == expectedType, 
+						BlockPosArgumentType.getLoadedBlockPos(ct, "center"), 
+						IntegerArgumentType.getInteger(ct, "radius"), 
+						PointOfInterestStorage.OccupationStatus.ANY)
+				.collect(Collectors.toUnmodifiableList());
+		if(poiList.size() == 0) {
+			CommandUtil.feedback(ct, "cmd.general.notfound");
+			return 0;
+		}
+		
+		poiList.forEach(action);
+		return Command.SINGLE_SUCCESS;
 	}
 
 	private static boolean setPoi(PointOfInterestStorage poiStorage, BlockPos blockPos, String type, boolean replace) {
@@ -119,5 +146,13 @@ public class PoiCommand {
 		}else {
 			return null;
 		}
+	}
+	
+	private static void visualize(PointOfInterest poi, ServerWorld world) {
+		ShapeSender ss = MessMod.INSTANCE.shapeSender;
+		BlockPos pos = poi.getPos();
+		long time = world.getTime();
+		RegistryKey<World> key = world.getRegistryKey();
+		ss.addShape(new RenderedBox(new Box(pos).expand(0.02), poi.isOccupied() ? 0xFF0000FF : 0x69604EFF , 0x4E9A6960, 300, time), key);
 	}
 }
