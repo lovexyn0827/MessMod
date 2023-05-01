@@ -137,4 +137,58 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.UPGARDE, holder.getPos().toLong(), 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, status.getId());
 	}
+	
+	@Inject(method = "method_17256", 
+			at = @At(value = "RETURN"), 
+			remap = false
+	)
+	private void onChunkLoadFinish(ChunkPos pos, 
+			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+		if(shouldSkip()) {
+			return;
+		}
+		
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_LOADING, pos.toLong(), 
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+	}
+	
+	@Inject(method = "save(Lnet/minecraft/world/chunk/Chunk;)Z", 
+			at = @At(value = "RETURN")
+	)
+	private void onChunkUnloadFinish(Chunk chunk, CallbackInfoReturnable<Boolean> cir) {
+		if(shouldSkip()) {
+			return;
+		}
+		
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UNLOADING, chunk.getPos().toLong(), 
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+	}
+	
+	@Inject(method = "method_20460", 
+			at = @At(value = "RETURN"), 
+			remap = false
+	)
+	private void onChunkGenerationFinish(ChunkHolder holder, Either<?, ?> either, 
+			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+		if(shouldSkip()) {
+			return;
+		}
+		
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_GENERATION, holder.getPos().toLong(), 
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+	}
+	
+	@Inject(method = "method_17225", 
+			at = @At(value = "RETURN"), 
+			remap = false
+	)
+	private void onChunkUpgradeFinish(ChunkPos pos, ChunkHolder holder, ChunkStatus status, List<?> list, 
+			CallbackInfoReturnable<Boolean> cir) {
+		if(shouldSkip()) {
+			return;
+		}
+		
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UPGARDE, holder.getPos().toLong(), 
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, status.getId());
+	}
 }
