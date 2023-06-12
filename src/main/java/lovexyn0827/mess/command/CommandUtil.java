@@ -59,6 +59,7 @@ public class CommandUtil {
 			firstPlayerJoined = false;
 			SetExplosionBlockCommand.reset();
 			LogPacketCommand.reset();
+			LazyLoadCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}

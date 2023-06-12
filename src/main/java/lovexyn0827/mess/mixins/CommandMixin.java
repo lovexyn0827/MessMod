@@ -22,6 +22,7 @@ import lovexyn0827.mess.command.FreezeEntityCommand;
 import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LagCommand;
+import lovexyn0827.mess.command.LazyLoadCommand;
 import lovexyn0827.mess.command.LogChunkBehaviorCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.LogPacketCommand;
@@ -75,6 +76,7 @@ public abstract class CommandMixin {
         AccessingPathCommand.register(this.dispatcher);
         ExportSaveCommand.register(this.dispatcher);
         LogChunkBehaviorCommand.register(this.dispatcher);
+        LazyLoadCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 
