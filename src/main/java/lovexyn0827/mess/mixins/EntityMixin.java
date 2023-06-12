@@ -41,10 +41,6 @@ public abstract class EntityMixin implements EntityInterface {
 	private boolean isFrozen;
 	private boolean isStepHeightDisabled;
 	private boolean shouldLogMovement;
-
-	@Shadow protected abstract Vec3d adjustMovementForPiston(Vec3d movement);
-	@Shadow protected abstract Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type);
-	@Shadow protected abstract Vec3d adjustMovementForCollisions(Vec3d movement);
 	
 	@SuppressWarnings("rawtypes")
 	@Inject(at = @At(
@@ -108,10 +104,9 @@ public abstract class EntityMixin implements EntityInterface {
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	private void onPistonMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
-		Vec3d vec = this.adjustMovementForPiston(movement);
-		if(currentReport != null && !this.world.isClient) {
-			currentReport.add(new LiteralText("Restricted piston movement to " + vec));
-			lastMovement = vec;
+		if(currentReport != null && !this.world.isClient  && !movement.equals(lastMovement)) {
+			currentReport.add(new LiteralText("Restricted piston movement to " + movement));
+			lastMovement = movement;
 		}
 	}
 	
@@ -135,10 +130,9 @@ public abstract class EntityMixin implements EntityInterface {
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	private void onSneakingMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
-		Vec3d vec = this.adjustMovementForSneaking(movement, type);
-		if(currentReport != null && !vec.equals(movement) && !this.world.isClient) {
-			currentReport.add(new LiteralText("Sneaking restricted the movement to " + vec));
-			lastMovement = vec;
+		if(currentReport != null && !movement.equals(lastMovement) && !this.world.isClient) {
+			currentReport.add(new LiteralText("Sneaking restricted the movement to " + movement));
+			lastMovement = movement;
 		}
 	}
 	
@@ -149,10 +143,9 @@ public abstract class EntityMixin implements EntityInterface {
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	private void onCollisionMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci, Vec3d vec3d) {
-		Vec3d vec = this.adjustMovementForCollisions(movement);
-		if(currentReport != null && !vec.equals(movement) && !this.world.isClient) {
-			currentReport.add(new LiteralText("Collision restricted the movement to " + vec));
-			lastMovement = vec;
+		if(currentReport != null && !vec3d.equals(lastMovement) && !this.world.isClient) {
+			currentReport.add(new LiteralText("Collision restricted the movement to " + movement));
+			lastMovement = vec3d;
 		}
 	}
 	
