@@ -122,7 +122,7 @@ public class PoiCommand {
 						BlockPosArgumentType.getLoadedBlockPos(ct, "center"), 
 						IntegerArgumentType.getInteger(ct, "radius"), 
 						PointOfInterestStorage.OccupationStatus.ANY)
-				.collect(Collectors.toUnmodifiableList());
+				.collect(Collectors.toList());
 		if(poiList.size() == 0) {
 			CommandUtil.feedback(ct, "cmd.general.notfound");
 			return 0;
