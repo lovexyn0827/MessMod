@@ -57,10 +57,7 @@ public class CommandUtil {
 			noreplyPlayerSource = null;
 			commandManager = null;
 			firstPlayerJoined = false;
-			EntityConfigCommand.reset();
 			SetExplosionBlockCommand.reset();
-			LogMovementCommand.reset();
-			FreezeEntityCommand.reset();
 			LogPacketCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){

@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import lovexyn0827.mess.command.FreezeEntityCommand;
+import lovexyn0827.mess.fakes.EntityInterface;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.world.ServerChunkManager;
 
@@ -13,7 +13,7 @@ import net.minecraft.server.world.ServerChunkManager;
 public class ServerChunkManagerMixin {
 	@Inject(method = "shouldTickEntity", at = @At("HEAD"), cancellable = true)
 	private void tickEntityIfNeeded(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-		if(FreezeEntityCommand.FROZEN_ENTITIES.contains(entity)) {
+		if(((EntityInterface) entity).isFrozen()) {
 			cir.setReturnValue(false);
 			cir.cancel();
 		}
