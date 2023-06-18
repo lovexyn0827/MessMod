@@ -8,29 +8,30 @@ import org.jetbrains.annotations.Nullable;
 import lovexyn0827.mess.util.Reflection;
 
 /**
- * Currently, there are six kinds of Node, they are: 
+ * Currently, there are 10 kinds of Node, they are: 
  * 
+ * <pre>
  *  - [index]: An element in an array or a collection
- *  
  *  - &lt;key&gt;: The value associated with the given key in a map
- *  
  *  - !field: The field with the given name
- *  
  *  - method(): The method with the given name, arguments are not supported in this version
- *  
- *  - x, y, and z: A component of a vector ({@code Vec3d}, {@code BlockPos}, or {@code ChunkPos}), or the coordination an entity
- *  
+ *  - x, y, and z: A component of a vector ({@code Vec3d}, {@code BlockPos}, or {@code ChunkPos}), 
+ *      or the coordination an entity
  *  - identityHash: The identity hash code of an object, which is usually the 
  *  	same as the one returned by the default {@code hashcode()} method.
- *  
  *  - size: The size of a list, map, array, etc.
- *  
+ *  - regular custom node: A named accessing path defined by the user.
+ *  - >Class::method: Mapper node, a more generic form of method node which supports using the 
+ *      previous input as an argument of the given method.
+ *  - (Class): Cast the input to a given type.
+ * </pre>
  * @author lovexyn0827
  * Date: April 22, 2022
  */
 abstract class Node {
 	/**
-	 * The type of the output of this node, or {@code null} if the type cannot be determined. Primitive types shouldn't be wrapped.
+	 * The type of the output of this node, or {@code null} if the type cannot be determined. Primitive types 
+	 * shouldn't be wrapped.
 	 */
 	@Nullable
 	protected Type outputType;
