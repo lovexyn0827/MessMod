@@ -11,7 +11,7 @@ public class ClassCastNode extends Node {
 	
 	public ClassCastNode(String className) {
 		try {
-			this.castTo = Reflection.getClassIncludingPrimitive(className.replace('/', '.'));
+			this.castTo = Class.forName(className.replace('/', '.'));
 		} catch (ClassNotFoundException e) {
 			TranslatableException e1 = new TranslatableException("exp.noclass", className);
 			e1.initCause(e);
@@ -61,6 +61,4 @@ public class ClassCastNode extends Node {
 		ClassCastNode other = (ClassCastNode) obj;
 		return Objects.equals(this.castTo, other.castTo);
 	}
-
-	
 }
