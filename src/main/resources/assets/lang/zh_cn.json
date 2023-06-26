@@ -18,6 +18,9 @@
 		"cmd.accessingpath.undef" : "给定的节点尚未被定义",
 		"cmd.accessingpath.invname" : "名称只能包含字母、数字和下划线", 
 		
+		//***** countentities *****
+		"cmd.countentities.result" : "共找到%d个实体", 
+		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
 		"cmd.ensure.blockat" : "%s处的方块为: %s",

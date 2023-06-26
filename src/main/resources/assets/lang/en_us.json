@@ -18,6 +18,9 @@
 		"cmd.accessingpath.undef" : "The given node hasn't been defined yet.", 
 		"cmd.accessingpath.invname" : "Only letters, numbers and underscores are permitted in the name.", 
 		
+		//***** countentities *****
+		"cmd.countentities.result" : "%d entities were found.", 
+		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
 		"cmd.ensure.blockat" : "Block at %s: %s",
