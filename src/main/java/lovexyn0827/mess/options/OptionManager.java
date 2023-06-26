@@ -75,6 +75,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean allowTargetingSpecialEntities;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean antiHostCheating;
 	
 	@Option(defaultValue = "false", 

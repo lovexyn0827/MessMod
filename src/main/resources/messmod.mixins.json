@@ -62,7 +62,8 @@
     "InGameHudMixin", 
     "PlayerInventoryMixin_Client", 
     "CreativeInventoryScreenMixin", 
-    "StructureBlockBlockEntityMixin"
+    "StructureBlockBlockEntityMixin", 
+    "GameRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

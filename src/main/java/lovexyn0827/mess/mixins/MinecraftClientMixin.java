@@ -14,12 +14,16 @@ import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
-import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.integrated.IntegratedServer;import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
 	@Shadow @Final ClientPlayerEntity player;
 	@Shadow @Final IntegratedServer server;
+	@Shadow @Final HitResult crosshairTarget;
+	EntityHitResult crossHairTargetForCommandSuggestions;
 	
 	@Shadow abstract Window getWindow();
 	
@@ -41,7 +45,7 @@ public abstract class MinecraftClientMixin {
 	@Inject(
 			method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", 
 			at = @At(value = "HEAD"))
-	private void onDisconnected(Screen screen,CallbackInfo ci) {
+	private void onDisconnected(Screen screen, CallbackInfo ci) {
 		MessMod.INSTANCE.onDisconnected();
 	}
 	
@@ -54,4 +58,17 @@ public abstract class MinecraftClientMixin {
 		return Math.min(OptionManager.maxClientTicksPerFrame, j);
 	}
 	
+	@Inject(
+			method = "doAttack", 
+			at = @At(value = "INVOKE", 
+					target = "net/minecraft/client/network/ClientPlayerInteractionManager.attackEntity(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/entity/Entity;)V"
+			), 
+			cancellable = true
+	)
+	private void preventAttackingInvalidEntitiesWhenNeeded(CallbackInfo ci) {
+		Entity e = ((EntityHitResult)this.crosshairTarget).getEntity();
+		if(OptionManager.allowTargetingSpecialEntities && (!e.isCollidable() || e.isSpectator())) {
+			ci.cancel();
+		}
+	}
 }
