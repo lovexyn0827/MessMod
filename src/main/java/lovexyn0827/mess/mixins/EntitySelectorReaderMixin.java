@@ -1,6 +1,7 @@
 package lovexyn0827.mess.mixins;
 
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,6 +14,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.predicate.NumberRange.IntRange;
 
@@ -22,6 +24,7 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	private Predicate<Entity> predicate;
 	private IntRange idRange;
 	private NetworkSide side;
+	private Pattern typeRegex;
 
 	@Override
 	public void setIdRange(IntRange range) {
@@ -52,6 +55,12 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 		if(this.idRange != null) {
 			this.predicate = this.predicate.and((e) -> this.idRange.test(e.getEntityId()));
 		}
+		
+		if(this.typeRegex != null) {
+			this.predicate = this.predicate.and((e) -> {
+				return this.typeRegex.matcher(EntityType.getId(e.getType()).toString()).matches();
+			});
+		}
 
 		EntitySelector selector = this.build();
 		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -64,5 +73,15 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	@Shadow
 	private EntitySelector build() {
 		throw new AssertionError();
+	}
+
+	@Override
+	public void setTypeRegex(Pattern typeRegex) {
+		this.typeRegex = typeRegex;
+	}
+
+	@Override
+	public Pattern getTypeRegex() {
+		return this.typeRegex;
 	}
 }
