@@ -125,5 +125,21 @@ public class EntitySelectorOptionsMixin {
 		}, (selectorReader) -> {
 			return ((EntitySelectorReaderInterface) selectorReader).getNameRegex() == null;
 		}, new LiteralText(I18N.translate("misc.nameRegex.desc")));
+		
+		putOption("class", (selectorReader) -> {
+			int i = selectorReader.getReader().getCursor();
+			String regexStr = selectorReader.getReader().readQuotedString();
+			selectorReader.setSuggestionProvider((builder, consumer) -> {
+				return CommandSource.suggestMatching(new String[] {"\""}, builder);
+			});
+			try {
+				((EntitySelectorReaderInterface) selectorReader).setClassRegex(Pattern.compile(regexStr));
+			} catch (PatternSyntaxException e) {
+				selectorReader.getReader().setCursor(i);
+				throw INVALID_REGEX_EXCEPTION.create(e);
+			}
+		}, (selectorReader) -> {
+			return ((EntitySelectorReaderInterface) selectorReader).getClassRegex() == null;
+		}, new LiteralText(I18N.translate("misc.class.desc")));
     }
 }

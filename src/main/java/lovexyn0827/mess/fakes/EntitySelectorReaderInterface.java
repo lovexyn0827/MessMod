@@ -14,4 +14,6 @@ public interface EntitySelectorReaderInterface {
 	Pattern getTypeRegex();
 	void setNameRegex(Pattern nameRegex);
 	Pattern getNameRegex();
+	void setClassRegex(Pattern classRegex);
+	Pattern getClassRegex();
 }

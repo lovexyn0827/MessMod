@@ -7,8 +7,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntitySelectorInterface;
 import lovexyn0827.mess.fakes.EntitySelectorReaderInterface;
+import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.EntitySelector;
@@ -26,6 +29,7 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	private NetworkSide side;
 	private Pattern typeRegex;
 	private Pattern nameRegex;
+	private Pattern classRegex;
 
 	@Override
 	public void setIdRange(IntRange range) {
@@ -68,6 +72,25 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 				return this.nameRegex.matcher(e.getName().getString()).matches();
 			});
 		}
+		
+		if(this.classRegex != null) {
+			this.predicate = this.predicate.and((e) -> {
+				Class<?> clazz = e.getClass();
+				Mapping mapping = MessMod.INSTANCE.getMapping();
+				for(; clazz != Object.class; clazz = clazz.getSuperclass()) {
+					String canonicalName = mapping.namedClass(clazz.getCanonicalName());
+					String simpleName = mapping.simpleNamedClass(clazz.getCanonicalName());
+					System.out.println(canonicalName);
+					System.out.print(simpleName);
+					if(this.classRegex.matcher(canonicalName.substring(canonicalName.lastIndexOf('.'))).matches()
+							|| this.classRegex.matcher(simpleName).matches()) {
+						return true;
+					}
+				}
+				
+				return false;
+			});
+		}
 
 		EntitySelector selector = this.build();
 		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -100,5 +123,15 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	@Override
 	public Pattern getNameRegex() {
 		return this.nameRegex;
+	}
+
+	@Override
+	public void setClassRegex(Pattern classRegex) {
+		this.classRegex = classRegex;
+	}
+
+	@Override
+	public Pattern getClassRegex() {
+		return classRegex;
 	}
 }

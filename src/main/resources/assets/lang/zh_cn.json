@@ -224,6 +224,7 @@
 		"misc.typeRegex.desc" : "指定实体ID（带命名空间）应符合的正则表达式", 
 		"misc.invregex" : "给定的正则表达式无效：", 
 		"misc.nameRegex.desc" : "指定一个实体名称应满足的正则表达式", 
+		"misc.class.desc" : "指定一个实体类名或超类名应满足的正则表达式",  
 		"misc.cancelhotbarstorage" : "只能在选项hotbarLength的值为9时存取物品栏", 
 		"misc.protver.err" : "服务端上安装的MessMod的协议版本与您客户端上的不同，建议安装与服务端版本一致的MessMod。"
 	}
