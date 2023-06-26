@@ -25,6 +25,7 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	private IntRange idRange;
 	private NetworkSide side;
 	private Pattern typeRegex;
+	private Pattern nameRegex;
 
 	@Override
 	public void setIdRange(IntRange range) {
@@ -61,6 +62,12 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 				return this.typeRegex.matcher(EntityType.getId(e.getType()).toString()).matches();
 			});
 		}
+		
+		if(this.nameRegex != null) {
+			this.predicate = this.predicate.and((e) -> {
+				return this.nameRegex.matcher(e.getName().getString()).matches();
+			});
+		}
 
 		EntitySelector selector = this.build();
 		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -83,5 +90,15 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	@Override
 	public Pattern getTypeRegex() {
 		return this.typeRegex;
+	}
+
+	@Override
+	public void setNameRegex(Pattern nameRegex) {
+		this.nameRegex = nameRegex;
+	}
+
+	@Override
+	public Pattern getNameRegex() {
+		return this.nameRegex;
 	}
 }

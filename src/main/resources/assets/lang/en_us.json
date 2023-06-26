@@ -223,6 +223,7 @@
 		"misc.side.desc" : "Where the entities are selected from. Note that this feature is not thread-safe, so it should be used in some simple commands without side-effects.", 
 		"misc.typeRegex.desc" : "A regular expression that the IDs (with namespace) of selected entities should match.", 
 		"misc.invregex" : "The given regular expression is invalid: ", 
+		"misc.nameRegex.desc" : "A regular expression that the name of selected entities should match.",  
 		"misc.cancelhotbarstorage" : "Hotbars can only be loaded/saved when the value of option hotbarLength is 9.", 
 		"misc.protver.err" : "The protcol version of the MessMod installed on the server is different from the one on your client,it is recommended to install MessMod with the same version as the server."
 	}

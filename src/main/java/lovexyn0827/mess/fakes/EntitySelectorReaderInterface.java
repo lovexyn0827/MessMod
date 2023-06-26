@@ -12,4 +12,6 @@ public interface EntitySelectorReaderInterface {
 	NetworkSide getSide();
 	void setTypeRegex(Pattern typeRegex);
 	Pattern getTypeRegex();
+	void setNameRegex(Pattern nameRegex);
+	Pattern getNameRegex();
 }

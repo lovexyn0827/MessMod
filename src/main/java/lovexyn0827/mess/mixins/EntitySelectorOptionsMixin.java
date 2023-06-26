@@ -98,7 +98,7 @@ public class EntitySelectorOptionsMixin {
 			int i = selectorReader.getReader().getCursor();
 			String regexStr = selectorReader.getReader().readQuotedString();
 			selectorReader.setSuggestionProvider((builder, consumer) -> {
-				return CommandSource.suggestMatching(new String[] {"client", "server"}, builder);
+				return CommandSource.suggestMatching(new String[] {"\""}, builder);
 			});
 			try {
 				((EntitySelectorReaderInterface) selectorReader).setTypeRegex(Pattern.compile(regexStr));
@@ -109,5 +109,21 @@ public class EntitySelectorOptionsMixin {
 		}, (selectorReader) -> {
 			return ((EntitySelectorReaderInterface) selectorReader).getTypeRegex() == null;
 		}, new LiteralText(I18N.translate("misc.typeRegex.desc")));
+		
+		putOption("nameRegex", (selectorReader) -> {
+			int i = selectorReader.getReader().getCursor();
+			String regexStr = selectorReader.getReader().readQuotedString();
+			selectorReader.setSuggestionProvider((builder, consumer) -> {
+				return CommandSource.suggestMatching(new String[] {"\""}, builder);
+			});
+			try {
+				((EntitySelectorReaderInterface) selectorReader).setNameRegex(Pattern.compile(regexStr));
+			} catch (PatternSyntaxException e) {
+				selectorReader.getReader().setCursor(i);
+				throw INVALID_REGEX_EXCEPTION.create(e);
+			}
+		}, (selectorReader) -> {
+			return ((EntitySelectorReaderInterface) selectorReader).getNameRegex() == null;
+		}, new LiteralText(I18N.translate("misc.nameRegex.desc")));
     }
 }
