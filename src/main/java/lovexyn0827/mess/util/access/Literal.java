@@ -391,7 +391,7 @@ public abstract class Literal<T> {
 			try {
 				return Class.forName(className);
 			} catch (ClassNotFoundException e) {
-				throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, null, className);
+				throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, e, className);
 			}
 		}
 
