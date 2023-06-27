@@ -31,8 +31,10 @@ public class EntitySelectorOptionsMixin {
 	// FIXME Dynamic translation
 	private static final SimpleCommandExceptionType NEGATIVE_ID_EXCEPTION = 
 			new SimpleCommandExceptionType(new LiteralText(I18N.translate("misc.negativeid")));
-	private static final SimpleCommandExceptionType UNDEFINED_EXCEPTION = 
-			new SimpleCommandExceptionType(new LiteralText(I18N.translate("cmd.general.nodef", "side")));
+	private static final DynamicCommandExceptionType UNDEFINED_EXCEPTION = 
+			new DynamicCommandExceptionType((side) -> {
+				return new LiteralText(I18N.translate("cmd.general.nodef", side));
+			});
 	private static final DynamicCommandExceptionType INVALID_REGEX_EXCEPTION = 
 			new DynamicCommandExceptionType((e) -> {
 				String msg;
@@ -88,7 +90,7 @@ public class EntitySelectorOptionsMixin {
 				break;
 			default: 
 				selectorReader.getReader().setCursor(i);
-				throw UNDEFINED_EXCEPTION.createWithContext(selectorReader.getReader());
+				throw UNDEFINED_EXCEPTION.createWithContext(selectorReader.getReader(), side);
 			}
 		}, (selectorReader) -> {
 			return !MessMod.isDedicatedEnv() && ((EntitySelectorReaderInterface) selectorReader).getSide() == null;
