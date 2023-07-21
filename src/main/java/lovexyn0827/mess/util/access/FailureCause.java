@@ -87,10 +87,9 @@ public enum FailureCause {
 	 */
 	INV_LAST_W("exp.invalidlastw");
 	
-	final String translationKey;
+	public final String translationKey;
 	
 	FailureCause(String translationKey) {
 		this.translationKey = translationKey;
-		
 	}
 }

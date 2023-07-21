@@ -23,7 +23,7 @@ public abstract class Literal<T> {
 	private static final Pattern NUMBER_PATTERN = Pattern
 			.compile("^((?:\\+|-)?[0-9]*(?:\\.[0-9]*)?|(?:\\+|-)?Infinity|NaN)(?:D|F|L|I)?$");
 	@NotNull
-	protected final String stringRepresentation;	//FIXME
+	protected final String stringRepresentation;
 	/**
 	 * Whether or not the value could be determined from the string representation directly
 	 * and won't change since created or initialized for the first time.
@@ -62,12 +62,12 @@ public abstract class Literal<T> {
 	}
 
 	/**
-	 * @param type The type which the literal is expected to be parsed as.
+	 * @param type The type which the literal is expected to be parsed as, or null if unknown.
 	 * @throws InvalidLiteralException 
 	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
 	 */
 	@Nullable
-	public abstract T get(Type type) throws InvalidLiteralException;
+	public abstract T get(@Nullable Type type) throws InvalidLiteralException;
 	
 	public static Literal<?> parse(String strRep) throws CommandSyntaxException {
 		// I & N are reserved for special floating-point numbers.
@@ -140,7 +140,10 @@ public abstract class Literal<T> {
 		return this;
 	}
 	
-	public boolean isCompiled() {
+	/**
+	 * @return Whether or not the literal is immutable and always represent the same value in a single run.
+	 */
+	public boolean isStatic() {
 		return this.compiled;
 	}
 	

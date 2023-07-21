@@ -3,16 +3,19 @@ package lovexyn0827.mess.util.access;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
-import com.ibm.icu.impl.locale.XCldrStub.ImmutableMap;
-
+import com.google.common.collect.ImmutableMap;
 import lovexyn0827.mess.util.Reflection;
 
 final class ValueOfMapNode extends Node {
-
 	private Literal<?> keyLiteral;
 	private Object key;
 	private Type keyType;
+	private Type valueType;
 	
 	ValueOfMapNode(Literal<?> key) {
 		this.keyLiteral = key;
@@ -66,40 +69,40 @@ final class ValueOfMapNode extends Node {
 	boolean canFollow(Node n) {
 		return Map.class.isAssignableFrom(Reflection.getRawType(n.outputType));
 	}
-
+	
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
+	void initialize(Type lastOutType) throws AccessingFailureException {
 		if(lastOutType instanceof ParameterizedType) {
 			ParameterizedType pt = ((ParameterizedType) lastOutType);
 			Class<?> lastCl = Reflection.getRawType(lastOutType);
 			if(isObject2PrimitiveMap(lastCl, pt.getActualTypeArguments().length)) {
-				Type keyType = pt.getActualTypeArguments()[0];
-				this.key = this.keyLiteral.get(keyType);
-				Type valType = void.class;
-				this.keyType = keyType;
-				this.outputType = valType;
-				return valType;
+				this.keyType = pt.getActualTypeArguments()[0];
+				this.valueType = null;
 			} else if(isPrimitive2ObjectMap(lastCl, pt.getActualTypeArguments().length)){
-				Type keyType = void.class;
-				this.key = this.keyLiteral.get(keyType);
-				Type valType = pt.getActualTypeArguments()[0];
-				this.outputType = valType;
-				this.keyType = keyType;
-				return valType;
+				this.keyType = null;
+				this.valueType = pt.getActualTypeArguments()[0];
 			} else {
-				Type keyType = pt.getActualTypeArguments()[0];
-				this.key = this.keyLiteral.get(keyType);
-				Type valType = ((ParameterizedType) lastOutType).getActualTypeArguments()[1];
-				this.outputType = valType;
-				this.keyType = keyType;
-				return valType;
+				this.keyType = pt.getActualTypeArguments()[0];
+				this.valueType = ((ParameterizedType) lastOutType).getActualTypeArguments()[1];
 			}
 		} else {
-			this.key = this.keyLiteral.get(Object.class);
-			this.outputType = Object.class;
 			this.keyType = Object.class;
-			return Object.class;
+			this.valueType = Object.class;
 		}
+		
+		this.inputType = this.keyType;
+		try {
+			this.key = this.keyLiteral.get(keyType);
+		} catch (InvalidLiteralException e) {
+			throw AccessingFailureException.create(e, this);
+		}
+		
+		super.initialize(lastOutType);
+	}
+
+	@Override
+	protected Type resolveOutputType(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
+		return this.valueType;
 	}
 	
 	private static boolean isFastutilClass(Class<?> cl) {
@@ -160,5 +163,23 @@ final class ValueOfMapNode extends Node {
 				throw AccessingFailureException.createWithArgs(FailureCause.NOT_MAP, this, null, this);
 			}
 		}
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		return (ctx) -> {
+			InsnList insns = new InsnList();
+			if(Map.class.isAssignableFrom(ctx.getLastOutputClass())) {
+				insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/util/Map"));
+				BytecodeHelper.appendConstantLoader(ctx, insns, keyLiteral, Reflection.getRawType(this.keyType));
+				insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/Map", 
+						"get", "(Ljava/lang/Object;)Ljava/lang/Object;"));
+			} else {
+				throw new CompilationException(FailureCause.NOT_MAP, this);
+			};
+			
+			ctx.endNode(this.valueType);
+			return insns;
+		};
 	}
 }

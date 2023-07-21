@@ -6,7 +6,7 @@ public class AccessingFailureException extends Exception {
 	private static final long serialVersionUID = -4184399838031396060L;
 	private final String shortenedMsg;
 	public final FailureCause failureCause;
-	private final Object[] args;
+	final Object[] args;
 	
 	/**
 	 * Whether or not the node from which the exception arose is specified.

@@ -2,13 +2,12 @@ package lovexyn0827.mess.util.access;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.objectweb.asm.tree.InsnList;
 import lovexyn0827.mess.util.Reflection;
 
 final class FieldNode extends Node {
-
 	private final String fieldName;
 	private Field field;
 	
@@ -67,26 +66,25 @@ final class FieldNode extends Node {
 		super.uninitialize();
 		this.field = null;
 	}
-
+	
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException {
-		Field f;
-		if(lastOutType instanceof Class<?>) {
-			f = Reflection.getFieldFromNamed((Class<?>) lastOutType, this.fieldName);
-		} else if(lastOutType instanceof ParameterizedType) {
-			f = Reflection.getFieldFromNamed((Class<?>) ((ParameterizedType) lastOutType).getRawType(), this.fieldName);
-		} else {
-			f = null;
-		}
-		
-		if(f != null) {
-			this.field = f;
-			this.outputType = f.getGenericType();
-			return this.outputType;
-		} else {
+	void initialize(Type lastOutType) throws AccessingFailureException {
+		this.field = this.resolveField(lastOutType);
+		if(this.field == null) {
 			throw AccessingFailureException.createWithArgs(FailureCause.NO_FIELD, this, null, 
 					this.fieldName, lastOutType.getTypeName());
 		}
+		
+		super.initialize(lastOutType);
+	}
+	
+	private Field resolveField(Type lastOutType) throws AccessingFailureException {
+		return Reflection.getFieldFromNamed(Reflection.getRawType(lastOutType), this.fieldName);
+	}
+
+	@Override
+	protected Type resolveOutputType(Type lastOutType) throws AccessingFailureException {
+		return this.field.getGenericType();
 	}
 
 	@Override
@@ -104,6 +102,7 @@ final class FieldNode extends Node {
 	@Override
 	void write(Object writeTo, Object newValue) throws AccessingFailureException {
 		try {
+			this.field.setAccessible(true);
 			this.field.set(writeTo, newValue);
 		} catch (IllegalArgumentException e) {
 			throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
@@ -111,5 +110,20 @@ final class FieldNode extends Node {
 		} catch (IllegalAccessException e) {
 			throw AccessingFailureException.create(FailureCause.ERROR, this, e);
 		}
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		return (ctx) -> {
+			InsnList insns = new InsnList();
+			if(this.field == null) {
+				throw new CompilationException(FailureCause.ERROR, (Object) null);
+			} else {
+				BytecodeHelper.appendCaller(insns, this.field, CompilationContext.CallableType.GETTER);
+			}
+			
+			ctx.endNode(this.field.getGenericType());
+			return insns;
+		};
 	}
 }

@@ -11,10 +11,11 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
-
+import org.objectweb.asm.tree.InsnList;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
@@ -87,17 +88,21 @@ final class MethodNode extends Node implements Cloneable {
 		} catch (AccessingFailureException e) {
 			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
-			MessMod.LOGGER.info("Failed to invoke " + this.method);
+			if(OptionManager.superSuperSecretSetting) {
+				e.printStackTrace();
+				MessMod.LOGGER.info("Failed to invoke " + this.method);
+			}
 			throw AccessingFailureException.createWithArgs(FailureCause.ERROR, this, e, e);
 		}
 	}
 	
-	private void resolveMethod(Class<? extends Object> clazz) throws AccessingFailureException {
+	private void resolveAndSetMethod(Class<? extends Object> clazz) throws AccessingFailureException {
 		Mutable<String> srg = new MutableObject<>();
 		Mapping map = MessMod.INSTANCE.getMapping();
 		final List<Method> candidates = Reflection.listMethods(clazz).stream()
 				.filter((m) -> {
+					// Determine whether or not a method can be a valid candidate.
+					// FIXME When multiple methods has the same types of parameters, the method be chosen inaccurately
 					String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
 					srg.setValue(map.srgMethodRecursively(clazz, this.name, descriptor));
 					if(m.getName().equals(srg.getValue())) {
@@ -187,13 +192,17 @@ final class MethodNode extends Node implements Cloneable {
 		return n.outputType != null && Reflection.listMethods(
 				Reflection.getRawType(n.outputType)).contains(this.method);
 	}
+	
+	@Override
+	void initialize(Type lastOutType) throws AccessingFailureException  {
+		Class<?> cl = Reflection.getRawType(lastOutType);
+		this.resolveAndSetMethod(cl);
+		super.initialize(lastOutType);
+	}
 
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException {
-		Class<?> cl = Reflection.getRawType(lastOutType);
-		this.resolveMethod(cl == null ? Object.class : cl);
-		this.outputType = this.method.getGenericReturnType();
-		return this.outputType;
+	protected Type resolveOutputType(Type lastOutType){
+		return this.method.getGenericReturnType();
 	}
 
 	public static Class<?>[] parseDescriptor(String descriptor) {
@@ -260,5 +269,30 @@ final class MethodNode extends Node implements Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError();
 		}
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		// TODO The same as MapperNode.getCompiler()?
+		return (ctx) -> {
+			InsnList insns = new InsnList();
+			if(this.method == null) {
+				throw new CompilationException(FailureCause.ERROR);
+			} else {
+				// 1. Prepare arguments
+				int argsLength = this.args.length;
+				Class<?>[] argTypes = this.method.getParameterTypes();
+				for(int i = 0; i < argsLength; i++) {
+					Literal<?> literal = this.args[i];
+					BytecodeHelper.appendConstantLoader(ctx, insns, literal, argTypes[i]);
+				}
+				
+				// 2. Invoke underlying method
+				BytecodeHelper.appendCaller(insns, this.method, CompilationContext.CallableType.INVOKER);
+			}
+			
+			ctx.endNode(this.method.getGenericReturnType());
+			return insns;
+		};
 	}
 }

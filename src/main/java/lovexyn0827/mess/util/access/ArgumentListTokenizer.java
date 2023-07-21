@@ -68,6 +68,7 @@ class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
 	}
 
 	private String readEscape() {
+		// TODO Translate error messages
 		StringReader in = this.input;
 		if(!in.canRead()) {
 			throw new IllegalStateException("Incomplete escape");

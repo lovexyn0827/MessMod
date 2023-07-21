@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,7 +20,87 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.mojang.datafixers.util.Pair;
 
+import it.unimi.dsi.fastutil.bytes.Byte2BooleanMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ByteMap;
+import it.unimi.dsi.fastutil.bytes.Byte2CharMap;
+import it.unimi.dsi.fastutil.bytes.Byte2DoubleMap;
+import it.unimi.dsi.fastutil.bytes.Byte2FloatMap;
+import it.unimi.dsi.fastutil.bytes.Byte2IntMap;
+import it.unimi.dsi.fastutil.bytes.Byte2LongMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ShortMap;
+import it.unimi.dsi.fastutil.chars.Char2BooleanMap;
+import it.unimi.dsi.fastutil.chars.Char2ByteMap;
+import it.unimi.dsi.fastutil.chars.Char2CharMap;
+import it.unimi.dsi.fastutil.chars.Char2DoubleMap;
+import it.unimi.dsi.fastutil.chars.Char2FloatMap;
+import it.unimi.dsi.fastutil.chars.Char2IntMap;
+import it.unimi.dsi.fastutil.chars.Char2LongMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
+import it.unimi.dsi.fastutil.chars.Char2ShortMap;
+import it.unimi.dsi.fastutil.doubles.Double2BooleanMap;
+import it.unimi.dsi.fastutil.doubles.Double2ByteMap;
+import it.unimi.dsi.fastutil.doubles.Double2CharMap;
+import it.unimi.dsi.fastutil.doubles.Double2DoubleMap;
+import it.unimi.dsi.fastutil.doubles.Double2FloatMap;
+import it.unimi.dsi.fastutil.doubles.Double2IntMap;
+import it.unimi.dsi.fastutil.doubles.Double2LongMap;
+import it.unimi.dsi.fastutil.doubles.Double2ObjectMap;
+import it.unimi.dsi.fastutil.doubles.Double2ShortMap;
+import it.unimi.dsi.fastutil.floats.Float2BooleanMap;
+import it.unimi.dsi.fastutil.floats.Float2ByteMap;
+import it.unimi.dsi.fastutil.floats.Float2CharMap;
+import it.unimi.dsi.fastutil.floats.Float2DoubleMap;
+import it.unimi.dsi.fastutil.floats.Float2FloatMap;
+import it.unimi.dsi.fastutil.floats.Float2IntMap;
+import it.unimi.dsi.fastutil.floats.Float2LongMap;
+import it.unimi.dsi.fastutil.floats.Float2ObjectMap;
+import it.unimi.dsi.fastutil.floats.Float2ShortMap;
+import it.unimi.dsi.fastutil.ints.Int2BooleanMap;
+import it.unimi.dsi.fastutil.ints.Int2ByteMap;
+import it.unimi.dsi.fastutil.ints.Int2CharMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2FloatMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2LongMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ShortMap;
+import it.unimi.dsi.fastutil.longs.Long2BooleanMap;
+import it.unimi.dsi.fastutil.longs.Long2ByteMap;
+import it.unimi.dsi.fastutil.longs.Long2CharMap;
+import it.unimi.dsi.fastutil.longs.Long2DoubleMap;
+import it.unimi.dsi.fastutil.longs.Long2FloatMap;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2LongMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ShortMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2ByteMap;
+import it.unimi.dsi.fastutil.objects.Object2CharMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortMap;
+import it.unimi.dsi.fastutil.objects.Reference2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Reference2ByteMap;
+import it.unimi.dsi.fastutil.objects.Reference2CharMap;
+import it.unimi.dsi.fastutil.objects.Reference2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2LongMap;
+import it.unimi.dsi.fastutil.objects.Reference2ShortMap;
+import it.unimi.dsi.fastutil.shorts.Short2BooleanMap;
+import it.unimi.dsi.fastutil.shorts.Short2ByteMap;
+import it.unimi.dsi.fastutil.shorts.Short2CharMap;
+import it.unimi.dsi.fastutil.shorts.Short2DoubleMap;
+import it.unimi.dsi.fastutil.shorts.Short2FloatMap;
+import it.unimi.dsi.fastutil.shorts.Short2IntMap;
+import it.unimi.dsi.fastutil.shorts.Short2LongMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.entity.Entity;
@@ -136,9 +217,9 @@ public class Reflection {
 	/**
 	 * Extract the raw type from the given Type instance.
 	 * @param type
-	 * @return The Class instance corresponding to the raw type of {@code type}, or null if it couldn't determiner.
+	 * @return The Class instance corresponding to the raw type of {@code type}, or {@code Object.class} if not determined.
 	 */
-	@Nullable
+	@NotNull
 	public static Class<?> getRawType(@NotNull Type type) {
 		// TODO Check if types like List<String>[] and ? extends List & Queue can be handled properly
 		if(type instanceof Class<?>) {
@@ -147,9 +228,9 @@ public class Reflection {
 			return (Class<?>) ((ParameterizedType) type).getRawType();
 		} else if(type instanceof WildcardType) {
 			Type[] bounds = ((WildcardType) type).getUpperBounds();
-			return bounds.length == 0 ? null : (Class<?>) bounds[0];
+			return bounds.length == 0 ? Object.class : (Class<?>) bounds[0];
 		} else {
-			return null;
+			return Object.class;
 		}
 	}
 	
@@ -163,6 +244,7 @@ public class Reflection {
 	}
 	
 	public static Method getDeepestOverridenMethod(Method in) {
+		// FIXME
 		Class<?> clazz = in.getDeclaringClass();
 		String name = in.getName();
 		Class<?>[] paramTypes = in.getParameterTypes();
@@ -173,6 +255,58 @@ public class Reflection {
 		}
 		
 		return in;
+	}
+	
+	public static Set<Class<?>> getAllInterfaces(Class<?> cl) {
+		HashSet<Class<?>> set = Sets.newHashSet();
+		for(Class<?> current = cl; current != null; current = current.getSuperclass()) {
+			appendAllInterfacesInternal(current, set);
+		}
+		
+		return set;
+	}
+	
+	private static void appendAllInterfacesInternal(Class<?> cl, HashSet<Class<?>> set) {
+		Class<?>[] interfaces = cl.getInterfaces();
+		for(Class<?> inf : interfaces) {
+			set.add(inf);
+			appendAllInterfacesInternal(inf, set);
+		}
+	}
+
+	public static Set<Type> getAllGenericInterfaces(Class<?> cl) {
+		HashSet<Type> set = Sets.newHashSet();
+		for(Class<?> current = cl; current != null; current = current.getSuperclass()) {
+			appendAllGenericInterfacesInternal(current, set);
+		}
+		
+		return set;
+	}
+	
+	private static void appendAllGenericInterfacesInternal(Type cl, HashSet<Type> set) {
+		Type[] interfaces = getRawType(cl).getGenericInterfaces();
+		for(Type inf : interfaces) {
+			set.add(inf);
+			appendAllGenericInterfacesInternal(inf, set);
+		}
+	}
+
+	public static boolean isClassExisting(String name) {
+		try {
+			Class.forName(name);
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+	}
+
+	public static Class<?> getTypeArgOrObject(Type inType, int ordinal) {
+		if(inType instanceof ParameterizedType) {
+			ParameterizedType pt = (ParameterizedType) inType;
+			return getRawType(pt.getActualTypeArguments()[ordinal]);
+		} else {
+			return Object.class;
+		}
 	}
 
 	static {
@@ -201,5 +335,90 @@ public class Reflection {
 				.put("byte", byte.class)
 				.put("void", void.class)
 				.build();
+		MAP_TO_TYPES = ImmutableMap
+				.<Class<?>, Pair<Class<?>, Class<?>>>builder()
+				.put(Object2DoubleMap.class, new Pair<>(null, double.class))
+				.put(Object2IntMap.class, new Pair<>(null, int.class))
+				.put(Object2FloatMap.class, new Pair<>(null, float.class))
+				.put(Object2LongMap.class, new Pair<>(null, long.class))
+				.put(Object2BooleanMap.class, new Pair<>(null, boolean.class))
+				.put(Object2CharMap.class, new Pair<>(null, char.class))
+				.put(Object2ByteMap.class, new Pair<>(null, byte.class))
+				.put(Object2ShortMap.class, new Pair<>(null, short.class))
+				.put(Reference2DoubleMap.class, new Pair<>(null, double.class))
+				.put(Reference2IntMap.class, new Pair<>(null, int.class))
+				.put(Reference2FloatMap.class, new Pair<>(null, float.class))
+				.put(Reference2LongMap.class, new Pair<>(null, long.class))
+				.put(Reference2BooleanMap.class, new Pair<>(null, boolean.class))
+				.put(Reference2CharMap.class, new Pair<>(null, char.class))
+				.put(Reference2ByteMap.class, new Pair<>(null, byte.class))
+				.put(Reference2ShortMap.class, new Pair<>(null, short.class))
+				.put(Int2DoubleMap.class, new Pair<>(int.class, double.class))
+				.put(Int2IntMap.class, new Pair<>(int.class, int.class))
+				.put(Int2FloatMap.class, new Pair<>(int.class, float.class))
+				.put(Int2LongMap.class, new Pair<>(int.class, long.class))
+				.put(Int2BooleanMap.class, new Pair<>(int.class, boolean.class))
+				.put(Int2CharMap.class, new Pair<>(int.class, char.class))
+				.put(Int2ByteMap.class, new Pair<>(int.class, byte.class))
+				.put(Int2ShortMap.class, new Pair<>(int.class, short.class))
+				.put(Double2DoubleMap.class, new Pair<>(double.class, double.class))
+				.put(Double2IntMap.class, new Pair<>(double.class, int.class))
+				.put(Double2FloatMap.class, new Pair<>(double.class, float.class))
+				.put(Double2LongMap.class, new Pair<>(double.class, long.class))
+				.put(Double2BooleanMap.class, new Pair<>(double.class, boolean.class))
+				.put(Double2CharMap.class, new Pair<>(double.class, char.class))
+				.put(Double2ByteMap.class, new Pair<>(double.class, byte.class))
+				.put(Double2ShortMap.class, new Pair<>(double.class, short.class))
+				.put(Float2DoubleMap.class, new Pair<>(float.class, double.class))
+				.put(Float2IntMap.class, new Pair<>(float.class, int.class))
+				.put(Float2FloatMap.class, new Pair<>(float.class, float.class))
+				.put(Float2LongMap.class, new Pair<>(float.class, long.class))
+				.put(Float2BooleanMap.class, new Pair<>(float.class, boolean.class))
+				.put(Float2CharMap.class, new Pair<>(float.class, char.class))
+				.put(Float2ByteMap.class, new Pair<>(float.class, byte.class))
+				.put(Float2ShortMap.class, new Pair<>(float.class, short.class))
+				.put(Long2DoubleMap.class, new Pair<>(long.class, double.class))
+				.put(Long2IntMap.class, new Pair<>(long.class, int.class))
+				.put(Long2FloatMap.class, new Pair<>(long.class, float.class))
+				.put(Long2LongMap.class, new Pair<>(long.class, long.class))
+				.put(Long2BooleanMap.class, new Pair<>(long.class, boolean.class))
+				.put(Long2CharMap.class, new Pair<>(long.class, char.class))
+				.put(Long2ByteMap.class, new Pair<>(long.class, byte.class))
+				.put(Long2ShortMap.class, new Pair<>(long.class, short.class))
+				.put(Char2DoubleMap.class, new Pair<>(char.class, double.class))
+				.put(Char2IntMap.class, new Pair<>(char.class, int.class))
+				.put(Char2FloatMap.class, new Pair<>(char.class, float.class))
+				.put(Char2LongMap.class, new Pair<>(char.class, long.class))
+				.put(Char2BooleanMap.class, new Pair<>(char.class, boolean.class))
+				.put(Char2CharMap.class, new Pair<>(char.class, char.class))
+				.put(Char2ByteMap.class, new Pair<>(char.class, byte.class))
+				.put(Char2ShortMap.class, new Pair<>(char.class, short.class))
+				.put(Byte2DoubleMap.class, new Pair<>(byte.class, double.class))
+				.put(Byte2IntMap.class, new Pair<>(byte.class, int.class))
+				.put(Byte2FloatMap.class, new Pair<>(byte.class, float.class))
+				.put(Byte2LongMap.class, new Pair<>(byte.class, long.class))
+				.put(Byte2BooleanMap.class, new Pair<>(byte.class, boolean.class))
+				.put(Byte2CharMap.class, new Pair<>(byte.class, char.class))
+				.put(Byte2ByteMap.class, new Pair<>(byte.class, byte.class))
+				.put(Byte2ShortMap.class, new Pair<>(byte.class, short.class))
+				.put(Short2DoubleMap.class, new Pair<>(short.class, double.class))
+				.put(Short2IntMap.class, new Pair<>(short.class, int.class))
+				.put(Short2FloatMap.class, new Pair<>(short.class, float.class))
+				.put(Short2LongMap.class, new Pair<>(short.class, long.class))
+				.put(Short2BooleanMap.class, new Pair<>(short.class, boolean.class))
+				.put(Short2CharMap.class, new Pair<>(short.class, char.class))
+				.put(Short2ByteMap.class, new Pair<>(short.class, byte.class))
+				.put(Short2ShortMap.class, new Pair<>(short.class, short.class))
+				.put(Double2ObjectMap.class, new Pair<>(double.class, null))
+				.put(Int2ObjectMap.class, new Pair<>(int.class, null))
+				.put(Float2ObjectMap.class, new Pair<>(float.class, null))
+				.put(Long2ObjectMap.class, new Pair<>(long.class, null))
+				.put(Char2ObjectMap.class, new Pair<>(char.class, null))
+				.put(Byte2ObjectMap.class, new Pair<>(byte.class, null))
+				.put(Short2ObjectMap.class, new Pair<>(short.class, null))
+				.build();
 	}
+
+	// Map class => {Key class, Value class} (type arguments are represented by null)
+	public static final ImmutableMap<Class<?>, Pair<Class<?>, Class<?>>> MAP_TO_TYPES;
 }

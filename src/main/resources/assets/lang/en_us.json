@@ -8,10 +8,11 @@
 		"cmd.general.unsubgen" : "Unsubscribed %s", 
 		"cmd.general.found" : "Found at (%d, %d, %d)", 
 		"cmd.general.notfound" : "Not found", 
-		"cmd.general.nodef" : "%s was not defined", 
+		"cmd.general.nodef" : "%s hasn't been defined", 
 		"cmd.general.unexpected" : "Unexpected error", 
 		"cmd.general.success" : "Success", 
 		"cmd.general.dupname" : "The name has already been used.", 
+		"cmd.general.unsupported" : "This feature is not supported currently.", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 

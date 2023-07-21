@@ -55,12 +55,18 @@ abstract class Node {
 	}
 
 	boolean isInitialized() {
-		return initialized;
+		return this.initialized;
 	}
 
-	final void initialize(Type lastOutClass) throws AccessingFailureException {
+	/**
+	 * Should be called after custom initialization finished.
+	 * @param lastOutClass
+	 * @throws AccessingFailureException
+	 * @implNote outputType field shouldn't be null after initialization.
+	 */
+	void initialize(Type lastOutClass) throws AccessingFailureException {
 		try {
-			this.prepare(lastOutClass);
+			this.outputType =  this.resolveOutputType(lastOutClass);
 		} catch (InvalidLiteralException e) {
 			throw AccessingFailureException.create(e, this);
 		}
@@ -77,9 +83,10 @@ abstract class Node {
 	/**
 	 * @throws AccessingFailureException 
 	 * @throws InvalidLiteralException 
-	 * @implNote outputType field shouldn't be null after initialization.
+	 * @implNote Never modify any field of this {@code Node}
 	 */
-	protected abstract Type prepare(Type lastOutType) throws AccessingFailureException, InvalidLiteralException;
+	protected abstract Type resolveOutputType(Type lastOutType) 
+			throws AccessingFailureException, InvalidLiteralException;
 	
 	/** Nodes obtained this way must maintain its original position in the path */
 	Node createCopyForInput(Object input) {
@@ -98,5 +105,11 @@ abstract class Node {
 		if(!this.isInitialized()) {
 			throw new IllegalStateException("Called before initialization!");
 		}
+	}
+	
+	abstract NodeCompiler getCompiler();
+	
+	boolean allowsPrimitiveTypes() {
+		return false;
 	}
 }

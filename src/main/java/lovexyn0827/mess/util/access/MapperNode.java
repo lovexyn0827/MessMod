@@ -2,6 +2,7 @@ package lovexyn0827.mess.util.access;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
@@ -27,14 +33,26 @@ public class MapperNode extends Node {
 			+ "::(?<name>[$_a-zA-Z0-9]+)(?:\\<(?<types>[^>]*)\\>)?(\\((?<args>.*)\\))?$");
 	private final Method method;
 	// may contain null, to show that the input will be used.
+	@NotNull
 	private final Literal<?>[] arguments;
 	private final Mode mode;
 	
 	public MapperNode(String toParse) throws CommandSyntaxException {
+		Triple<Method, Literal<?>[], Mode> result = parse(toParse);
+		this.method = result.getLeft();
+		this.arguments = result.getMiddle();
+		this.mode = result.getRight();
+	}
+
+	private static Triple<Method, Literal<?>[], Mode> parse(String toParse) throws CommandSyntaxException {
 		//Class::method<...>(...)
 		// XXX Currently, the method lookup is performed on the client, which may have some valid paths rejected.
 		Matcher matcher = PATTERN.matcher(toParse);
+		Method method;
+		Literal<?>[] args;
+		Mode mode;
 		if(matcher.matches()) {
+			// Spilt the string representation
 			String name = matcher.group("name");
 			String className = matcher.group("class").replace('/', '.');
 			if(name == null && className == null) {
@@ -43,47 +61,45 @@ public class MapperNode extends Node {
 			
 			String typesStr = matcher.group("types");
 			String argsStr = matcher.group("args");
-			try {
-				Optional<Method> mayMethod = resloveMethod(className, name, typesStr);
-				if(mayMethod.isPresent()) {
-					this.method = mayMethod.get();
-				} else {
-					String mS = name + ((typesStr == null) ? "" : '<' + typesStr + ">");
-					throw new TranslatableException("exp.nomethod", 
-							mS, className);
+			// Search for a method that satisfies the given restrictions, or throw if it fails.
+			Optional<Method> mayMethod = resolveMethod(className, name, typesStr);
+			if(mayMethod.isPresent()) {
+				method = mayMethod.get();
+			} else {
+				String mS = name + ((typesStr == null) ? "" : '<' + typesStr + ">");
+				throw new TranslatableException("exp.nomethod", mS, className);
+			}
+			
+			// 
+			if(typesStr == null) {
+				// Arguments are not supported in simple mode as the argument must be the input object itself
+				boolean hasArgs = argsStr == null || argsStr.isEmpty();
+				if(!hasArgs) {
+					throw new TranslatableException("exp.mapper.unsupportedargs");
 				}
 				
-				if(typesStr == null) {
-					boolean hasArgs = argsStr == null || argsStr.isEmpty();
-					if(!hasArgs) {
-						throw new TranslatableException("exp.mapper.unsupportedargs");
-					}
-					
-					this.arguments = new Literal<?>[] { null };
-					this.mode = Mode.SIMPLE;
-				} else if(argsStr != null) {
-					this.arguments = this.parseArgs(argsStr);;
-					this.mode = Mode.NORMAL;
-				} else {
-					throw new TranslatableException("exp.mapper.format");
-				}
-			} catch (ClassNotFoundException e) {
-				TranslatableException e1 = new TranslatableException("exp.noclass", className);
-				e1.initCause(e);
-				throw e1;
+				args = new Literal<?>[] { null };
+				mode = Mode.SIMPLE;
+			} else if(argsStr != null) {
+				// Parse arguments
+				args = parseArgs(method, argsStr);
+				mode = Mode.NORMAL;
+			} else {
+				throw new TranslatableException("exp.mapper.format");
 			}
 		} else {
 			throw new TranslatableException("exp.mapper.format");
 		}
+		
+		return Triple.of(method, args, mode);
 	}
 
-	public Literal<?>[] parseArgs(String argsStr) throws CommandSyntaxException {
+	public static Literal<?>[] parseArgs(Method method, String argsStr) throws CommandSyntaxException {
 		if (!argsStr.isEmpty()) {
 			String[] argLS = new ArgumentListTokenizer(argsStr).toArray();
 			int givenArgCount = argLS.length;
-			
-			if(givenArgCount != this.method.getParameterCount()) {
-				throw new TranslatableException("exp.argcount", this.method.getParameterCount(), givenArgCount);
+			if(givenArgCount != method.getParameterCount()) {
+				throw new TranslatableException("exp.argcount", method.getParameterCount(), givenArgCount);
 			}
 			
 			Literal<?>[] argL = new Literal<?>[givenArgCount];
@@ -106,10 +122,17 @@ public class MapperNode extends Node {
 		}
 	}
 	
-	private static Optional<Method> resloveMethod(String className, String name, String typesStr) 
-			throws ClassNotFoundException {
+	private static Optional<Method> resolveMethod(String className, String name, String typesStr) {
 		Mapping map = MessMod.INSTANCE.getMapping();
-		Class<?> clazz = Class.forName(className);
+		Class<?> clazz;
+		try {
+			clazz = Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			TranslatableException e1 = new TranslatableException("exp.noclass", className);
+			e1.initCause(e);
+			throw e1;
+		}
+		
 		if(typesStr == null) {
 			// Class::method, only methods with a single parameter and returns something.
 			return Reflection.listMethods(clazz).stream()
@@ -254,19 +277,62 @@ public class MapperNode extends Node {
 		} catch (AccessingFailureException e) {
 			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
-			MessMod.LOGGER.info("Failed to invoke " + this.method);
 			throw AccessingFailureException.createWithArgs(FailureCause.ERROR, this, e, e);
 		}
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
+	protected Type resolveOutputType(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
 		return this.method.getGenericReturnType();
+	}
+	
+	@Override
+	public boolean allowsPrimitiveTypes() {
+		return this.method != null && Modifier.isStatic(this.method.getModifiers());
 	}
 
 	private enum Mode {
 		SIMPLE, 
 		NORMAL
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		return (ctx) -> {
+			InsnList insns = new InsnList();
+			if(this.method == null) {
+				throw new CompilationException(FailureCause.ERROR, (Object) null);
+			} else {
+				// 1. Prepare arguments
+				if(!Modifier.isStatic(this.method.getModifiers())) {
+					insns.add(new InsnNode(Opcodes.DUP));
+				}
+				
+				int lastOutIdx = BytecodeHelper.appendLocalVarStorer(ctx, insns, ctx.getLastOutputClass());
+				int argsLength = this.arguments.length;
+				Class<?>[] argTypes = this.method.getParameterTypes();
+				for(int i = 0; i < argsLength; i++) {
+					Literal<?> literal = this.arguments[i];
+					if(literal == null) {
+						BytecodeHelper.appendLocalVarLoader(insns, lastOutIdx, ctx.getLastOutputClass());
+						if(argTypes[i].isPrimitive() && !ctx.getLastOutputClass().isPrimitive()) {
+							BytecodeHelper.appendPrimitiveUnwrapper(insns, argTypes[i]);
+						}
+						
+						if(!argTypes[i].isPrimitive() && ctx.getLastOutputClass().isPrimitive()) {
+							BytecodeHelper.appendPrimitiveWrapper(insns, argTypes[i]);
+						}
+					} else {
+						BytecodeHelper.appendConstantLoader(ctx, insns, literal, argTypes[i]);
+					}
+				}
+				
+				// 2. Invoke underlying method
+				BytecodeHelper.appendCaller(insns, this.method, CompilationContext.CallableType.INVOKER);
+			}
+			
+			ctx.endNode(this.method.getReturnType());
+			return insns;
+		};
 	}
 }

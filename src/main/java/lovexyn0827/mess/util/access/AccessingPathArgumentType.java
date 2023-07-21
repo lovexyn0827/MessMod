@@ -54,7 +54,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			nodes.add(n);
 		}
 		
-		return new AccessingPath(nodes);
+		return new JavaAccessingPath(nodes, stringRepresentation);
 	}
 
 	@Nullable
