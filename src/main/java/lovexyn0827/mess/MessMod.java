@@ -114,7 +114,6 @@ public class MessMod implements ModInitializer {
 		this.blockInfoRederer.tick();
 		this.shapeSender.updateClientTime(server.getOverworld().getTime());
 		this.entityLogger.serverTick();
-		this.gameTime = server.getOverworld().getTime();
 	}
 	
 
@@ -321,5 +320,9 @@ public class MessMod implements ModInitializer {
 
 	public long getGameTime() {
 		return this.gameTime;
+	}
+
+	public void updateTime(long time) {
+		this.gameTime = time;
 	}
 }
