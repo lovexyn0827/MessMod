@@ -176,6 +176,8 @@
 		"opt.entityExplosionRaysVisiblity.desc" : "Explosion ray (used in the calculation the exposure of entities) renderer. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.", 
 		"opt.entityExplosionRaysLifetime.desc" : "The number of ticks the rendered rays remains. ", 
 		"opt.entityLogAutoArchiving.desc" : "Archive the entity log produced within a single session automatically. These archives can be found in folder `World Folder/entitylog/archives`.", 
+		"opt.fletchingTablePulseDetectingMode.desc" : "Specify which type of pulses are record.", 
+		"opt.fletchingTablePulseDetector.desc" : "Record the lengths of redstone signal pulses received bu fletching tables.", 
 		"opt.generateChunkGrid.desc" : "Generate a layer of glass on the ground to show the chunks.", 
 		"opt.getEntityRangeExpansion.desc" : "[TODO]In the vanilla getEntities() method, only entities which are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually it doesn't matter, but when height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Change it to a higher value may fix some bugs about interaction between entities and something else.", 
 		"opt.hideSurvivalSaves.desc" : "Hide worlds that is likely to be survival saves to prevent it to be opened accidentally. Can only be set globally.", 

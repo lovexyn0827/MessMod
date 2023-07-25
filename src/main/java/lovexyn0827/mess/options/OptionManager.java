@@ -33,6 +33,7 @@ import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
+import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.i18n.Language;
@@ -168,6 +169,14 @@ public class OptionManager{
 	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class)
 	public static boolean entityLogAutoArchiving;
+	
+	@Option(defaultValue = "POSITIVE", 
+			parserClass = PulseRecorder.Mode.Parser.class)
+	public static PulseRecorder.Mode fletchingTablePulseDetectingMode;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean fletchingTablePulseDetector;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)

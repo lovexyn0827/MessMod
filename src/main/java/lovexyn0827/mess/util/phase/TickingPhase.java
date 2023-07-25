@@ -9,7 +9,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.world.World;
 
 public interface TickingPhase {
-	public void triggerEvents(@Nullable World world);
+	public void begin(@Nullable World world);
 	public void addEvent(Event event);
 	public void removeEvent(Event event);
 	public boolean isNotInAnyWorld();

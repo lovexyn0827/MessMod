@@ -19,6 +19,7 @@ public enum ServerTickingPhase implements TickingPhase {
 	TICKED_ALL_WORLDS(true), 
 	SERVER_TASKS(true);
 	
+	private static ServerTickingPhase current;
 	private final List<TickingPhase.Event> events = Lists.newArrayList();
 	public final boolean notInAnyWorld;
 	
@@ -26,14 +27,22 @@ public enum ServerTickingPhase implements TickingPhase {
 		this.notInAnyWorld = notInAnyWorld;
 	}
 	
-	public void triggerEvents(@Nullable World world) {
+	@Override
+	public void begin(@Nullable World world) {
+		current = this;
+		this.triggerEvents(world);
+	}
+
+	protected void triggerEvents(@Nullable World world) {
 		this.events.forEach((e) -> e.trigger(this, world));
 	}
 	
+	@Override
 	public void addEvent(TickingPhase.Event event) {
 		this.events.add(event);
 	}
 
+	@Override
 	public void removeEvent(TickingPhase.Event event) {
 		this.events.remove(event);
 	}
@@ -49,9 +58,15 @@ public enum ServerTickingPhase implements TickingPhase {
 		}
 	}
 	
-	public static void removeAllEvents() {
+	public static void initialize() {
+		current = null;
 		for(ServerTickingPhase phase : values()) {
 			phase.events.clear();
 		}
+	}
+	
+	@Nullable
+	public static ServerTickingPhase current() {
+		return current;
 	}
 }

@@ -72,6 +72,7 @@ public class MessMod implements ModInitializer {
 	private BlockPlacementHistory placementHistory;
 	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
 	private ChunkBehaviorLogger chunkLogger;
+	private long gameTime;
 
 	private MessMod() {
 		this.reloadMapping();
@@ -113,6 +114,7 @@ public class MessMod implements ModInitializer {
 		this.blockInfoRederer.tick();
 		this.shapeSender.updateClientTime(server.getOverworld().getTime());
 		this.entityLogger.serverTick();
+		this.gameTime = server.getOverworld().getTime();
 	}
 	
 
@@ -142,7 +144,7 @@ public class MessMod implements ModInitializer {
 		this.placementHistory = null;
 		this.chunkLoadingInfoRenderer.close();
 		this.chunkLoadingInfoRenderer = null;
-		ServerTickingPhase.removeAllEvents();
+		ServerTickingPhase.initialize();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.entityLogger.archiveLogs();
@@ -209,12 +211,12 @@ public class MessMod implements ModInitializer {
 
 	@Environment(EnvType.CLIENT)
 	public void onClientTickStart() {
-		ClientTickingPhase.CLIENT_TICK_START.triggerEvents(null);
+		ClientTickingPhase.CLIENT_TICK_START.begin(null);
 	}
 
 	@Environment(EnvType.CLIENT)
 	public void onClientTicked() {
-		ClientTickingPhase.CLIENT_TICK_END.triggerEvents(null);
+		ClientTickingPhase.CLIENT_TICK_END.begin(null);
 		ServerHudManager shm = this.getServerHudManager();
 		if (this.entityLogger != null) {
 			this.entityLogger.clientTick();
@@ -315,5 +317,9 @@ public class MessMod implements ModInitializer {
 
 	public ChunkBehaviorLogger getChunkLogger() {
 		return this.chunkLogger;
+	}
+
+	public long getGameTime() {
+		return this.gameTime;
 	}
 }

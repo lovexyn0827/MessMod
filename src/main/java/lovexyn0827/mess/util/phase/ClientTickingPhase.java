@@ -14,7 +14,11 @@ public enum ClientTickingPhase implements TickingPhase {
 	private final List<TickingPhase.Event> events = Lists.newArrayList();
 	
 	@Override
-	public void triggerEvents(@Nullable World world) {
+	public void begin(@Nullable World world) {
+		this.triggerEvents(world);
+	}
+	
+	protected void triggerEvents(@Nullable World world) {
 		this.events.forEach((e) -> e.trigger(this, world));
 	}
 

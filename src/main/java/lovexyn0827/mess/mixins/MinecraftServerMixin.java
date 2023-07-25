@@ -17,7 +17,7 @@ import net.minecraft.server.MinecraftServer;
 public abstract class MinecraftServerMixin {
 	@Inject(method = "tick", at = @At(value = "RETURN"))
 	public void onTicked(BooleanSupplier bs, CallbackInfo ci) {
-		ServerTickingPhase.TICKED_ALL_WORLDS.triggerEvents(null);
+		ServerTickingPhase.TICKED_ALL_WORLDS.begin(null);
 		MessMod.INSTANCE.onServerTicked((MinecraftServer)(Object) this);
 	}
 	
@@ -38,6 +38,6 @@ public abstract class MinecraftServerMixin {
 	
 	@Inject(method = "method_16208",at = @At(value = "RETURN"))
 	private void onAsyncTasksExecuted(CallbackInfo ci) {
-		ServerTickingPhase.SERVER_TASKS.triggerEvents(null);
+		ServerTickingPhase.SERVER_TASKS.begin(null);
 	}
 }
