@@ -16,6 +16,7 @@ public enum ServerTickingPhase implements TickingPhase {
 	BLOCK_EVENT(false),
 	ENTITY(false),
 	TILE_ENTITY(false),
+	REST(false), 
 	TICKED_ALL_WORLDS(true), 
 	SERVER_TASKS(true);
 	

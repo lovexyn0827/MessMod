@@ -54,12 +54,19 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 	}
 	
 	@Inject(method = "tick", 
+			at = @At("HEAD")
+			)
+	private void startTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
+		ServerTickingPhase.WEATHER_CYCLE.begin((ServerWorld)(Object) this);
+	}
+	
+	@Inject(method = "tick", 
 			at = @At(value = "INVOKE_STRING", 
 					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
 					args = "ldc=chunkSource")
 			)
 	private void startChunkTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.WEATHER_CYCLE.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.CHUNK.begin((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -68,7 +75,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 					args = "ldc=tickPending")
 			)
 	private void startScheduledTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.CHUNK.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.SCHEDULED_TICK.begin((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -77,7 +84,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 					args = "ldc=raid")
 			)
 	private void startVillageTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.SCHEDULED_TICK.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.VILLAGE.begin((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -86,7 +93,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 					args = "ldc=blockEvents")
 			)
 	private void startBlockEventTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.VILLAGE.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.BLOCK_EVENT.begin((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -95,21 +102,21 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 					args = "ldc=entities")
 			)
 	private void startEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.BLOCK_EVENT.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.ENTITY.begin((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V")
 			)
 	private void startBlockEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.ENTITY.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.TILE_ENTITY.begin((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
 			at = @At("RETURN")
 			)
 	private void endTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.TILE_ENTITY.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.REST.begin((ServerWorld)(Object) this);
 	}
 	
 	@Override
