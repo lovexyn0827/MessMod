@@ -1,5 +1,6 @@
 package lovexyn0827.mess.mixins;
 
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,12 +45,13 @@ public abstract class KeyboardMixin {
 	
 	@Inject(method = "onKey", at = @At("RETURN"))
 	private void handleKey(long window, int key, int scancode, int i, int j, CallbackInfo ci) {
+		boolean isBeingPressed = i == GLFW.GLFW_PRESS;
 		MinecraftClient mc = MinecraftClient.getInstance();
-		if(key == 'Z' && Screen.hasControlDown()) {
+		if(key == 'Z' && Screen.hasControlDown() && isBeingPressed) {
 			if(mc.player != null) {
 				mc.player.networkHandler.sendPacket(new CustomPayloadC2SPacket(Channels.UNDO, new PacketByteBuf(Unpooled.buffer())));
 			}
-		} else if(key == 'Y' && Screen.hasControlDown()) {
+		} else if(key == 'Y' && Screen.hasControlDown() && isBeingPressed) {
 			if(mc.player != null) {
 				mc.player.networkHandler.sendPacket(new CustomPayloadC2SPacket(Channels.REDO, new PacketByteBuf(Unpooled.buffer())));
 			}
