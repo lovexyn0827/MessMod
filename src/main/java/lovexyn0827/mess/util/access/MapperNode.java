@@ -20,6 +20,7 @@ import org.objectweb.asm.tree.InsnNode;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.util.MethodDescriptor;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
@@ -165,18 +166,11 @@ public class MapperNode extends Node {
 				}
 			} else {
 				// The descriptor is given
-				// TODO Handle overriding / overridden methods better.
-				Class<?>[] types = MethodNode.parseDescriptor(typesStr);
-				return Reflection.listMethods(clazz).stream()
-						.filter((m) -> {
-							String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
-							String srg = map.srgMethodRecursively(m.getDeclaringClass(), name, descriptor);
-							return m.getName().equals(srg) 
-									&& Arrays.equals(types, m.getParameterTypes()) 
-									&& !m.isSynthetic();
-						})
-						.findFirst()
-						.map(Reflection::getDeepestOverridenMethod);
+				// Simply using the given method is fine
+				// However, allowing referencing methods declared by super types may make things easier.
+				MethodDescriptor desc = MethodDescriptor.parse(
+						MessMod.INSTANCE.getMapping().srgMethodDescriptor(typesStr));
+				return Optional.ofNullable(Reflection.getMethodFromDesc(clazz, name, desc));
 			}
 		}
 	}

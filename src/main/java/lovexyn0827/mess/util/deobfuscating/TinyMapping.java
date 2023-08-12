@@ -110,7 +110,6 @@ class TinyMapping implements Mapping {
 		}
 	}
 
-	// Maybe unused
 	@Override
 	public boolean isClassMapped(Class<?> clazz) {
 		return this.classes.containsKey(clazz.getCanonicalName());

@@ -243,20 +243,41 @@ public class Reflection {
 		}
 	}
 	
+	/**
+	 * Gets a method that is overridden by the given one. If two different {@code in} overrides the same method,
+	 * the returned method should be identical whenever possible.
+	 */
+	@NotNull
 	public static Method getDeepestOverridenMethod(Method in) {
-		// FIXME
-		Class<?> clazz = in.getDeclaringClass();
-		String name = in.getName();
-		Class<?>[] paramTypes = in.getParameterTypes();
-		while((clazz = clazz.getSuperclass()) != null) {
-			try {
-				in = clazz.getDeclaredMethod(name, paramTypes);
-			} catch (NoSuchMethodException | SecurityException e) {}
-		}
-		
-		return in;
+		return getAllMethods(in.getDeclaringClass()).stream()
+				.filter((m) -> isOverriding(m, in))
+				.sorted((m1, m2) -> m1.getDeclaringClass().isAssignableFrom(m2.getDeclaringClass()) ? -1 : 1)
+				.findFirst()
+				.orElseGet(() -> in);
 	}
 	
+	public static boolean isOverriding(Method m, Method maySuper) {
+		if (m.getName().equals(maySuper.getName()) 
+				&& m.getParameterCount() == maySuper.getParameterCount()) {
+			if(!maySuper.getReturnType().isAssignableFrom(m.getReturnType())) {
+				return false;
+			}
+			
+			int argCount = m.getParameterCount();
+			Class<?>[] mTypes = m.getParameterTypes();
+			Class<?>[] maySuperTypes = maySuper.getParameterTypes();
+			for(int i = 0; i < argCount; i++) {
+				if(!mTypes[i].isAssignableFrom(maySuperTypes[i])) {
+					return false;
+				}
+			}
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public static Set<Class<?>> getAllInterfaces(Class<?> cl) {
 		HashSet<Class<?>> set = Sets.newHashSet();
 		for(Class<?> current = cl; current != null; current = current.getSuperclass()) {
@@ -307,6 +328,66 @@ public class Reflection {
 		} else {
 			return Object.class;
 		}
+	}
+	
+	/**
+	 * Gets a Set containing methods of a given class, including inherited ones.
+	 */
+	public static Set<Method> getAllMethods(Class<?> cl) {
+		HashSet<Method> set = Sets.newHashSet();
+		appendAllMethodsInternal(cl, set);
+		return set;
+	}
+
+	private static void appendAllMethodsInternal(Class<?> cl, HashSet<Method> set) {
+		for(Method m : cl.getDeclaredMethods()) {
+			set.add(m);
+		}
+		
+		for(Class<?> in : cl.getInterfaces()) {
+			appendAllMethodsInternal(in, set);
+		}
+		
+		Class<?> superCl = cl.getSuperclass();
+		if(superCl != null) {
+			appendAllMethodsInternal(superCl, set);
+		} else {
+			return;
+		}
+	}
+
+	@Nullable
+	public static Class<?> toClassOrNull(org.objectweb.asm.Type type, boolean shouldMapToSrg) {
+		String name;
+		if(shouldMapToSrg) {
+			Mapping map = MessMod.INSTANCE.getMapping();
+			name = type.getSort() == org.objectweb.asm.Type.ARRAY ? 
+					map.srgDescriptor(type.getDescriptor()) : map.srgClass(type.getClassName());
+		} else {
+			name = type.getSort() == org.objectweb.asm.Type.ARRAY ? type.getDescriptor() : type.getClassName();
+		}
+		
+		try {
+			return getClassIncludingPrimitive(name.replace('/', '.'));
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * Gets a method with <b>exactly</b> matching name and descriptor, from a given class and its super types.
+	 */
+	@Nullable
+	public static Method getMethodFromDesc(Class<?> cl, String name, MethodDescriptor desc) {
+		for(Method m : getAllMethods(cl)) {
+			if(name.equals(m.getName())) {
+				if(desc.matches(m)) {
+					return m;
+				}
+			}
+		}
+		
+		return null;
 	}
 
 	static {

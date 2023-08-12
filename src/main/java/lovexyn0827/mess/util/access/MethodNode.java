@@ -16,6 +16,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.MethodDescriptor;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
@@ -23,7 +24,6 @@ import lovexyn0827.mess.util.deobfuscating.Mapping;
 final class MethodNode extends Node implements Cloneable {
 	static final Pattern METHOD_PATTERN = Pattern.compile(
 			"^(?<name>[$_a-zA-Z0-9]+)(?:\\<(?<types>[^>]*)\\>)?\\((?<args>.*)\\)$");
-
 	private final String name;
 	@Nullable
 	private final Class<?>[] types;
@@ -31,12 +31,15 @@ final class MethodNode extends Node implements Cloneable {
 	@Nullable
 	private Method method;
 	private final Integer argNum;
+	@Nullable
+	private final Class<?> returnTypes;
 	
 	MethodNode(String name, String types, String args) {
 		this.name = name;
 		if(types != null) {
 			if(types.matches("[0-9]+")) {
 				this.types = null;
+				this.returnTypes = null;
 				try {
 					this.argNum = Integer.parseInt(types);
 				} catch (NumberFormatException e) {
@@ -44,11 +47,15 @@ final class MethodNode extends Node implements Cloneable {
 				}
 			} else {
 				this.argNum = null;
-				this.types = parseDescriptor(types);
+				MethodDescriptor desc = MethodDescriptor.parse(
+						MessMod.INSTANCE.getMapping().srgMethodDescriptor(types));
+				this.types = desc.argTypes;
+				this.returnTypes = desc.returnType;
 			}
 		} else {
 			this.types = null;
 			this.argNum = null;
+			this.returnTypes = null;
 		}
 		
 		try {
@@ -117,12 +124,11 @@ final class MethodNode extends Node implements Cloneable {
 						return false;
 					}
 				})
-				.filter((m) -> !m.isSynthetic())
 				.map(Reflection::getDeepestOverridenMethod)
 				.distinct()
 				.collect(Collectors.toList());
 		if(candidates.size() == 1) {
-			this.method = candidates.iterator().next();
+			this.method = candidates.get(0);
 		} else if(candidates.size() == 0) {
 			throw AccessingFailureException.createWithArgs(FailureCause.NO_METHOD, this, null, 
 					srg.getValue(), clazz.getSimpleName());	// XXX Deobfusciation
@@ -203,30 +209,6 @@ final class MethodNode extends Node implements Cloneable {
 	@Override
 	protected Type resolveOutputType(Type lastOutType){
 		return this.method.getGenericReturnType();
-	}
-
-	public static Class<?>[] parseDescriptor(String descriptor) {
-		Mapping map = MessMod.INSTANCE.getMapping();
-		org.objectweb.asm.Type[] args;
-		try {
-			args = org.objectweb.asm.Type.getArgumentTypes(descriptor);
-		} catch (RuntimeException e) {
-			throw new TranslatableException("exp.descriptor");
-		}
-		
-		Class<?>[] result = new Class<?>[args.length];
-		for(int i = 0; i < args.length; i++) {
-			String clName = map.srgClass(args[i].getClassName());	// XXX Srg or named
-			try {
-				result[i] = Reflection.getClassIncludingPrimitive(clName);
-			} catch (ClassNotFoundException e) {
-				TranslatableException e1 = new TranslatableException("exp.noclass", clName);
-				e1.initCause(e);
-				throw e1;
-			}
-		}
-		
-		return result;
 	}
 
 	public static Literal<?>[] parseArgs(String argsStr) throws CommandSyntaxException {

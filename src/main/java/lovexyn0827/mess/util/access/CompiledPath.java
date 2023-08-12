@@ -22,6 +22,9 @@ import org.objectweb.asm.Opcodes;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.util.MethodDescriptor;
+import lovexyn0827.mess.util.Reflection;
 import net.minecraft.util.Util;
 
 public abstract class CompiledPath implements AccessingPath {
@@ -91,14 +94,12 @@ public abstract class CompiledPath implements AccessingPath {
 			throw new RuntimeException(e);
 		}
 		
-		Class<?>[] argTypes = MethodNode.parseDescriptor(descriptor);
-		Method m;
-		try {
-			// FIXME Also here (see MethodNode)
-			m = cl.getDeclaredMethod(methodName, argTypes);
-		} catch (NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+		MethodDescriptor descObj = MethodDescriptor.parse(
+				MessMod.INSTANCE.getMapping().srgMethodDescriptor(descriptor));
+		Method m = Reflection.getMethodFromDesc(cl, methodName, descObj);
+		if(m == null) {
+			throw new NoSuchMethodError(String.format("Failed to locate method: %s.%s%s", 
+					className, methodName, descriptor));
 		}
 		
 		m.setAccessible(true);
