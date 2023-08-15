@@ -13,7 +13,8 @@ import net.minecraft.entity.Entity;
 public class GameRendererMixin {
 	@Inject(method = "method_18144", 
 			at = @At("HEAD"), 
-			cancellable = true
+			cancellable = true, 
+			remap = false
 	)
 	private static void allowNonCollidableEntities(Entity e, CallbackInfoReturnable<Boolean> cir) {
 		if(OptionManager.allowTargetingSpecialEntities) {

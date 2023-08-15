@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.log.AbstractAchivingLogger;
 import lovexyn0827.mess.log.CsvWriter;
 import net.minecraft.server.MinecraftServer;
@@ -43,7 +44,7 @@ public class ChunkBehaviorLogger extends AbstractAchivingLogger {
 				.addColumn("GameTime")
 				.addColumn("RealTime")
 				.addColumn("Thread")
-				.addColumn("Cause")	// TODO
+				.addColumn("Cause")
 				.addColumn("Addition")
 				.build(writer);
 		this.working = true;
@@ -66,7 +67,7 @@ public class ChunkBehaviorLogger extends AbstractAchivingLogger {
 	}
 	
 	public synchronized void onEvent(ChunkEvent event, long pos, Identifier dim, Thread thread, 
-			Object cause, String addition) {
+			Object cause, Object addition) {
 		if(this.working && this.subscribedEvents.contains(event)) {
 			this.currentLog.println(event.name(), 
 					new ChunkPos(pos), 
@@ -90,5 +91,10 @@ public class ChunkBehaviorLogger extends AbstractAchivingLogger {
 
 	public boolean isWorking() {
 		return this.working;
+	}
+
+	public static boolean shouldSkip() {
+		ChunkBehaviorLogger logger = MessMod.INSTANCE.getChunkLogger();
+		return logger == null || !logger.isWorking();
 	}
 }

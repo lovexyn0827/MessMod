@@ -1,5 +1,7 @@
 package lovexyn0827.mess.util;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -10,15 +12,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 
@@ -103,7 +103,8 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
-import net.minecraft.entity.Entity;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.EntityType;
 
 /**
@@ -111,10 +112,11 @@ import net.minecraft.entity.EntityType;
  * Date: April 10, 2022
  */
 public class Reflection {
-	public static final Map<EntityType<?>, Class<?>> ENTITY_TYPE_TO_CLASS = Maps.newHashMap();
-	private static final Pattern GERERIC_TYPE_EXTRACTOR = Pattern.compile("<([0-9a-zA-Z_.]*)>");
+	public static final Map<EntityType<?>, Class<?>> ENTITY_TYPE_TO_CLASS;
 	private static final ImmutableMap<String, Class<?>> PRIMITIVE_CLASSES;
-	
+	public static final ImmutableBiMap<BlockEntityType<?>, Class<?>> BLOCK_ENTITY_TYPE_TO_CLASS;
+	// Map class => {Key class, Value class} (type arguments are represented by null)
+	public static final ImmutableMap<Class<?>, Pair<Class<?>, Class<?>>> MAP_TO_TYPES;
 	
 	public static boolean hasField(Class<?> clazz, final Field field) {
 		return hasField(clazz, field.getName());
@@ -278,6 +280,37 @@ public class Reflection {
 		}
 	}
 
+	public static boolean isOverriding(Executable m, Executable maySuper) {
+		if((m instanceof Method) && (maySuper instanceof Method)) {
+			return isOverriding((Method) m, (Method) maySuper);
+		} else if((m instanceof Constructor) && (maySuper instanceof Constructor)) {
+			return isOverriding((Constructor<?>) m, (Constructor<?>)maySuper);
+		} else {
+			return false;
+		}
+	}
+
+	private static boolean isOverriding(Constructor<?> m, Constructor<?> maySuper) {
+		if (m.getParameterCount() == maySuper.getParameterCount()) {
+			if(!maySuper.getDeclaringClass().isAssignableFrom(m.getDeclaringClass())) {
+				return false;
+			}
+			
+			int argCount = m.getParameterCount();
+			Class<?>[] mTypes = m.getParameterTypes();
+			Class<?>[] maySuperTypes = maySuper.getParameterTypes();
+			for(int i = 0; i < argCount; i++) {
+				if(!mTypes[i].isAssignableFrom(maySuperTypes[i])) {
+					return false;
+				}
+			}
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public static Set<Class<?>> getAllInterfaces(Class<?> cl) {
 		HashSet<Class<?>> set = Sets.newHashSet();
 		for(Class<?> current = cl; current != null; current = current.getSuperclass()) {
@@ -390,22 +423,61 @@ public class Reflection {
 		return null;
 	}
 
+	public static Method getMethodForInternalPropose(Class<?> owner, String name, String srg, Class<?> ... argTypes) {
+		try {
+			if(FabricLoader.getInstance().getMappingResolver().getCurrentRuntimeNamespace().equals("named")) {
+				return owner.getDeclaredMethod(name, argTypes);
+			} else {
+				return owner.getDeclaredMethod(srg, argTypes);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
 	static {
+		ImmutableBiMap.Builder<EntityType<?>, Class<?>> entityTypeMapBuilder = ImmutableBiMap.builder();
 		Stream.of(EntityType.class.getFields())
-				.filter((f) -> Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers()))
-				.forEach((f) -> {
+				.filter((f) -> {
+					return Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers())
+							&& f.getType() == EntityType.class;
+				}).forEach((f) -> {
 					try {
-						Matcher m = GERERIC_TYPE_EXTRACTOR.matcher(f.toGenericString());
-						if(m.find() && f.getType() == EntityType.class) {
-							Class<?> cl = Class.forName(m.group(1));
-							if(Entity.class.isAssignableFrom(cl)) {
-								ENTITY_TYPE_TO_CLASS.put((EntityType<?>) f.get(null), cl);
+						Type fType = f.getGenericType();
+						if(fType instanceof ParameterizedType) {
+							ParameterizedType genericType = (ParameterizedType) fType;
+							Type[] typeArgs = genericType.getActualTypeArguments();
+							if(typeArgs.length == 1) {
+								entityTypeMapBuilder.put((EntityType<?>) f.get(null), getRawType(typeArgs[0]));
 							}
 						}
-					} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+					} catch (IllegalArgumentException | IllegalAccessException e) {
 						e.printStackTrace();
 					}
 				});
+		ENTITY_TYPE_TO_CLASS = entityTypeMapBuilder.build();
+		ImmutableBiMap.Builder<BlockEntityType<?>, Class<?>> beTypeMapBuilder = ImmutableBiMap.builder();
+		Stream.of(BlockEntityType.class.getFields())
+				.filter((f) -> {
+					return Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers())
+							&& f.getType() == BlockEntityType.class;
+				})
+				.forEach((f) -> {
+					try {
+						Type fType = f.getGenericType();
+						if(fType instanceof ParameterizedType) {
+							ParameterizedType genericType = (ParameterizedType) fType;
+							Type[] typeArgs = genericType.getActualTypeArguments();
+							if(typeArgs.length == 1) {
+								beTypeMapBuilder.put((BlockEntityType<?>) f.get(null), getRawType(typeArgs[0]));
+							}
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
+					}
+				});
+		BLOCK_ENTITY_TYPE_TO_CLASS = beTypeMapBuilder.build();
 		PRIMITIVE_CLASSES = ImmutableMap.<String, Class<?>>builder()
 				.put("int", int.class)
 				.put("long", long.class)
@@ -499,7 +571,4 @@ public class Reflection {
 				.put(Short2ObjectMap.class, new Pair<>(short.class, null))
 				.build();
 	}
-
-	// Map class => {Key class, Value class} (type arguments are represented by null)
-	public static final ImmutableMap<Class<?>, Pair<Class<?>, Class<?>>> MAP_TO_TYPES;
 }

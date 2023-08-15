@@ -35,6 +35,8 @@ import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.hud.AlignMode;
 import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.blame.BlamingMode;
+import lovexyn0827.mess.util.blame.Confidence;
 import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.api.EnvType;
@@ -85,6 +87,14 @@ public class OptionManager{
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean attackableTnt;
+	
+	@Option(defaultValue = "POSSIBLE", 
+			parserClass = Confidence.Parser.class)
+	public static Confidence blameThreshold;
+	
+	@Option(defaultValue = "DISABLED", 
+			parserClass = BlamingMode.Parser.class)
+	public static BlamingMode blamingMode;
 	
 	@Option(defaultValue = "NORMALLY", 
 			parserClass = BlockInfoRenderer.FrozenUpdateMode.Parser.class)
