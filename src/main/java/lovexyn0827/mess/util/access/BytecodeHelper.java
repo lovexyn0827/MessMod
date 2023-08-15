@@ -202,6 +202,14 @@ final class BytecodeHelper {
 			case INVOKER: 
 				Method m = (Method) mem;
 				desc = org.objectweb.asm.Type.getMethodDescriptor(m);
+				String operationDesc;
+				if(!Modifier.isStatic(m.getModifiers())) {
+					operationDesc = desc.replace("(", "(" + 
+							org.objectweb.asm.Type.getDescriptor(m.getDeclaringClass()));
+				} else {
+					operationDesc = desc;
+				}
+				
 				if(canAccessDirectly(mem)) {
 					if(isStatic) {
 						opcode = Opcodes.INVOKESTATIC;
@@ -217,7 +225,8 @@ final class BytecodeHelper {
 							org.objectweb.asm.Type.getInternalName(m.getDeclaringClass()), 
 							m.getName(), desc));
 				} else {
-					insns.add(new InvokeDynamicInsnNode("inDy_" + m.getName(), desc, CompiledPath.METHOD_BSM_HANDLE, 
+					insns.add(new InvokeDynamicInsnNode("inDy_" + m.getName(), operationDesc, 
+							CompiledPath.METHOD_BSM_HANDLE, 
 							org.objectweb.asm.Type.getInternalName(m.getDeclaringClass()), m.getName(), 
 							desc));
 				}

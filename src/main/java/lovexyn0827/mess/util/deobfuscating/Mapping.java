@@ -36,6 +36,7 @@ public interface Mapping {
 	String namedMethod(String srg, String desc);
 	
 	/**
+	 * @param clazz The declaring class of target method, using intermediate names. 
 	 * @param desc The descriptor of target method, using intermediate names. 
 	 */
 	@NotNull
@@ -135,7 +136,7 @@ public interface Mapping {
 	default String srgMethodDescriptor(String namedDesc) {
 		Type descType = Type.getMethodType(namedDesc);
 		Type[] srgArgTypes = Arrays.stream(descType.getArgumentTypes())
-				.map(Type::getInternalName)
+				.map(Type::getDescriptor)
 				.map(this::srgDescriptor)
 				.map(Type::getType)
 				.toArray((count) -> new Type[count]);
