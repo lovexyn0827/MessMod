@@ -67,7 +67,8 @@
     "PlayerInventoryMixin_Client", 
     "CreativeInventoryScreenMixin", 
     "StructureBlockBlockEntityMixin", 
-    "GameRendererMixin"
+    "GameRendererMixin", 
+    "WorldListWidgetEntryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
