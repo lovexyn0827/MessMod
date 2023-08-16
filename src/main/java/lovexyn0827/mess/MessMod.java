@@ -161,6 +161,7 @@ public class MessMod implements ModInitializer {
 		this.entityLogger = null;
 		this.chunkLogger = null;
 		CommandUtil.updateServer(null);
+		OptionManager.loadGlobal();
 	}
 
 	public void onServerPlayerSpawned(ServerPlayerEntity player) {
