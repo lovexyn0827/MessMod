@@ -4,11 +4,10 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.IOException;
+import java.util.Set;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import lovexyn0827.mess.MessMod;
@@ -55,31 +54,32 @@ public class LogChunkBehaviorCommand {
 							CommandUtil.feedback(ct, "cmd.general.success");
 							return Command.SINGLE_SUCCESS;
 						}))
-				.then(literal("setSubscribed")
-						.then(argument("event", StringArgumentType.word())
-								.suggests(CommandUtil.immutableSuggestionsOfEnum(ChunkEvent.class))
-								.then(argument("enabled", BoolArgumentType.bool())
-										.executes((ct) -> {
-											if(MessMod.INSTANCE.getChunkLogger().isWorking()) {
-												CommandUtil.error(ct, "cmd.logchunkbehavior.reqidle");
-												return 0;
-											}
-											
-											String eventName = StringArgumentType.getString(ct, "event");
-											ChunkEvent event;
-											try {
-												event = ChunkEvent.valueOf(eventName);
-											} catch (IllegalArgumentException e) {
-												CommandUtil.errorWithArgs(ct, "%s was not defined", eventName);
-												return 0;
-											}
-											
-											boolean enabled = BoolArgumentType.getBool(ct, "enabled");
-											MessMod.INSTANCE.getChunkLogger().setSubscribed(event, enabled);
-											CommandUtil.feedbackWithArgs(ct, 
-													enabled ? "cmd.general.subgen" : "cmd.general.unsubgen", eventName);
-											return Command.SINGLE_SUCCESS;
-										}))))
+				.then(literal("subscribe")
+						.then(argument("events", EnumSetArgumentType.of(ChunkEvent.class))
+								.executes((ct) -> {
+									if(MessMod.INSTANCE.getChunkLogger().isWorking()) {
+										CommandUtil.error(ct, "cmd.logchunkbehavior.reqidle");
+										return 0;
+									}
+									
+									Set<ChunkEvent> set = EnumSetArgumentType.<ChunkEvent>getEnums(ct, "events");
+									MessMod.INSTANCE.getChunkLogger().subscribeAll(set);
+									CommandUtil.feedbackWithArgs(ct,"cmd.general.submulti", set.size(), set);
+									return Command.SINGLE_SUCCESS;
+								})))
+				.then(literal("unsubscribe")
+						.then(argument("events", EnumSetArgumentType.of(ChunkEvent.class))
+								.executes((ct) -> {
+									if(MessMod.INSTANCE.getChunkLogger().isWorking()) {
+										CommandUtil.error(ct, "cmd.logchunkbehavior.reqidle");
+										return 0;
+									}
+									
+									Set<ChunkEvent> set = EnumSetArgumentType.<ChunkEvent>getEnums(ct, "events");
+									MessMod.INSTANCE.getChunkLogger().unsubscribeAll(set);
+									CommandUtil.feedbackWithArgs(ct,"cmd.general.unsubmulti", set.size(), set);
+									return Command.SINGLE_SUCCESS;
+								})))
 				.then(literal("listSubscribed")
 						.executes((ct) -> {
 							for(ChunkEvent event : MessMod.INSTANCE.getChunkLogger().listSubscribedEvents()) {

@@ -6,6 +6,8 @@
 		"cmd.general.unsub" : "Found %d entities, and unsubscribed %d entities among them", 
 		"cmd.general.subgen" : "Subscribed %s", 
 		"cmd.general.unsubgen" : "Unsubscribed %s", 
+		"cmd.general.submulti" : "Subscribed %d items: %s", 
+		"cmd.general.unsubmulti" : "Unsubscribed %d items: %s", 
 		"cmd.general.found" : "Found at (%d, %d, %d)", 
 		"cmd.general.notfound" : "Not found", 
 		"cmd.general.nodef" : "%s hasn't been defined", 
@@ -13,6 +15,7 @@
 		"cmd.general.success" : "Success", 
 		"cmd.general.dupname" : "The name has already been used.", 
 		"cmd.general.unsupported" : "This feature is not supported currently.", 
+		"cmd.general.nomatching" : "No matching item was found.", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 

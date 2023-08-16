@@ -10,7 +10,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.i18n.I18N;
@@ -179,7 +178,8 @@ public class CommandUtil {
 		};
 	}
 	
-	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<ChunkEvent> class1) {
+	@Deprecated
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<? extends Enum<?>> class1) {
 		return (ct, builder) -> {
 			Stream.of(class1.getEnumConstants())
 					.map(Enum::name)

@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -57,13 +56,12 @@ public class ChunkBehaviorLogger extends AbstractAchivingLogger {
 		this.currentLog = null;
 	}
 	
-	public void setSubscribed(ChunkEvent event, boolean enabled) {
-		Objects.requireNonNull(event);
-		if(enabled) {
-			this.subscribedEvents.add(event);
-		} else {
-			this.subscribedEvents.remove(event);
-		}
+	public void subscribeAll(Set<ChunkEvent> events) {
+		this.subscribedEvents.addAll(events);
+	}
+	
+	public void unsubscribeAll(Set<ChunkEvent> events) {
+		this.subscribedEvents.removeAll(events);
 	}
 	
 	public synchronized void onEvent(ChunkEvent event, long pos, Identifier dim, Thread thread, 
