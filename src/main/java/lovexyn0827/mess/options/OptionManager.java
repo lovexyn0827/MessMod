@@ -180,6 +180,10 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean entityLogAutoArchiving;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean fillHistory;
+	
 	@Option(defaultValue = "POSITIVE", 
 			parserClass = PulseRecorder.Mode.Parser.class)
 	public static PulseRecorder.Mode fletchingTablePulseDetectingMode;

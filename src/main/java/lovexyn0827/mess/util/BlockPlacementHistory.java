@@ -1,10 +1,13 @@
 package lovexyn0827.mess.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
 import org.jetbrains.annotations.Nullable;
+
+import com.google.common.base.Objects;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,6 +17,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 public class BlockPlacementHistory {
+	private static final ThreadLocal<List<BlockChange>> CURRENT = new ThreadLocal<>();
 	private final ServerPlayerEntity player;
 	private final Stack<Operation> history = new Stack<>();
 	private final Stack<Operation> redoQueue = new Stack<>();
@@ -24,9 +28,37 @@ public class BlockPlacementHistory {
 
 	public void pushSingle(BlockPos pos, BlockState prevState, 
 			BlockState newState, @Nullable BlockEntity prevBlockEntity) {
-		this.history.push(new Operation(Collections.singletonList(new  BlockChange(pos, prevState, 
+		this.history.push(new Operation(
+				Collections.singletonList(new BlockChange(this.player.getServerWorld(), pos, prevState, 
 				prevBlockEntity == null ? null : prevBlockEntity.toTag(new CompoundTag()), newState, null))));
 		this.redoQueue.clear();
+	}
+	
+	public void beginOperation() {
+		CURRENT.set(new ArrayList<>());
+	}
+	
+	public static void appendBlockChange(ServerWorld world, BlockPos pos, BlockState prevState, 
+			BlockState newState, @Nullable CompoundTag prevBlockEntity, @Nullable CompoundTag newBlockEntity) {
+		if(prevState.equals(newState) && Objects.equal(prevBlockEntity, newBlockEntity)) {
+			return;
+		}
+		
+		if(CURRENT.get() == null) {
+			return;
+		}
+		
+		CURRENT.get().add(new BlockChange(world, pos.toImmutable(), prevState, prevBlockEntity, newState, newBlockEntity));
+	}
+	
+	public void endOperation(boolean abort) {
+		if(abort) {
+			CURRENT.set(null);
+		} else {
+			this.history.push(new Operation(CURRENT.get()));
+			this.redoQueue.clear();
+			CURRENT.set(null);
+		}
 	}
 	
 	public void undo() {
@@ -69,7 +101,7 @@ public class BlockPlacementHistory {
 		}
 	}
 	
-	private final class BlockChange {
+	private static final class BlockChange {
 		protected final BlockPos pos;
 		protected final BlockState prevState;
 		protected final BlockState newState;
@@ -77,9 +109,11 @@ public class BlockPlacementHistory {
 		protected final CompoundTag prevBlockEntity;
 		@Nullable
 		protected final CompoundTag newBlockEntity;
+		private final ServerWorld world;
 		
-		BlockChange(BlockPos pos, BlockState prevState, CompoundTag prevBlockEntity, 
+		BlockChange(ServerWorld world, BlockPos pos, BlockState prevState, CompoundTag prevBlockEntity, 
 				BlockState newState, CompoundTag newBlockEntity) {
+			this.world = world;
 			this.pos = pos;
 			this.prevState = prevState;
 			this.newState = newState;
@@ -88,18 +122,16 @@ public class BlockPlacementHistory {
 		}
 
 		public void redo() {
-			ServerWorld world = BlockPlacementHistory.this.player.getServerWorld();
-			world.setBlockState(this.pos, this.newState, 11, 0);
+			this.world.setBlockState(this.pos, this.newState, 11, 0);
 			if(this.newBlockEntity != null) {
-				world.setBlockEntity(this.pos, BlockEntity.createFromTag(this.newState, this.newBlockEntity));
+				this.world.setBlockEntity(this.pos, BlockEntity.createFromTag(this.newState, this.newBlockEntity));
 			}
 		}
 
 		public void undo() {
-			ServerWorld world = BlockPlacementHistory.this.player.getServerWorld();
-			world.setBlockState(this.pos, this.prevState, 11, 0);
+			this.world.setBlockState(this.pos, this.prevState, 11, 0);
 			if (this.prevBlockEntity != null) {
-				world.setBlockEntity(this.pos, BlockEntity.createFromTag(this.prevState, this.prevBlockEntity));
+				this.world.setBlockEntity(this.pos, BlockEntity.createFromTag(this.prevState, this.prevBlockEntity));
 			}
 		}
 	}

@@ -181,6 +181,7 @@
 		"opt.entityExplosionRaysVisiblity.desc" : "启用或禁用实体爆炸射线渲染。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。", 
 		"opt.entityExplosionRaysLifetime.desc" : "设置实体爆炸射线的显示时长，单位为刻。", 
 		"opt.entityLogAutoArchiving.desc" : "自动存档一个会话内产生的实体数据记录，存档文件可在`世界文件夹/entitylog/archives`找到", 
+		"opt.fillHistory.desc" : "记录`/fill`产生的方块变更以便在将来撤销或重做", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "指定被记录的脉冲类型", 
 		"opt.fletchingTablePulseDetector.desc" : "记录制箭台接收到的红石脉冲的长度", 
 		"opt.generateChunkGrid.desc" : "在地表生层一层玻璃来标记区块", 
