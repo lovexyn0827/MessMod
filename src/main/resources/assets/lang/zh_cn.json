@@ -159,6 +159,8 @@
 		"opt.allowTargetingSpecialEntities.desc" : "允许玩家将光标对准物品、雪球和箭矢等实体以获取相应的指令建议", 
 		"opt.antiHostCheating.desc" : "对局域网游戏的房主启用反作弊", 
 		"opt.attackableTnt.desc" : "TNT可以被玩家的攻击杀死", 
+		"opt.blameThreshold.desc" : "事件原因可以被相信并记录时的最小置信度。不要将其设为`IMPOSSIBLE`。", 
+		"opt.blamingMode.desc" : "指定区块加载等事件的原因的记录方式。\n- DISABLED：完全禁用原因记录。\n- SIMPLE_TRACE：记录事件发生位置的堆栈踪迹而不进行反混淆。\n- DEOBFUSCATED_TRACE：记录反混淆后的堆栈踪迹。输出质量最好，但会增大日志文件大小与性能开销。\n ANALYZED：使用堆栈踪迹计算出几个标签。这时日志文件会明显减小，但性能消耗却可能更大。", 
 		"opt.blockInfoRendererUpdateInFrozenTicks.desc" : "游戏运算被地毯端中/tick指令暂停时方块信息渲染器的行为", 
 		"opt.blockPlacementHistory.desc" : "记录玩家最近放置的方块用于撤销/重做。如果期间方块被玩家以外的事物更改，那么撤销操作可能会引起不可预料的后果。", 
 		"opt.blockShapeToBeRendered.desc" : "选项renderBlockShape为true时被渲染的方块轮廓类型。COLLIDER对应方块的碰撞箱，OUTLINE对应方块在玩家对准时显示的边界。详见Github中Wiki。", 
