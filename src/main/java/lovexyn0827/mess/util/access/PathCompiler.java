@@ -32,6 +32,8 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import com.google.common.collect.Lists;
 import com.mojang.brigadier.StringReader;
 
+import lovexyn0827.mess.options.OptionManager;
+
 class PathCompiler {
 	private final LinkedList<Node> nodes = new LinkedList<>();
 	private final CompilationContext ctx;
@@ -50,7 +52,13 @@ class PathCompiler {
 
 	public Class<?> compile() throws CompilationException {
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-		ClassVisitor wrapedCw = new TraceClassVisitor(cw, new PrintWriter(System.out));
+		ClassVisitor wrappedCw;
+		if(OptionManager.superSuperSecretSetting) {
+			wrappedCw = new TraceClassVisitor(cw, new PrintWriter(System.out));
+		} else {
+			wrappedCw = cw;
+		}
+		
 		this.classFile = new ClassNode();
 		// 1. Build class metadata
 		this.classFile.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, 
@@ -97,7 +105,7 @@ class PathCompiler {
 		}
 		
 		// 8. Generate and load class
-		this.classFile.accept(wrapedCw);
+		this.classFile.accept(wrappedCw);
 		byte[] clBytes = cw.toByteArray();
 		try {
 			return PathClassLoader.INSTANCE.defineClass(this.className.replace('/', '.'), clBytes);
@@ -230,24 +238,6 @@ class PathCompiler {
 		this.clinitInsns.add(cstLoading);
 	}
 
-//	private void buildConstantCountSupplier() {
-//		MethodNode mn = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC | Opcodes.ACC_STATIC,
-//				"getConstantCounts", "()[I", null, new String[0]);
-//		int[] counts = new int[] {this.ctx.getSubPaths().size(), this.ctx.getDynamicLiterals().size()};
-//		InsnList insns = mn.instructions;
-//		insns.add(new TypeInsnNode(Opcodes.NEW, "[I"));
-//		insns.add(new IntInsnNode(Opcodes.BIPUSH, counts.length));
-//		insns.add(new IntInsnNode(Opcodes.NEWARRAY, Opcodes.T_INT));
-//		for(int i = 0; i < counts.length; i++) {
-//			insns.add(new InsnNode(Opcodes.DUP));
-//			insns.add(new IntInsnNode(Opcodes.BIPUSH, i));
-//			insns.add(new IntInsnNode(Opcodes.BIPUSH, counts[i]));
-//		}
-//		
-//		insns.add(new InsnNode(Opcodes.ARETURN));
-//		this.classFile.methods.add(mn);
-//	}
-
 	private void buildAccessMethod() throws CompilationException {
 		MethodNode accessMethod = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, 
 				"access", "(Ljava/lang/Object;Ljava/lang/reflect/Type;)Ljava/lang/Object;", null, 
@@ -287,23 +277,4 @@ class PathCompiler {
 		this.classFile.methods.add(accessMethod);
 		this.ctx.lockConstantLists();
 	}
-	
-//	private class PathClassTransformer extends ClassVisitor {
-//		public PathClassTransformer(int api, ClassVisitor classVisitor) {
-//			super(api, classVisitor);
-//			Objects.requireNonNull(classVisitor);
-//		}
-//		
-//		@Override
-//		public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, 
-//				String[] exceptions) {
-//		}
-//	}
-//	
-//	private class PathMethodTransformer extends MethodVisitor {
-//		public PathMethodTransformer(int api, MethodVisitor methodVisitor) {
-//			super(api, methodVisitor);
-//			Objects.requireNonNull(methodVisitor);
-//		}
-//	}
 }

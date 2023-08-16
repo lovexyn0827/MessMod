@@ -80,8 +80,6 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 				for(; clazz != Object.class; clazz = clazz.getSuperclass()) {
 					String canonicalName = mapping.namedClass(clazz.getCanonicalName());
 					String simpleName = mapping.simpleNamedClass(clazz.getCanonicalName());
-					System.out.println(canonicalName);
-					System.out.print(simpleName);
 					if(this.classRegex.matcher(canonicalName.substring(canonicalName.lastIndexOf('.'))).matches()
 							|| this.classRegex.matcher(simpleName).matches()) {
 						return true;
