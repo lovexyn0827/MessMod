@@ -38,7 +38,12 @@ public class InGameHudMixin extends DrawableHelper {
 		if(OptionManager.hotbarLength == 9) {
 			this.drawTexture(matrices, x, y, u, v, width, height);
 		} else {
-			fill(matrices, x, y + 3, x + OptionManager.hotbarLength * 20, y + 19, 0x80808080);
+			int slots = OptionManager.hotbarLength;
+			hud.drawTexture(matrices, x, y, 0, 0, 1, 22);
+			hud.drawTexture(matrices, x + slots * 20 + 1, y, 0, 0, 1, 22);
+			for(int i = 0; i < slots; i++) {
+				hud.drawTexture(matrices, x + i * 20 + 1, y, 1, 0, 20, 22);
+			}
 		}
 	}
 }
