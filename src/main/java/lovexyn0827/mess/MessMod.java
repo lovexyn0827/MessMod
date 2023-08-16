@@ -26,7 +26,6 @@ import lovexyn0827.mess.rendering.ShapeSender;
 import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
-import lovexyn0827.mess.util.BlockPlacementHistory;
 import lovexyn0827.mess.util.access.CustomNode;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
@@ -69,7 +68,6 @@ public class MessMod implements ModInitializer {
 	@Environment(EnvType.CLIENT)
 	private MessClientNetworkHandler clientNetworkHandler;
 	private MessServerNetworkHandler serverNetworkHandler;
-	private BlockPlacementHistory placementHistory;
 	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
 	private ChunkBehaviorLogger chunkLogger;
 	private long gameTime;
@@ -125,7 +123,6 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer = new ServerSyncedBoxRenderer(server);
 		this.blockInfoRederer.initializate(server);
 		this.hudManagerS = new ServerHudManager(server);
-		this.placementHistory = new BlockPlacementHistory();
 		CustomNode.reload(server);
 		this.chunkLoadingInfoRenderer = new ChunkLoadingInfoRenderer();
 		this.entityLogger = new EntityLogger(server);
@@ -140,7 +137,6 @@ public class MessMod implements ModInitializer {
 		this.hudManagerS = null;
 		this.entityLogger.closeAll();
 		this.serverNetworkHandler = null;
-		this.placementHistory = null;
 		this.chunkLoadingInfoRenderer.close();
 		this.chunkLoadingInfoRenderer = null;
 		ServerTickingPhase.initialize();
@@ -296,10 +292,6 @@ public class MessMod implements ModInitializer {
 	@Environment(EnvType.CLIENT)
 	public MessClientNetworkHandler getClientNetworkHandler() {
 		return this.clientNetworkHandler;
-	}
-
-	public BlockPlacementHistory getPlacementHistory() {
-		return this.placementHistory;
 	}
 	
 	public static boolean isDedicatedServerEnv() {

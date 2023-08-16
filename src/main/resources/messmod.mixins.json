@@ -45,7 +45,8 @@
     "EntityPredicatesMixin", 
     "ThreadedAnvilChunkStorageMixin", 
     "ServerChunkManagerMixin", 
-    "FletchingTableBlockMixin"
+    "FletchingTableBlockMixin", 
+    "ServerPlayerEntityMixin"
   ],
   "client": [
     "MinecraftClientMixin",

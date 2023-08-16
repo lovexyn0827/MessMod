@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.BlockPlacementHistory;
 import net.minecraft.block.BlockState;
@@ -28,9 +28,10 @@ public class BlockItemMixin {
 			ItemPlacementContext itemPlacementContext, BlockState blockState) {
 		PlayerEntity player = context.getPlayer();
 		if(OptionManager.blockPlacementHistory && context.getPlayer() instanceof ServerPlayerEntity) {
-			BlockPlacementHistory history = MessMod.INSTANCE.getPlacementHistory();
+			BlockPlacementHistory history = ((ServerPlayerEntityInterface) player).getBlockPlacementHistory();
 			if(history != null) {
-				history.push((ServerPlayerEntity) context.getPlayer(), context.getBlockPos(), player.world.getBlockState(context.getBlockPos()), blockState);
+				history.pushSingle(context.getBlockPos(), player.world.getBlockState(context.getBlockPos()), 
+						blockState, player.world.getBlockEntity(context.getBlockPos()));
 			}
 		}
 	}
