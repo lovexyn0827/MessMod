@@ -104,7 +104,7 @@
 		//***** raycast *****
 		"cmd.raycast.usage" : "TODO", 
 		"cmd.raycast.result.block" : "撞击位置：(%.15f, %.15f, %.15f)\n方块坐标：(%d, %d, %d)\n方块：%s\n撞击面：%s", 
-		"cmd.raycast.result.entity" : "实体：%s\n撞击位置：(%.15f, %.15f, %.15f)", 
+		"cmd.raycast.result.entity" : "实体：%s (%d)\n撞击位置：(%.15f, %.15f, %.15f)", 
 		"cmd.raycast.result.miss" : "未检测到碰撞", 
 		
 		//***** ride *****
