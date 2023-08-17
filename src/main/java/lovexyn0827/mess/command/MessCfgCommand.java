@@ -13,6 +13,7 @@ import lovexyn0827.mess.options.InvaildOptionException;
 import lovexyn0827.mess.options.Option;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.options.OptionParser;
+import lovexyn0827.mess.util.DocumentGenerator;
 import lovexyn0827.mess.util.FormattedText;
 import lovexyn0827.mess.util.i18n.I18N;
 import net.fabricmc.loader.api.FabricLoader;
@@ -45,6 +46,7 @@ public class MessCfgCommand {
 						boolean modified = !v.equals(f.getAnnotation(Option.class).defaultValue());
 						s.sendFeedback(modified ? text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText()) : text, false);
 					});
+					DocumentGenerator.optionDoc();
 					return 1;
 				})
 				.then(literal("reloadConfig")
@@ -97,7 +99,7 @@ public class MessCfgCommand {
 								.executes((ct) -> {
 									String value = StringArgumentType.getString(ct, "value");
 									if(o.globalOnly()) {
-										MutableText errMsg = new LiteralText(I18N.translate("cmd.messcfg.globalonly", f.getName()))
+										MutableText errMsg = new LiteralText(I18N.translate("cmd.messcfg.globalonly"))
 												.fillStyle(Style.EMPTY
 														.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, 
 																"/messcfg setGlobal " + f.getName() + ' ' + value)));

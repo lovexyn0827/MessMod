@@ -70,6 +70,17 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 			return b.buildFuture();
 		};
 	}
+
+	@Override
+	public String getAvailableValues(boolean chinese) {
+		StringBuilder sb = new StringBuilder(chinese ? "`[]`（空列表）或一个`a,b,c`形式的列表，包含一些下方的一些项目：" : 
+				"`[]` (empty list) or some of the following elements, separated by ',': ");
+		for(String e : this.elements.keySet()) {
+			sb.append("\n- `" + e + '`');
+		}
+		
+		return sb.toString();
+	}
 	
 	public static class Ticket extends ListParser<ChunkTicketType<?>> {
 		private static final ImmutableBiMap<String, ChunkTicketType<?>> VANILLA_TICKET_TYPES;

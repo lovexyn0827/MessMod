@@ -40,4 +40,14 @@ public class EnumParser<T extends Enum<T>> implements OptionParser<Enum<T>> {
 			return builder.buildFuture();
 		};
 	}
+
+	@Override
+	public String getAvailableValues(boolean chinese) {
+		StringBuilder sb = new StringBuilder();
+		for(Enum<?> e : clazz.getEnumConstants()) {
+			sb.append("\n- `" + e.name() + '`');
+		}
+		
+		return sb.toString();
+	}
 }

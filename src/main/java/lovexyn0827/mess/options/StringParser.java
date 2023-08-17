@@ -11,5 +11,10 @@ public class StringParser implements OptionParser<String> {
 	public String serialize(String val) {
 		return val;
 	}
+	
+	@Override
+	public String getAvailableValues(boolean chinese) {
+		return chinese ? "任意字符串" : "Any string";
+	}
 
 }

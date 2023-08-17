@@ -27,4 +27,9 @@ public class BooleanParser implements OptionParser<Boolean> {
 	public SuggestionProvider<ServerCommandSource> createSuggestions() {
 		return CommandUtil.immutableSuggestions("true", "false");
 	}
+
+	@Override
+	public String getAvailableValues(boolean chinese) {
+		return chinese ? "`true`或`false`" : "`true` / `false`";
+	}
 }

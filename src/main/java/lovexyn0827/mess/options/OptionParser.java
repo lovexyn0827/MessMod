@@ -34,4 +34,6 @@ public interface OptionParser<T> {
 	default SuggestionProvider<ServerCommandSource> createSuggestions() {
 		return null;
 	}
+
+	String getAvailableValues(boolean chinese);
 }

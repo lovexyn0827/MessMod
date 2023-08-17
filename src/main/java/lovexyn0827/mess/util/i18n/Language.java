@@ -25,7 +25,7 @@ public class Language {
 	private final String readableName;
 	private final Map<String, String> translations = Maps.newHashMap();
 	private final String id;
-	
+
 	/**
 	 * Create a new @{code Language} instance using the definition in assets/lang/@{code name}.json
 	 * @param id Can be something like en_us, zh_cn, and so on. 
@@ -34,11 +34,11 @@ public class Language {
 	public Language(String id) throws Exception {
 		this.id = id;
 		Path langFile = FabricLoader.getInstance().getModContainer("messmod")
-				.get().getRootPath().resolve("assets/lang/" + id + ".json");
-		try {
-			JsonObject def = new JsonParser()
-					.parse(new String(Files.readAllBytes(langFile), Charset.forName("GBK")))
-					.getAsJsonObject();
+								.get().getRootPath().resolve("assets/lang/" + id + ".json");
+						try {
+							JsonObject def = new JsonParser()
+									.parse(new String(Files.readAllBytes(langFile), Charset.forName("GBK")))
+									.getAsJsonObject();
 			this.readableName = def.get("readableName").getAsString();
 			def.getAsJsonObject("translations")
 					.entrySet()
@@ -48,6 +48,10 @@ public class Language {
 			e.printStackTrace();
 			throw e;
 		}
+	}
+	
+	public String getId() {
+		return id;
 	}
 	
 	/**
@@ -119,6 +123,18 @@ public class Language {
 				});
 				return b.buildFuture();
 			};
+		}
+
+		@Override
+		public String getAvailableValues(boolean chinese) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("\n- `-FOLLOW_SYSTEM_SETTINGS-`");
+			I18N.SUPPORTED_LANGUAGES.forEach((l) -> {
+				sb.append("\n- `" + l + '`');
+				sb.append("\n- `" + l + "_FORCELOAD" + '`');
+				
+			});
+			return sb.toString();
 		}
 	}
 }

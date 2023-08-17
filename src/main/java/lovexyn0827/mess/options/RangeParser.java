@@ -75,6 +75,17 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 		return result;
 	}
 	
+	@Override
+	public String getAvailableValues(boolean chinese) {
+		StringBuilder sb = new StringBuilder(chinese ? "`[]`（空列表）或一个`a,b,c`形式的列表，包含一些下方的一些项目或`...`：" : 
+				"`[]` (empty list) or some of the following elements, separated by ',': ");
+		for(String e : this.elements.keySet()) {
+			sb.append("\n- `" + e + '`');
+		}
+		
+		return sb.toString();
+	}
+	
 	public static final class ChunkStatusRange extends RangeParser<ChunkStatusRange.ChunkStatusSorter> {
 		private static final ImmutableBiMap<String, ChunkStatusSorter> VANILLA_CHUNK_STATUSES;
 		

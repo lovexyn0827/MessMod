@@ -16,6 +16,11 @@ public class FloatParser implements OptionParser<Float> {
 		return Float.toString(val);
 	}
 
+	@Override
+	public String getAvailableValues(boolean chinese) {
+		return chinese ? "任意实数" : "Any real number";
+	}
+
 	public static class Positive extends FloatParser {
 		@Override
 		public Float tryParse(String str) throws InvaildOptionException {
@@ -25,6 +30,11 @@ public class FloatParser implements OptionParser<Float> {
 			} else {
 				throw new InvaildOptionException("Use a positive number here");
 			}
+		}
+
+		@Override
+		public String getAvailableValues(boolean chinese) {
+			return chinese ? "任意正实数" : "Any positive real number";
 		}
 	}
 }
