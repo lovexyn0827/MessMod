@@ -53,6 +53,8 @@
 		//***** exportsave *****
 		"cmd.exportsave.failexp" : "导出存档失败", 
 		"cmd.exportsave.success" : "已导出存档，耗时%f秒",
+		"cmd.exportsave.addcomp" : "添加了%d个存档组件：%s", 
+		"cmd.exportsave.remcomp" : "排除了%d个存档组件：%s", 
 		
 		//***** fixedentityhud *****
 		"cmd.fixedentityhud.add" : "向Sidebar中添加了一行数据", 

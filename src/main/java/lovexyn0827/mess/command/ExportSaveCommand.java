@@ -4,6 +4,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.IOException;
+import java.util.Set;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -15,6 +16,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.export.ExportTask;
+import lovexyn0827.mess.export.SaveComponent;
 import lovexyn0827.mess.export.WorldGenType;
 import lovexyn0827.mess.mixins.ServerCommandSourceAccessor;
 import net.minecraft.command.argument.ColumnPosArgumentType;
@@ -27,7 +29,7 @@ import net.minecraft.util.math.ColumnPos;
 public class ExportSaveCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		SuggestionProvider<ServerCommandSource> regionSuggest = (ct, b) -> {
-			getExportTask(ct).listRegions().forEach(b::suggest);
+			getExportTask(ct).listRegionNames().forEach(b::suggest);
 			return b.buildFuture();
 		};
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("exportsave").requires(CommandUtil.COMMAND_REQUMENT)
@@ -61,14 +63,22 @@ public class ExportSaveCommand {
 						.executes((ct) -> {
 							ExportTask.reset(((ServerCommandSourceAccessor) ct.getSource()).getOutput());
 							return Command.SINGLE_SUCCESS;
-						}));
+						}))
+				.then(literal("addComponent")
+						.then(argument("comp", EnumSetArgumentType.of(SaveComponent.class))
+								.executes(ExportSaveCommand::addComponent)))
+				.then(literal("removeComponent")
+						.then(argument("comp", EnumSetArgumentType.of(SaveComponent.class))
+								.executes(ExportSaveCommand::removeComponent)))
+				.then(literal("listComponents")
+						.executes(ExportSaveCommand::listComponents));
 		dispatcher.register(command);
 	}
 
 	private static int addRegion(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
 		ExportTask task = getExportTask(ct);
 		String name = StringArgumentType.getString(ct, "name");
-		if(task.listRegions().contains(name)) {
+		if(task.listRegionNames().contains(name)) {
 			CommandUtil.error(ct, "cmd.general.dupname");
 			return 0;
 		}
@@ -125,5 +135,29 @@ public class ExportSaveCommand {
 	private static ExportTask getExportTask(CommandContext<ServerCommandSource> ct) {
 		return ExportTask.of(((ServerCommandSourceAccessor) ct.getSource()).getOutput(), 
 				ct.getSource().getMinecraftServer());
+	}
+	
+	private static int addComponent(CommandContext<ServerCommandSource> ct) {
+		Set<SaveComponent> set = EnumSetArgumentType.<SaveComponent>getEnums(ct, "comp");
+		ExportTask task = getExportTask(ct);
+		task.addComponents(set);
+		CommandUtil.feedbackWithArgs(ct,"cmd.exportsave.addcomp", set.size(), set);
+		return Command.SINGLE_SUCCESS;
+	}
+	
+	private static int removeComponent(CommandContext<ServerCommandSource> ct) {
+		Set<SaveComponent> set = EnumSetArgumentType.<SaveComponent>getEnums(ct, "comp");
+		ExportTask task = getExportTask(ct);
+		task.omitComponents(set);
+		CommandUtil.feedbackWithArgs(ct,"cmd.exportsave.remcomp", set.size(), set);
+		return Command.SINGLE_SUCCESS;
+	}
+	
+	private static int listComponents(CommandContext<ServerCommandSource> ct) {
+		for(SaveComponent c : getExportTask(ct).getComponents()) {
+			CommandUtil.feedbackRaw(ct, c.name());
+		}
+		
+		return Command.SINGLE_SUCCESS;
 	}
 }

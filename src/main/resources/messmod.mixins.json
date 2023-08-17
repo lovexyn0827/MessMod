@@ -48,7 +48,9 @@
     "FletchingTableBlockMixin", 
     "ServerPlayerEntityMixin", 
     "BlockStateArgumentMixin", 
-    "FillCommandMixin"
+    "FillCommandMixin", 
+    "RaidManagerAccessor", 
+    "DataCommandStorageAccessor"
   ],
   "client": [
     "MinecraftClientMixin",
