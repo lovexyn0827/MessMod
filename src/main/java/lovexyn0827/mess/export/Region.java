@@ -71,6 +71,7 @@ public final class Region {
 		}
 		
 		storage.close();
+		// FIXME: POIs may be exported incorrectly
 		poiDst.tick(() -> true);
 		poiDst.close();
 	}

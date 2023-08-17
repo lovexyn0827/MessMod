@@ -31,13 +31,13 @@ public class ChunkLoadingInfoRenderer {
 		}
 		
 		RegistryKey<World> worldKey = world.getRegistryKey();
-		if(worldKey == World.OVERWORLD) {
-			ss.clearSpaceFromServer(CHUNK_LOADING);
-		}
-		
 		int radius = OptionManager.chunkLoadingInfoRenderRadius;
 		int diameter = 2 * radius + 1;
 		for(ServerPlayerEntity player : world.getPlayers()) {
+			if(worldKey == World.OVERWORLD) {
+				ss.clearSpaceFromServer(CHUNK_LOADING, player);
+			}
+			
 			if(player.isHolding(Items.NAUTILUS_SHELL)) {
 				ServerChunkManager scm = world.getChunkManager();
 				int x = player.chunkX - radius;
@@ -71,7 +71,7 @@ public class ChunkLoadingInfoRenderer {
 						RenderedBox marker = new RenderedBox(blockX, height, blockZ, 
 								blockX + 2.0D, height + 0.5D, blockZ + 2.0D, color | 0x000000FF, color, 
 								2, world.getTime());
-						ss.addShape(marker, worldKey, CHUNK_LOADING);
+						ss.addShape(marker, worldKey, CHUNK_LOADING, player);
 					}
 				}
 			}

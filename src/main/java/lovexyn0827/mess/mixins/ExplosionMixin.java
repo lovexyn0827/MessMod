@@ -70,9 +70,13 @@ public abstract class ExplosionMixin {
 				HitResult hit = world.raycast(new RaycastContext(source, vec3d, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
 				ShapeSender sr = MessMod.INSTANCE.shapeSender;
 				sr.addShape(new RenderedLine(source, hit.getPos(), 0x00FF00FF, 
-						OptionManager.entityExplosionRaysLifetime, world.getTime()), entity.getEntityWorld().getRegistryKey());
+						OptionManager.entityExplosionRaysLifetime, world.getTime()), 
+						entity.getEntityWorld().getRegistryKey(), 
+						null);
 				sr.addShape(new RenderedLine(hit.getPos(), vec3d, 0xFF0000FF, 
-						OptionManager.entityExplosionRaysLifetime, world.getTime()), entity.getEntityWorld().getRegistryKey());
+						OptionManager.entityExplosionRaysLifetime, world.getTime()), 
+						entity.getEntityWorld().getRegistryKey(), 
+						null);
 			}
 		}
 	}

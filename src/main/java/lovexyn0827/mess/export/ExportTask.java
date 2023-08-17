@@ -82,7 +82,7 @@ public final class ExportTask {
 		if(region != null) {
 			RenderedBox box = new RenderedBox(Box.from(region.getBlockBox()), 
 					0xFF0000FF, 0xFFFF003F, ticks, region.getWorld().getTime());
-			MessMod.INSTANCE.shapeSender.addShape(box, region.getWorld().getRegistryKey());
+			MessMod.INSTANCE.shapeSender.addShape(box, region.getWorld().getRegistryKey(), this.owner);
 		}
 	}
 	
