@@ -114,7 +114,7 @@ public class ExportSaveCommand {
 	}
 
 	private static int export(CommandContext<ServerCommandSource> ct) {
-		long start = Util.getMeasuringTimeMs();
+		long start = Util.getMeasuringTimeNano();
 		ExportTask task = getExportTask(ct);
 		WorldGenType wg = WorldGenType.valueOf(StringArgumentType.getString(ct, "worldgen"));
 		try {
@@ -128,7 +128,7 @@ public class ExportSaveCommand {
 			return 0;
 		}
 		
-		CommandUtil.feedbackWithArgs(ct, "cmd.exportsave.success", (Util.getMeasuringTimeMs() - start) / 1000D);
+		CommandUtil.feedbackWithArgs(ct, "cmd.exportsave.success", (Util.getMeasuringTimeNano() - start) / 10E8D);
 		return Command.SINGLE_SUCCESS;
 	}
 	
