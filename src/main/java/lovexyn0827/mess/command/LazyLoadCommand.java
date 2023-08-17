@@ -24,6 +24,12 @@ public class LazyLoadCommand {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("lazyload").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("add")
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
+								.executes((ct) -> {
+									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
+									LAZY_CHUNKS.add(ChunkPos.toLong(pos.x, pos.z));
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
+									return Command.SINGLE_SUCCESS;
+								})
 								.then(argument("corner2", ColumnPosArgumentType.columnPos())
 										.executes((ct) -> {
 											forEachSelected(ct, LAZY_CHUNKS::add);
@@ -32,6 +38,12 @@ public class LazyLoadCommand {
 										}))))
 				.then(literal("remove")
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
+								.executes((ct) -> {
+									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
+									LAZY_CHUNKS.remove(ChunkPos.toLong(pos.x, pos.z));
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
+									return Command.SINGLE_SUCCESS;
+								})
 								.then(argument("corner2", ColumnPosArgumentType.columnPos())
 										.executes((ct) -> {
 											forEachSelected(ct, LAZY_CHUNKS::remove);
