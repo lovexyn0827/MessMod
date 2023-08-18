@@ -150,6 +150,10 @@
 		"exp.emptyarg" : "某个参数为空", 
 		"exp.unknownphase" : "未知的运算阶段：%s", 
 		"exp.invalidlastw" : "%s不能被设为%s", 
+		"exp.incomescape" : "转义字符不完整", 
+		"exp.incomuncode" : "Unicode字符表示不完整", 
+		"exp.unknownescape" : "不支持的转义字符：%s", 
+		"exp.incompquote" : "不完整的字符引文", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 
@@ -228,6 +232,8 @@
 		"opt.err.rnum" : "给定的值不是一个数字", 
 		"opt.err.rhotbar" : "需要1～36之间的一个整数", 
 		"opt.err.nodef" : "%s未被定义", 
+		"opt.err.lithium" : "此选项与Lithium不兼容", 
+		"opt.err.reqcarpet" : "该选项需要安装Carpet", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "id不能为负值", 

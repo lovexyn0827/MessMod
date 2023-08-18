@@ -677,7 +677,7 @@ public class OptionManager{
 			}
 			
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
-				throw new InvalidOptionException("Please install the carpet mod!");
+				throw new InvalidOptionException("opt.err.reqcarpet");
 			}
 			
 			// FIXME Only influences the sender?
@@ -688,16 +688,15 @@ public class OptionManager{
 			}
 		});
 		CustomAction checkLithium = (oldVal, newVal, ct) -> {
-			if (FabricLoader.getInstance().isModLoaded("lithium")) {
-				throw new InvalidOptionException("Warning: This feature is not compatible with lithium. "
-						+ "Maybe it won't work properly");
+			if (FabricLoader.getInstance().isModLoaded("lithium") && (Boolean) newVal) {
+				throw new InvalidOptionException("opt.err.lithium");
 			}
 		};
 		registerCustomApplicationBehavior("entityExplosionInfluence", checkLithium);
 		registerCustomApplicationBehavior("disableExplosionExposureCalculation", checkLithium);
 		CustomAction requireCarpet = (oldVal, newVal, ct) -> {
-			if (!FabricLoader.getInstance().isModLoaded("carpet")) {
-				throw new InvalidOptionException("Please install the carpet mod!");
+			if (!FabricLoader.getInstance().isModLoaded("carpet") && (Boolean) newVal) {
+				throw new InvalidOptionException("opt.err.reqcarpet");
 			}
 		};
 		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", requireCarpet);

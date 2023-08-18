@@ -150,6 +150,10 @@
 		"exp.emptyarg" : "One of the given arguments is empty!", 
 		"exp.unknownphase" : "Unknown ticking phase: %s", 
 		"exp.invalidlastw" : "%s couldn't be set to %s", 
+		"exp.incomescape" : "Incomplete escape", 
+		"exp.incomuncode" : "Incomplete Unicode character", 
+		"exp.unknownescape" : "Unsupported escape: %s", 
+		"exp.incompquote" : "Incomplete quote", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 
@@ -228,6 +232,8 @@
 		"opt.err.rnum" : "The given value is not a number", 
 		"opt.err.rhotbar" : "Requires a number between 1 and 36", 
 		"opt.err.nodef" : "%s is not defined", 
+		"opt.err.lithium" : "This option is incompatible with Lithium!", 
+		"opt.err.reqcarpet" : "This option require Carpet to function!", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 
