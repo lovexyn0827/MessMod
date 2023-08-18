@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.google.common.collect.Sets;
+import com.mojang.util.UUIDTypeAdapter;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -17,9 +18,10 @@ import net.minecraft.world.World;
  */
 @Environment(EnvType.CLIENT)
 public class LocalShapeStorage extends ShapeCache implements ShapeSender {
-	private final UUID localPlayerUuid = UUID.fromString(MinecraftClient.getInstance().getSession().getUuid());
+	private final UUID localPlayerUuid;
 	
 	LocalShapeStorage() {
+		this.localPlayerUuid = UUIDTypeAdapter.fromString(MinecraftClient.getInstance().getSession().getUuid());
 	}
 
 	@Override
