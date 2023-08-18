@@ -227,6 +227,7 @@
 		"opt.err.rnonnegative" : "需要一个非负数", 
 		"opt.err.rnum" : "给定的值不是一个数字", 
 		"opt.err.rhotbar" : "需要1～36之间的一个整数", 
+		"opt.err.nodef" : "%s未被定义", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "id不能为负值", 

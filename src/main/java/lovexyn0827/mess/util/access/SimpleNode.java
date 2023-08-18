@@ -36,7 +36,7 @@ class SimpleNode<I, O> extends Node {
 		ALL_FUNCTIONS[this.funcId] = func;
 	}
 	
-	@SuppressWarnings("unchecked")	// XXX
+	@SuppressWarnings("unchecked")
 	@Override
 	Object access(Object previous) {
 		return func.apply((I) previous);

@@ -3,11 +3,11 @@ package lovexyn0827.mess.options;
 public class FloatParser implements OptionParser<Float> {
 
 	@Override
-	public Float tryParse(String str) throws InvaildOptionException {
+	public Float tryParse(String str) throws InvalidOptionException {
 		try {
 			return Float.valueOf(str);
 		} catch (NumberFormatException e) {
-			throw new InvaildOptionException("The given value is not a number!");
+			throw new InvalidOptionException("The given value is not a number!");
 		}
 	}
 
@@ -18,12 +18,12 @@ public class FloatParser implements OptionParser<Float> {
 
 	public static class Positive extends FloatParser {
 		@Override
-		public Float tryParse(String str) throws InvaildOptionException {
+		public Float tryParse(String str) throws InvalidOptionException {
 			Float f = super.tryParse(str);
 			if(f > 0) {
 				return f;
 			} else {
-				throw new InvaildOptionException("Use a positive number here");
+				throw new InvalidOptionException("Use a positive number here");
 			}
 		}
 	}

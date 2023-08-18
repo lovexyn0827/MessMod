@@ -247,7 +247,7 @@ public class MapperNode extends Node {
 					Literal<?> l = this.arguments[i];
 					if(l != null) {
 						try {
-							argObjs[i] = l.get(argTypes[i]);	// XXX Generic type
+							argObjs[i] = l.get(argTypes[i]);
 						} catch (InvalidLiteralException e) {
 							throw AccessingFailureException.create(e, this);
 						}

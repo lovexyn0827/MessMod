@@ -227,6 +227,7 @@
 		"opt.err.rnonnegative" : "Requires a non-negative number", 
 		"opt.err.rnum" : "The given value is not a number", 
 		"opt.err.rhotbar" : "Requires a number between 1 and 36", 
+		"opt.err.nodef" : "%s is not defined", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 

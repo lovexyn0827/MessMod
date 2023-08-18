@@ -95,7 +95,6 @@ public class MessMod implements ModInitializer {
 			Files.createDirectories(scriptPath);
 		}
 		
-		// TODO
 		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/" + name + ".sc"), 
 				Paths.get(this.scriptDir, name + ".sc"), 
 				StandardCopyOption.REPLACE_EXISTING);

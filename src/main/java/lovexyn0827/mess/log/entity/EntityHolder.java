@@ -170,7 +170,7 @@ public class EntityHolder {
 		return this.entityId;
 	}
 	
-	// TODO Use something better
+	// Use something better (maybe alternative other than employing ObjectHolders doesn't exist)
 	private static enum ToBeReplaced {
 		INSTANCE
 	}

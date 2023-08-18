@@ -8,13 +8,13 @@ import net.minecraft.server.command.ServerCommandSource;
 public class BooleanParser implements OptionParser<Boolean> {
 
 	@Override
-	public Boolean tryParse(String str) throws InvaildOptionException {
+	public Boolean tryParse(String str) throws InvalidOptionException {
 		if("true".equals(str)) {
 			return true;
 		} else if ("false".equals(str)) {
 			return false;
 		} else {
-			throw new InvaildOptionException("Use true of false here");
+			throw new InvalidOptionException("Use true of false here");
 		}
 	}
 

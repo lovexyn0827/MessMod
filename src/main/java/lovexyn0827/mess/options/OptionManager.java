@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,7 +57,8 @@ import net.minecraft.util.crash.CrashReport;
  */
 // TODO Now the option manager is pretty messy!
 public class OptionManager{
-	private static final File GLOBAL_OPTION_FILE = new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop");
+	private static final File GLOBAL_OPTION_FILE = new File(
+			FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop");
 	private static final Properties GLOBAL_OPTION_SERIALIZER = new Properties();
 	public static final List<Field> OPTIONS = Stream.of(OptionManager.class.getFields())
 			.filter((f) -> f.isAnnotationPresent(Option.class))
@@ -70,7 +70,7 @@ public class OptionManager{
 	/**
 	 * Actions taken right after an option is set to a given value.
 	 */
-	public static final Map<String, BiConsumer<String, CommandContext<ServerCommandSource>>> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
+	public static final Map<String, CustomAction> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
 	
 	@Option(defaultValue = "STANDARD", 
 			parserClass = AccessingPath.InitializationStrategy.Parser.class)
@@ -342,55 +342,62 @@ public class OptionManager{
 	
 	private static void loadFromProperties(Properties options) {
 		for(Field f : OPTIONS) {
-			String serialized;
 			String name = f.getName();
 			Option o = f.getAnnotation(Option.class);
 			try {
-				@SuppressWarnings("deprecation")
-				OptionParser<?> parser = o.parserClass().newInstance();
+				OptionParser<?> parser = OptionParser.of(o);
+				Object oldVal = f.get(o);
 				try {
 					options.computeIfAbsent(name, 
 							(t) -> GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (key) -> o.defaultValue()));
-					serialized = (String) options.get(name);
-					f.set(null, parser.tryParse(serialized));
-					saveGlobal();
-				} catch (InvaildOptionException e) {
-					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", name, e.getMessage());
+					Object newVal = parser.tryParse((String) options.get(name));
+					f.set(null, newVal);
+					CustomAction behavior = 
+							CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
+					if(behavior != null) {
+						behavior.onOptionUpdate(oldVal, newVal, null);
+					}
+				} catch (InvalidOptionException e) {
+					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", 
+							name, e.getMessage());
 					String dV;
 					if(isVaild(parser, (String) GLOBAL_OPTION_SERIALIZER.get(name))) {
 						dV = GLOBAL_OPTION_SERIALIZER.getProperty(name);
-						options.put(name, dV);
 					} else {
 						dV = o.defaultValue();
 						GLOBAL_OPTION_SERIALIZER.put(name, dV);
-						options.put(name, dV);
 					}
 
-					serialized = dV;
+					options.put(name, dV);
 					try {
-						f.set(null, parser.tryParse(dV));
-					} catch (IllegalArgumentException | IllegalAccessException | InvaildOptionException e1) {
+						Object newVal = parser.tryParse(dV);
+						f.set(null, newVal);
+						CustomAction behavior = 
+								CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
+						if(behavior != null) {
+							// Exceptions are not handled as the value is guaranteed to be valid.
+							behavior.onOptionUpdate(oldVal, newVal, null);
+						}
+					} catch (IllegalArgumentException | IllegalAccessException | InvalidOptionException e1) {
 						e1.printStackTrace();
+						throw new RuntimeException(e1);
 					}
 				}
-
-				BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
-				if(behavior != null) {
-					behavior.accept(serialized, null);
-				}
-			} catch (SecurityException | IllegalAccessException | InstantiationException e1) {
+			} catch (SecurityException | IllegalAccessException e1) {
 				e1.printStackTrace();
-				
 			}
+			
+			saveGlobal();
 		}
 		
 		if(MessMod.LOGGER.isDebugEnabled()) {
-			MessMod.LOGGER.debug("Loaded {} MessMod config from {}", OPTIONS.size(), localOptionFile.getAbsolutePath());
+			MessMod.LOGGER.debug("Loaded {} MessMod config from {}", 
+					OPTIONS.size(), localOptionFile.getAbsolutePath());
 			OPTIONS.stream()
-			.map((f) -> {
-				return f.getName() + ": " + getString(f);
-			})
-			.forEach(MessMod.LOGGER::debug);
+					.map((f) -> {
+						return f.getName() + ": " + getString(f);
+					})
+					.forEach(MessMod.LOGGER::debug);
 		}
 	}
 	
@@ -420,7 +427,9 @@ public class OptionManager{
 		sendOptionsToClientsIfNeeded();
 	}
 
-	// Only calls from MessMod.onInitialize() are permitted
+	/**
+	 *  Only calls from {@code MessMod.onInitialize()} and {@code MessMod.onServerShutdwn()} are permitted
+	 */
 	public static void loadGlobal() {
 		if(GLOBAL_OPTION_FILE.exists()) {
 			try (FileInputStream in = new FileInputStream(GLOBAL_OPTION_FILE)) {
@@ -436,55 +445,67 @@ public class OptionManager{
 		
 		for(Field f : OPTIONS) {
 			String name = f.getName();
-			String serialized;
 			Option o = f.getAnnotation(Option.class);
 			try {
-				@SuppressWarnings("deprecation")
-				OptionParser<?> parser = o.parserClass().newInstance();
+				Object oldValue = f.get(null);
+				Object newValue;
+				OptionParser<?> parser = OptionParser.of(o);
 				try {
-					GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (k) -> o.defaultValue());
-					serialized = (String) GLOBAL_OPTION_SERIALIZER.get(name);
-					f.set(null, parser.tryParse(serialized));
-					saveGlobal();
-				} catch (InvaildOptionException e) {
-					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", name, e.getMessage());
+					newValue = parser.tryParse((String) GLOBAL_OPTION_SERIALIZER.get(name));
+					f.set(null, newValue);
+				} catch (InvalidOptionException e) {
+					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", 
+							name, e.getMessage());
 					String dV = o.defaultValue();
-					serialized = dV;
 					GLOBAL_OPTION_SERIALIZER.put(name, dV);
 					try {
-						f.set(null, parser.tryParse(dV));
-					} catch (IllegalArgumentException | IllegalAccessException | InvaildOptionException e1) {
+						newValue = parser.tryParse(dV);
+						f.set(null, newValue);
+					} catch (IllegalArgumentException | IllegalAccessException | InvalidOptionException e1) {
 						e1.printStackTrace();
+						throw new RuntimeException(e1);
 					}
 				}
 				
-
-				BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
+				CustomAction behavior = 
+						CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
 				if(behavior != null) {
-					behavior.accept(serialized, null);
+					try {
+						behavior.onOptionUpdate(oldValue, newValue, null);
+					} catch (InvalidOptionException e) {
+						sendErrorOrWarn(null, e.getLocalizedMessage());
+						f.set(null, oldValue);
+						GLOBAL_OPTION_SERIALIZER.put(name, parser.serializeObj(oldValue));
+					}
 				}
-			} catch (SecurityException | IllegalAccessException | InstantiationException e1) {
+			} catch (SecurityException | IllegalAccessException e1) {
 				e1.printStackTrace();
 			}
 		}
+		
+		saveGlobal();
 	}
 	
 	private static boolean isVaild(OptionParser<?> parser, String val) {
 		try {
 			return (parser.tryParse(val) != null);
-		} catch (InvaildOptionException e) {
+		} catch (InvalidOptionException e) {
 			return false;
 		}
 	}
 	
 	private static void writeDefault() {
-		OPTIONS.forEach((f) -> GLOBAL_OPTION_SERIALIZER.put(f.getName(), f.getAnnotation(Option.class).defaultValue()));
+		OPTIONS.forEach((f) -> {
+			GLOBAL_OPTION_SERIALIZER.put(f.getName(), f.getAnnotation(Option.class).defaultValue());
+		});
 		saveGlobal();
 	}
 
 	private static void writeDefaultLocally() {
 		OPTIONS.forEach((f) -> localOptionSerializer.put(f.getName(), 
-				GLOBAL_OPTION_SERIALIZER.computeIfAbsent(f.getName(), (key) -> f.getAnnotation(Option.class).defaultValue())));
+				GLOBAL_OPTION_SERIALIZER.computeIfAbsent(f.getName(), (key) -> {
+					return f.getAnnotation(Option.class).defaultValue();
+				})));
 		save();
 	}
 
@@ -506,43 +527,52 @@ public class OptionManager{
 		}
 	}
 
-	public static void set(Field f, Object obj) {
-		set(f, obj, null);
+	public static boolean set(Field f, Object obj) {
+		return set(f, obj, null);
 	}
 
-	public static void set(Field f, Object obj, @Nullable CommandContext<ServerCommandSource> ct) {
+	public static boolean set(Field f, Object obj, @Nullable CommandContext<ServerCommandSource> ct) {
 		try {
+			Object old = f.get(null);
 			f.set(null, obj);
-			@SuppressWarnings("deprecation")
-			String serialized = f.getAnnotation(Option.class).parserClass()
-					.newInstance().serializeObj(obj);
+			Option o = f.getAnnotation(Option.class);
+			OptionParser<?> parser = OptionParser.of(o);
+			String serialized = parser.serializeObj(obj);
 			localOptionSerializer.put(f.getName(), serialized);
 			save();
-			BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
+			CustomAction behavior = 
+					CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
 			if(behavior != null) {
-				behavior.accept(serialized, ct);
+				try {
+					behavior.onOptionUpdate(old, obj, ct);
+				} catch (InvalidOptionException e) {
+					sendErrorOrWarn(ct, e.getLocalizedMessage());
+					f.set(null, old);
+					GLOBAL_OPTION_SERIALIZER.put(f.getName(), parser.serializeObj(old));
+					return false;
+				}
 			}
 			
 			sendOptionsToClientsIfNeeded();
+			return true;
 		} catch (IllegalArgumentException e) {
 			MessMod.LOGGER.fatal("Couldn't set the value of option {}, that shouldn't happed!", f.getName());
 			e.printStackTrace();
-		} catch (IllegalAccessException | InstantiationException e) {
+			return false;
+		} catch (IllegalAccessException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	public static void setGlobal(Field f, Object obj) {
-		try {
-			GLOBAL_OPTION_SERIALIZER.put(f.getName(), f.getAnnotation(Option.class).parserClass()
-					.newInstance().serializeObj(obj));
+	public static boolean setGlobal(Field f, Object obj) {
+		if(set(f, obj)) {
+			GLOBAL_OPTION_SERIALIZER.put(f.getName(), OptionParser.of(f.getAnnotation(Option.class)).serializeObj(obj));
 			saveGlobal();
-		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			return true;
+		} else {
+			return false;
 		}
-		
-		set(f, obj);
 	}
 
 	private static void sendOptionsToClientsIfNeeded() {
@@ -575,8 +605,7 @@ public class OptionManager{
 		return GLOBAL_OPTION_SERIALIZER.get(f.getName()).toString();
 	}
 
-	private static void registerCustomApplicationBehavior(String name, 
-			@Nullable BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior) {
+	private static void registerCustomApplicationBehavior(String name, @Nullable CustomAction behavior) {
 		CUSTOM_APPLICATION_BEHAVIORS.put(name, behavior);
 	}
 	
@@ -629,12 +658,11 @@ public class OptionManager{
 		return I18N.translate("opt." + name + ".desc");
 	}
 
-	@SuppressWarnings("deprecation")
 	private static void loadDefaults() {
 		OPTIONS.forEach((f) -> {
 			Option o = f.getAnnotation(Option.class);
 			try {
-				f.set(null, o.parserClass().newInstance().tryParse(o.defaultValue()));
+				f.set(null, OptionParser.of(o).tryParse(o.defaultValue()));
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException(e);
@@ -643,40 +671,47 @@ public class OptionManager{
 	}
 	
 	static{
-		registerCustomApplicationBehavior("enabledTools", (val, ct) -> {
+		registerCustomApplicationBehavior("enabledTools", (oldValue, newValue, ct) -> {
 			if(ct == null) {
 				return;
 			}
 			
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
-				sendErrorOrWarn(ct, "Please install the carpet mod!");
+				throw new InvalidOptionException("Please install the carpet mod!");
 			}
 			
-			try {
-				if(new BooleanParser().tryParse(val)) {
-					CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool");
-				}else {
-					CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script unload tool");
-				}
-			} catch (InvaildOptionException e) {
-				e.printStackTrace();
+			// FIXME Only influences the sender?
+			if((Boolean) newValue) {
+				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool");
+			}else {
+				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script unload tool");
 			}
 		});
-		BiConsumer<String, CommandContext<ServerCommandSource>> checkLithium = (val, ct) -> {
+		CustomAction checkLithium = (oldVal, newVal, ct) -> {
 			if (FabricLoader.getInstance().isModLoaded("lithium")) {
-				sendErrorOrWarn(ct, "Warning: This feature is not compatible with lithium. Maybe it won't work properly");
+				throw new InvalidOptionException("Warning: This feature is not compatible with lithium. "
+						+ "Maybe it won't work properly");
 			}
 		};
 		registerCustomApplicationBehavior("entityExplosionInfluence", checkLithium);
 		registerCustomApplicationBehavior("disableExplosionExposureCalculation", checkLithium);
-		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", (val, ct) -> {
+		CustomAction requireCarpet = (oldVal, newVal, ct) -> {
 			if (!FabricLoader.getInstance().isModLoaded("carpet")) {
-				sendErrorOrWarn(ct, "Please install the carpet mod!");
+				throw new InvalidOptionException("Please install the carpet mod!");
+			}
+		};
+		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", requireCarpet);
+		registerCustomApplicationBehavior("hudStyles", (oldVal, newVal, ct) -> {
+			if (!MessMod.isDedicatedServerEnv() && MessMod.INSTANCE.getClientHudManager() != null) {
+				MessMod.INSTANCE.getClientHudManager().updateStyle((String) newVal);
 			}
 		});
-		registerCustomApplicationBehavior("hudStyles", (val, ct) -> {
-			if (!MessMod.isDedicatedServerEnv() && MessMod.INSTANCE.getClientHudManager() != null) {
-				MessMod.INSTANCE.getClientHudManager().updateStyle(val);
+		registerCustomApplicationBehavior("language", (oldVal, newVal, ct) -> {
+			boolean forceLoad = ((String) newVal).endsWith(Language.FORCELOAD_SUFFIX);
+			String id = ((String) newVal).replace(Language.FORCELOAD_SUFFIX, "");
+			if(!I18N.setLanguage(id, forceLoad)) {
+				// Needn't be translated
+				throw new InvalidOptionException("Language " + id + " is unsupported currently or incomplete.");
 			}
 		});
 		OPTIONS.forEach((o) -> {
@@ -685,5 +720,16 @@ public class OptionManager{
 			}
 		});
 		loadDefaults();
+	}
+	
+	@FunctionalInterface
+	private interface CustomAction {
+		/**
+		 * Called after the new value of an option has been set. This method mainly perform some validations, and
+		 * some custom application steps.
+		 * @param oldValue The previous value of the updated option, or null not exist.
+		 */
+		void onOptionUpdate(@Nullable Object oldValue, Object newValue, 
+				@Nullable CommandContext<ServerCommandSource> ct)throws InvalidOptionException;
 	}
 }

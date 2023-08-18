@@ -47,7 +47,8 @@ public class FillCommandMixin {
 			@At(value = "INVOKE", target = "com/mojang/brigadier/exceptions/SimpleCommandExceptionType.create"
 					+ "()Lcom/mojang/brigadier/exceptions/CommandSyntaxException;"), 
 			@At(value = "INVOKE", target = "com/mojang/brigadier/exceptions/Dynamic2CommandExceptionType.create"
-					+ "(Ljava/lang/Object;Ljava/lang/Object;)Lcom/mojang/brigadier/exceptions/CommandSyntaxException;")})
+					+ "(Ljava/lang/Object;Ljava/lang/Object;)Lcom/mojang/brigadier/exceptions/CommandSyntaxException;")}, 
+			remap = false)
 	private static void onFillFail(ServerCommandSource source, BlockBox range, BlockStateArgument block, 
 			@Coerce Enum<?> mode, @Nullable Predicate<CachedBlockPosition> filter, CallbackInfoReturnable<Integer> cir) {
 		if(OptionManager.fillHistory) {

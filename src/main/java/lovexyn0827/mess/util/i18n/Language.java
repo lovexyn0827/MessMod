@@ -13,7 +13,7 @@ import com.google.gson.JsonParser;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.options.InvaildOptionException;
+import lovexyn0827.mess.options.InvalidOptionException;
 import lovexyn0827.mess.options.OptionParser;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.command.ServerCommandSource;
@@ -22,6 +22,7 @@ import net.minecraft.server.command.ServerCommandSource;
  * A language definition. Only the in-game contents will be translated.
  */
 public class Language {
+	public static final String FORCELOAD_SUFFIX = "_FORCELOAD";
 	private final String readableName;
 	private final Map<String, String> translations = Maps.newHashMap();
 	private final String id;
@@ -68,7 +69,8 @@ public class Language {
 	
 	/**
 	 * Compare translation keys against en_us.json, to find absence and redundancy in the keys.
-	 * @return {@code true} if all the translation keys here is also in en_us.json, and all keys in en_us.json is also here, {@code false} otherwise.
+	 * @return {@code true} if all the translation keys here is also in en_us.json, 
+	 * and all keys in en_us.json is also here, {@code false} otherwise.
 	 */
 	public boolean vaildate() {
 		if("en_us".equals(this.id)) {
@@ -79,8 +81,12 @@ public class Language {
 			if(here.containsAll(en) && en.containsAll(here)) {
 				return true;
 			} else {
-				en.stream().filter((key) -> !here.contains(key)).forEach((key) -> MessMod.LOGGER.warn("Absence: " + key));
-				here.stream().filter((key) -> !en.contains(key)).forEach((key) -> MessMod.LOGGER.warn("Redunancy: " + key));
+				en.stream()
+						.filter((key) -> !here.contains(key))
+						.forEach((key) -> MessMod.LOGGER.warn("Absence: " + key));
+				here.stream()
+						.filter((key) -> !en.contains(key))
+						.forEach((key) -> MessMod.LOGGER.warn("Redunancy: " + key));
 				return false;
 			}
 		}
@@ -91,16 +97,13 @@ public class Language {
 	}
 	
 	public static class Parser implements OptionParser<String> {
-
 		@Override
-		public String tryParse(String str) throws InvaildOptionException {
-			// TODO Move application steps to where it should be.
-			boolean forceLoad = str.endsWith("_FORCELOAD");
-			if(I18N.setLanguage(str.replace("_FORCELOAD", ""), forceLoad)) {
+		public String tryParse(String str) throws InvalidOptionException {
+			if("-FOLLOW_SYSTEM_SETTINGS-".equals(str) || 
+					I18N.SUPPORTED_LANGUAGES.contains(str.replace(FORCELOAD_SUFFIX, ""))) {
 				return str;
 			} else {
-				// Needn't be translated
-				throw new InvaildOptionException("The language is unsupported currently or incomplete.");
+				throw new InvalidOptionException("opt.err.nodef", str);
 			}
 		}
 

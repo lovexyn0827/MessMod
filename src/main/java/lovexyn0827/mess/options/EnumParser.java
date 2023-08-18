@@ -20,11 +20,11 @@ public class EnumParser<T extends Enum<T>> implements OptionParser<Enum<T>> {
 	}
 
 	@Override
-	public Enum<T> tryParse(String str) throws InvaildOptionException {
+	public Enum<T> tryParse(String str) throws InvalidOptionException {
 		try {
 			return Enum.valueOf(clazz, str);
 		} catch(IllegalArgumentException e) {
-			InvaildOptionException e1 = new InvaildOptionException("The value of this option couldn't be " + 
+			InvalidOptionException e1 = new InvalidOptionException("The value of this option couldn't be " + 
 					str + ", beacuse " + e.getMessage());
 			e1.initCause(e);
 			throw e1;

@@ -77,7 +77,7 @@ final class MethodNode extends Node implements Cloneable {
 			Type[] argTypes = this.method.getGenericParameterTypes();
 			for(int i = 0; i < argsL.length; i++) {
 				try {
-					argObjs[i] = argsL[i].get(argTypes[i]);	// XXX Generic type
+					argObjs[i] = argsL[i].get(argTypes[i]);
 				} catch (InvalidLiteralException e) {
 					throw AccessingFailureException.create(e, this);
 				}
@@ -131,7 +131,7 @@ final class MethodNode extends Node implements Cloneable {
 			this.method = candidates.get(0);
 		} else if(candidates.size() == 0) {
 			throw AccessingFailureException.createWithArgs(FailureCause.NO_METHOD, this, null, 
-					srg.getValue(), clazz.getSimpleName());	// XXX Deobfusciation
+					srg.getValue(), clazz.getSimpleName());
 		} else {
 			throw AccessingFailureException.create(FailureCause.MULTI_TARGET, this);
 		}
@@ -255,7 +255,6 @@ final class MethodNode extends Node implements Cloneable {
 
 	@Override
 	NodeCompiler getCompiler() {
-		// TODO The same as MapperNode.getCompiler()?
 		return (ctx) -> {
 			InsnList insns = new InsnList();
 			if(this.method == null) {

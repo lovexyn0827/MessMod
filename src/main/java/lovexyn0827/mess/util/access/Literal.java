@@ -245,8 +245,7 @@ public abstract class Literal<T> {
 
 		@Override
 		public Enum<?> get(Type clazz) throws InvalidLiteralException {
-			// FIXME Non-necessary non-null check
-			if(this.compiled && this.enumConstant != null) {
+			if(this.compiled) {
 				return this.enumConstant;
 			}
 			
@@ -259,7 +258,6 @@ public abstract class Literal<T> {
 			if(cl != null && cl.isEnum()) {
 				String f = MessMod.INSTANCE.getMapping().srgField(cl.getName(), this.stringRepresentation);
 				try {
-					// XXX
 					@SuppressWarnings({ "unchecked", "rawtypes" })
 					Enum<?> e = Enum.valueOf((Class) cl, f);
 					this.enumConstant = e;
