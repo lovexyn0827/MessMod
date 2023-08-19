@@ -12,7 +12,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.TranslatableException;
-import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
 import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.server.command.ServerCommandSource;

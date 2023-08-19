@@ -40,7 +40,6 @@
 		
 		//***** entitylog *****
 		"cmd.entitylog.usage" : "TODO", 
-		"cmd.entitylog.restart" : "Warning: All active logs will be restarted", 
 		"cmd.entitylog.listen" : "Started listening to %s", 
 		"cmd.entitylog.unlisten" : "Stopped listening to %s", 
 		"cmd.general.autosub" : "Entity with type %s won't be subscribed automatically", 
@@ -49,6 +48,7 @@
 		"cmd.general.stopautosubname" : "Entity with name %s won't be subscribed automatically", 
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
+		"cmd.general.reqidle" : "This action is only available when the logger is idle.", 
 		
 		//***** exportsave *****
 		"cmd.exportsave.failexp" : "Failed to export the save.", 

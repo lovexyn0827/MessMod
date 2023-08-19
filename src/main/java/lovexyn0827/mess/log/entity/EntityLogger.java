@@ -11,8 +11,8 @@ import java.util.Set;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -27,6 +27,7 @@ import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Pair;
 
 // TODO Support for EnderDragonPart, whose EntityType is not specified
 public final class EntityLogger extends AbstractAchivingLogger {
@@ -38,6 +39,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 	private Map<String, EntityLogColumn> customFields = new HashMap<>();
 	private final Set<EntityType<?>> autoSubTypes = Sets.newHashSet();
 	private final Set<String> autoSubNames = Sets.newHashSet();
+	private SideLogStoragePolicy defaultStoragePolicy = SideLogStoragePolicy.SERVER_ONLY;
 	
 	public EntityLogger(MinecraftServer server) {
 		super(server);
@@ -49,7 +51,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 				this.subscribe(world.getEntitiesByType(null, (e) -> {
 					return this.autoSubTypes.contains(e.getType()) || 
 							this.autoSubNames.contains(e.getName().asString());
-				}));
+				}), this.defaultStoragePolicy);
 			});
 		}
 		
@@ -104,9 +106,16 @@ public final class EntityLogger extends AbstractAchivingLogger {
 		this.clientLoggingEntries.clear();
 	}
 
-	public void listenToField(String field, EntityType<?> type, String name, AccessingPath path, TickingPhase phase) {
-		Map<EntityIndex, EntityHolder> temp = new HashMap<>(this.serverLoggingEntries);
-		this.closeAll();
+	public void listenToField(String field, EntityType<?> type, String name, 
+			@Nullable AccessingPath path, TickingPhase phase) {
+		if(path == null) {
+			path = AccessingPath.DUMMY;
+		}
+		
+		if(!this.isIdle()) {
+			throw new TranslatableException("cmd.entitilog.reqidle");
+		}
+		
 		if(this.customFields.containsKey(name)) {
 			throw new TranslatableException("exp.dupname");
 		}
@@ -128,45 +137,55 @@ public final class EntityLogger extends AbstractAchivingLogger {
 		} else {
 			throw new TranslatableException("exp.dupfield");
 		}
-		
-		temp.values().forEach((h) -> {
-			EntityIndex idx = new EntityIndex(h.entity);
-			this.serverLoggingEntries.put(idx, new EntityHolder(h.entity, this, false));
-			this.clientLoggingEntries.put(idx, new EntityHolder(h.entity, this, true));
-		});
 	}
 
 	public void unlistenToField(String name) {
-		Map<EntityIndex, EntityHolder> temp = new HashMap<>(this.serverLoggingEntries);
-		this.closeAll();
+		if(!this.isIdle()) {
+			throw new TranslatableException("cmd.entitilog.reqidle");
+		}
+		
 		if(this.customFields.remove(name) == null) {
 			throw new TranslatableException("exp.nofieldunlistend", name);
 		}
-		
-		temp.values().forEach((h) -> {
-			EntityIndex idx = new EntityIndex(h.entity);
-			this.serverLoggingEntries.put(idx, new EntityHolder(h.entity, this, false));
-			this.clientLoggingEntries.put(idx, new EntityHolder(h.entity, this, true));
-		});
 	}
 
 	/**
 	 * @return The number of newly subscribed entities
 	 */
-	public int subscribe(Collection<? extends Entity> entities) {
+	public int subscribe(Collection<? extends Entity> entities, SideLogStoragePolicy policy) {
 		this.hasCreatedAnyLog = true;
 		MutableInt i = new MutableInt();
+		MutableInt j = new MutableInt();
 		entities.forEach((e) -> {
-					EntityIndex idx = new EntityIndex(e);
-					this.serverLoggingEntries.computeIfAbsent(idx, (id) -> {
-						i.increment();
-						return new EntityHolder(e, this, false);
-					});
-					this.clientLoggingEntries.computeIfAbsent(idx, (id) -> {
-						return new EntityHolder(e, this, true);
-					});
+			EntityIndex idx = new EntityIndex(e);
+			if(policy == SideLogStoragePolicy.MIXED) {
+				Pair<EntityHolder, EntityHolder> holder = EntityHolder.createMixedHolderPair(e, this);
+				if(!this.clientLoggingEntries.containsKey(idx)) {
+					this.clientLoggingEntries.put(idx, holder.getLeft());
+				}
+				
+				if(!this.serverLoggingEntries.containsKey(idx)) {
+					this.serverLoggingEntries.put(idx, holder.getRight());
+					i.increment();
+				}
+			} else {
+				this.serverLoggingEntries.computeIfAbsent(idx, (id) -> {
+					i.increment();
+					return new EntityHolder(e, this, false, policy);
 				});
-		return i.intValue();
+				this.clientLoggingEntries.computeIfAbsent(idx, (id) -> {
+					return new EntityHolder(e, this, true, policy);
+				});
+			}
+		});
+		return Math.max(i.intValue(), j.intValue());
+	}
+	
+	/**
+	 * @return The number of newly subscribed entities
+	 */
+	public int subscribe(Collection<? extends Entity> entities) {
+		return this.subscribe(entities, this.defaultStoragePolicy);
 	}
 
 	/**
@@ -174,22 +193,26 @@ public final class EntityLogger extends AbstractAchivingLogger {
 	 */
 	public int unsubscribe(Collection<? extends Entity> entities) {
 		MutableInt i = new MutableInt();
+		MutableInt j = new MutableInt();
 		entities.stream()
 				.map(EntityIndex::new)
 				.map(this.serverLoggingEntries::remove)
-				.filter(Predicates.notNull())
 				.forEach((eh)-> {
-					eh.close();
-					i.increment();
+					if(eh != null) {
+						eh.close();
+						i.increment();
+					}
 				});
 		entities.stream()
 				.map(EntityIndex::new)
 				.map(this.clientLoggingEntries::remove)
-				.filter(Predicates.notNull())
 				.forEach((eh)-> {
-					eh.close();
+					if(eh != null) {
+						eh.close();
+						j.increment();
+					}
 				});
-		return i.intValue();
+		return Math.max(i.intValue(), j.intValue());
 	}
 
 	public void addAutoSubEntityType(EntityType<?> type) {
@@ -224,11 +247,18 @@ public final class EntityLogger extends AbstractAchivingLogger {
 		return this.serverLoggingEntries.size();
 	}
 	
-// TODO	public static enum SideLogStoragePolicy {
-//		MIXED, 
-//		SEPARATED;
-//	}
+	public SideLogStoragePolicy getDefaultStoragePolicy() {
+		return this.defaultStoragePolicy;
+	}
+
+	public void setDefaultStoragePolicy(SideLogStoragePolicy storagePolicy) {
+		this.defaultStoragePolicy = storagePolicy;
+	}
 	
+	public boolean isIdle() {
+		return this.clientLoggingEntries.isEmpty() && this.serverLoggingEntries.isEmpty();
+	}
+
 	private static class EntityIndex {
 		private final int entityId;
 		private final boolean isClientSideEntity;

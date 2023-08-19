@@ -16,6 +16,12 @@
 		"cmd.general.dupname" : "名称已被占用", 
 		"cmd.general.unsupported" : "暂不支持该功能", 
 		"cmd.general.nomatching" : "找不到匹配的项目", 
+		"cmd.general.autosub" : "类型为%s的实体将被自动监听", 
+		"cmd.general.stopautosub" : "不再自动监听类型为%s的实体", 
+		"cmd.general.autosubname" : "名为%s的实体将被自动监听", 
+		"cmd.general.stopautosubname" : "不再自动监听名为%s的实体", 
+		"cmd.general.flush" : "已将新内容保存到磁盘", 
+		"cmd.general.count" : "共有%d个被监视实体", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "无法加载保存的自定义节点：%s", 
@@ -40,15 +46,9 @@
 		
 		//***** entitylog *****
 		"cmd.entitylog.usage" : "TODO", 
-		"cmd.entitylog.restart" : "警告：所有记录将重新开始", 
 		"cmd.entitylog.listen" : "开始监听字段%s", 
 		"cmd.entitylog.unlisten" : "停止监听字段%s", 
-		"cmd.general.autosub" : "类型为%s的实体将被自动监听", 
-		"cmd.general.stopautosub" : "不再自动监听类型为%s的实体", 
-		"cmd.general.autosubname" : "名为%s的实体将被自动监听", 
-		"cmd.general.stopautosubname" : "不再自动监听名为%s的实体", 
-		"cmd.general.flush" : "已将新内容保存到磁盘", 
-		"cmd.general.count" : "共有%d个被监视实体", 
+		"cmd.entitilog.reqidle" : "该行为只在记录器空闲时可用", 
 		
 		//***** exportsave *****
 		"cmd.exportsave.failexp" : "导出存档失败", 

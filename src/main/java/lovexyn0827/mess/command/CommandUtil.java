@@ -178,7 +178,6 @@ public class CommandUtil {
 		};
 	}
 	
-	@Deprecated
 	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<? extends Enum<?>> class1) {
 		return (ct, builder) -> {
 			Stream.of(class1.getEnumConstants())

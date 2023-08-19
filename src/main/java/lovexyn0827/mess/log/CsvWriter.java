@@ -31,8 +31,8 @@ public class CsvWriter implements AutoCloseable, Flushable {
 				.collect(Collectors.joining(",")) + "\r\n";
 	}
 
+	@Override
 	public void close() throws IOException {
-		this.writer.flush();
 		this.writer.close();
 	}
 
