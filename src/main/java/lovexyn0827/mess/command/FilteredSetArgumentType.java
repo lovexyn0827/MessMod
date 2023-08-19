@@ -57,10 +57,11 @@ public class FilteredSetArgumentType<T> extends ElementSetArgumentType<T, Filter
 	}
 	
 	static {
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		ArgumentSerializer<FilteredSetArgumentType> serializer = 
-				(ArgumentSerializer<FilteredSetArgumentType>)(Object) new Serializer();
-		ArgumentTypes.register("mess_filter", FilteredSetArgumentType.class, serializer);
+		// ???
+		@SuppressWarnings("unchecked")
+		Class<FilteredSetArgumentType<Object>> cl = 
+				(Class<FilteredSetArgumentType<Object>>)(Object) FilteredSetArgumentType.class;
+		ArgumentTypes.register("mess_filter", cl, new Serializer<Object>());
 	}
 
 	static final class ParseResult<T> extends ElementSetArgumentType.ParseResult<T> {
@@ -69,26 +70,27 @@ public class FilteredSetArgumentType<T> extends ElementSetArgumentType<T, Filter
 		}
 	}
 	
-	private static class Serializer implements ArgumentSerializer<FilteredSetArgumentType<?>> {
+	private static class Serializer<T> implements ArgumentSerializer<FilteredSetArgumentType<T>> {
 		@Override
-		public void toPacket(FilteredSetArgumentType<?> type, PacketByteBuf buf) {
+		public void toPacket(FilteredSetArgumentType<T> type, PacketByteBuf buf) {
 			buf.writeInt(type.elementsByName.size());
 			type.elementsByName.keySet().forEach(buf::writeString);
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
-		public FilteredSetArgumentType<?> fromPacket(PacketByteBuf buf) {
+		public FilteredSetArgumentType<T> fromPacket(PacketByteBuf buf) {
 			int count = buf.readInt();
-			Map<String, Object> elements = new HashMap<>();
+			Map<String, T> elements = new HashMap<>();
 			for(int i = 0; i < count; i++) {
-				elements.put(buf.readString(), new Object());
+				elements.put(buf.readString(), (T) new Object());
 			}
 			
 			return of(elements);
 		}
 
 		@Override
-		public void toJson(FilteredSetArgumentType<?> type, JsonObject jsonObject) {
+		public void toJson(FilteredSetArgumentType<T> type, JsonObject jsonObject) {
 			JsonArray list = new JsonArray();
 			type.elementsByName.keySet().forEach(list::add);
 			jsonObject.add("elements", list);
