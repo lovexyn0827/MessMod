@@ -1205,6 +1205,8 @@ Display the redstone signal level of the targeted redstone gate (i.e. repeaters 
 
 Display the loading state of chunks. Entity processing chunks, lazy load chunks and other chunks have a cube, with a color of red, green and grey, displayed on the top of its center. Requires enabling `chunkLoadingInfoRenderer` and holding a nautilus shell.
 
+![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/chunk-loading-status.png)
+
 ## Tool Items (requires fabric-carpet and enabledTools)
 
 ***Brick***: Pause or continue ticking using /tick freeze provided by the Carpet

@@ -1203,7 +1203,9 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 #### 区块加载状态显示
 
-显示区块的加载状态，分强加载、弱加载与边界加载与以下三级，分别在区块中心最高处显示为红色、绿色与灰色的半透明色块。需要启用选项`chunkLoadingInfoRenderer`并手持鹦鹉螺壳
+显示区块的加载状态，分强加载、弱加载与边界加载与以下三级，分别在区块中心最高处显示为红色、绿色与灰色的半透明色块。需要启用选项`chunkLoadingInfoRenderer`并手持鹦鹉螺壳。
+
+![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/chunk-loading-status.png)
 
 ## 工具物品（需要Carpet和选项`enabledTools`）
 
