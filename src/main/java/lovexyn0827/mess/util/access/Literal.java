@@ -406,7 +406,7 @@ public abstract class Literal<T> {
 			
 			String className = this.stringRepresentation.substring(2).replace('/', '.');
 			try {
-				this.classVal = Class.forName(className);
+				this.classVal = Reflection.getClassIncludingPrimitive(className);
 				this.compiled = true;
 				return this.classVal;
 			} catch (ClassNotFoundException e) {
