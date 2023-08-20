@@ -554,6 +554,14 @@
 
 默认值：`STANDARD`
 
+##### `allowSelectingDeadEntities`
+
+允许目标选择器`@e`选中死亡的实体
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `allowTargetingSpecialEntities`
 
 允许玩家将光标对准物品、雪球和箭矢等实体以获取相应的指令建议
@@ -711,6 +719,14 @@ TNT可以被玩家的攻击杀死
 ##### `disableChunkLoadingCheckInCommands`
 
 禁用指令中对方块是否被加载的检查
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `disableEnchantCommandRestriction`
+
+移除`/enchant`中对附魔等级与附魔兼容性的检查
 
 可能取值：`true`或`false`
 
@@ -1353,4 +1369,4 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 这个Mod最初是我在2021年2月为了研究实体运动而开发的，因此HUD、碰撞箱、工具物品与`/entityfield`是这个Mod最早的一批特性。后来，更多的特性在它们被用到时被引入
 
-在2022年4月后我加快了Mod的开发进度，添加了很多新特性并对一些旧特性进行了彻底的重构。截止到2023年8月20日，该Mod共添加了28条指令，68个选项和9个渲染器。
+在2022年4月后我加快了Mod的开发进度，添加了很多新特性并对一些旧特性进行了彻底的重构。截止到2023年8月20日，该Mod共添加了28条指令，70个选项和9个渲染器。

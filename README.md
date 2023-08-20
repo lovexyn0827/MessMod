@@ -554,6 +554,14 @@ Available values:
 
 Default value: `STANDARD`
 
+##### `allowSelectingDeadEntities`
+
+Allow entity selector `@e` dead entities.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `allowTargetingSpecialEntities`
 
 Allow the player to target entities like items, snowballs and arrows, enabling command suggestions for them.
@@ -711,6 +719,14 @@ Default value: `false`
 ##### `disableChunkLoadingCheckInCommands`
 
 As the name says, you can fill some blocks in unloaded chunks.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `disableEnchantCommandRestriction`
+
+Remove the restriction on enchantment level and compatibility from `/enchant`.
 
 Available values: `true` / `false`
 
@@ -1352,4 +1368,4 @@ Specify a regular expression matching the class (package name is optional) of se
 
 Initially, I started this mod in Feb 2021 to do some researches on the motion of entities, thus the HUDs, bounding box renderer, tool items and command `/entityfield` was the earliest features of this mod. Later, more features were introduced gradually if they were needed.
 
-After April 2022, I speeded up the development of the mod, much more features were added while many previously added ones was completely refactored. By 2023/08/20, 28 commands, 68 options (or rules) and 9 renderers had been available.
+After April 2022, I speeded up the development of the mod, much more features were added while many previously added ones was completely refactored. By 2023/08/20, 28 commands, 70 options (or rules) and 9 renderers had been available.
