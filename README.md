@@ -1291,7 +1291,7 @@ Display the loading state of chunks. Entity processing chunks, lazy load chunks 
 
 ## Accessing Paths
 
-See the wiki.
+See the [wiki](https://github.com/lovexyn0827/MessMod/wiki/Accessing-Path).
 
 ## Options In Entity Selectors
 

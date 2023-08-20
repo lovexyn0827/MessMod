@@ -1292,7 +1292,7 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 ## Accessing Path
 
-见Wiki。
+见[Wiki](https://github.com/lovexyn0827/MessMod/wiki/Accessing-Path_zh_cn)。
 
 ## 实体选择器选项
 
