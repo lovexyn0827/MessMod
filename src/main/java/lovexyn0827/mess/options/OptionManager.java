@@ -78,6 +78,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean allowSelectingDeadEntities;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean allowTargetingSpecialEntities;
 	
 	@Option(defaultValue = "false", 

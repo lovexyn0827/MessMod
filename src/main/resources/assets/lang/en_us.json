@@ -162,6 +162,7 @@
 		
 		//***** Options *****chunkLogAutoArchiving
 		"opt.accessingPathInitStrategy.desc" : "There are there initializing strategies available: \n- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances and so on, will be used to handle all subsequent inputs.\n- Standard strategy: Accessing paths are parsed for every different inputs, and the parsed copies are cached until the inputs are discarded by the garbage collector.\n- Strict Strategy: Accessing paths are reinitialized each time they are used.", 
+		"opt.allowSelectingDeadEntities.desc" : "Allow entity selector `@e` dead entities.", 
 		"opt.allowTargetingSpecialEntities.desc" : "Allow the player to target entities like items, snowballs and arrows, enabling command suggestions for them.",
 		"opt.antiHostCheating.desc" : "Enable anti-cheating for the host player in SP & LAN game.", 
 		"opt.attackableTnt.desc" : "TNT entities can be killed by players' attacking.", 

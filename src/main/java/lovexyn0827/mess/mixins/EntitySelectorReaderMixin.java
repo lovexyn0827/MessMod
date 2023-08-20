@@ -3,6 +3,7 @@ package lovexyn0827.mess.mixins;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntitySelectorInterface;
 import lovexyn0827.mess.fakes.EntitySelectorReaderInterface;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -131,5 +133,18 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	@Override
 	public Pattern getClassRegex() {
 		return classRegex;
+	}
+	
+	@Redirect(method = "readAtVariable", 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/command/EntitySelectorReader.predicate:Ljava/util/function/Predicate;", 
+					opcode = Opcodes.PUTFIELD
+			)
+	)
+	private void replaceIsAlive(EntitySelectorReader reader, Predicate<Entity> p0) {
+		if(!OptionManager.allowSelectingDeadEntities) {
+			this.predicate = p0;
+		}
 	}
 }
