@@ -15,6 +15,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.server.integrated.IntegratedServer;import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 
@@ -67,7 +70,8 @@ public abstract class MinecraftClientMixin {
 	)
 	private void preventAttackingInvalidEntitiesWhenNeeded(CallbackInfo ci) {
 		Entity e = ((EntityHitResult)this.crosshairTarget).getEntity();
-		if(OptionManager.allowTargetingSpecialEntities && (!e.isCollidable() || e.isSpectator())) {
+		if(OptionManager.allowTargetingSpecialEntities && (e instanceof ItemEntity 
+				|| e instanceof ExperienceOrbEntity || e instanceof PersistentProjectileEntity)) {
 			ci.cancel();
 		}
 	}
