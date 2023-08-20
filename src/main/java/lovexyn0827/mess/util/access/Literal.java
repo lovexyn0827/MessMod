@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
@@ -73,7 +72,7 @@ public abstract class Literal<T> {
 		// I & N are reserved for special floating-point numbers.
 		switch(strRep.charAt(0)) {
 		case '"' : 
-			return new StringL(new StringReader(strRep).readStringUntil('"') + '"');
+			return new StringL(strRep);
 		case 'E' : 
 			if(strRep.charAt(1) == '+') {
 				return new EnumL(strRep);
@@ -156,7 +155,7 @@ public abstract class Literal<T> {
 		
 		protected StringL(String strRep) {
 			super(strRep);
-			strRep.substring(1, strRep.length() - 2);
+			this.string = strRep.substring(1, strRep.length() - 1);
 			this.compiled = true;
 		}
 
