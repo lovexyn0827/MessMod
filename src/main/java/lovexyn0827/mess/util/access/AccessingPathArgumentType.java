@@ -109,6 +109,8 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					return new ComponentNode.Z();
 				case "identityHash" : 
 					return SimpleNode.IDENTITY_HASH;
+				case "class" :
+					return SimpleNode.CLASS;
 				case "size" : 
 					return new SizeNode();
 				default : 
