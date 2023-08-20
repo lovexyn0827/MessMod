@@ -153,6 +153,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean disableEnchantCommandRestriction;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean disableExplosionExposureCalculation;
 	
 	@Option(defaultValue = "false", 

@@ -180,6 +180,7 @@
 		"opt.debugStickSkipsInvaildState.desc" : "防止调试棒将方块调整到非法状态。目前这个选项在一些情况下不能正常工作，例如调整铁轨的shape属性时仍可以将其调整到非法状态使其掉落。", 
 		"opt.dedicatedServerCommands.desc" : "在单人游戏中启用专用于服务器的指令", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "禁用指令中对方块是否被加载的检查", 
+		"opt.disableEnchantCommandRestriction.desc" : "移除`/enchant`中对附魔等级与附魔兼容性的检查", 
 		"opt.disableExplosionExposureCalculation.desc" : "禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。\n在安装Lithium后可能不能正常工作。", 
 		"opt.disableProjectileRandomness.desc" : "取消弹射物的随机速度，用于部分测试，不过不要忘记关闭。", 
 		"opt.enabledTools.desc" : "启用或禁用工具物品。\n - 骨头：`/tick step <骨头数目>` \n - 红砖：`/tick freeze` \n - 下界合金锭：`/kill @e[type!=player]`", 

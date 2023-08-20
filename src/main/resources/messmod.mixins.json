@@ -50,7 +50,8 @@
     "BlockStateArgumentMixin", 
     "FillCommandMixin", 
     "RaidManagerAccessor", 
-    "DataCommandStorageAccessor"
+    "DataCommandStorageAccessor", 
+    "EnchantCommandMixin"
   ],
   "client": [
     "MinecraftClientMixin",
