@@ -459,6 +459,7 @@ public class OptionManager{
 				Object newValue;
 				OptionParser<?> parser = OptionParser.of(o);
 				try {
+					GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (n) -> o.defaultValue());
 					newValue = parser.tryParse((String) GLOBAL_OPTION_SERIALIZER.get(name));
 					f.set(null, newValue);
 				} catch (InvalidOptionException e) {

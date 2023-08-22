@@ -16,6 +16,12 @@
 		"cmd.general.dupname" : "The name has already been used.", 
 		"cmd.general.unsupported" : "This feature is not supported currently.", 
 		"cmd.general.nomatching" : "No matching item was found.", 
+		"cmd.general.autosub" : "Entity with type %s won't be subscribed automatically", 
+		"cmd.general.stopautosub" : "Entity with type %s won't be subscribed automatically", 
+		"cmd.general.autosubname" : "Entity with name %s will be subscribed automatically", 
+		"cmd.general.stopautosubname" : "Entity with name %s won't be subscribed automatically", 
+		"cmd.general.flush" : "Flushed all changes", 
+		"cmd.general.count" : "%d active subscribed entity in total", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 
@@ -42,13 +48,7 @@
 		"cmd.entitylog.usage" : "TODO", 
 		"cmd.entitylog.listen" : "Started listening to %s", 
 		"cmd.entitylog.unlisten" : "Stopped listening to %s", 
-		"cmd.general.autosub" : "Entity with type %s won't be subscribed automatically", 
-		"cmd.general.stopautosub" : "Entity with type %s won't be subscribed automatically", 
-		"cmd.general.autosubname" : "Entity with name %s will be subscribed automatically", 
-		"cmd.general.stopautosubname" : "Entity with name %s won't be subscribed automatically", 
-		"cmd.general.flush" : "Flushed all changes", 
-		"cmd.general.count" : "%d active subscribed entity in total", 
-		"cmd.general.reqidle" : "This action is only available when the logger is idle.", 
+		"cmd.entitylog.reqidle" : "This action is only available when the logger is idle.", 
 		
 		//***** exportsave *****
 		"cmd.exportsave.failexp" : "Failed to export the save.", 

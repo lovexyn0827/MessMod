@@ -1355,7 +1355,7 @@ Specify a regular expression matching the class (package name is optional) of se
 
 - Structure blocks can be seen when the player is very far from them, if the version of fabric-carpet is lower than 1.4.25.
 - Stacktrace will be printed when the Carpet Mod is not loaded. If the Carpet Mod is loaded, enabling the `superSecretSetting` has the same effect.
-- A warning screen is poped when trying to open a survival with MessMod installed for the firse time.
+- A warning screen is poped when trying to open a survival with MessMod installed for the first time.
 
 ## Notice
 
