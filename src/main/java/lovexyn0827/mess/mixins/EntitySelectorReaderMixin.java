@@ -32,6 +32,7 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	private Pattern typeRegex;
 	private Pattern nameRegex;
 	private Pattern classRegex;
+	private Class<?> clazz;
 
 	@Override
 	public void setIdRange(IntRange range) {
@@ -91,6 +92,10 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 				return false;
 			});
 		}
+		
+		if(this.clazz != null) {
+			this.predicate = this.predicate.and(this.clazz::isInstance);
+		}
 
 		EntitySelector selector = this.build();
 		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -146,5 +151,15 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 		if(!OptionManager.allowSelectingDeadEntities) {
 			this.predicate = p0;
 		}
+	}
+
+	@Override
+	public void setInstanceofClass(Class<?> cl) {
+		this.clazz = cl;
+	}
+
+	@Override
+	public Class<?> getInstanceofClass() {
+		return this.clazz;
 	}
 }

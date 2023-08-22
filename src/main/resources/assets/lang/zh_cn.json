@@ -248,6 +248,7 @@
 		"misc.cancelhotbarstorage" : "只能在选项hotbarLength的值为9时存取物品栏", 
 		"misc.protver.err" : "服务端上安装的MessMod的协议版本与您客户端上的不同，建议安装与服务端版本一致的MessMod。", 
 		"misc.warnsur.title" : "MessMod不适用于生存存档", 
-		"misc.warnsur.msg" : "该存档似乎还未被在安装有MessMod时打开过，若打开存档则可能会破坏原版游戏机制或造成意外作弊。是否继续加载生存存档？"
+		"misc.warnsur.msg" : "该存档似乎还未被在安装有MessMod时打开过，若打开存档则可能会破坏原版游戏机制或造成意外作弊。是否继续加载生存存档？", 
+		"misc.instanceof.desc" : "选取的实体的类的超类或所实现的接口（直接或间接地）的具体名称"
 	}
 }

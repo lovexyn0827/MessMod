@@ -248,6 +248,7 @@
 		"misc.cancelhotbarstorage" : "Hotbars can only be loaded/saved when the value of option hotbarLength is 9.", 
 		"misc.protver.err" : "The protcol version of the MessMod installed on the server is different from the one on your client,it is recommended to install MessMod with the same version as the server.", 
 		"misc.warnsur.title" : "MessMod Is Not For Survival", 
-		"misc.warnsur.msg" : "This save probably hasn't been opened with MessMod loaded before, and doing so may break vanilla mechanisms and result in accidental cheating. Procceed to open anyway?"
+		"misc.warnsur.msg" : "This save probably hasn't been opened with MessMod loaded before, and doing so may break vanilla mechanisms and result in accidental cheating. Procceed to open anyway?", 
+		"misc.instanceof.desc" : "A concrete class name of the super class or implemented (directly or indirectly) of the class of selected entities."
 	}
 }
