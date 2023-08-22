@@ -250,12 +250,11 @@ public final class ExportTask {
 	private boolean createArchive(String name, Path archive, Path temp)
 			throws IOException, FileNotFoundException {
 		MutableBoolean success = new MutableBoolean(true);
-		Path saveRoot = this.server.getSavePath(EXPORT_PATH);
 		String fn = name + "-" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
 		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive.resolve(fn).toFile()))) {
 			Files.walkFileTree(temp, new SimpleFileVisitor<Path>() {
 				public FileVisitResult visitFile(Path path, BasicFileAttributes attr) throws IOException {
-					String entryPath = saveRoot.relativize(path).toString().replace('\\', '/');
+					String entryPath = name + '/' + temp.relativize(path).toString().replace('\\', '/');
 					try {
 						zos.putNextEntry(new ZipEntry(entryPath));
 						zos.write(Files.readAllBytes(path));
