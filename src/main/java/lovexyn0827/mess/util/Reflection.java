@@ -161,15 +161,22 @@ public class Reflection {
 	 * @return A Field instance if the specified field exists in the given class or its super classes, null otherwise.
 	 */
 	@Nullable
-	public static Field getFieldFromNamed(Class<?> targetClass, String fieldName) {
+	public static Field getFieldFromNamed(Class<?> targetClass, @NotNull String fieldName) {
 		Mapping mapping = MessMod.INSTANCE.getMapping();
 		while(targetClass != null && targetClass != Object.class) {
 			String srg = mapping.srgField(targetClass.getName(), fieldName);
+			try {
+				return targetClass.getDeclaredField(fieldName);
+			} catch (NoSuchFieldException e) {
+			} catch (SecurityException e) {
+			}
+			
 			if(srg != null) {
 				try {
 					return targetClass.getDeclaredField(srg);
 				} catch (NoSuchFieldException e) {
-				} catch (SecurityException e) {}
+				} catch (SecurityException e) {
+				}
 			}
 			
 			targetClass = targetClass.getSuperclass();

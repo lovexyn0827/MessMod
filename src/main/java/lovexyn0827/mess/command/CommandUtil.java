@@ -104,10 +104,16 @@ public class CommandUtil {
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendError(new LiteralText(I18N.translate(ob.toString())));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 	
 	public static void errorWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
 		ct.getSource().sendError(new LiteralText(String.format(I18N.translate(fmt), args)));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 
 	public static void error(CommandContext<ServerCommandSource> ct, String string, Exception e) {
@@ -116,6 +122,7 @@ public class CommandUtil {
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
 		if(OptionManager.superSuperSecretSetting) {
 			e.printStackTrace();
+			Thread.dumpStack();
 		}
 	}
 	
@@ -125,6 +132,7 @@ public class CommandUtil {
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
 		if(OptionManager.superSuperSecretSetting) {
 			e.printStackTrace();
+			Thread.dumpStack();
 		}
 	}
 
