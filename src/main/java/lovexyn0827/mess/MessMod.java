@@ -8,14 +8,17 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.log.EntityLogger;
+import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
+import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.network.MessClientNetworkHandler;
 import lovexyn0827.mess.network.MessServerNetworkHandler;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
+import lovexyn0827.mess.rendering.ChunkLoadingInfoRenderer;
 import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
 import lovexyn0827.mess.rendering.ShapeCache;
 import lovexyn0827.mess.rendering.ShapeRenderer;
@@ -23,10 +26,11 @@ import lovexyn0827.mess.rendering.ShapeSender;
 import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
-import lovexyn0827.mess.util.BlockPlacementHistory;
-import lovexyn0827.mess.util.TickingPhase;
+import lovexyn0827.mess.util.access.CustomNode;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
+import lovexyn0827.mess.util.phase.ClientTickingPhase;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
@@ -34,6 +38,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.MessageType;
+import net.minecraft.network.NetworkSide;
 import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
@@ -50,6 +55,7 @@ public class MessMod implements ModInitializer {
 	private ClientHudManager hudManagerC;
 	private ServerHudManager hudManagerS;
 	private ServerSyncedBoxRenderer boxRenderer;
+	@Nullable
 	private MinecraftServer server;
 	private String scriptDir;
 	@Environment(EnvType.CLIENT)
@@ -58,15 +64,15 @@ public class MessMod implements ModInitializer {
 	public ShapeCache shapeCache;
 	public ShapeSender shapeSender;
 	private BlockInfoRenderer blockInfoRederer = new BlockInfoRenderer();
-	private EntityLogger logger;
+	private EntityLogger entityLogger;
 	@Environment(EnvType.CLIENT)
 	private MessClientNetworkHandler clientNetworkHandler;
 	private MessServerNetworkHandler serverNetworkHandler;
-	private BlockPlacementHistory placementHistory;
+	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
+	private ChunkBehaviorLogger chunkLogger;
+	private long gameTime;
 
 	private MessMod() {
-		this.boxRenderer = new ServerSyncedBoxRenderer();
-		this.logger = new EntityLogger();
 		this.reloadMapping();
 	}
 
@@ -89,7 +95,6 @@ public class MessMod implements ModInitializer {
 			Files.createDirectories(scriptPath);
 		}
 		
-		// TODO
 		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/" + name + ".sc"), 
 				Paths.get(this.scriptDir, name + ".sc"), 
 				StandardCopyOption.REPLACE_EXISTING);
@@ -105,11 +110,7 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer.tick();
 		this.blockInfoRederer.tick();
 		this.shapeSender.updateClientTime(server.getOverworld().getTime());
-		try {
-			this.logger.tick(server);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.entityLogger.serverTick();
 	}
 	
 
@@ -118,37 +119,48 @@ public class MessMod implements ModInitializer {
 		CommandUtil.updateServer(server);
 		OptionManager.updateServer(server);
 		this.serverNetworkHandler = new MessServerNetworkHandler(server);
-		this.shapeSender = ShapeSender.create(server);
-		this.boxRenderer.setServer(server);
+		this.boxRenderer = new ServerSyncedBoxRenderer(server);
 		this.blockInfoRederer.initializate(server);
 		this.hudManagerS = new ServerHudManager(server);
-		this.placementHistory = new BlockPlacementHistory();
-		try {
-			this.logger.initialize(server);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		CustomNode.reload(server);
+		this.chunkLoadingInfoRenderer = new ChunkLoadingInfoRenderer();
+		this.entityLogger = new EntityLogger(server);
+		this.shapeSender = ShapeSender.create(server);
+		this.chunkLogger = new ChunkBehaviorLogger(server);
 	}
 
 	public void onServerShutdown(MinecraftServer server) {
-		this.boxRenderer.uninitialize();
+		this.boxRenderer = null;
 		this.server = null;
-		this.logger.closeAll();
+		this.entityLogger.closeAll();
 		this.hudManagerS = null;
-		this.logger.closeAll();
+		this.entityLogger.closeAll();
 		this.serverNetworkHandler = null;
-		this.placementHistory = null;
-		TickingPhase.removeAllEvents();
+		this.chunkLoadingInfoRenderer.close();
+		this.chunkLoadingInfoRenderer = null;
+		ServerTickingPhase.initialize();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
-				this.logger.archiveLogs();
+				this.entityLogger.archiveLogs();
 			} catch (IOException e) {
 				LOGGER.error("Failed to archive entity logs!");
 				e.printStackTrace();
 			}
 		}
 		
+		if(OptionManager.chunkLogAutoArchiving) {
+			try {
+				this.chunkLogger.archiveLogs();
+			} catch (IOException e) {
+				LOGGER.error("Failed to archive entity logs!");
+				e.printStackTrace();
+			}
+		}
+		
+		this.entityLogger = null;
+		this.chunkLogger = null;
 		CommandUtil.updateServer(null);
+		OptionManager.loadGlobal();
 	}
 
 	public void onServerPlayerSpawned(ServerPlayerEntity player) {
@@ -193,8 +205,18 @@ public class MessMod implements ModInitializer {
 	}
 
 	@Environment(EnvType.CLIENT)
+	public void onClientTickStart() {
+		ClientTickingPhase.CLIENT_TICK_START.begin(null);
+	}
+
+	@Environment(EnvType.CLIENT)
 	public void onClientTicked() {
+		ClientTickingPhase.CLIENT_TICK_END.begin(null);
 		ServerHudManager shm = this.getServerHudManager();
+		if (this.entityLogger != null) {
+			this.entityLogger.clientTick();
+		}
+		
 		if(shm != null && shm.playerHudC != null) {
 			shm.playerHudC.updateData();
 		}
@@ -213,12 +235,16 @@ public class MessMod implements ModInitializer {
 	}
 
 	public void sendMessageToEveryone(Object... message) {
-		String merged = "";
-		for(Object ob : message) {
-			merged += ob;
+		if(this.server == null) {
+			throw new IllegalStateException("Called without a server started!");
 		}
 		
-		this.server.getPlayerManager().broadcast(new LiteralText(merged), 
+		StringBuilder sb = new StringBuilder();
+		for(Object ob : message) {
+			sb.append(ob);
+		}
+		
+		this.server.getPlayerManager().broadcast(new LiteralText(sb.toString()), 
 				MessageType.SYSTEM, 
 				new UUID(0x31f38bL,0x31f0b8L));
 	}
@@ -228,7 +254,7 @@ public class MessMod implements ModInitializer {
 	}
 	
 	public EntityLogger getEntityLogger() {
-		return this.logger;
+		return this.entityLogger;
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -267,12 +293,28 @@ public class MessMod implements ModInitializer {
 	public MessClientNetworkHandler getClientNetworkHandler() {
 		return this.clientNetworkHandler;
 	}
-
-	public BlockPlacementHistory getPlacementHistory() {
-		return this.placementHistory;
-	}
 	
 	public static boolean isDedicatedServerEnv() {
 		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
+	}
+
+	public boolean isOnThread(NetworkSide side) {
+		if(side == NetworkSide.CLIENTBOUND) {
+			return MinecraftClient.getInstance().isOnThread();
+		} else {
+			return this.server != null ? this.server.isOnThread() : false;
+		}
+	}
+
+	public ChunkBehaviorLogger getChunkLogger() {
+		return this.chunkLogger;
+	}
+
+	public long getGameTime() {
+		return this.gameTime;
+	}
+
+	public void updateTime(long time) {
+		this.gameTime = time;
 	}
 }

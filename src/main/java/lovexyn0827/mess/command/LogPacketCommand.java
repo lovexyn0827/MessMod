@@ -7,10 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import lovexyn0827.mess.MessMod;
@@ -23,55 +21,41 @@ import net.minecraft.network.Packet;
 import net.minecraft.server.command.ServerCommandSource;
 
 public class LogPacketCommand {
-	public static final Set<Class<?>> SUBSCRIBED_TYPES = Sets.newHashSet();
+	public static final Map<String, Class<?>> SUBSCRIBED_TYPES = Maps.newHashMap();
 	public static final Map<String, Class<?>> PACKET_TYPES = Maps.newHashMap();
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("logpacket").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("sub")
-						.then(argument("type", StringArgumentType.word())
-								.suggests((ct, b) -> {
-									PACKET_TYPES.keySet().forEach(b::suggest);
-									return b.buildFuture();
-								})
+						.then(argument("type", FilteredSetArgumentType.of(PACKET_TYPES.keySet(), (o) -> o))
 								.executes((ct) -> {
-									Class<?> type = PACKET_TYPES.get(StringArgumentType.getString(ct, "type"));
-									if(type != null) {
-										SUBSCRIBED_TYPES.add(type);
-									} else {
-										CommandUtil.errorWithArgs(ct, "cmd.general.nodef", 
-												StringArgumentType.getString(ct, "type"));
+									Set<String> classes = FilteredSetArgumentType.<String>getFiltered(ct, "type");
+									if(classes.isEmpty()) {
+										CommandUtil.error(ct, "cmd.general.nomatching");
+										return 0;
 									}
 									
+									classes.forEach((cn) -> SUBSCRIBED_TYPES.put(cn, PACKET_TYPES.get(cn)));
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.submulti", classes.size(), classes);
 									return Command.SINGLE_SUCCESS;
 								})))
 				.then(literal("unsub")
-						.then(argument("type", StringArgumentType.word())
-								.suggests((ct, b) -> {
-									SUBSCRIBED_TYPES.forEach((c) -> b.suggest(c.getSimpleName()));
-									return b.buildFuture();
-								})
+						.then(argument("type", FilteredSetArgumentType.of(PACKET_TYPES.keySet(), (o) -> o))
 								.executes((ct) -> {
-									Class<?> type = PACKET_TYPES.get(StringArgumentType.getString(ct, "type"));
-									if(type != null) {
-										SUBSCRIBED_TYPES.remove(type);
-									} else {
-										CommandUtil.errorWithArgs(ct, "cmd.general.nodef", 
-												StringArgumentType.getString(ct, "type"));
+									Set<String> classes = FilteredSetArgumentType.<String>getFiltered(ct, "type");
+									if(classes.isEmpty()) {
+										CommandUtil.error(ct, "cmd.general.nomatching");
+										return 0;
 									}
 									
+									classes.forEach(SUBSCRIBED_TYPES::remove);
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.unsubmulti", classes.size(), classes);
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
 	}
 
 	public static boolean isSubscribed(Packet<?> packet) {
-		for(Class<?> clazz : SUBSCRIBED_TYPES) {
-			if(clazz.isInstance(packet)) {
-				return true;
-			}
-		}
-		
-		return false;
+		return SUBSCRIBED_TYPES.values().contains(packet.getClass());
 	}
 	
 	static {

@@ -2,15 +2,16 @@ package lovexyn0827.mess.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import lovexyn0827.mess.log.EntityLogColumn;
+import lovexyn0827.mess.log.entity.EntityLogColumn;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 
 public class WrappedPath implements HudLine {
-	private final AccessingPath path;
-	private final String name;
+	protected final AccessingPath path;
+	protected final String name;
 
 	public WrappedPath(AccessingPath path, String name) {
 		this.path = path;
@@ -66,7 +67,7 @@ public class WrappedPath implements HudLine {
 			Object ob = this.path.access(in, in.getClass());
 			return ob != null ? ob.toString() : "null";
 		} catch (AccessingFailureException e) {
-			return e.cause.name();
+			return e.failureCause.name();
 		}
 	}
 
@@ -78,6 +79,11 @@ public class WrappedPath implements HudLine {
 	@Override
 	public String getName() {
 		return this.name;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("%s(%s)", this.name, this.path);
 	}
 
 	public static class Phased extends WrappedPath implements EntityLogColumn {
@@ -93,5 +99,9 @@ public class WrappedPath implements HudLine {
 			return this.phase;
 		}
 		
+		@Override
+		public String toString() {
+			return String.format("%s(%s@%s)", this.name, this.path, this.phase);
+		}
 	}
 }

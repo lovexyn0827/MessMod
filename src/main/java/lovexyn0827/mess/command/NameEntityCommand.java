@@ -22,6 +22,7 @@ public class NameEntityCommand {
 										e.setCustomName(new LiteralText(StringArgumentType.getString(ct, "name")));
 										e.setCustomNameVisible(true);
 									});
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);

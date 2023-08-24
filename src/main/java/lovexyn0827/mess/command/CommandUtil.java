@@ -56,11 +56,9 @@ public class CommandUtil {
 			noreplyPlayerSource = null;
 			commandManager = null;
 			firstPlayerJoined = false;
-			EntityConfigCommand.reset();
 			SetExplosionBlockCommand.reset();
-			LogMovementCommand.reset();
-			FreezeEntityCommand.reset();
 			LogPacketCommand.reset();
+			LazyLoadCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}
@@ -106,22 +104,36 @@ public class CommandUtil {
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendError(new LiteralText(I18N.translate(ob.toString())));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 	
 	public static void errorWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
 		ct.getSource().sendError(new LiteralText(String.format(I18N.translate(fmt), args)));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 
 	public static void error(CommandContext<ServerCommandSource> ct, String string, Exception e) {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(I18N.translate(string) + ": " + I18N.translate(e.getMessage()))
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
+		if(OptionManager.superSuperSecretSetting) {
+			e.printStackTrace();
+			Thread.dumpStack();
+		}
 	}
 	
 	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, @NotNull Exception e) {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(str == null ? "[null]" : str)
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
+		if(OptionManager.superSuperSecretSetting) {
+			e.printStackTrace();
+			Thread.dumpStack();
+		}
 	}
 
 	public static ServerCommandSource noreplySource() {
@@ -165,9 +177,19 @@ public class CommandUtil {
 				entity);
 	}
 	
-	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(String ... args) {
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(Object ... args) {
 		return (ct, builder) -> {
 			Stream.of(args)
+					.map(Object::toString)
+					.forEach(builder::suggest);
+			return builder.buildFuture();
+		};
+	}
+	
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<? extends Enum<?>> class1) {
+		return (ct, builder) -> {
+			Stream.of(class1.getEnumConstants())
+					.map(Enum::name)
 					.forEach(builder::suggest);
 			return builder.buildFuture();
 		};

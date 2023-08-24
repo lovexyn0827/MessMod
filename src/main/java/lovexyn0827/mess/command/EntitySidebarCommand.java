@@ -12,10 +12,12 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.data.SidebarDataSender;
 import lovexyn0827.mess.util.Reflection;
-import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
@@ -51,7 +53,7 @@ public class EntitySidebarCommand {
 									String name = StringArgumentType.getString(ct, "name");
 									SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 									if (sender.removeCustomLine(name)) {
-										CommandUtil.feedbackWithArgs(ct, "Removed the line named %s from the sidebar.", name);
+										CommandUtil.feedbackWithArgs(ct, "cmd.fixedentityhud.remove", name);
 										return Command.SINGLE_SUCCESS;
 									} else {
 										CommandUtil.error(ct, "cmd.general.notfound");
@@ -67,13 +69,14 @@ public class EntitySidebarCommand {
 		String name = StringArgumentType.getString(ct, "name");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
-			if (sender.addLine(e, field, name, TickingPhase.TICKED_ALL_WORLDS, AccessingPath.DUMMY)) {
+			if (sender.addLine(e, field, name, ServerTickingPhase.TICKED_ALL_WORLDS, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
+				CommandUtil.feedback(ct, "cmd.general.success");
+				return 0;
 			}
-			
-			return Command.SINGLE_SUCCESS;
 		} catch (TranslatableException e1) {
 			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
 			return 0;
@@ -84,16 +87,17 @@ public class EntitySidebarCommand {
 		Entity e = EntityArgumentType.getEntity(ct, "target");
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
-		TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
+		TickingPhase phase = TickingPhaseArgumentType.getPhase(ct, "whereToUpdate");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
 			if (sender.addLine(e, field, name, phase, AccessingPath.DUMMY)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
+				CommandUtil.feedback(ct, "cmd.general.success");
+				return 0;
 			}
-			
-			return Command.SINGLE_SUCCESS;
 		} catch (TranslatableException e1) {
 			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
 			return 0;
@@ -104,17 +108,18 @@ public class EntitySidebarCommand {
 		Entity e = EntityArgumentType.getEntity(ct, "target");
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
-		TickingPhase phase = TickingPhase.valueOf(StringArgumentType.getString(ct, "whereToUpdate"));
+		TickingPhase phase = TickingPhaseArgumentType.getPhase(ct, "whereToUpdate");
 		AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 		SidebarDataSender sender = MessMod.INSTANCE.getServerHudManager().sidebar;
 		try {
 			if (sender.addLine(e, field, name, phase, path)) {
 				CommandUtil.feedback(ct, "cmd.fixedentityhud.add");
+				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
+				CommandUtil.feedback(ct, "cmd.general.success");
+				return 0;
 			}
-			
-			return Command.SINGLE_SUCCESS;
 		} catch (TranslatableException e1) {
 			CommandUtil.errorRaw(ct, e1.getMessage(), e1);
 			return 0;

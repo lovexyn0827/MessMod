@@ -3,10 +3,10 @@ package lovexyn0827.mess.options;
 import lovexyn0827.mess.util.i18n.I18N;
 
 // Couldn't extend TranslatableException because it shouldn't be a RuntimeException
-public class InvaildOptionException extends Exception {
+public class InvalidOptionException extends Exception {
 	private Object[] args;
 
-	public InvaildOptionException(String string, Object ... args) {
+	public InvalidOptionException(String string, Object ... args) {
 		super(string);
 		this.args = args;
 	}

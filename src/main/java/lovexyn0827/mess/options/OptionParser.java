@@ -15,9 +15,9 @@ public interface OptionParser<T> {
 	/**
 	 * Translate a string representation of a value of an option to its runtime representation.
 	 * @return The runtime representation of {@code str}
-	 * @throws InvaildOptionException If the given string representation is not qualified.
+	 * @throws InvalidOptionException If the given string representation is not qualified.
 	 */
-	T tryParse(String str) throws InvaildOptionException;
+	T tryParse(String str) throws InvalidOptionException;
 	
 	/**
 	 * Translate a runtime representation of a value of an option to its string representation.
@@ -33,5 +33,14 @@ public interface OptionParser<T> {
 	@Nullable
 	default SuggestionProvider<ServerCommandSource> createSuggestions() {
 		return null;
+	}
+	
+	static OptionParser<?> of(Option o) {
+		try {
+			return o.parserClass().getConstructor().newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 }

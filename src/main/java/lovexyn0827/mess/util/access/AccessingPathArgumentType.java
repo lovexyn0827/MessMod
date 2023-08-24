@@ -12,6 +12,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.TranslatableException;
+import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.server.command.ServerCommandSource;
 
 public final class AccessingPathArgumentType implements ArgumentType<AccessingPath> {
@@ -54,7 +56,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			nodes.add(n);
 		}
 		
-		return new AccessingPath(nodes);
+		return new JavaAccessingPath(nodes, stringRepresentation);
 	}
 
 	@Nullable
@@ -83,6 +85,15 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			String nodeStr = sr.readStringUntil('>');
 			sr.skip();
 			return new ValueOfMapNode(Literal.parse(nodeStr));
+		} else if(sr.peek() == '>') {
+			sr.skip();
+			String nodeStr = sr.readStringUntil('.');
+			return new MapperNode(nodeStr);
+		} else if(sr.peek() == '(') {
+			sr.skip();
+			String nodeStr = sr.readStringUntil(')');
+			sr.skip();
+			return new ClassCastNode(nodeStr);
 		} else {
 			String nodeStr = sr.readStringUntil('.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
@@ -98,13 +109,24 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					return new ComponentNode.Z();
 				case "identityHash" : 
 					return SimpleNode.IDENTITY_HASH;
+				case "class" :
+					return SimpleNode.CLASS;
 				case "size" : 
 					return new SizeNode();
 				default : 
-					throw new TranslatableException("exp.unknownnode");
+					CustomNode node = CustomNode.create(nodeStr);
+					if(node != null) {
+						return node;
+					} else {
+						throw new TranslatableException("exp.unknownnode", nodeStr);
+					}
 				}
 			}
 		}
 	}
 
+	static {
+		ArgumentTypes.register("mess_accessing_path", AccessingPathArgumentType.class, 
+				new ConstantArgumentSerializer<AccessingPathArgumentType>(AccessingPathArgumentType::accessingPathArg));
+	}
 }

@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
@@ -19,7 +20,7 @@ public class RemoteShapeSender implements ShapeSender {
 
 	@Override
 	// Mode - Dimension - Space - Tag
-	public void addShape(Shape shape, RegistryKey<World> dim, ShapeSpace space) {
+	public void addShape(Shape shape, RegistryKey<World> dim, ShapeSpace space, ServerPlayerEntity player) {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		buffer.writeEnumConstant(UpdateMode.ADD_SHAPE);
 		buffer.writeIdentifier(dim.getValue());
@@ -27,11 +28,17 @@ public class RemoteShapeSender implements ShapeSender {
 		NbtCompound tag = new NbtCompound();
 		buffer.writeNbt(shape.toTag(tag));
 		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.SHAPE, buffer);
-		this.server.getPlayerManager().sendToDimension(packet, dim);
+		if(player == null) {
+			this.server.getPlayerManager().sendToDimension(packet, dim);
+		} else {
+			if(player.networkHandler != null) {
+				player.networkHandler.sendPacket(packet);
+			}
+		}
 	}
 
 	@Override
-	public void clearSpaceFromServer(ShapeSpace space) {
+	public void clearSpaceFromServer(ShapeSpace space, ServerPlayerEntity player) {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		buffer.writeEnumConstant(UpdateMode.CLEAR_SPACE);
 		buffer.writeString(space.name);

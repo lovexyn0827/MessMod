@@ -11,21 +11,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.mojang.brigadier.CommandDispatcher;
 
+import lovexyn0827.mess.command.AccessingPathCommand;
+import lovexyn0827.mess.command.CountEntitiesCommand;
 import lovexyn0827.mess.command.EnsureCommand;
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
+import lovexyn0827.mess.command.ExportSaveCommand;
 import lovexyn0827.mess.command.FreezeEntityCommand;
 import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LagCommand;
+import lovexyn0827.mess.command.LazyLoadCommand;
+import lovexyn0827.mess.command.LogChunkBehaviorCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.LogPacketCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
 import lovexyn0827.mess.command.MoveEntityCommand;
 import lovexyn0827.mess.command.NameEntityCommand;
+import lovexyn0827.mess.command.PartlyKillCommand;
 import lovexyn0827.mess.command.PoiCommand;
 import lovexyn0827.mess.command.RaycastCommand;
 import lovexyn0827.mess.command.RepeatCommand;
@@ -33,6 +39,7 @@ import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -66,14 +73,35 @@ public abstract class CommandMixin {
         LagCommand.register(this.dispatcher);
         FreezeEntityCommand.register(this.dispatcher);
         LogPacketCommand.register(this.dispatcher);
+        PartlyKillCommand.register(this.dispatcher);
+        AccessingPathCommand.register(this.dispatcher);
+        ExportSaveCommand.register(this.dispatcher);
+        LogChunkBehaviorCommand.register(this.dispatcher);
+        LazyLoadCommand.register(this.dispatcher);
+        CountEntitiesCommand.register(this.dispatcher);
     }
     
-    @Redirect(method = "execute", at = @At(
-    		value = "INVOKE",
-    		target = "org/apache/logging/log4j/Logger.isDebugEnabled()V", 
-    		remap = false),
-    		require = 0)
+    @Redirect(method = "execute", 
+    		at = @At(
+    				value = "INVOKE",
+    				target = "org/apache/logging/log4j/Logger.isDebugEnabled()V", 
+    				remap = false
+    		),
+    		require = 0
+    )
     private boolean alwaysOutputStackTrace(Logger l) {
     	return true;
+    }
+    
+    @Redirect(method = "<init>", 
+    		at = @At(
+    				value = "INVOKE", 
+    				target = "net/minecraft/server/command/CommandManager$RegistrationEnvironment."
+    						+ "isDedicated(Lnet/minecraft/server/command/CommandManager$RegistrationEnvironment;)Z"
+    		)
+    )
+    private boolean modifyDedicated(CommandManager.RegistrationEnvironment env) {
+    	return ((CommandManagerRegistrationEnvironmentAccessor)(Object) env).isDedicated() 
+    			|| OptionManager.dedicatedServerCommands;
     }
 }

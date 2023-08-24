@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.util.TickingPhase;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
 
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -17,7 +17,7 @@ import net.minecraft.server.MinecraftServer;
 public abstract class MinecraftServerMixin {
 	@Inject(method = "tick", at = @At(value = "RETURN"))
 	public void onTicked(BooleanSupplier bs, CallbackInfo ci) {
-		TickingPhase.TICKED_ALL_WORLDS.triggerEvents(null);
+		ServerTickingPhase.TICKED_ALL_WORLDS.begin(null);
 		MessMod.INSTANCE.onServerTicked((MinecraftServer)(Object) this);
 	}
 	
@@ -36,8 +36,13 @@ public abstract class MinecraftServerMixin {
 		MessMod.INSTANCE.onServerShutdown((MinecraftServer)(Object)this);
 	}
 	
-	@Inject(method = "runTasksTillTickEnd",at = @At(value = "RETURN"))
+	@Inject(method = "method_16208",at = @At(value = "HEAD"))
+	private void onAsyncTasksBegin(CallbackInfo ci) {
+		ServerTickingPhase.SERVER_TASKS.begin(null);
+	}
+	
+	@Inject(method = "method_16208",at = @At(value = "RETURN"))
 	private void onAsyncTasksExecuted(CallbackInfo ci) {
-		TickingPhase.SERVER_TASKS.triggerEvents(null);
+		ServerTickingPhase.REST.begin(null);
 	}
 }

@@ -26,7 +26,7 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 	}
 	
 	@Override
-	public List<T> tryParse(String str) throws InvaildOptionException {
+	public List<T> tryParse(String str) throws InvalidOptionException {
 		if(EMPTY_LIST.equals(str) || str.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -37,14 +37,14 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 			if(element != null) {
 				result.add(element);
 			} else {
-				throw new InvaildOptionException("cmd.general.nodef", elementStr);
+				throw new InvalidOptionException("cmd.general.nodef", elementStr);
 			}
 		}
 		
 		return result;
 	}
 
-	protected T parseElement(String elementStr) throws InvaildOptionException {
+	protected T parseElement(String elementStr) throws InvalidOptionException {
 		return this.elements.get(elementStr);
 	}
 
@@ -104,12 +104,12 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 		}
 		
 		@Override
-		public List<Either<Field, String>> tryParse(String str) throws InvaildOptionException {
+		public List<Either<Field, String>> tryParse(String str) throws InvalidOptionException {
 			return super.tryParse(str);
 		}
 		
 		@Override
-		protected Either<Field, String> parseElement(String elementStr) throws InvaildOptionException {
+		protected Either<Field, String> parseElement(String elementStr) throws InvalidOptionException {
 			if(MessMod.isDedicatedServerEnv()) {
 				return Either.right(elementStr);
 			} else {

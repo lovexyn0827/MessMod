@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
+import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
 import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
@@ -67,12 +68,12 @@ public class MessServerNetworkHandler {
 		});
 		register(Channels.UNDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				MessMod.INSTANCE.getPlacementHistory().undo(player);
+				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().undo();
 			}
 		});
 		register(Channels.REDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				MessMod.INSTANCE.getPlacementHistory().redo(player);
+				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
 			}
 		});
 	}

@@ -3,7 +3,6 @@ package lovexyn0827.mess.rendering.hud.data;
 import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
-
 import net.minecraft.entity.Entity;
 
 public interface HudLine{
@@ -12,7 +11,10 @@ public interface HudLine{
 	boolean canGetFrom(Entity entity);
 	String getName();
 	
-	public class Unknown implements HudLine, Comparable<HudLine> {
+	/**
+	 * Used on remote clients, to represent a custom field.
+	 */
+	public static final class Unknown implements HudLine, Comparable<HudLine> {
 		public final String name;
 		
 		Unknown(String name) {

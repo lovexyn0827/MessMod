@@ -9,7 +9,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.options.InvaildOptionException;
+import lovexyn0827.mess.options.InvalidOptionException;
 import lovexyn0827.mess.options.Option;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.options.OptionParser;
@@ -60,81 +60,83 @@ public class MessCfgCommand {
 							return Command.SINGLE_SUCCESS;
 						}));
 		OptionManager.OPTIONS.forEach((f) -> {
-			try {
-				Option o = f.getAnnotation(Option.class);
-				if(!OptionManager.isSupportedInCurrentEnv(o)) {
-					return;
-				}
-				
-				@SuppressWarnings("deprecation")
-				OptionParser<?> parser = o.parserClass().newInstance();
-				SuggestionProvider<ServerCommandSource> sp = parser.createSuggestions();
-				if(sp == null) {
-					sp = CommandUtil.immutableSuggestions(o.suggestions());
-				}
-				
-				command.then(literal(f.getName()).requires(CommandUtil.COMMAND_REQUMENT)
-						.executes((ct) -> {
-							MutableText text = new FormattedText(f.getName(), "a", false).asMutableText();
-							if(o.experimental()) {
-								text.append(new FormattedText("cmd.messcfg.exp", "rcl").asMutableText());
-							}
-							
-							text.append(new LiteralText("\n" + OptionManager.getDescription(f.getName()) + "\n").formatted(Formatting.GRAY));
-							String value = OptionManager.getString(f);
-							text.append(new FormattedText("cmd.messcfg.current", "f", true, value).asMutableText());
-							if(!o.defaultValue().equals(value)) {
-								text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
-							}
-							
-							text.append(new FormattedText("cmd.messcfg.global", "f", true, o.defaultValue()).asMutableText());
-							text.append(new FormattedText("cmd.messcfg.default", "f", true, o.defaultValue()).asMutableText());
-							ct.getSource().sendFeedback(text, false);
-							return Command.SINGLE_SUCCESS;
-						})
-						.then(argument("value", StringArgumentType.greedyString())
-								.suggests(sp)
-								.executes((ct) -> {
-									String value = StringArgumentType.getString(ct, "value");
-									if(o.globalOnly()) {
-										MutableText errMsg = new LiteralText(I18N.translate("cmd.messcfg.globalonly"))
-												.fillStyle(Style.EMPTY
-														.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, 
-																"/messcfg setGlobal " + f.getName() + ' ' + value)));
-										ct.getSource().sendError(errMsg);
-										return -1;
-									}
-									
-									try {
-										Object obj = parser.tryParse(value);
-										OptionManager.set(f, obj, ct);
+			Option o = f.getAnnotation(Option.class);
+			if(!OptionManager.isSupportedInCurrentEnv(o)) {
+				return;
+			}
+			
+			OptionParser<?> parser = OptionParser.of(o);
+			SuggestionProvider<ServerCommandSource> sp = parser.createSuggestions();
+			if(sp == null) {
+				sp = CommandUtil.immutableSuggestions((Object[]) o.suggestions());
+			}
+			
+			command.then(literal(f.getName()).requires(CommandUtil.COMMAND_REQUMENT)
+					.executes((ct) -> {
+						MutableText text = new FormattedText(f.getName(), "a", false).asMutableText();
+						if(o.experimental()) {
+							text.append(new FormattedText("cmd.messcfg.exp", "rcl").asMutableText());
+						}
+						
+						text.append(new LiteralText("\n" + OptionManager.getDescription(f.getName()) + "\n")
+								.formatted(Formatting.GRAY));
+						String value = OptionManager.getString(f);
+						text.append(new FormattedText("cmd.messcfg.current", "f", true, value).asMutableText());
+						if(!o.defaultValue().equals(value)) {
+							text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
+						}
+						
+						text.append(new FormattedText("cmd.messcfg.global", "f", true, o.defaultValue()).asMutableText());
+						text.append(new FormattedText("cmd.messcfg.default", "f", true, o.defaultValue()).asMutableText());
+						ct.getSource().sendFeedback(text, false);
+						return Command.SINGLE_SUCCESS;
+					})
+					.then(argument("value", StringArgumentType.greedyString())
+							.suggests(sp)
+							.executes((ct) -> {
+								String value = StringArgumentType.getString(ct, "value");
+								if(o.globalOnly()) {
+									MutableText errMsg = new LiteralText(I18N.translate("cmd.messcfg.globalonly", f.getName()))
+											.fillStyle(Style.EMPTY
+													.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, 
+															"/messcfg setGlobal " + f.getName() + ' ' + value)));
+									ct.getSource().sendError(errMsg);
+									return -1;
+								}
+								
+								try {
+									Object obj = parser.tryParse(value);
+									if(OptionManager.set(f, obj, ct)) {
 										CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.set", f.getName(), value);
 										return Command.SINGLE_SUCCESS;
-									} catch (InvaildOptionException e) {
-										CommandUtil.error(ct, e.getMessage());
-										return -1;
 									}
-								})));
-				command.then(literal("setGlobal").requires(CommandUtil.COMMAND_REQUMENT)
-						.then(literal(f.getName()).requires(CommandUtil.COMMAND_REQUMENT)
-								.then(argument("value", StringArgumentType.greedyString())
-										.suggests(sp)
-										.executes((ct) -> {
-											try {
-												String value = StringArgumentType.getString(ct, "value");
-												Object obj = parser.tryParse(value);
-												OptionManager.setGlobal(f, obj);
+									
+									return 0;
+								} catch (InvalidOptionException e) {
+									CommandUtil.error(ct, e.getMessage());
+									return -1;
+								}
+							})));
+			command.then(literal("setGlobal").requires(CommandUtil.COMMAND_REQUMENT)
+					.then(literal(f.getName()).requires(CommandUtil.COMMAND_REQUMENT)
+							.then(argument("value", StringArgumentType.greedyString())
+									.suggests(sp)
+									.executes((ct) -> {
+										try {
+											String value = StringArgumentType.getString(ct, "value");
+											Object obj = parser.tryParse(value);
+											if(OptionManager.setGlobal(f, obj)) {
 												CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.setglobal", f.getName(), value);
 												return Command.SINGLE_SUCCESS;
-											} catch (InvaildOptionException e) {
-												e.printStackTrace();
-												CommandUtil.error(ct, e.getMessage());
-												return -1;
 											}
-										}))));
-			} catch (InstantiationException | IllegalAccessException e1) {
-				e1.printStackTrace();
-			}
+											
+											return 0;
+										} catch (InvalidOptionException e) {
+											e.printStackTrace();
+											CommandUtil.error(ct, e.getMessage());
+											return -1;
+										}
+									}))));
 		});
 		dispatcher.register(command);
 	}

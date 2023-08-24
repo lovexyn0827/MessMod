@@ -70,7 +70,8 @@ public class RemoteShapeCache extends ShapeCache {
 					RegistryKey<World> dim = RegistryKey.of(Registry.WORLD_KEY, buffer.readIdentifier());
 					ShapeSpace space = new ShapeSpace(buffer.readString());
 					NbtCompound tag = buffer.readNbt();
-					this.getShapesInDimension(dim).computeIfAbsent(space, (s) -> Sets.newHashSet()).add(Shape.fromTag(tag));
+					this.getShapesInDimension(dim).computeIfAbsent(space, (s) -> Sets.newHashSet())
+							.add(Shape.fromTag(tag));
 					break;
 				case CLEAR_SPACE : 
 					ShapeSpace space2 = new ShapeSpace(buffer.readString());
@@ -88,7 +89,7 @@ public class RemoteShapeCache extends ShapeCache {
 		this.shapeHandler.close();
 	}
 	
-	protected class RemoteShapeTask implements Runnable {
+	protected static class RemoteShapeTask implements Runnable {
 		private final Runnable operation;
 
 		public RemoteShapeTask(Runnable runnable) {

@@ -20,7 +20,7 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 	/**
 	 * Example: "IN1,IN2,IN3", "IN1,,IN3", ",,IN5", "IN1,IN3,,IN5"
 	 */
-	public List<T> tryParse(String str) throws InvaildOptionException {
+	public List<T> tryParse(String str) throws InvalidOptionException {
 		if(EMPTY_LIST.equals(str) || str.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -32,7 +32,7 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 				if(i == 0 && i < splited.length - 1) {
 					T max = this.elements.get(splited[i + 1]);
 					if(max == null) {
-						throw new InvaildOptionException("cmd.general.nodef", splited[i + 1]);
+						throw new InvalidOptionException("cmd.general.nodef", splited[i + 1]);
 					}
 					
 					this.elements.values().stream().filter((e) -> e.compareTo(max) <= 0).forEach(result::add);
@@ -40,19 +40,19 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 				} else if (i == splited.length - 1 && i > 0) {
 					T min = this.elements.get(splited[i - 1]);
 					if(min == null) {
-						throw new InvaildOptionException("cmd.general.nodef", splited[i - 1]);
+						throw new InvalidOptionException("cmd.general.nodef", splited[i - 1]);
 					}
 					
 					this.elements.values().stream().filter((e) -> e.compareTo(min) >= 0).forEach(result::add);
 				} else if (i > 0 && i < splited.length - 1) {
 					T max = this.elements.get(splited[i + 1]);
 					if(max == null) {
-						throw new InvaildOptionException("cmd.general.nodef", splited[i + 1]);
+						throw new InvalidOptionException("cmd.general.nodef", splited[i + 1]);
 					}
 					
 					T min = this.elements.get(splited[i - 1]);
 					if(min == null) {
-						throw new InvaildOptionException("cmd.general.nodef", splited[i - 1]);
+						throw new InvalidOptionException("cmd.general.nodef", splited[i - 1]);
 					}
 
 					this.elements.values().stream()
@@ -65,7 +65,7 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 			} else {
 				T val = this.elements.get(splited[i]);
 				if(val == null) {
-					throw new InvaildOptionException("cmd.general.nodef", splited[i]);
+					throw new InvalidOptionException("cmd.general.nodef", splited[i]);
 				}
 				
 				result.add(val);
@@ -75,7 +75,7 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 		return result;
 	}
 	
-	public static class ChunkStatusRange extends RangeParser<ChunkStatusRange.ChunkStatusSorter> {
+	public static final class ChunkStatusRange extends RangeParser<ChunkStatusRange.ChunkStatusSorter> {
 		private static final ImmutableBiMap<String, ChunkStatusSorter> VANILLA_CHUNK_STATUSES;
 		
 		public ChunkStatusRange() {

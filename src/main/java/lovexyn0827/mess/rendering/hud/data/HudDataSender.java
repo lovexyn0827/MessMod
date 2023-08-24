@@ -25,11 +25,14 @@ public interface HudDataSender {
 	Collection<HudLine> getCustomLines();
 	
 	/**
-	 * @implNote Custom lines whose name is the same as the one of the names of in built-in lines and other custom
-	 *  lines should be rejected.
+	 * @implNote Custom lines whose name is the same as the one of the names of in built-in lines and one of the other
+	 *  custom lines should be rejected.
 	 */
 	default boolean addCustomLine(HudLine line) {
-		if(this.getCustomLines().contains(line) || BuiltinHudInfo.BY_TITLE.containsKey(line.getName())) {
+		boolean hasDuplication = this.getCustomLines().stream().anyMatch((l0) -> {
+			return l0.getName().equals(line.getName()) || l0.equals(line);
+		});
+		if(hasDuplication || BuiltinHudInfo.BY_TITLE.containsKey(line.getName())) {
 			return false;
 		} else {
 			this.getCustomLines().add(line);

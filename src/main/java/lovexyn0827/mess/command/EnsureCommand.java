@@ -20,17 +20,17 @@ public class EnsureCommand {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("ensure").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(argument("pos", BlockPosArgumentType.blockPos())
 						.executes((ct) -> {
-								BlockPos pos = BlockPosArgumentType.getBlockPos(ct, "pos");
-								World world = ct.getSource().getWorld();
-								BlockState state = world.getBlockState(pos);
-								BlockEntity be = world.getBlockEntity(pos);
-								String posStr = "(" + pos.getX() + "," + pos.getY() + "," + pos.getZ() + ")";
-								CommandUtil.feedbackWithArgs(ct, "cmd.ensure.blockat", posStr, state);
-								if(be != null) {
-									CommandUtil.feedbackWithArgs(ct, "cmd.ensure.be", BlockEntityType.getId(be.getType()));
-								}
-								
-								return Command.SINGLE_SUCCESS;
+							BlockPos pos = BlockPosArgumentType.getBlockPos(ct, "pos");
+							World world = ct.getSource().getWorld();
+							BlockState state = world.getBlockState(pos);
+							BlockEntity be = world.getBlockEntity(pos);
+							String posStr = "(" + pos.getX() + "," + pos.getY() + "," + pos.getZ() + ")";
+							CommandUtil.feedbackWithArgs(ct, "cmd.ensure.blockat", posStr, state);
+							if(be != null) {
+								CommandUtil.feedbackWithArgs(ct, "cmd.ensure.be", BlockEntityType.getId(be.getType()));
+							}
+							
+							return Command.SINGLE_SUCCESS;
 						}));
 		dispatcher.register(command);
 	}

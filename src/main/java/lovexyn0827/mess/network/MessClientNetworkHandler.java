@@ -61,8 +61,8 @@ public class MessClientNetworkHandler {
 		this.send(packet);
 	}
 
-	private static void register(Identifier hud, PacketHandler handler) {
-		PACKET_HANDLERS.put(hud, handler);
+	private static void register(Identifier id, PacketHandler handler) {
+		PACKET_HANDLERS.put(id, handler);
 	}
 	
 	static {

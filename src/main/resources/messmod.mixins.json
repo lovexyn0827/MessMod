@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "lovexyn0827.mess.mixins",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "lovexyn0827.mess.MessModMixinPlugin",
   "mixins": [
     "MinecraftServerMixin",
     "CommandMixin",
@@ -34,7 +35,23 @@
     "PistonExtensionBlockMixin", 
     "PlayerInventoryMixin_Server", 
     "ClientConnectionMixin", 
-    "NetworkStateAccessor"
+    "NetworkStateAccessor", 
+    "MinecartItemMixin", 
+    "SpawnEggItemMixin", 
+    "MinecraftServerAccessor", 
+    "ServerCommandSourceAccessor", 
+    "RegionBasedStorageAccessor", 
+    "CommandManagerRegistrationEnvironmentAccessor", 
+    "EntityPredicatesMixin", 
+    "ThreadedAnvilChunkStorageMixin", 
+    "ServerChunkManagerMixin", 
+    "FletchingTableBlockMixin", 
+    "ServerPlayerEntityMixin", 
+    "BlockStateArgumentMixin", 
+    "FillCommandMixin", 
+    "RaidManagerAccessor", 
+    "DataCommandStorageAccessor", 
+    "EnchantCommandMixin"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -52,7 +69,10 @@
     "WorldListWidgetEntryAccessor", 
     "InGameHudMixin", 
     "PlayerInventoryMixin_Client", 
-    "CreativeInventoryScreenMixin"
+    "CreativeInventoryScreenMixin", 
+    "StructureBlockBlockEntityMixin", 
+    "GameRendererMixin", 
+    "WorldListWidgetEntryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

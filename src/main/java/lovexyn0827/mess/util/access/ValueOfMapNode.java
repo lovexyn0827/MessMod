@@ -3,13 +3,19 @@ package lovexyn0827.mess.util.access;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
+import com.google.common.collect.ImmutableMap;
 import lovexyn0827.mess.util.Reflection;
 
-class ValueOfMapNode extends Node {
-
+final class ValueOfMapNode extends Node {
 	private Literal<?> keyLiteral;
 	private Object key;
+	private Type keyType;
+	private Type valueType;
 	
 	ValueOfMapNode(Literal<?> key) {
 		this.keyLiteral = key;
@@ -22,10 +28,10 @@ class ValueOfMapNode extends Node {
 			if(m.containsKey(this.key)) {
 				return m.get(this.key);
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.NO_KEY, this);
+				throw AccessingFailureException.create(FailureCause.NO_KEY, this);
 			}
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NOT_MAP, this);
+			throw AccessingFailureException.createWithArgs(FailureCause.NOT_MAP, this, null, this);
 		}
 	}
 	
@@ -46,7 +52,7 @@ class ValueOfMapNode extends Node {
 		
 		ValueOfMapNode other = (ValueOfMapNode) obj;
 		return this.key.equals(other.key) 
-				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType));
+				&& (this.outputType == null ? other.outputType == null : this.outputType.equals(other.outputType));
 	}
 	
 	@Override
@@ -63,36 +69,40 @@ class ValueOfMapNode extends Node {
 	boolean canFollow(Node n) {
 		return Map.class.isAssignableFrom(Reflection.getRawType(n.outputType));
 	}
-
+	
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException {
+	void initialize(Type lastOutType) throws AccessingFailureException {
 		if(lastOutType instanceof ParameterizedType) {
 			ParameterizedType pt = ((ParameterizedType) lastOutType);
 			Class<?> lastCl = Reflection.getRawType(lastOutType);
 			if(isObject2PrimitiveMap(lastCl, pt.getActualTypeArguments().length)) {
-				Type keyType = pt.getActualTypeArguments()[0];
-				this.key = this.keyLiteral.get(keyType);
-				Type valType = void.class;
-				this.outputType = valType;
-				return valType;
+				this.keyType = pt.getActualTypeArguments()[0];
+				this.valueType = null;
 			} else if(isPrimitive2ObjectMap(lastCl, pt.getActualTypeArguments().length)){
-				Type keyType = void.class;
-				this.key = this.keyLiteral.get(keyType);
-				Type valType = pt.getActualTypeArguments()[0];
-				this.outputType = valType;
-				return valType;
+				this.keyType = null;
+				this.valueType = pt.getActualTypeArguments()[0];
 			} else {
-				Type keyType = pt.getActualTypeArguments()[0];
-				this.key = this.keyLiteral.get(keyType);
-				Type valType = ((ParameterizedType) lastOutType).getActualTypeArguments()[1];
-				this.outputType = valType;
-				return valType;
+				this.keyType = pt.getActualTypeArguments()[0];
+				this.valueType = ((ParameterizedType) lastOutType).getActualTypeArguments()[1];
 			}
 		} else {
-			this.key = this.keyLiteral.get(Object.class);
-			this.outputType = Object.class;
-			return Object.class;
+			this.keyType = Object.class;
+			this.valueType = Object.class;
 		}
+		
+		this.inputType = this.keyType;
+		try {
+			this.key = this.keyLiteral.get(keyType);
+		} catch (InvalidLiteralException e) {
+			throw AccessingFailureException.create(e, this);
+		}
+		
+		super.initialize(lastOutType);
+	}
+
+	@Override
+	protected Type resolveOutputType(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
+		return this.valueType;
 	}
 	
 	private static boolean isFastutilClass(Class<?> cl) {
@@ -119,5 +129,57 @@ class ValueOfMapNode extends Node {
 		ValueOfMapNode node = new ValueOfMapNode(this.keyLiteral.recreate());
 		node.ordinary = this.ordinary;
 		return node;
+	}
+	
+	@Override
+	boolean isWrittable() {
+		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	void write(Object writeTo, Object newValue) throws AccessingFailureException {
+		if(ImmutableMap.class.isAssignableFrom(Reflection.getRawType(inputType))) {
+			throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
+		} else {
+			if(writeTo instanceof Map) {
+				@SuppressWarnings("rawtypes")
+				Map m = (Map) writeTo;
+				boolean keyTypeMatched = (this.keyType == void.class || this.key == null) ? true : 
+						Reflection.getRawType(this.keyType).isAssignableFrom(this.key.getClass());
+				boolean valTypeMatched = (this.outputType == void.class || newValue == null) ? true : 
+						Reflection.getRawType(this.outputType).isAssignableFrom(newValue.getClass());
+				if(keyTypeMatched && valTypeMatched) {
+					try {
+						m.put(this.key, newValue);
+					} catch (UnsupportedOperationException e) {
+						throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
+					}
+				} else {
+					throw AccessingFailureException.createWithArgs(
+							FailureCause.INV_LAST, this, null, this);
+				}
+			} else {
+				throw AccessingFailureException.createWithArgs(FailureCause.NOT_MAP, this, null, this);
+			}
+		}
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		return (ctx) -> {
+			InsnList insns = new InsnList();
+			if(Map.class.isAssignableFrom(ctx.getLastOutputClass())) {
+				insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "java/util/Map"));
+				BytecodeHelper.appendConstantLoader(ctx, insns, keyLiteral, Reflection.getRawType(this.keyType));
+				insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/Map", 
+						"get", "(Ljava/lang/Object;)Ljava/lang/Object;"));
+			} else {
+				throw new CompilationException(FailureCause.NOT_MAP, this);
+			};
+			
+			ctx.endNode(this.valueType);
+			return insns;
+		};
 	}
 }

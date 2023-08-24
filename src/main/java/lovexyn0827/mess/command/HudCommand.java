@@ -38,8 +38,10 @@ public class HudCommand {
 													EntityType<?> type = Registry.ENTITY_TYPE
 															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 													Class<?> cl = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
+													String field = StringArgumentType.getString(ct, "field");
 													MessMod.INSTANCE.getServerHudManager().lookingHud
-															.addField(cl, StringArgumentType.getString(ct, "field"));
+															.addField(cl, field);
+													CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 													return Command.SINGLE_SUCCESS;
 												})
 												.then(argument("name", StringArgumentType.word())
@@ -52,12 +54,12 @@ public class HudCommand {
 															try {
 																MessMod.INSTANCE.getServerHudManager().lookingHud.addField(cl, field, name, null);
 																CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
+																return Command.SINGLE_SUCCESS;
 															} catch (Exception e) {
 																e.printStackTrace();
 																CommandUtil.errorRaw(ct, e.getMessage(), e);
+																return 0;
 															}
-															
-															return Command.SINGLE_SUCCESS;
 														})
 														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 																.executes((ct) -> {
@@ -70,12 +72,12 @@ public class HudCommand {
 																	try {
 																		MessMod.INSTANCE.getServerHudManager().lookingHud.addField(cl, field, name, path);
 																		CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
+																		return Command.SINGLE_SUCCESS;
 																	} catch (Exception e) {
 																		e.printStackTrace();
 																		CommandUtil.errorRaw(ct, e.getMessage(), e);
+																		return 0;
 																	}
-																	
-																	return Command.SINGLE_SUCCESS;
 																}))))))
 						.then(literal("client").requires((s) -> !MessMod.isDedicatedEnv())
 								.then(argument("field", StringArgumentType.word())
@@ -169,7 +171,12 @@ public class HudCommand {
 	
 	private static void unsubscribe(HudDataSender lookingHud, CommandContext<ServerCommandSource> ct) {
 		String name = StringArgumentType.getString(ct, "name");
-		lookingHud.removeCustomLine(name);
+		if(lookingHud.removeCustomLine(name)) {
+			CommandUtil.feedback(ct, "cmd.general.success");
+		} else {
+
+			CommandUtil.errorWithArgs(ct, "cmd.general.nodef", name);
+		}
 	}
 
 	private static void addListenedWithNameAndPath(CommandContext<ServerCommandSource> ct, PlayerHudDataSender playerHudS, Class<?> cl) {
@@ -178,6 +185,8 @@ public class HudCommand {
 		AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 		if(!playerHudS.addField(cl, field, name, path)) {
 			CommandUtil.error(ct, "exp.dupfield");
+		} else {
+			CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
 		}
 	}
 	
@@ -186,6 +195,8 @@ public class HudCommand {
 		String name = StringArgumentType.getString(ct, "name");
 		if(!playerHudC.addField(cl, field, name, null)) {
 			CommandUtil.error(ct, "exp.dupfield");
+		} else {
+			CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 		}
 	}
 	
@@ -193,6 +204,8 @@ public class HudCommand {
 		String field = StringArgumentType.getString(ct, "field");
 		if(!playerHudC.addField(cl, field)) {
 			CommandUtil.error(ct, "exp.dupfield");
+		} else {
+			CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 		}
 	}
 

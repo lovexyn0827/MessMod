@@ -3,11 +3,12 @@ package lovexyn0827.mess.util;
 import java.lang.reflect.Field;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.log.EntityLogColumn;
+import lovexyn0827.mess.log.entity.EntityLogColumn;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 
 public class ListenedField implements HudLine, Comparable<HudLine> {
@@ -65,7 +66,11 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 			return true;
 		}
 		
-		if(obj instanceof ListenedField) {
+		if(obj == null) {
+			return false;
+		}
+		
+		if(obj.getClass() == ListenedField.class) {
 			ListenedField other = (ListenedField) obj;
 			return this.field.equals(other.field)
 					&& this.path.equals(other.path);
@@ -107,6 +112,10 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 		public boolean equals(Object obj) {
 			if(this == obj) {
 				return true;
+			}
+			
+			if(obj == null) {
+				return false;
 			}
 			
 			if(obj instanceof Phased) {

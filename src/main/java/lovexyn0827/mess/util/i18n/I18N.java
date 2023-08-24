@@ -30,8 +30,8 @@ public class I18N {
 	
 	@SuppressWarnings("resource")
 	public static boolean setLanguage(String name, boolean forceLoad) {
-		// FIXME Loading fails in some environments
 		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {
+			forceLoad = true;
 			if (!MessMod.isDedicatedEnv() && MinecraftClient.getInstance().options != null) {
 				String sysLang = MinecraftClient.getInstance().options.language;
 				if (I18N.SUPPORTED_LANGUAGES.contains(sysLang)) {

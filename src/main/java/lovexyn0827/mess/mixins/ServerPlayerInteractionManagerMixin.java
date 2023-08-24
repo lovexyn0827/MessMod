@@ -7,11 +7,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.BlockPlacementHistory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
@@ -31,9 +32,9 @@ public class ServerPlayerInteractionManagerMixin {
 	private void recordBreaking(BlockPos pos, CallbackInfoReturnable<Boolean> ci, BlockState blockState, 
 			BlockEntity blockEntity, Block block, boolean bl) {
 		if(OptionManager.blockPlacementHistory) {
-			BlockPlacementHistory history = MessMod.INSTANCE.getPlacementHistory();
+			BlockPlacementHistory history = ((ServerPlayerEntityInterface) this.player).getBlockPlacementHistory();
 			if(history != null) {
-				history.push(this.player, pos, blockState, player.world.getBlockState(pos));
+				history.pushSingle(pos, blockState, Blocks.AIR.getDefaultState(), blockEntity);
 			}
 		}
 	}

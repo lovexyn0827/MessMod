@@ -4,6 +4,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Set;
 
 import com.mojang.brigadier.Command;
@@ -20,11 +21,12 @@ import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
+import lovexyn0827.mess.util.access.InvalidLiteralException;
+import lovexyn0827.mess.util.access.Literal;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.Vec3d;
 
 public class EntityFieldCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -47,31 +49,56 @@ public class EntityFieldCommand {
 										AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 										return getField(ct, path);
 									} catch (TranslatableException e) {
-										e.printStackTrace();
 										ct.getSource().sendError(new LiteralText(e.getMessage()));
 										return 0;
 									}
 								})));
 		
 		ArgumentBuilder<ServerCommandSource, ?> modify = literal("modify")
-				.requires((source)->source.hasPermissionLevel(1))
+				.requires((source) -> source.hasPermissionLevel(1))
 				.then(argument("fieldName",StringArgumentType.string()).suggests(suggests)
 						.then(argument("newValue",StringArgumentType.string())
 								.executes((ct)->{
 									try {
-										modifyField(EntityArgumentType.getEntity(ct, "target"),
+										if(modifyField(EntityArgumentType.getEntity(ct, "target"),
 												StringArgumentType.getString(ct, "fieldName"),
-												StringArgumentType.getString(ct, "newValue"));
-										CommandUtil.feedback(ct, "cmd.entityfield.modify.success");
-										return 1;
+												StringArgumentType.getString(ct, "newValue"), 
+												null, 
+												ct)) {
+											CommandUtil.feedback(ct, "cmd.entityfield.modify.success");
+											return Command.SINGLE_SUCCESS;
+										}
+										
+										return 0;
 									} catch (Exception e) {
 										CommandUtil.error(ct, "cmd.entityfield.modify.failure", e);
 										return -1;
 									}
-								})));
+								})
+								.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+										.executes((ct)->{
+											try {
+												if(modifyField(EntityArgumentType.getEntity(ct, "target"),
+														StringArgumentType.getString(ct, "fieldName"),
+														StringArgumentType.getString(ct, "newValue"), 
+														AccessingPathArgumentType.getAccessingPath(ct, "path"), 
+														ct)) {
+													CommandUtil.feedback(ct, "cmd.entityfield.modify.success");
+													return Command.SINGLE_SUCCESS;
+												}
+												
+												return 0;
+											} catch (TranslatableException e) {
+												ct.getSource().sendError(new LiteralText(e.getMessage()));
+												return 0;
+											} catch (Exception e) {
+												CommandUtil.error(ct, "cmd.entityfield.modify.failure", e);
+												return 0;
+											}
+										}))));
 		
 		ArgumentBuilder<ServerCommandSource, ?> listAll = literal("listAvailableFields")
-				.executes((ct)->{
+				.executes((ct) -> {
 					Set<String> fieldSet;
 					try {
 						fieldSet = Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass());
@@ -132,36 +159,48 @@ public class EntityFieldCommand {
 		}
 	}
 
-	private static boolean modifyField(Entity entity, String fieldName, String newValue) throws NumberFormatException, IllegalArgumentException, IllegalAccessException {
-		Field field = Reflection.getFieldFromNamed(entity.getClass(), fieldName);
-		if(field == null) {
-			throw new IllegalArgumentException("cmd.entityfield.nosuchfield");
-		}
-
-		field.setAccessible(true);
-		Class<?> type = field.getType();
-		if(type == Integer.TYPE) {
-			field.set(entity, Integer.parseInt(newValue));
-		} else if (type == Float.TYPE) {
-			field.set(entity, Float.parseFloat(newValue));
-		} else if (type == Double.TYPE) {
-			field.set(entity, Double.parseDouble(newValue));
-		} else if (type == String.class) {
-			field.set(entity, newValue);
-		} else if (type == Vec3d.class) {
-			String[] subVals = newValue.split(",");
-			if(subVals.length != 3) throw new IllegalArgumentException("cmd.entityfield.modify.vectorsyntax");
-			Vec3d vec3d = new Vec3d(Double.parseDouble(subVals[0]),
-					Double.parseDouble(subVals[1]),
-					Double.parseDouble(subVals[2]));
-			field.set(entity, vec3d);
-		} else if (type == Boolean.TYPE){
-			if((!newValue.equals("true")) && (!newValue.equals("false"))) throw new IllegalArgumentException("Use true or false");
-			field.set(entity, Boolean.parseBoolean(newValue));
+	private static boolean modifyField(Entity entity, String fieldName, String newValue, AccessingPath path, 
+			CommandContext<ServerCommandSource> ct) 
+			throws IllegalAccessException, CommandSyntaxException, AccessingFailureException {
+		Object obj;
+		Type type;
+		if("-THIS-".equals(fieldName)) {
+			obj = entity;
+			type = entity.getClass();
 		} else {
-			throw new IllegalArgumentException("cmd.entityfield.modify.unsupported");
+			Field field = Reflection.getFieldFromNamed(entity.getClass(), fieldName);
+			if(field == null) {
+				throw new IllegalArgumentException("cmd.entityfield.nosuchfield");
+			}
+
+			field.setAccessible(true);
+			if(path == null) {
+				try {
+					field.set(entity, Literal.parse(newValue).get(field.getGenericType()));
+				} catch (InvalidLiteralException e) {
+					String msg = e.getMessage();
+					CommandUtil.error(ct, msg == null ? "~null~" : msg, e);
+					return false;
+				} catch (IllegalArgumentException e) {
+					CommandUtil.errorWithArgs(ct, "cmd.entityfield.modify.dismatch", 
+							field.getType().getCanonicalName());
+					return false;
+				}
+				
+				return true;
+			} else {
+				obj = field.get(entity);
+				type = field.getGenericType();
+			}
+			
 		}
 		
-		return true;
+		try {
+			path.write(obj, type, newValue);
+			return true;
+		} catch (AccessingFailureException e) {
+			CommandUtil.errorRaw(ct, e.getMessage(), e);
+			return false;
+		}
 	}
 }

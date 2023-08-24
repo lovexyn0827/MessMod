@@ -1,18 +1,24 @@
 package lovexyn0827.mess.mixins;
 
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntitySelectorInterface;
 import lovexyn0827.mess.fakes.EntitySelectorReaderInterface;
+import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.predicate.NumberRange.IntRange;
 
@@ -22,6 +28,10 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	private Predicate<Entity> predicate;
 	private IntRange idRange;
 	private NetworkSide side;
+	private Pattern typeRegex;
+	private Pattern nameRegex;
+	private Pattern classRegex;
+	private Class<?> clazz;
 
 	@Override
 	public void setIdRange(IntRange range) {
@@ -52,6 +62,39 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 		if(this.idRange != null) {
 			this.predicate = this.predicate.and((e) -> this.idRange.test(e.getId()));
 		}
+		
+		if(this.typeRegex != null) {
+			this.predicate = this.predicate.and((e) -> {
+				return this.typeRegex.matcher(EntityType.getId(e.getType()).toString()).matches();
+			});
+		}
+		
+		if(this.nameRegex != null) {
+			this.predicate = this.predicate.and((e) -> {
+				return this.nameRegex.matcher(e.getName().getString()).matches();
+			});
+		}
+		
+		if(this.classRegex != null) {
+			this.predicate = this.predicate.and((e) -> {
+				Class<?> clazz = e.getClass();
+				Mapping mapping = MessMod.INSTANCE.getMapping();
+				for(; clazz != Object.class; clazz = clazz.getSuperclass()) {
+					String canonicalName = mapping.namedClass(clazz.getCanonicalName());
+					String simpleName = mapping.simpleNamedClass(clazz.getCanonicalName());
+					if(this.classRegex.matcher(canonicalName.substring(canonicalName.lastIndexOf('.'))).matches()
+							|| this.classRegex.matcher(simpleName).matches()) {
+						return true;
+					}
+				}
+				
+				return false;
+			});
+		}
+		
+		if(this.clazz != null) {
+			this.predicate = this.predicate.and(this.clazz::isInstance);
+		}
 
 		EntitySelector selector = this.build();
 		if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
@@ -64,5 +107,58 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	@Shadow
 	private EntitySelector build() {
 		throw new AssertionError();
+	}
+
+	@Override
+	public void setTypeRegex(Pattern typeRegex) {
+		this.typeRegex = typeRegex;
+	}
+
+	@Override
+	public Pattern getTypeRegex() {
+		return this.typeRegex;
+	}
+
+	@Override
+	public void setNameRegex(Pattern nameRegex) {
+		this.nameRegex = nameRegex;
+	}
+
+	@Override
+	public Pattern getNameRegex() {
+		return this.nameRegex;
+	}
+
+	@Override
+	public void setClassRegex(Pattern classRegex) {
+		this.classRegex = classRegex;
+	}
+
+	@Override
+	public Pattern getClassRegex() {
+		return classRegex;
+	}
+	
+	@Redirect(method = "readAtVariable", 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/command/EntitySelectorReader.predicate:Ljava/util/function/Predicate;", 
+					opcode = Opcodes.PUTFIELD
+			)
+	)
+	private void replaceIsAlive(EntitySelectorReader reader, Predicate<Entity> p0) {
+		if(!OptionManager.allowSelectingDeadEntities) {
+			this.predicate = p0;
+		}
+	}
+
+	@Override
+	public void setInstanceofClass(Class<?> cl) {
+		this.clazz = cl;
+	}
+
+	@Override
+	public Class<?> getInstanceofClass() {
+		return this.clazz;
 	}
 }
