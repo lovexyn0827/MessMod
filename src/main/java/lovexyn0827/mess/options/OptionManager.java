@@ -383,8 +383,12 @@ public class OptionManager{
 						CustomAction behavior = 
 								CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
 						if(behavior != null) {
-							// Exceptions are not handled as the value is guaranteed to be valid.
-							behavior.onOptionUpdate(oldVal, newVal, null);
+							// Exceptions are handled as the value may be invalid due to the absence of Carpet.
+							try {
+								behavior.onOptionUpdate(oldVal, newVal, null);
+							} catch (InvalidOptionException e1) {
+								MessMod.LOGGER.warn("Failed to load option {}: {}", name, e1.getLocalizedMessage());
+							}
 						}
 					} catch (IllegalArgumentException | IllegalAccessException | InvalidOptionException e1) {
 						e1.printStackTrace();
@@ -704,7 +708,8 @@ public class OptionManager{
 		registerCustomApplicationBehavior("entityExplosionInfluence", checkLithium);
 		registerCustomApplicationBehavior("disableExplosionExposureCalculation", checkLithium);
 		CustomAction requireCarpet = (oldVal, newVal, ct) -> {
-			if (!FabricLoader.getInstance().isModLoaded("carpet") && (Boolean) newVal) {
+			if (!FabricLoader.getInstance().isModLoaded("carpet") 
+					&& (!(newVal instanceof Boolean) || (Boolean) newVal)) {
 				throw new InvalidOptionException("opt.err.reqcarpet");
 			}
 		};
