@@ -29,8 +29,8 @@ public abstract class WorldListWidgetEntryMixin {
 	@Shadow
 	protected abstract void method_29990();
 	
-	@Inject(method = "start", at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/world/WorldListWidget$Entry."
-			+ "method_29990()V"), cancellable = true)
+	@Inject(method = "play", at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/world/WorldListWidget$Entry."
+			+ "start()V"), cancellable = true)
 	private void requireComfirmIfNeeded(CallbackInfo ci) {
 		if(this.level.getGameMode().isSurvivalLike() 
 				&& !new File(this.level.getFile().getParentFile(), "mcwmem.prop").exists()) {

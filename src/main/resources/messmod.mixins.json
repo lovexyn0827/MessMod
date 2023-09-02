@@ -51,13 +51,13 @@
     "FillCommandMixin", 
     "RaidManagerAccessor", 
     "DataCommandStorageAccessor", 
-    "EnchantCommandMixin"
+    "EnchantCommandMixin", 
+    "EntityMixin"
   ],
   "client": [
     "MinecraftClientMixin",
     "KeyboardMixin",
     "ClientPlayNetworkHandlerMixin",
-    "EntityMixin",
     "WorldRendererMixin",
     "ClientPlayerEntityMixin",
     "AbstractRedstoneGateBlockMixin",
@@ -70,7 +70,6 @@
     "InGameHudMixin", 
     "PlayerInventoryMixin_Client", 
     "CreativeInventoryScreenMixin", 
-    "StructureBlockBlockEntityMixin", 
     "GameRendererMixin", 
     "WorldListWidgetEntryMixin"
   ],

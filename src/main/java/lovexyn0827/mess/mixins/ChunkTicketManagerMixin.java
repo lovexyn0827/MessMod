@@ -4,8 +4,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.command.LazyLoadCommand;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.options.OptionManager;
@@ -44,6 +46,16 @@ public class ChunkTicketManagerMixin {
 		if(!ChunkBehaviorLogger.shouldSkip()) {
 			MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.TICKET_REMOVAL, pos, null, Thread.currentThread(), 
 					StackTrace.blameCurrent(), ticket);
+		}
+	}
+	
+	@Inject(method = "shouldTickEntities", at = @At("HEAD"), cancellable = true)
+	private void tickEntityIfNeeded(long pos, CallbackInfoReturnable<Boolean> cir) {
+		if(!LazyLoadCommand.LAZY_CHUNKS.isEmpty()) {
+			if(LazyLoadCommand.LAZY_CHUNKS.contains(pos)) {
+				cir.setReturnValue(false);
+				cir.cancel();
+			}
 		}
 	}
 }

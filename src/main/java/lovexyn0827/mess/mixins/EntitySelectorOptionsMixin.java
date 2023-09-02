@@ -52,7 +52,7 @@ public class EntitySelectorOptionsMixin {
 			});
 	
 	@Shadow
-	private static final Map<String, ?> options = Maps.newHashMap();
+	private static final Map<String, ?> OPTIONS = Maps.newHashMap();
 	@Shadow
 	private static void putOption(String id, EntitySelectorOptions.SelectorHandler handler, 
 			Predicate<EntitySelectorReader> condition, Text description) {}

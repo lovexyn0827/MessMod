@@ -95,9 +95,9 @@ public abstract class CommandMixin {
     
     @Redirect(method = "<init>", 
     		at = @At(
-    				value = "INVOKE", 
+    				value = "FIELD", 
     				target = "net/minecraft/server/command/CommandManager$RegistrationEnvironment."
-    						+ "isDedicated(Lnet/minecraft/server/command/CommandManager$RegistrationEnvironment;)Z"
+    						+ "dedicated:Z"
     		)
     )
     private boolean modifyDedicated(CommandManager.RegistrationEnvironment env) {

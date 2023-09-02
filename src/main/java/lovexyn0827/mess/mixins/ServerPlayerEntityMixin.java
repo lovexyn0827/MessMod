@@ -12,7 +12,6 @@ import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
 import lovexyn0827.mess.util.BlockPlacementHistory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 
 @Mixin(ServerPlayerEntity.class)
@@ -25,8 +24,7 @@ public class ServerPlayerEntityMixin implements ServerPlayerEntityInterface {
 	}
 	
 	@Inject(method = "<init>", at = @At("RETURN"))
-	private void onCreate(MinecraftServer server, ServerWorld world, GameProfile profile, 
-			ServerPlayerInteractionManager interactionManager, CallbackInfo ci) {
+	private void onCreate(MinecraftServer server, ServerWorld world, GameProfile profile, CallbackInfo ci) {
 		this.blockPlacementHistory = new BlockPlacementHistory((ServerPlayerEntity)(Object) this);
 	}
 }

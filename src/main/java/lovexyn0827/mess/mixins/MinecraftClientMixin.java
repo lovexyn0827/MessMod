@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
@@ -68,10 +69,11 @@ public abstract class MinecraftClientMixin {
 			), 
 			cancellable = true
 	)
-	private void preventAttackingInvalidEntitiesWhenNeeded(CallbackInfo ci) {
+	private void preventAttackingInvalidEntitiesWhenNeeded(CallbackInfoReturnable<Boolean> ci) {
 		Entity e = ((EntityHitResult)this.crosshairTarget).getEntity();
 		if(OptionManager.allowTargetingSpecialEntities && (e instanceof ItemEntity 
 				|| e instanceof ExperienceOrbEntity || e instanceof PersistentProjectileEntity)) {
+			ci.setReturnValue(false);
 			ci.cancel();
 		}
 	}

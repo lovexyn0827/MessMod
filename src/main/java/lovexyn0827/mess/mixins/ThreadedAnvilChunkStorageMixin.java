@@ -2,6 +2,7 @@ package lovexyn0827.mess.mixins;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -125,8 +126,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			at = @At(value = "HEAD"), 
 			remap = false
 	)
-	private void onChunkUpgrade(ChunkPos pos, ChunkHolder holder, ChunkStatus status, List<?> list, 
-			CallbackInfoReturnable<Boolean> cir) {
+	private void onChunkUpgrade(ChunkPos pos, ChunkHolder holder, ChunkStatus status, Executor e, 
+			List<?> list, CallbackInfoReturnable<Boolean> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -180,8 +181,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			at = @At(value = "RETURN"), 
 			remap = false
 	)
-	private void onChunkUpgradeFinish(ChunkPos pos, ChunkHolder holder, ChunkStatus status, List<?> list, 
-			CallbackInfoReturnable<Boolean> cir) {
+	private void onChunkUpgradeFinish(ChunkPos pos, ChunkHolder holder, ChunkStatus status, Executor exec, 
+			List<?> list, CallbackInfoReturnable<Boolean> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}

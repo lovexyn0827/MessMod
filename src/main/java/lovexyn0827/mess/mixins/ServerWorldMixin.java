@@ -6,19 +6,23 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.EntityInterface;
 import lovexyn0827.mess.fakes.ServerWorldInterface;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
@@ -129,5 +133,21 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 	@Override
 	public PulseRecorder getPulseRecorder() {
 		return this.pulseRecorder;
+	}
+	
+	@Inject(
+			method = "method_31420", 
+			at = @At(
+					value = "INVOKE", 
+					target = "net/minecraft/server/world/ChunkTicketManager.shouldTickEntities(J)Z"
+			), 
+			cancellable = true, 
+			locals = LocalCapture.CAPTURE_FAILHARD, 
+			remap = false
+	)
+	public void skipTickingEntityIfNeeded(Profiler profiler, Entity entity, CallbackInfo ci) {
+		if(((EntityInterface) entity).isFrozen()) {
+			ci.cancel();
+		}
 	}
 }

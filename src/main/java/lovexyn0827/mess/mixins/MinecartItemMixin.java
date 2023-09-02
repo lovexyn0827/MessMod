@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 public abstract class MinecartItemMixin {
 	@Redirect(method = "useOnBlock", 
 			at = @At(value = "INVOKE", 
-					target = "Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/tag/Tag;)Z"
+					target = "Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/tag/TagKey;)Z"
 			)
 	)
 	private boolean canPlaceMinecart(BlockState state, TagKey<Block> tag) {

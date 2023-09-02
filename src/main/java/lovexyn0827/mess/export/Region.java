@@ -1,6 +1,5 @@
 package lovexyn0827.mess.export;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -51,7 +50,7 @@ public final class Region {
 				.relativize(((MinecraftServerAccessor) this.dimension.getServer()).getSession()
 						.getWorldDirectory(this.dimension.getRegistryKey()));
 		RegionBasedStorage storage = RegionBasedStorageAccessor
-				.create(new File(temp.resolve(dir).toFile(), "region"), true);
+				.create(temp.resolve(dir).resolve("region"), true);
 		PointOfInterestStorage poiStorage = this.dimension.getPointOfInterestStorage();
 		PointOfInterestStorage poiDst = new PointOfInterestStorage(temp.resolve(dir).resolve("poi"), 
 				this.dimension.getServer().getDataFixer(), false, this.dimension);
