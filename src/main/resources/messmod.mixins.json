@@ -51,13 +51,13 @@
     "FillCommandMixin", 
     "RaidManagerAccessor", 
     "DataCommandStorageAccessor", 
-    "EnchantCommandMixin"
+    "EnchantCommandMixin", 
+    "EntityMixin"
   ],
   "client": [
     "MinecraftClientMixin",
     "KeyboardMixin",
     "ClientPlayNetworkHandlerMixin",
-    "EntityMixin",
     "WorldRendererMixin",
     "ClientPlayerEntityMixin",
     "AbstractRedstoneGateBlockMixin",
