@@ -26,7 +26,7 @@ public class LazyLoadCommand {
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
 								.executes((ct) -> {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
-									LAZY_CHUNKS.add(ChunkPos.toLong(pos.x, pos.z));
+									LAZY_CHUNKS.add(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
@@ -40,7 +40,7 @@ public class LazyLoadCommand {
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
 								.executes((ct) -> {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
-									LAZY_CHUNKS.remove(ChunkPos.toLong(pos.x, pos.z));
+									LAZY_CHUNKS.remove(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
