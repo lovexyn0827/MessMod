@@ -17,7 +17,7 @@ import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.NetworkState;
 import net.minecraft.network.NetworkState.PacketHandler;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.server.command.ServerCommandSource;
 
 public class LogPacketCommand {
@@ -66,10 +66,9 @@ public class LogPacketCommand {
 						((NetworkStateAccessor)(Object) state).getHandlerMap();
 				handlerMap.values().forEach((handler) -> {
 					try {
-						Iterable<Class<? extends Packet<?>>> classes = handler.getPacketTypes();
-						for(Class<?> clazz : classes) {
+						handler.forEachPacketType((clazz) -> {
 							PACKET_TYPES.put(mapping.simpleNamedClass(clazz.getName()), clazz);
-						}
+						});
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

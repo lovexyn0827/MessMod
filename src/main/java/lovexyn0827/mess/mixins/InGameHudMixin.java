@@ -34,15 +34,15 @@ public class InGameHudMixin extends DrawableHelper {
 					ordinal = 0
 			)
 	)
-	private void drawHotbarBackground(InGameHud hud, MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
+	private void drawHotbarBackground(MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
 		if(OptionManager.hotbarLength == 9) {
-			this.drawTexture(matrices, x, y, u, v, width, height);
+			drawTexture(matrices, x, y, u, v, width, height);
 		} else {
 			int slots = OptionManager.hotbarLength;
-			hud.drawTexture(matrices, x, y, 0, 0, 1, 22);
-			hud.drawTexture(matrices, x + slots * 20 + 1, y, 0, 0, 1, 22);
+			drawTexture(matrices, x, y, 0, 0, 1, 22);
+			drawTexture(matrices, x + slots * 20 + 1, y, 0, 0, 1, 22);
 			for(int i = 0; i < slots; i++) {
-				hud.drawTexture(matrices, x + i * 20 + 1, y, 1, 0, 20, 22);
+				drawTexture(matrices, x + i * 20 + 1, y, 1, 0, 20, 22);
 			}
 		}
 	}

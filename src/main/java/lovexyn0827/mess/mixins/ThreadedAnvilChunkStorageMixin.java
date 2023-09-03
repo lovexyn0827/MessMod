@@ -1,6 +1,7 @@
 package lovexyn0827.mess.mixins;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -82,12 +83,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 				StackTrace.blameCurrent(), requiredStatus.getId());
 	}
 	
-	@Inject(method = "method_17256", 
+	@Inject(method = "method_43375", 
 			at = @At(value = "HEAD"), 
 			remap = false
 	)
-	private void onChunkLoad(ChunkPos pos, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void onChunkLoad(ChunkPos pos, Optional<?> nbt, 
+			CallbackInfoReturnable<Either<Chunk, ChunkHolder.Unloaded>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -137,12 +138,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 				StackTrace.blameCurrent(), status.getId());
 	}
 	
-	@Inject(method = "method_17256", 
+	@Inject(method = "method_43375", 
 			at = @At(value = "RETURN"), 
 			remap = false
 	)
-	private void onChunkLoadFinish(ChunkPos pos, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void onChunkLoadFinish(ChunkPos pos, Optional<?> nbt, 
+			CallbackInfoReturnable<Either<Chunk, ChunkHolder.Unloaded>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}

@@ -8,8 +8,8 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 /**

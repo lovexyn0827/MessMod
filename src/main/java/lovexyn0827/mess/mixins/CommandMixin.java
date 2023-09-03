@@ -40,6 +40,7 @@ import lovexyn0827.mess.command.RngCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
 import lovexyn0827.mess.options.OptionManager;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -50,11 +51,12 @@ public abstract class CommandMixin {
     private CommandDispatcher<ServerCommandSource> dispatcher;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void registerCommand(CommandManager.RegistrationEnvironment regEnv, CallbackInfo info) {
+    private void registerCommand(CommandManager.RegistrationEnvironment regEnv, CommandRegistryAccess cra, 
+    		CallbackInfo info) {
         ExplodeCommand.register(this.dispatcher);
         ModifyCommand.register(this.dispatcher);
         PoiCommand.register(this.dispatcher);
-        SetExplosionBlockCommand.register(this.dispatcher);
+        SetExplosionBlockCommand.register(this.dispatcher, cra);
         EntityFieldCommand.register(this.dispatcher);
         MessCfgCommand.register(this.dispatcher);
         RngCommand.register(this.dispatcher);

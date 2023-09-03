@@ -5,8 +5,8 @@ import java.util.Locale;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.mixins.FormattingAccessor;
 import lovexyn0827.mess.util.i18n.I18N;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 public class FormattedText {
@@ -65,7 +65,7 @@ public class FormattedText {
 	}
 	
 	public MutableText asMutableText() {
-		MutableText mt = new LiteralText(String.format(this.content, this.args));
+		MutableText mt = Text.literal(String.format(this.content, this.args));
 		for(char c : this.format.toCharArray()) {
 			Formatting f = byCode(c);
 			if(f == null) {

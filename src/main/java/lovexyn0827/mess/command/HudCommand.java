@@ -20,10 +20,10 @@ import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.entity.EntityType;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class HudCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -35,7 +35,7 @@ public class HudCommand {
 										.then(argument("field", StringArgumentType.word())
 												.suggests(CommandUtil.FIELDS_SUGGESTION)
 												.executes((ct) -> {
-													EntityType<?> type = Registry.ENTITY_TYPE
+													EntityType<?> type = Registries.ENTITY_TYPE
 															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 													Class<?> cl = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 													String field = StringArgumentType.getString(ct, "field");
@@ -46,7 +46,7 @@ public class HudCommand {
 												})
 												.then(argument("name", StringArgumentType.word())
 														.executes((ct) -> {
-															EntityType<?> type = Registry.ENTITY_TYPE
+															EntityType<?> type = Registries.ENTITY_TYPE
 																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 															Class<?> cl = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 															String field = StringArgumentType.getString(ct, "field");
@@ -63,7 +63,7 @@ public class HudCommand {
 														})
 														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 																.executes((ct) -> {
-																	EntityType<?> type = Registry.ENTITY_TYPE
+																	EntityType<?> type = Registries.ENTITY_TYPE
 																			.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 																	Class<?> cl = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 																	String field = StringArgumentType.getString(ct, "field");

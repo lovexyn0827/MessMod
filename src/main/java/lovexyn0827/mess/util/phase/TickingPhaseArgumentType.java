@@ -12,8 +12,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.i18n.I18N;
-import net.minecraft.command.argument.ArgumentTypes;
-import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.server.command.ServerCommandSource;
 
 public class TickingPhaseArgumentType implements ArgumentType<TickingPhase> {
@@ -63,10 +61,5 @@ public class TickingPhaseArgumentType implements ArgumentType<TickingPhase> {
 	
 	public static TickingPhase getPhase(CommandContext<ServerCommandSource> ct, String argName) {
 		return ct.getArgument(argName, TickingPhase.class);
-	}
-	
-	static {
-		ArgumentTypes.register("mess_phase", TickingPhaseArgumentType.class, 
-				new ConstantArgumentSerializer<TickingPhaseArgumentType>(TickingPhaseArgumentType::phaseArg));
 	}
 }

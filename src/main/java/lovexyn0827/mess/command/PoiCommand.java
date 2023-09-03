@@ -14,14 +14,17 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.RenderedBox;
 import lovexyn0827.mess.rendering.ShapeSender;
 import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.poi.PointOfInterest;
 import net.minecraft.world.poi.PointOfInterestStorage;
@@ -38,7 +41,7 @@ import java.util.stream.Collectors;
 public class PoiCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		SuggestionProvider<ServerCommandSource> sp = (ct,builder)->{
-			for(PointOfInterestType poi:Registry.POINT_OF_INTEREST_TYPE) {
+			for(PointOfInterestType poi : Registries.POINT_OF_INTEREST_TYPE) {
 				builder = builder.suggest(poi.toString());
 			}
 			return builder.buildFuture();
@@ -49,7 +52,7 @@ public class PoiCommand {
 								then(argument("type",StringArgumentType.word()).suggests(sp).
 										then(argument("replace",BoolArgumentType.bool()).
 												executes((ct) -> {
-													BlockPos pos = BlockPosArgumentType.getBlockPos(ct, "pos");
+													BlockPos pos = BlockPosArgumentType.getValidBlockPos(ct, "pos");
 													if(setPoi(ct.getSource().getWorld().getPointOfInterestStorage(),
 															pos, StringArgumentType.getString(ct, "type"), 
 															BoolArgumentType.getBool(ct, "replace"))) {
@@ -64,7 +67,7 @@ public class PoiCommand {
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								executes((ct) -> {
 									PointOfInterestType type = getPoi(ct.getSource().getWorld().getPointOfInterestStorage(),
-											BlockPosArgumentType.getBlockPos(ct, "pos"));
+											BlockPosArgumentType.getValidBlockPos(ct, "pos"));
 									CommandUtil.feedback(ct, type==null ? "null" : type.toString());
 									return 0;
 								}))).
@@ -74,7 +77,7 @@ public class PoiCommand {
 										then(argument("type",StringArgumentType.word()).suggests(sp).
 												executes((ct) -> {
 													boolean foundAny = false;
-													PointOfInterestType expectedType = Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
+													PointOfInterestType expectedType = Registries.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
 													Iterable<BlockPos> iterator = BlockPos.iterate(BlockPosArgumentType.getLoadedBlockPos(ct, "corner1"), 
 															BlockPosArgumentType.getLoadedBlockPos(ct, "corner2"));
 													for(BlockPos pos : iterator) {
@@ -114,11 +117,14 @@ public class PoiCommand {
 	}
 
 	private static int forEachPoi(CommandContext<ServerCommandSource> ct, Consumer<PointOfInterest> action) throws CommandSyntaxException {
-		PointOfInterestType expectedType = Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
+		String typeS = StringArgumentType.getString(ct, "type");
+		Registry<PointOfInterestType> reg = Registries.POINT_OF_INTEREST_TYPE;
+		RegistryEntry<PointOfInterestType> expected = 
+				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, new Identifier(typeS)));
 		List<PointOfInterest> poiList = ct.getSource()
 				.getWorld()
 				.getPointOfInterestStorage()
-				.getInCircle((type) -> type == expectedType, 
+				.getInCircle((type) -> type == expected, 
 						BlockPosArgumentType.getLoadedBlockPos(ct, "center"), 
 						IntegerArgumentType.getInteger(ct, "radius"), 
 						PointOfInterestStorage.OccupationStatus.ANY)
@@ -135,14 +141,16 @@ public class PoiCommand {
 	private static boolean setPoi(PointOfInterestStorage poiStorage, BlockPos blockPos, String type, boolean replace) {
 		if(poiStorage.getType(blockPos).isPresent() && !replace) return false;
 		poiStorage.remove(blockPos);
-		poiStorage.add(blockPos, Registry.POINT_OF_INTEREST_TYPE.get(new Identifier(type)));
+		Registry<PointOfInterestType> reg = Registries.POINT_OF_INTEREST_TYPE;
+		poiStorage.add(blockPos, 
+				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, new Identifier(type))));
 		return true;
 	}
 	
 	private static PointOfInterestType getPoi(PointOfInterestStorage poiStorage, BlockPos blockPos) {
-		Optional<PointOfInterestType> type = poiStorage.getType(blockPos);
+		Optional<RegistryEntry<PointOfInterestType>> type = poiStorage.getType(blockPos);
 		if(type.isPresent()) {
-			return type.get();
+			return type.get().value();
 		}else {
 			return null;
 		}

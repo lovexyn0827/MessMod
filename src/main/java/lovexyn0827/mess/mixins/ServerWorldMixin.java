@@ -56,7 +56,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
             return d <= e ? blockHitResult : blockHitResult2;
         }, context2 -> {
             Vec3d vec3d = context2.getStart().subtract(context2.getEnd());
-            return BlockHitResult.createMissed(context2.getEnd(), Direction.getFacing(vec3d.x, vec3d.y, vec3d.z), new BlockPos(context2.getEnd()));
+            return BlockHitResult.createMissed(context2.getEnd(), Direction.getFacing(vec3d.x, vec3d.y, vec3d.z), BlockPos.ofFloored(context2.getEnd()));
         });
 	}
 	

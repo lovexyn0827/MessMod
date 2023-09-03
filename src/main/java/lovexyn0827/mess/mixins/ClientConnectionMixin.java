@@ -9,14 +9,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.LogPacketCommand;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
-import net.minecraft.network.Packet;
+import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.packet.Packet;
 
 @Mixin(ClientConnection.class)
 public class ClientConnectionMixin {
@@ -24,7 +23,7 @@ public class ClientConnectionMixin {
 	private NetworkSide side;
 	
 	@Inject(method = "sendImmediately", at = @At("HEAD"))
-	private void onPacketBeingSended(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> callback, CallbackInfo ci) {
+	private void onPacketBeingSended(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {
 		if(LogPacketCommand.isSubscribed(packet)) {
 			MessMod.LOGGER.info("{}: Sended Packet: {}", 
 					this.side == NetworkSide.CLIENTBOUND ? "CLIENT" : "SERVER", 

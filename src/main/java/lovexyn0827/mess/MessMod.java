@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +36,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.MessageType;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
@@ -45,7 +43,7 @@ import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class MessMod implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
@@ -83,6 +81,7 @@ public class MessMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		OptionManager.loadGlobal();
+		CommandUtil.registerArgumentTypes();
 	}
 	
 	public Mapping getMapping() {
@@ -170,7 +169,7 @@ public class MessMod implements ModInitializer {
 			copyScript("tool");
 			if(FabricLoader.getInstance().isModLoaded("carpet")) {
 				if(OptionManager.enabledTools) {
-					this.server.getCommandManager().execute(CommandUtil.noreplyPlayerSources(), 
+					this.server.getCommandManager().executeWithPrefix(CommandUtil.noreplyPlayerSources(), 
 							"/script load tool global");
 				}
 			}
@@ -244,9 +243,7 @@ public class MessMod implements ModInitializer {
 			sb.append(ob);
 		}
 		
-		this.server.getPlayerManager().broadcast(new LiteralText(sb.toString()), 
-				MessageType.SYSTEM, 
-				new UUID(0x31f38bL,0x31f0b8L));
+		this.server.getPlayerManager().broadcast(Text.literal(sb.toString()), false);
 	}
 
 	public String getScriptDir() {

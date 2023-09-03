@@ -7,8 +7,8 @@ import lovexyn0827.mess.MessMod;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.thread.ThreadExecutor;
 import net.minecraft.world.World;
 
@@ -67,7 +67,7 @@ public class RemoteShapeCache extends ShapeCache {
 				switch(buffer.readEnumConstant(RemoteShapeSender.UpdateMode.class)) {
 				case ADD_SHAPE : 
 					// Mode - Dimension - Space - Tag
-					RegistryKey<World> dim = RegistryKey.of(Registry.WORLD_KEY, buffer.readIdentifier());
+					RegistryKey<World> dim = RegistryKey.of(RegistryKeys.WORLD, buffer.readIdentifier());
 					ShapeSpace space = new ShapeSpace(buffer.readString());
 					NbtCompound tag = buffer.readNbt();
 					this.getShapesInDimension(dim).computeIfAbsent(space, (s) -> Sets.newHashSet())

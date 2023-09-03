@@ -8,9 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FletchingTableBlock;
 import net.minecraft.block.AbstractBlock;
-import net.minecraft.network.MessageType;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -41,7 +39,7 @@ public abstract class FletchingTableBlockMixin extends AbstractBlock {
 				.getPulseRecorder()
 				.setSignalLevel(pos, powered)
 				.ifPresent((p) -> {
-					sw.getServer().getPlayerManager().broadcast(p.toText(), MessageType.SYSTEM, Util.NIL_UUID);
+					sw.getServer().getPlayerManager().broadcast(p.toText(), false);
 				});
 	}
 }

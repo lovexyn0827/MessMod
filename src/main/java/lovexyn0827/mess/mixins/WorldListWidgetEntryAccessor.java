@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.world.level.storage.LevelSummary;
 
-@Mixin(WorldListWidget.Entry.class)
+@Mixin(WorldListWidget.WorldEntry.class)
 public interface WorldListWidgetEntryAccessor {
 	@Accessor("level")
 	LevelSummary getLevelSummary();

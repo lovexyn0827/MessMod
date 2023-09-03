@@ -1,9 +1,9 @@
 package lovexyn0827.mess.rendering;
 
 import lovexyn0827.mess.MessMod;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public interface ShapeSender {

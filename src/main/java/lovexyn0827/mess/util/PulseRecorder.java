@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lovexyn0827.mess.options.EnumParser;
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -58,14 +57,14 @@ public final class PulseRecorder {
 		}
 		
 		public Text toText() {
-			MutableText text = new LiteralText(positive ? "+" : "-");
+			MutableText text = Text.literal(positive ? "+" : "-");
 			String details = String.format("From: %d#%s\nTo: %d#%s\nAt: (%d, %d, %d)", 
 					this.start.gameTime, this.start.phase == null ? "?" : this.start.phase.name(), 
 					this.end.gameTime, this.end.phase == null ? "?" : this.end.phase.name(), 
 					pos.getX(), pos.getY(), pos.getZ());
-			HoverEvent he = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details));
+			HoverEvent he = new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(details));
 			text.formatted(Formatting.BOLD, positive ? Formatting.RED : Formatting.BLUE);
-			text.append(new LiteralText(Long.toString(this.length)).formatted(Formatting.RESET).fillStyle(Style
+			text.append(Text.literal(Long.toString(this.length)).formatted(Formatting.RESET).fillStyle(Style
 					.EMPTY.withHoverEvent(he)));
 			return text;
 		}

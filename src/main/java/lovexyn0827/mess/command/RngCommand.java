@@ -3,7 +3,6 @@ package lovexyn0827.mess.command;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.util.Iterator;
-import java.util.Random;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
@@ -20,6 +19,7 @@ import lovexyn0827.mess.mixins.EntityAccessor;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.util.math.random.Random;
 
 public class RngCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {

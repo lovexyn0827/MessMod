@@ -23,17 +23,16 @@ import net.minecraft.command.EntitySelectorOptions;
 import net.minecraft.command.EntitySelectorReader;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.predicate.NumberRange;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
 @Mixin(EntitySelectorOptions.class)
 public class EntitySelectorOptionsMixin {
 	// FIXME Dynamic translation
 	private static final SimpleCommandExceptionType NEGATIVE_ID_EXCEPTION = 
-			new SimpleCommandExceptionType(new LiteralText(I18N.translate("misc.negativeid")));
+			new SimpleCommandExceptionType(Text.literal(I18N.translate("misc.negativeid")));
 	private static final DynamicCommandExceptionType UNDEFINED_EXCEPTION = 
 			new DynamicCommandExceptionType((side) -> {
-				return new LiteralText(I18N.translate("cmd.general.nodef", side));
+				return Text.literal(I18N.translate("cmd.general.nodef", side));
 			});
 	private static final DynamicCommandExceptionType INVALID_REGEX_EXCEPTION = 
 			new DynamicCommandExceptionType((e) -> {
@@ -44,11 +43,11 @@ public class EntitySelectorOptionsMixin {
 					msg = e.toString();
 				}
 				
-				return new LiteralText(I18N.translate("misc.invregex", msg));
+				return Text.literal(I18N.translate("misc.invregex", msg));
 			});
 	private static final DynamicCommandExceptionType NO_CLASS_EXCEPTION = 
 			new DynamicCommandExceptionType((e) -> {
-				return new LiteralText(I18N.translate("exp.noclass", e));
+				return Text.literal(I18N.translate("exp.noclass", e));
 			});
 	
 	@Shadow
@@ -77,7 +76,7 @@ public class EntitySelectorOptionsMixin {
 		}, (selectorReader) -> {
 			NumberRange.IntRange range = ((EntitySelectorReaderInterface) selectorReader).getIdRange();
 			return range == null || range.isDummy();
-		}, new LiteralText(I18N.translate("misc.idopt.desc")));
+		}, Text.literal(I18N.translate("misc.idopt.desc")));
 		
 		putOption("side", (selectorReader) -> {
 			int i = selectorReader.getReader().getCursor();
@@ -98,7 +97,7 @@ public class EntitySelectorOptionsMixin {
 			}
 		}, (selectorReader) -> {
 			return !MessMod.isDedicatedEnv() && ((EntitySelectorReaderInterface) selectorReader).getSide() == null;
-		}, new LiteralText(I18N.translate("misc.side.desc")));
+		}, Text.literal(I18N.translate("misc.side.desc")));
 		
 		putOption("typeRegex", (selectorReader) -> {
 			int i = selectorReader.getReader().getCursor();
@@ -114,7 +113,7 @@ public class EntitySelectorOptionsMixin {
 			}
 		}, (selectorReader) -> {
 			return ((EntitySelectorReaderInterface) selectorReader).getTypeRegex() == null;
-		}, new LiteralText(I18N.translate("misc.typeRegex.desc")));
+		}, Text.literal(I18N.translate("misc.typeRegex.desc")));
 		
 		putOption("nameRegex", (selectorReader) -> {
 			int i = selectorReader.getReader().getCursor();
@@ -130,7 +129,7 @@ public class EntitySelectorOptionsMixin {
 			}
 		}, (selectorReader) -> {
 			return ((EntitySelectorReaderInterface) selectorReader).getNameRegex() == null;
-		}, new LiteralText(I18N.translate("misc.nameRegex.desc")));
+		}, Text.literal(I18N.translate("misc.nameRegex.desc")));
 		
 		putOption("class", (selectorReader) -> {
 			int i = selectorReader.getReader().getCursor();
@@ -146,7 +145,7 @@ public class EntitySelectorOptionsMixin {
 			}
 		}, (selectorReader) -> {
 			return ((EntitySelectorReaderInterface) selectorReader).getClassRegex() == null;
-		}, new LiteralText(I18N.translate("misc.class.desc")));
+		}, Text.literal(I18N.translate("misc.class.desc")));
 		
 		putOption("instanceof", (selectorReader) -> {
 			int i = selectorReader.getReader().getCursor();
@@ -164,6 +163,6 @@ public class EntitySelectorOptionsMixin {
 			}
 		}, (selectorReader) -> {
 			return ((EntitySelectorReaderInterface) selectorReader).getNameRegex() == null;
-		}, new LiteralText(I18N.translate("misc.instanceof.desc")));
+		}, Text.literal(I18N.translate("misc.instanceof.desc")));
     }
 }

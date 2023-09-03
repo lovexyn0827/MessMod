@@ -121,7 +121,7 @@ public class EntitySelectorMixin implements EntitySelectorInterface {
 			
 			if (this.playerName != null) {
 				mc.world.getPlayers().stream()
-						.filter((p) -> p.getName().asString().equals(this.playerName))
+						.filter((p) -> p.getName().getString().equals(this.playerName))
 						.findFirst()
 						.ifPresent(result::add);
 				cir.setReturnValue(result);

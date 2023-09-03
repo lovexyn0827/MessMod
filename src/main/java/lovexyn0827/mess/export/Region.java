@@ -53,7 +53,7 @@ public final class Region {
 				.create(temp.resolve(dir).resolve("region"), true);
 		PointOfInterestStorage poiStorage = this.dimension.getPointOfInterestStorage();
 		PointOfInterestStorage poiDst = new PointOfInterestStorage(temp.resolve(dir).resolve("poi"), 
-				this.dimension.getServer().getDataFixer(), false, this.dimension);
+				this.dimension.getServer().getDataFixer(), false, this.dimension.getRegistryManager(), this.dimension);
 		for(int x = this.min.x; x <= this.max.x; x++) {
 			for(int z = this.min.z; z <= this.max.z; z++) {
 				ChunkPos pos = new ChunkPos(x, z);

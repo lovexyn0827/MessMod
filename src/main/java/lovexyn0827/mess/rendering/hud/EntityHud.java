@@ -2,6 +2,7 @@ package lovexyn0827.mess.rendering.hud;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.util.math.Matrix4f;
 
 /**
  * It should be responable for rendering, not getting data from entities.
@@ -49,16 +49,14 @@ public abstract class EntityHud {
 		int x = this.xStart;
 		// i don't know how it works, but it runs correctly...
 		//
-		Matrix4f matrix4f = Matrix4f.projectionMatrix(0.0f, 
-				this.client.getWindow().getFramebufferWidth(), 0.0f, 
-				this.client.getWindow().getFramebufferHeight(), 1000.0f, 3000.0f);
-		RenderSystem.setProjectionMatrix(matrix4f);
+		Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, this.client.getWindow().getFramebufferWidth(), 
+				this.client.getWindow().getFramebufferHeight(), 0.0f, 1000.0f, 3000.0f);
+        RenderSystem.setProjectionMatrix(matrix4f);
 		MatrixStack matrixStack = RenderSystem.getModelViewStack();
 		matrixStack.loadIdentity();
 		matrixStack.translate(0.0, 0.0, -2000.0);
 		RenderSystem.applyModelViewMatrix();
 		RenderSystem.lineWidth(1.0f);
-		RenderSystem.disableTexture();
 		this.updateAlign();
 		float size = OptionManager.hudTextSize;
 		ms.scale(size, size, size);

@@ -20,6 +20,7 @@ import lovexyn0827.mess.rendering.RenderedLine;
 import lovexyn0827.mess.rendering.ShapeSender;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.entity.Entity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -28,7 +29,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -53,7 +53,7 @@ public class RaycastCommand {
 														World world = ct.getSource().getWorld();
 														BlockHitResult hit = world.raycast(rct);
 														Vec3d end = hit.getType() == HitResult.Type.MISS?to : hit.getPos();
-														ServerPlayerEntity player = ct.getSource().getEntity() instanceof ServerPlayerEntity ? ct.getSource().getPlayer() : null;
+														ServerPlayerEntity player = ct.getSource().getEntity() instanceof ServerPlayerEntity ? ct.getSource().getPlayerOrThrow() : null;
 														BlockView.raycast(from, to, rct, (c, p) -> {
 															MessMod.INSTANCE.shapeSender.addShape(
 																	new RenderedBox(new Box(p), 0x00007fff, 0x00ff001f, 300, world.getTime()), 
@@ -127,7 +127,7 @@ public class RaycastCommand {
 	private static void raycastEntities(CommandContext<ServerCommandSource> ct, boolean shouldAddShapes) 
 			throws CommandSyntaxException {
 		ServerPlayerEntity player = ct.getSource().getEntity() instanceof ServerPlayerEntity ? 
-				ct.getSource().getPlayer() : null;
+				ct.getSource().getPlayerOrThrow() : null;
 		Vec3d from = Vec3ArgumentType.getVec3(ct, "from");
 		Vec3d to = Vec3ArgumentType.getVec3(ct, "to");
 		Entity excluded = BoolArgumentType.getBool(ct, "excludeSender") ? ct.getSource().getEntity() : null;
@@ -152,7 +152,7 @@ public class RaycastCommand {
 				e = toCheck;
 				pos = opt.get();
 				CommandUtil.feedbackWithArgs(ct, "cmd.raycast.result.entity", 
-						e.hasCustomName() ? e.getCustomName().asString() : e.getType()
+						e.hasCustomName() ? e.getCustomName().getContent() : e.getType()
 								.getTranslationKey()
 								.replaceFirst("^.+\\u002e", ""), 
 						e.getId(), 

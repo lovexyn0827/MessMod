@@ -8,9 +8,7 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CraftingTableBlock;
-import net.minecraft.network.MessageType;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -28,8 +26,7 @@ public abstract class CraftingTableBlockMixin extends AbstractBlock {
 				ServerWorld sw = (ServerWorld) world;
 				sw.getServer().getPlayerManager().broadcast(
 						new FormattedText("NC: Tick %d @ (%d, %d, %d)", "cl", false, world.getTime(), 
-								pos.getX(), pos.getY(), pos.getZ()).asMutableText(), 
-						MessageType.SYSTEM, Util.NIL_UUID);
+								pos.getX(), pos.getY(), pos.getZ()).asMutableText(), false);
 			}
 		}
 	}
@@ -40,8 +37,7 @@ public abstract class CraftingTableBlockMixin extends AbstractBlock {
 			ServerWorld sw = (ServerWorld) world;
 			sw.getServer().getPlayerManager().broadcast(
 					new FormattedText("PP: Tick %d @ (%d, %d, %d)", "1l", false, sw.getTime(), 
-							pos.getX(), pos.getY(), pos.getZ()).asMutableText(), 
-					MessageType.SYSTEM, Util.NIL_UUID);
+							pos.getX(), pos.getY(), pos.getZ()).asMutableText(), false);
 		}
 	}
 }

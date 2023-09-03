@@ -22,9 +22,9 @@ import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class EntityLogCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -45,7 +45,7 @@ public class EntityLogCommand {
 										.suggests(CommandUtil.FIELDS_SUGGESTION)
 										.executes((ct) -> {
 											EntityLogger l = MessMod.INSTANCE.getEntityLogger();
-											EntityType<?> type = Registry.ENTITY_TYPE
+											EntityType<?> type = Registries.ENTITY_TYPE
 													.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 											String field = StringArgumentType.getString(ct, "field");
 											try {
@@ -60,7 +60,7 @@ public class EntityLogCommand {
 										.then(argument("name", StringArgumentType.word())
 												.executes((ct) -> {
 													EntityLogger l = MessMod.INSTANCE.getEntityLogger();
-													EntityType<?> type = Registry.ENTITY_TYPE
+													EntityType<?> type = Registries.ENTITY_TYPE
 															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 													String field = StringArgumentType.getString(ct, "field");
 													String name = StringArgumentType.getString(ct, "name");
@@ -76,7 +76,7 @@ public class EntityLogCommand {
 												.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 														.executes((ct) -> {
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
-															EntityType<?> type = Registry.ENTITY_TYPE
+															EntityType<?> type = Registries.ENTITY_TYPE
 																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 															String field = StringArgumentType.getString(ct, "field");
 															String name = StringArgumentType.getString(ct, "name");
@@ -93,7 +93,7 @@ public class EntityLogCommand {
 												.then(TickingPhase.commandArg()
 														.executes((ct) -> {
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
-															EntityType<?> type = Registry.ENTITY_TYPE
+															EntityType<?> type = Registries.ENTITY_TYPE
 																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 															String field = StringArgumentType.getString(ct, "field");
 															String name = StringArgumentType.getString(ct, "name");
@@ -110,7 +110,7 @@ public class EntityLogCommand {
 														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 																.executes((ct) -> {
 																	EntityLogger l = MessMod.INSTANCE.getEntityLogger();
-																	EntityType<?> type = Registry.ENTITY_TYPE
+																	EntityType<?> type = Registries.ENTITY_TYPE
 																			.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
 																	String field = StringArgumentType.getString(ct, "field");
 																	String name = StringArgumentType.getString(ct, "name");
@@ -155,7 +155,7 @@ public class EntityLogCommand {
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.executes((ct) -> {
 									Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
-									EntityType<?> type = Registry.ENTITY_TYPE.get(id);
+									EntityType<?> type = Registries.ENTITY_TYPE.get(id);
 									MessMod.INSTANCE.getEntityLogger().addAutoSubEntityType(type);
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.autosub", id);
 									return Command.SINGLE_SUCCESS;
@@ -165,7 +165,7 @@ public class EntityLogCommand {
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.executes((ct) -> {
 									Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
-									EntityType<?> type = Registry.ENTITY_TYPE.get(id);
+									EntityType<?> type = Registries.ENTITY_TYPE.get(id);
 									MessMod.INSTANCE.getEntityLogger().removeAutoSubEntityType(type);
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.stopautosub", id);
 									return Command.SINGLE_SUCCESS;

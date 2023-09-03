@@ -1,7 +1,5 @@
 package lovexyn0827.mess.mixins;
 
-import java.io.File;
-
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,7 +15,7 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.gui.screen.world.WorldListWidget;
 import net.minecraft.world.level.storage.LevelSummary;
 
-@Mixin(WorldListWidget.Entry.class)
+@Mixin(WorldListWidget.WorldEntry.class)
 public abstract class WorldListWidgetEntryMixin {
 	@Shadow
 	private @Final MinecraftClient client;
@@ -27,17 +25,16 @@ public abstract class WorldListWidgetEntryMixin {
 	private @Final SelectWorldScreen screen;
 	
 	@Shadow
-	protected abstract void method_29990();
+	protected abstract void start();
 	
-	@Inject(method = "play", at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/world/WorldListWidget$Entry."
+	@Inject(method = "play", at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/world/WorldListWidget$WorldEntry."
 			+ "start()V"), cancellable = true)
 	private void requireComfirmIfNeeded(CallbackInfo ci) {
 		if(this.level.getGameMode().isSurvivalLike() 
-				&& !new File(this.level.getFile().getParentFile(), "mcwmem.prop").exists()) {
+				&& !this.level.getIconPath().getParent().resolve("mcwmem.prop").toFile().exists()) {
 			BooleanConsumer bc = (bool) -> {
 				if(bool) {
-					this.method_29990();
-					this.client.startIntegratedServer(this.level.getName());
+					this.start();
 				} else {
 					this.client.setScreen(screen);
 				}

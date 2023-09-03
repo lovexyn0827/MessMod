@@ -96,7 +96,7 @@ public class EntityHolder {
 	}
 	
 	private static File getLogFile(Entity e, char type, EntityLogger logger) {
-		String entityName = e.getName().asString();
+		String entityName = e.getName().getString();
 		String name = String.format("%s@%d-%c-%s.csv", 
 				DATE_FORMAT.format(new Date()), 
 				e.getId(), 

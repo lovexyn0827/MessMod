@@ -5,8 +5,6 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.command.argument.ArgumentTypes;
-import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.server.command.ServerCommandSource;
 
 public class ExtendedFloatArgumentType implements ArgumentType<Float> {
@@ -27,10 +25,5 @@ public class ExtendedFloatArgumentType implements ArgumentType<Float> {
 
 	public static float getFloat(CommandContext<ServerCommandSource> ct, String string) {
 		return ct.getArgument(string, Float.class);
-	}
-	
-	static {
-		ArgumentTypes.register("mess_float", ExtendedFloatArgumentType.class, 
-				new ConstantArgumentSerializer<ExtendedFloatArgumentType>(ExtendedFloatArgumentType::floatArg));
 	}
 }

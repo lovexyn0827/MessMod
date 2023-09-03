@@ -13,8 +13,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 /**
@@ -61,7 +61,7 @@ public class RenderedText extends Shape {
         matrices.scale(-1.0F, 1.0F, 1.0F);
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
         //textRenderer.draw(this.value, 0, 0.0F, this.color, false, matrices.peek().getModel(), immediate, false, 0x0000002f, 15728880);
-        textRenderer.draw(this.value, 0, 0, this.color, false, matrices.peek().getPositionMatrix(), immediate, false, 0x0000002f, 15728880);
+        textRenderer.draw(this.value, 0, 0, this.color, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0x0000002f, 15728880);
         immediate.draw();
         matrices.pop();
         RenderSystem.enableCull();

@@ -60,7 +60,7 @@ public class MessServerNetworkHandler {
 			int protocol = buf.readInt();
 			String ver = buf.readString(32767);
 			MessMod.LOGGER.info("Player {} joined the game with MessMod {} (Protocol Version: {})", 
-					player.getName().asString(), ver, protocol);
+					player.getName().getContent(), ver, protocol);
 			if(protocol != Channels.CHANNEL_VERSION) {
 				MessMod.LOGGER.warn("But note that the protocol version of the client differs from the one here.");
 				player.sendMessage(new FormattedText("misc.protver.err", "c").asMutableText(), false);

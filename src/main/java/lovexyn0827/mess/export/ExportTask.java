@@ -36,6 +36,7 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
@@ -44,7 +45,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.village.raid.Raid;
 import net.minecraft.village.raid.RaidManager;
 import net.minecraft.world.ForcedChunkState;
@@ -304,7 +304,7 @@ public final class ExportTask {
 	}
 
 	private void exportRaids(ServerWorld world, PersistentStateManager psm) throws IOException {
-	    String id = RaidManager.nameFor(world.method_40134());
+	    String id = RaidManager.nameFor(world.getDimensionEntry());
 		RaidManager ps = world.getPersistentStateManager()
 				.get((nbt) -> RaidManager.fromNbt(world, nbt), id);
 		RaidManager tempRm = RaidManager.fromNbt(world, ps.writeNbt(new NbtCompound()));
@@ -328,7 +328,7 @@ public final class ExportTask {
 		settings.put("structures", structures);
 		NbtList layers = new NbtList();
 		NbtCompound layer = new NbtCompound();
-		layer.putString("block", Registry.BLOCK.getId(block).toString());
+		layer.putString("block", Registries.BLOCK.getId(block).toString());
 		layer.putInt("height", 1);
 		layers.add(layer);
 		settings.put("layers", layers);

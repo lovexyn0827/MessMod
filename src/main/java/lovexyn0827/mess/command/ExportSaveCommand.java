@@ -86,8 +86,8 @@ public class ExportSaveCommand {
 		ColumnPos corner1 = ColumnPosArgumentType.getColumnPos(ct, "corner1");
 		ColumnPos corner2 = ColumnPosArgumentType.getColumnPos(ct, "corner2");
 		task.addRegion(name, 
-				new ChunkPos(corner1.x >> 4, corner1.z >> 4), 
-				new ChunkPos(corner2.x >> 4, corner2.z >> 4), 
+				new ChunkPos(corner1.x() >> 4, corner1.z() >> 4), 
+				new ChunkPos(corner2.x() >> 4, corner2.z() >> 4), 
 				DimensionArgumentType.getDimensionArgument(ct, "dimension"));
 		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;

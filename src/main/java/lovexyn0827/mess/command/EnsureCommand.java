@@ -20,7 +20,7 @@ public class EnsureCommand {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("ensure").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(argument("pos", BlockPosArgumentType.blockPos())
 						.executes((ct) -> {
-							BlockPos pos = BlockPosArgumentType.getBlockPos(ct, "pos");
+							BlockPos pos = BlockPosArgumentType.getValidBlockPos(ct, "pos");
 							World world = ct.getSource().getWorld();
 							BlockState state = world.getBlockState(pos);
 							BlockEntity be = world.getBlockEntity(pos);

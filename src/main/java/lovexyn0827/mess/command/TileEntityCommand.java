@@ -7,8 +7,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.util.registry.Registry;
 
 public class TileEntityCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -22,7 +22,7 @@ public class TileEntityCommand {
 										return -1;
 									}
 									
-									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.type", Registry.BLOCK_ENTITY_TYPE.getId(be.getType()).getPath());
+									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.type", Registries.BLOCK_ENTITY_TYPE.getId(be.getType()).getPath());
 									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.createNbtWithId());
 									return 1;
 								}))).

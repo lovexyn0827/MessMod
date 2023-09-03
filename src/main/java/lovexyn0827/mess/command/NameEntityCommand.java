@@ -10,7 +10,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class NameEntityCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -19,7 +19,7 @@ public class NameEntityCommand {
 						.then(argument("name", StringArgumentType.greedyString())
 								.executes((ct) -> {
 									EntityArgumentType.getEntities(ct, "entities").forEach((e) -> {
-										e.setCustomName(new LiteralText(StringArgumentType.getString(ct, "name")));
+										e.setCustomName(Text.literal(StringArgumentType.getString(ct, "name")));
 										e.setCustomNameVisible(true);
 									});
 									CommandUtil.feedback(ct, "cmd.general.success");

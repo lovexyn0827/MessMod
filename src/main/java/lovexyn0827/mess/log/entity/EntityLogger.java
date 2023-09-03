@@ -50,7 +50,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 			this.server.getWorlds().forEach((world) -> {
 				this.subscribe(world.getEntitiesByType(null, (e) -> {
 					return this.autoSubTypes.contains(e.getType()) || 
-							this.autoSubNames.contains(e.getName().asString());
+							this.autoSubNames.contains(e.getName().getString());
 				}), this.defaultStoragePolicy);
 			});
 		}

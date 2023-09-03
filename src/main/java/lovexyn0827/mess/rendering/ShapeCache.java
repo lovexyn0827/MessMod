@@ -9,7 +9,7 @@ import com.google.common.collect.Sets;
 
 import lovexyn0827.mess.MessMod;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public abstract class ShapeCache {

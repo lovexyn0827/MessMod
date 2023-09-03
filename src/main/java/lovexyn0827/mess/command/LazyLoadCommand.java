@@ -26,7 +26,7 @@ public class LazyLoadCommand {
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
 								.executes((ct) -> {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
-									LAZY_CHUNKS.add(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
+									LAZY_CHUNKS.add(ChunkPos.toLong(pos.x() >> 4, pos.z() >> 4));
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
@@ -40,7 +40,7 @@ public class LazyLoadCommand {
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
 								.executes((ct) -> {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
-									LAZY_CHUNKS.remove(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
+									LAZY_CHUNKS.remove(ChunkPos.toLong(pos.x() >> 4, pos.z() >> 4));
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
@@ -60,10 +60,10 @@ public class LazyLoadCommand {
 	private static void forEachSelected(CommandContext<ServerCommandSource> ct, LongConsumer action) {
 		ColumnPos c1 = ColumnPosArgumentType.getColumnPos(ct, "corner1");
 		ColumnPos c2 = ColumnPosArgumentType.getColumnPos(ct, "corner2");
-		int x1 = Math.min(c1.x, c2.x) >> 4;
-		int x2 = Math.max(c1.x, c2.x) >> 4;
-		int z1 = Math.min(c1.z, c2.z) >> 4;
-		int z2 = Math.min(c1.z, c2.z) >> 4;
+		int x1 = Math.min(c1.x(), c2.x()) >> 4;
+		int x2 = Math.max(c1.x(), c2.x()) >> 4;
+		int z1 = Math.min(c1.z(), c2.z()) >> 4;
+		int z2 = Math.min(c1.z(), c2.z()) >> 4;
 		for(int x = x1; x <= x2; x++) {
 			for(int z = z1; z <= z2; z++) {
 				action.accept(ChunkPos.toLong(x, z));

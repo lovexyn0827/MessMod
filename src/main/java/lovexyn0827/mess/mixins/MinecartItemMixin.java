@@ -10,8 +10,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.MinecartItem;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 
@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 public abstract class MinecartItemMixin {
 	@Redirect(method = "useOnBlock", 
 			at = @At(value = "INVOKE", 
-					target = "Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/tag/TagKey;)Z"
+					target = "Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/registry/tag/TagKey;)Z"
 			)
 	)
 	private boolean canPlaceMinecart(BlockState state, TagKey<Block> tag) {

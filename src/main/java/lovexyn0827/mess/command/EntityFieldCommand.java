@@ -26,7 +26,7 @@ import lovexyn0827.mess.util.access.Literal;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class EntityFieldCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -49,7 +49,7 @@ public class EntityFieldCommand {
 										AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
 										return getField(ct, path);
 									} catch (TranslatableException e) {
-										ct.getSource().sendError(new LiteralText(e.getMessage()));
+										ct.getSource().sendError(Text.literal(e.getMessage()));
 										return 0;
 									}
 								})));
@@ -89,7 +89,7 @@ public class EntityFieldCommand {
 												
 												return 0;
 											} catch (TranslatableException e) {
-												ct.getSource().sendError(new LiteralText(e.getMessage()));
+												ct.getSource().sendError(Text.literal(e.getMessage()));
 												return 0;
 											} catch (Exception e) {
 												CommandUtil.error(ct, "cmd.entityfield.modify.failure", e);

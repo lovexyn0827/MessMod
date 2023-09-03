@@ -3,15 +3,11 @@ package lovexyn0827.mess.command;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import lovexyn0827.mess.util.NameFilter;
-import net.minecraft.command.argument.ArgumentTypes;
-import net.minecraft.command.argument.serialize.ArgumentSerializer;
-import net.minecraft.network.PacketByteBuf;
 
 public class EnumSetArgumentType extends ElementSetArgumentType<Enum<?>, EnumSetArgumentType.ParseResult> {
 	private final Class<? extends Enum<?>> clazz;
@@ -30,7 +26,7 @@ public class EnumSetArgumentType extends ElementSetArgumentType<Enum<?>, EnumSet
 	}
 
 	@Override
-	protected ParseResult filter(NameFilter filter) {
+	protected lovexyn0827.mess.command.EnumSetArgumentType.ParseResult filter(NameFilter filter) {
 		return new ParseResult(filter.filter(this.clazz));
 	}
 
@@ -44,39 +40,11 @@ public class EnumSetArgumentType extends ElementSetArgumentType<Enum<?>, EnumSet
 		
 		return builder.buildFuture();
 	}
-	
-	static {
-		ArgumentTypes.register("mess_enum", EnumSetArgumentType.class, new Serializer());
-	}
 
 	static final class ParseResult extends ElementSetArgumentType.ParseResult<Enum<?>> {
 		public ParseResult(Set<Enum<?>> set) {
 			super(set);
 		}
-	}
-	
-	private static class Serializer implements ArgumentSerializer<EnumSetArgumentType> {
-		@Override
-		public void toPacket(EnumSetArgumentType type, PacketByteBuf buf) {
-			buf.writeString(type.clazz.getName());
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public EnumSetArgumentType fromPacket(PacketByteBuf buf) {
-			try {
-				return of((Class<? extends Enum<?>>) Class.forName(buf.readString()));
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				return of(Empty.class);
-			}
-		}
-
-		@Override
-		public void toJson(EnumSetArgumentType type, JsonObject jsonObject) {
-			jsonObject.addProperty("clazz", type.clazz.getName());
-		}
-		
 	}
 	
 	public enum Empty {

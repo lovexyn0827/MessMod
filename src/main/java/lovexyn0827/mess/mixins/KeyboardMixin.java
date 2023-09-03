@@ -20,6 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.text.Text;
 
 @Mixin(Keyboard.class)
 public abstract class KeyboardMixin {
@@ -32,8 +33,8 @@ public abstract class KeyboardMixin {
 			LookingAtEntityHud lookingHud = MessMod.INSTANCE.getClientHudManager().lookingHud;
 			if(lookingHud != null) {
 				lookingHud.toggleRender();
-				this.client.player.sendChatMessage(
-						I18N.translate("hud.target") + (lookingHud.shouldRender ? "On" : "Off"));
+				this.client.player.sendMessage(
+						Text.literal(I18N.translate("hud.target") + (lookingHud.shouldRender ? "On" : "Off")));
 			}
 			
 			break;
@@ -41,8 +42,8 @@ public abstract class KeyboardMixin {
 			PlayerHud playerHudC = MessMod.INSTANCE.getClientHudManager().playerHudC;
 			if(playerHudC != null) {
 				playerHudC.toggleRender();
-				this.client.player.sendChatMessage(
-						I18N.translate("hud.client") + (playerHudC.shouldRender ? "On" : "Off"));
+				this.client.player.sendMessage(
+						Text.literal(I18N.translate("hud.client") + (playerHudC.shouldRender ? "On" : "Off")));
 			}
 			
 			break;
@@ -50,8 +51,8 @@ public abstract class KeyboardMixin {
 			PlayerHud playerHudS = MessMod.INSTANCE.getClientHudManager().playerHudS;
 			if(playerHudS != null) {
 				playerHudS.toggleRender();
-				this.client.player.sendChatMessage(
-						I18N.translate("hud.server") + (playerHudS.shouldRender ? "On" : "Off"));
+				this.client.player.sendMessage(
+						Text.literal(I18N.translate("hud.server") + (playerHudS.shouldRender ? "On" : "Off")));
 			}
 			
 			break;

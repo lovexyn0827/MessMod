@@ -16,11 +16,8 @@ import lovexyn0827.mess.fakes.EntityInterface;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MovementType;
-import net.minecraft.network.MessageType;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -40,9 +37,8 @@ public abstract class EntityMixin implements EntityInterface {
 	
 	@SuppressWarnings("rawtypes")
 	@Inject(at = @At(
-					value = "FIELD",
-					target = "Lnet/minecraft/entity/Entity;stepHeight:F",
-					opcode = Opcodes.GETFIELD
+					value = "INVOKE",
+					target = "Lnet/minecraft/entity/Entity;getStepHeight()F"
 			), 
 			cancellable = true,
 			method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
@@ -63,8 +59,8 @@ public abstract class EntityMixin implements EntityInterface {
 		if(type != MovementType.SELF && type != MovementType.PLAYER) {
 			if(this.shouldLogMovement && !this.world.isClient) {
 				currentReport = Lists.newArrayList();
-				currentReport.add(new LiteralText("Tick: " + this.world.getTime()).formatted(Formatting.DARK_GREEN, Formatting.BOLD));
-				currentReport.add(new LiteralText("Entity: " + this.type + '(' + this.id + ')'));
+				currentReport.add(Text.literal("Tick: " + this.world.getTime()).formatted(Formatting.DARK_GREEN, Formatting.BOLD));
+				currentReport.add(Text.literal("Entity: " + this.type + '(' + this.id + ')'));
 				String typeStr = "Unknown";
 				switch(type) {
 				case PISTON :
@@ -80,9 +76,9 @@ public abstract class EntityMixin implements EntityInterface {
 					break;
 				}
 				
-				currentReport.add(new LiteralText("Source: "  + typeStr));
-				currentReport.add(new LiteralText("Initial Movement: " + movement));
-				currentReport.add(new LiteralText("Initial Motion: " + this.velocity));
+				currentReport.add(Text.literal("Source: "  + typeStr));
+				currentReport.add(Text.literal("Initial Movement: " + movement));
+				currentReport.add(Text.literal("Initial Motion: " + this.velocity));
 				lastMovement = movement;
 			}
 		}
@@ -96,7 +92,7 @@ public abstract class EntityMixin implements EntityInterface {
 	)
 	private void onPistonMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if(currentReport != null && !this.world.isClient  && !movement.equals(lastMovement)) {
-			currentReport.add(new LiteralText("Restricted piston movement to " + movement));
+			currentReport.add(Text.literal("Restricted piston movement to " + movement));
 			lastMovement = movement;
 		}
 	}
@@ -109,7 +105,7 @@ public abstract class EntityMixin implements EntityInterface {
 	)
 	private void onCobwebMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if(currentReport != null && !movement.equals(lastMovement) && !this.world.isClient) {
-			currentReport.add(new LiteralText("MovementMultipler restricted the movement to " + movement));
+			currentReport.add(Text.literal("MovementMultipler restricted the movement to " + movement));
 			lastMovement = movement;
 		}
 	}
@@ -122,7 +118,7 @@ public abstract class EntityMixin implements EntityInterface {
 	)
 	private void onSneakingMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if(currentReport != null && !movement.equals(lastMovement) && !this.world.isClient) {
-			currentReport.add(new LiteralText("Sneaking restricted the movement to " + movement));
+			currentReport.add(Text.literal("Sneaking restricted the movement to " + movement));
 			lastMovement = movement;
 		}
 	}
@@ -135,7 +131,7 @@ public abstract class EntityMixin implements EntityInterface {
 	)
 	private void onCollisionMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci, Vec3d vec3d) {
 		if(currentReport != null && !vec3d.equals(lastMovement) && !this.world.isClient) {
-			currentReport.add(new LiteralText("Collision restricted the movement to " + movement));
+			currentReport.add(Text.literal("Collision restricted the movement to " + movement));
 			lastMovement = vec3d;
 		}
 	}
@@ -145,8 +141,8 @@ public abstract class EntityMixin implements EntityInterface {
 	)
 	private void postMove(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if(currentReport != null && !this.world.isClient) {
-			currentReport.add(new LiteralText("Final Motion: " + this.velocity));
-			currentReport.forEach((t) -> world.getServer().getPlayerManager().broadcast(t, MessageType.CHAT, Util.NIL_UUID));
+			currentReport.add(Text.literal("Final Motion: " + this.velocity));
+			currentReport.forEach((t) -> world.getServer().getPlayerManager().broadcast(t, false));
 			currentReport = null;
 			lastMovement = null;
 		}

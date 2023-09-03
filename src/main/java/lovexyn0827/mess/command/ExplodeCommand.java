@@ -8,8 +8,7 @@ import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.explosion.Explosion.DestructionType;
-
+import net.minecraft.world.World;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -40,7 +39,7 @@ public class ExplodeCommand {
 	}
 	
 	private static void createExplosion(ServerWorld world, Vec3d pos, float power, boolean fire) {
-		world.createExplosion(null, pos.x, pos.y, pos.z, power, fire, DestructionType.DESTROY);
+		world.createExplosion(null, pos.x, pos.y, pos.z, power, fire, World.ExplosionSourceType.NONE);
 	}
 
 }

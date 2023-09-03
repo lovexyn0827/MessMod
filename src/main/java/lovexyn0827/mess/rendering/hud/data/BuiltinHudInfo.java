@@ -17,7 +17,7 @@ import net.minecraft.entity.vehicle.BoatEntity;
 public enum BuiltinHudInfo implements HudLine {
 	ID("ID", DataType.INTEGER, Entity::getId, null),
 	NAME("Name", DataType.STRING, (entity) -> {
-		return entity.hasCustomName() ? entity.getCustomName().asString() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
+		return entity.hasCustomName() ? entity.getCustomName().getContent() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
 	}),
 	POS_X("Pos X", DataType.DOUBLE, Entity::getX),
 	POS_Y("Pos Y", DataType.DOUBLE, Entity::getY),
@@ -39,7 +39,7 @@ public enum BuiltinHudInfo implements HudLine {
 	HEALTH("Health", DataType.FLOAT, (e) -> ((LivingEntity) e).getHealth(), LivingEntity.class),
 	LIVING_FLAGS("Living State", DataType.STRING, (e) -> EntityHudUtil.getLivingFlags((LivingEntity) e), LivingEntity.class),
 	MOVEMENT_SPEED("OnLand Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).getMovementSpeed(), LivingEntity.class),
-	FLYING_SPEED("Fly Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).airStrafingSpeed, LivingEntity.class),
+	//XXX FLYING_SPEED("Fly Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).airStrafingSpeed, LivingEntity.class),
 	FUSE("Fuse", DataType.INTEGER, (e) -> ((TntEntity) e).getFuse(), TntEntity.class),
 	POWER_X("Power X", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerX, ExplosiveProjectileEntity.class),
 	POWER_Y("Power Y", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerY, ExplosiveProjectileEntity.class),

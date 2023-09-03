@@ -17,9 +17,10 @@ public abstract class WorldListWidgetMixin extends EntryListWidget {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Redirect(method = "filter", 
+	@Redirect(method = "showSummaries", 
 			at = @At(value = "INVOKE", 
-					target = "Lnet/minecraft/client/gui/screen/world/WorldListWidget;addEntry(Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
+					target = "net/minecraft/client/gui/screen/world/WorldListWidget"
+							+ ".addEntry(Lnet/minecraft/client/gui/widget/EntryListWidget$Entry;)I"
 			)
 	)
 	private int hideSuvivalSaves(WorldListWidget list, EntryListWidget.Entry entry) {
