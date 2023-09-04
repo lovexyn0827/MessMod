@@ -53,6 +53,7 @@ public abstract class EntityHud {
 				this.client.getWindow().getFramebufferHeight(), 0.0f, 1000.0f, 3000.0f);
         RenderSystem.setProjectionMatrix(matrix4f);
 		MatrixStack matrixStack = RenderSystem.getModelViewStack();
+		matrixStack.push();
 		matrixStack.loadIdentity();
 		matrixStack.translate(0.0, 0.0, -2000.0);
 		RenderSystem.applyModelViewMatrix();
@@ -83,6 +84,8 @@ public abstract class EntityHud {
 			
 		});
 		this.hudManager.hudHeight += (mutableY.getValue() - this.yStart);
+		matrixStack.pop();
+		RenderSystem.applyModelViewMatrix();
 	}
 	
 	public void toggleRender() {
