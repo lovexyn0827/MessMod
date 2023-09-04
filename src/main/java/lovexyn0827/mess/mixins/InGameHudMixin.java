@@ -8,19 +8,12 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import lovexyn0827.mess.options.OptionManager;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.VertexConsumerProvider.Immediate;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 @Mixin(InGameHud.class)
-public class InGameHudMixin extends DrawContext {
-	public InGameHudMixin(MinecraftClient client, Immediate vertexConsumers) {
-		super(client, vertexConsumers);
-	}
-
+public class InGameHudMixin {
 	@Shadow
 	private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/widgets.png");
     
@@ -41,19 +34,19 @@ public class InGameHudMixin extends DrawContext {
 	
 	@Redirect(method = "renderHotbar", 
 			at = @At(value = "INVOKE", 
-					target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V", 
+					target = "net/minecraft/client/gui/DrawContext.drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V", 
 					ordinal = 0
 			)
 	)
-	private void drawHotbarBackground(MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
+	private void drawHotbarBackground(DrawContext dc, Identifier id, int x, int y, int u, int v, int width, int height) {
 		if(OptionManager.hotbarLength == 9) {
-			drawTexture(WIDGETS_TEXTURE, x, y, u, v, width, height);
+			dc.drawTexture(WIDGETS_TEXTURE, x, y, u, v, width, height);
 		} else {
 			int slots = OptionManager.hotbarLength;
-			drawTexture(WIDGETS_TEXTURE, x, y, 0, 0, 1, 22);
-			drawTexture(WIDGETS_TEXTURE, x + slots * 20 + 1, y, 0, 0, 1, 22);
+			dc.drawTexture(WIDGETS_TEXTURE, x, y, 0, 0, 1, 22);
+			dc.drawTexture(WIDGETS_TEXTURE, x + slots * 20 + 1, y, 0, 0, 1, 22);
 			for(int i = 0; i < slots; i++) {
-				drawTexture(WIDGETS_TEXTURE, x + i * 20 + 1, y, 1, 0, 20, 22);
+				dc.drawTexture(WIDGETS_TEXTURE, x + i * 20 + 1, y, 1, 0, 20, 22);
 			}
 		}
 	}
