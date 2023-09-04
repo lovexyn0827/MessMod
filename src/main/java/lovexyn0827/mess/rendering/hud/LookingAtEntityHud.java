@@ -3,7 +3,6 @@ package lovexyn0827.mess.rendering.hud;
 import java.util.Optional;
 
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
@@ -24,7 +23,7 @@ public class LookingAtEntityHud extends EntityHud {
 		}
 		
 		String describe = "Target" + entityInfo;
-		if(this.shouldRender) this.render(new MatrixStack(), describe);
+		if(this.shouldRender) this.render(describe);
 	}
 
 	public static Entity getTarget(ServerPlayerEntity player) {
@@ -33,7 +32,7 @@ public class LookingAtEntityHud extends EntityHud {
 		Vec3d max = pos.add(direction);
 		Entity target = null;
 		double minDistance = 18;
-		for(Entity entity : player.world.getEntitiesByClass((Class<? extends Entity>) Entity.class, 
+		for(Entity entity : player.getWorld().getEntitiesByClass((Class<? extends Entity>) Entity.class, 
 				player.getBoundingBox().expand(10),  
 				(e) -> true)) {
 			if(entity.getUuid() == player.getUuid()) continue;

@@ -207,7 +207,7 @@ public class EntityHolder {
 		}
 		
 		this.listenedFields.entrySet().forEach((e) -> {
-			boolean isEntityWorld = e.getKey().getPhase().isNotInAnyWorld() || world == this.entity.world;
+			boolean isEntityWorld = e.getKey().getPhase().isNotInAnyWorld() || world == this.entity.getWorld();
 			if(e.getKey().getPhase() == phase && isEntityWorld) {
 				if(e.getValue() != ToBeReplaced.INSTANCE) {
 					throw new IllegalStateException("The value of " + e.getKey() + " has already been set!");

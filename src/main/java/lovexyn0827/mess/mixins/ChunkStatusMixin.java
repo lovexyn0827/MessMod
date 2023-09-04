@@ -31,10 +31,10 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 @Mixin(ChunkStatus.class)
 public class ChunkStatusMixin {
 	@Inject(method = "runGenerationTask", at = @At(value = "HEAD"), cancellable = true)
-	private void skipTaskIfNeeded(Executor executor, ServerWorld world, ChunkGenerator chunkGenerator, StructureTemplateManager structureManager, 
-			ServerLightingProvider lightingProvider, 
-			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> chunks, boolean bl, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void runGenerationTask(Executor executor, ServerWorld world, ChunkGenerator generator, 
+			StructureTemplateManager structureTemplateManager, ServerLightingProvider lightingProvider, 
+			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> fullChunkConverter, 
+			List<Chunk> chunks, CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
 		if(OptionManager.skippedGenerationStages.isEmpty()) {
 			return;
 		}
@@ -52,7 +52,10 @@ public class ChunkStatusMixin {
 	}
 	
 	@Inject(method = "runGenerationTask", at = @At(value = "RETURN"), cancellable = true)
-	private void generateChunkGrid(Executor executor, ServerWorld world, ChunkGenerator generator, StructureTemplateManager structureManager, ServerLightingProvider lightingProvider, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> fullChunkConverter, List<Chunk> chunks, boolean bl, CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void generateChunkGrid(Executor executor, ServerWorld world, ChunkGenerator generator, 
+			StructureTemplateManager structureTemplateManager, ServerLightingProvider lightingProvider, 
+			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> fullChunkConverter, 
+			List<Chunk> chunks, CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
 		ChunkStatus s = (ChunkStatus)(Object) this;
 		if(OptionManager.generateChunkGrid && s == ChunkStatus.SURFACE) {
 			Chunk chunk = chunks.get(chunks.size() / 2);

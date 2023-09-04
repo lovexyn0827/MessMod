@@ -3,7 +3,6 @@ package lovexyn0827.mess.rendering.hud;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
 import lovexyn0827.mess.rendering.hud.data.RemoteHudDataStorage;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class EntitySideBar extends EntityHud {
 	public EntitySideBar(ClientHudManager clientHudManager) {
@@ -13,7 +12,7 @@ public class EntitySideBar extends EntityHud {
 	
 	public void render() {
 		if(this.getData().size() > 0) {
-			this.render(new MatrixStack(), "Entity Sidebar");
+			this.render("Entity Sidebar");
 		}
 	}
 	

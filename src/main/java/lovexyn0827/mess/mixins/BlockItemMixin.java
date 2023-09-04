@@ -30,8 +30,8 @@ public class BlockItemMixin {
 		if(OptionManager.blockPlacementHistory && context.getPlayer() instanceof ServerPlayerEntity) {
 			BlockPlacementHistory history = ((ServerPlayerEntityInterface) player).getBlockPlacementHistory();
 			if(history != null) {
-				history.pushSingle(context.getBlockPos(), player.world.getBlockState(context.getBlockPos()), 
-						blockState, player.world.getBlockEntity(context.getBlockPos()));
+				history.pushSingle(context.getBlockPos(), player.getWorld().getBlockState(context.getBlockPos()), 
+						blockState, player.getWorld().getBlockEntity(context.getBlockPos()));
 			}
 		}
 	}

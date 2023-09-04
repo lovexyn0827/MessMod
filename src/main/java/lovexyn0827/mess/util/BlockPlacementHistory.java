@@ -29,7 +29,7 @@ public class BlockPlacementHistory {
 	public void pushSingle(BlockPos pos, BlockState prevState, 
 			BlockState newState, @Nullable BlockEntity prevBlockEntity) {
 		this.history.push(new Operation(
-				Collections.singletonList(new BlockChange(this.player.getWorld(), pos, prevState, 
+				Collections.singletonList(new BlockChange(this.player.getServerWorld(), pos, prevState, 
 				prevBlockEntity == null ? null : prevBlockEntity.createNbtWithIdentifyingData(), 
 				newState, null))));
 		this.redoQueue.clear();

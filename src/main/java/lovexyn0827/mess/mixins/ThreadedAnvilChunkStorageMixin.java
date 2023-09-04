@@ -19,6 +19,7 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.util.blame.StackTrace;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
@@ -80,7 +81,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_UPGARDE, holder.getPos().toLong(), 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), 
-				StackTrace.blameCurrent(), requiredStatus.getId());
+				StackTrace.blameCurrent(), Registries.CHUNK_STATUS.getId(requiredStatus));
 	}
 	
 	@Inject(method = "method_43375", 
@@ -135,7 +136,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.UPGARDE, holder.getPos().toLong(), 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), 
-				StackTrace.blameCurrent(), status.getId());
+				StackTrace.blameCurrent(), Registries.CHUNK_STATUS.getId(status));
 	}
 	
 	@Inject(method = "method_43375", 
@@ -189,6 +190,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UPGARDE, holder.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), status.getId());
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), 
+				Registries.CHUNK_STATUS.getId(status));
 	}
 }

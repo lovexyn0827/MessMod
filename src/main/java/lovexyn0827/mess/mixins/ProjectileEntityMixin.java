@@ -25,14 +25,15 @@ public abstract class ProjectileEntityMixin extends Entity {
 		super(type, world);
 	}
 
+	@SuppressWarnings("resource")
 	@Inject(method = "tick",
 			at = @At("TAIL")
 			)
 	private void loadChunkIfNeeded(CallbackInfo ci) {
-		if(!this.world.isClient) {
+		if(!this.getWorld().isClient) {
 			// Firework rockets are not supported because their movements are hard to predict.
 			if(OptionManager.projectileChunkLoading && !((Object)this instanceof FireworkRocketEntity)) {
-				ServerWorld world = (ServerWorld)this.world;
+				ServerWorld world = (ServerWorld)this.getWorld();
 				Vec3d nextPos = this.getPos().add(this.getVelocity());
 				ChunkTicketType<? super Entity> tt = OptionManager.projectileChunkLoadingPermanence ? PERMANENT_ENTITY_TICKET : ENTITY_TICKET;
 				world.getServer().submitAndJoin(() -> 

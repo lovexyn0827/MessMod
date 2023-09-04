@@ -27,7 +27,7 @@ public interface SidebarDataSender extends HudDataSender {
 	}
 	
 	static boolean shouldUpdate(SidebarLine line, TickingPhase phase, @Nullable World world) {
-		World entityWorld = line.entity.world;
+		World entityWorld = line.entity.getWorld();
 		return line.updatePhase == phase && line.canGet() && 
 				(entityWorld == world || phase.isNotInAnyWorld() ||
 				entityWorld instanceof ServerWorld && phase instanceof ClientTickingPhase ||

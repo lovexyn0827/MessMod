@@ -97,15 +97,15 @@ public class CommandUtil {
 	}
 	
 	public static void feedback(CommandContext<? extends ServerCommandSource> ct, Object ob) {
-		ct.getSource().sendFeedback(Text.literal(ob != null ? I18N.translate(ob.toString()) : "[null]"), false);
+		ct.getSource().sendFeedback(() -> Text.literal(ob != null ? I18N.translate(ob.toString()) : "[null]"), false);
 	}
 	
 	public static void feedbackWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
-		ct.getSource().sendFeedback(Text.literal(String.format(I18N.translate(fmt), args)), false);
+		ct.getSource().sendFeedback(() -> Text.literal(String.format(I18N.translate(fmt), args)), false);
 	}
 	
 	public static void feedbackRaw(CommandContext<? extends ServerCommandSource> ct, Object ob) {
-		ct.getSource().sendFeedback(Text.literal(ob == null ? "[null]" : ob.toString()), false);
+		ct.getSource().sendFeedback(() -> Text.literal(ob == null ? "[null]" : ob.toString()), false);
 	}
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {

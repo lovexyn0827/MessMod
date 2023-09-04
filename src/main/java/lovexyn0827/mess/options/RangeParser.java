@@ -9,6 +9,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Lists;
 
+import net.minecraft.registry.Registries;
 import net.minecraft.world.chunk.ChunkStatus;
 
 public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T> {
@@ -131,7 +132,8 @@ public abstract class RangeParser<T extends Comparable<T>> extends ListParser<T>
 					})
 					.filter((status) -> status != ChunkStatus.BIOMES && status != ChunkStatus.FULL)
 					.map((status) -> new ChunkStatusSorter(status, status.getIndex()))
-					.forEach((wrapped) -> builder.put(wrapped.status.getId(), wrapped));
+					.forEach((wrapped) -> builder.put(
+							Registries.CHUNK_STATUS.getId(wrapped.status).toString(), wrapped));
 			VANILLA_CHUNK_STATUSES = builder.build();
 		}
 	}

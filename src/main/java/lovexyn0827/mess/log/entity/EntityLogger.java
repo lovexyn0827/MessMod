@@ -263,9 +263,10 @@ public final class EntityLogger extends AbstractAchivingLogger {
 		private final int entityId;
 		private final boolean isClientSideEntity;
 		
+		@SuppressWarnings("resource")
 		private EntityIndex(Entity e) {
 			this.entityId = e.getId();
-			this.isClientSideEntity = e.world.isClient;
+			this.isClientSideEntity = e.getWorld().isClient;
 			
 		}
 

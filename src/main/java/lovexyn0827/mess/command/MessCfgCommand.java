@@ -31,9 +31,9 @@ public class MessCfgCommand {
 				.executes((ct) -> {
 					ModMetadata metadata = FabricLoader.getInstance().getModContainer("messmod").get().getMetadata();
 					ServerCommandSource s = ct.getSource();
-					s.sendFeedback(Text.literal(metadata.getName() + " " + metadata.getVersion()).formatted(Formatting.BOLD), false);
+					s.sendFeedback(() -> Text.literal(metadata.getName() + " " + metadata.getVersion()).formatted(Formatting.BOLD), false);
 					CommandUtil.feedbackRaw(ct, metadata.getDescription());
-					s.sendFeedback(new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
+					s.sendFeedback(() -> new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
 					OptionManager.OPTIONS.forEach((f) -> {
 						String n = f.getName();
 						String v = OptionManager.getString(f);
@@ -44,7 +44,7 @@ public class MessCfgCommand {
 												Text.literal(OptionManager.getDescription(n))))))
 								.formatted(Formatting.GRAY);
 						boolean modified = !v.equals(f.getAnnotation(Option.class).defaultValue());
-						s.sendFeedback(modified ? text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText()) : text, false);
+						s.sendFeedback(() -> modified ? text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText()) : text, false);
 					});
 					return 1;
 				})
@@ -89,7 +89,7 @@ public class MessCfgCommand {
 						
 						text.append(new FormattedText("cmd.messcfg.global", "f", true, o.defaultValue()).asMutableText());
 						text.append(new FormattedText("cmd.messcfg.default", "f", true, o.defaultValue()).asMutableText());
-						ct.getSource().sendFeedback(text, false);
+						ct.getSource().sendFeedback(() -> text, false);
 						return Command.SINGLE_SUCCESS;
 					})
 					.then(argument("value", StringArgumentType.greedyString())

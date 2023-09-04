@@ -64,8 +64,8 @@ public abstract class ExplosionMixin {
 			double d, double e, double f, double g, double h, int i, int j, double k, double l, double m, double n, double o, double p, 
 			Vec3d vec3d
 			) {
-		if(entity.world instanceof ServerWorld) {
-			ServerWorld world = (ServerWorld)(entity.world);
+		if(entity.getWorld() instanceof ServerWorld) {
+			ServerWorld world = (ServerWorld)(entity.getWorld());
 			if(OptionManager.entityExplosionRaysVisiblity) {
 				HitResult hit = world.raycast(new RaycastContext(source, vec3d, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
 				ShapeSender sr = MessMod.INSTANCE.shapeSender;
@@ -92,7 +92,7 @@ public abstract class ExplosionMixin {
 			int e, int r, List f, Vec3d vec3d, int g, Entity entity, double h, double s, double t, double u, 
 			double blockPos, double fluidState, double v) {
 		// FIXME: Not compatible with Lithium, may be fixed via disabling the Mixin of it.
-		if(OptionManager.entityExplosionInfluence && !entity.world.isClient) {
+		if(OptionManager.entityExplosionInfluence && !entity.getWorld().isClient) {
 			StringBuilder entityInfoBuilder = new StringBuilder(entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "")).
 					append("[").append(entity.getId()).append(",").append(entity.getPos()).append("]");
 			MessMod.INSTANCE.sendMessageToEveryone("Affected Entity: ", entityInfoBuilder.toString(), "\n", 

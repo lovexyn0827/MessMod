@@ -36,14 +36,14 @@ public class EndEyeItemMixin {
 				} catch (NumberFormatException e) {
 				}
 				
-				HitResult hit = sp.world.raycast(new RaycastContext(start, 
+				HitResult hit = sp.getWorld().raycast(new RaycastContext(start, 
 						start.add(sp.getRotationVector().multiply(r)), 
 						RaycastContext.ShapeType.COLLIDER, 
 						RaycastContext.FluidHandling.NONE, 
 						sp));
 				if(hit.getType() != HitResult.Type.MISS) {
 					Vec3d pos = hit.getPos();
-					sp.getWorld().getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, 
+					sp.getServerWorld().getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, 
 							sp.getChunkPos(), 1, sp.getId());
 					sp.networkHandler.requestTeleport(pos.x, pos.y, pos.z, sp.getYaw(), sp.getPitch());
 				}

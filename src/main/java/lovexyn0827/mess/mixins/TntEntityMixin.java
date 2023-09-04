@@ -24,13 +24,14 @@ public abstract class TntEntityMixin extends Entity{
 		super(type, world);
 	}
 
+	@SuppressWarnings("resource")
 	@Inject(method = "tick",
 			at = @At("TAIL")
 			)
 	private void loadChunkIfNeeded(CallbackInfo ci) {
-		if(!this.world.isClient) {
+		if(!this.getWorld().isClient) {
 			if(OptionManager.tntChunkLoading) {
-				ServerWorld world = (ServerWorld)this.world;
+				ServerWorld world = (ServerWorld)this.getWorld();
 				Vec3d nextPos = this.getPos();
 				ChunkTicketType<? super Entity> tt = OptionManager.tntChunkLoadingPermanence ? PERMANENT_ENTITY_TICKET : ENTITY_TICKET;
 				world.getServer().submitAndJoin(() -> world.getChunkManager().addTicket(tt,
@@ -44,7 +45,7 @@ public abstract class TntEntityMixin extends Entity{
 		if(OptionManager.attackableTnt) {
 			this.remove(RemovalReason.KILLED);
 			if(attacker.isSneaking()) {
-				this.world.getEntitiesByType(EntityType.TNT, this.getBoundingBox(), (e) -> true).forEach((e) -> e.remove(RemovalReason.KILLED));
+				this.getWorld().getEntitiesByType(EntityType.TNT, this.getBoundingBox(), (e) -> true).forEach((e) -> e.remove(RemovalReason.KILLED));
 			}
 			
 			return true;

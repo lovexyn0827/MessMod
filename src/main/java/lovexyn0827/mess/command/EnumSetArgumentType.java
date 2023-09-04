@@ -22,12 +22,12 @@ public class EnumSetArgumentType extends ElementSetArgumentType<Enum<?>, EnumSet
 	
 	@SuppressWarnings("unchecked")
 	public static <T extends Enum<?>> Set<T> getEnums(final CommandContext<?> context, final String name) {
-		return (Set<T>) context.getArgument(name, ParseResult.class).set;
+		return (Set<T>) context.getArgument(name, lovexyn0827.mess.command.EnumSetArgumentType.ParseResult.class).set;
 	}
 
 	@Override
 	protected lovexyn0827.mess.command.EnumSetArgumentType.ParseResult filter(NameFilter filter) {
-		return new ParseResult(filter.filter(this.clazz));
+		return new lovexyn0827.mess.command.EnumSetArgumentType.ParseResult(filter.filter(this.clazz));
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package lovexyn0827.mess.rendering.hud;
 
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class PlayerHud extends EntityHud{
@@ -14,6 +13,6 @@ public class PlayerHud extends EntityHud{
 	}
 	
 	public void render() {
-		this.render(new MatrixStack(), (this.isServer ? "Server" : "Client") + "Player(" + this.player.getId() + ")");
+		this.render((this.isServer ? "Server" : "Client") + "Player(" + this.player.getId() + ")");
 	}
 }
