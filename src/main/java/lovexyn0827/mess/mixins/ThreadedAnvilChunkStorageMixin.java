@@ -77,7 +77,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			return;
 		}
 		
-		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_UPGARDE, holder.getPos().toLong(), 
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_UPGRADE, holder.getPos().toLong(), 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), 
 				StackTrace.blameCurrent(), requiredStatus.getId());
 	}
@@ -132,7 +132,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			return;
 		}
 		
-		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.UPGARDE, holder.getPos().toLong(), 
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.UPGRADE, holder.getPos().toLong(), 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), 
 				StackTrace.blameCurrent(), status.getId());
 	}
@@ -187,7 +187,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			return;
 		}
 		
-		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UPGARDE, holder.getPos().toLong(), 
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UPGRADE, holder.getPos().toLong(), 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), status.getId());
 	}
 }
