@@ -11,7 +11,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.command.EnumSetArgumentType.Empty;
-import lovexyn0827.mess.mixins.ArgumentTypesMixin;
+import lovexyn0827.mess.mixins.ArgumentTypesAccessor;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
@@ -21,6 +21,7 @@ import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
@@ -201,20 +202,20 @@ public class CommandUtil {
 		};
 	}
 
-	public static void registerArgumentTypes() {
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_enum_set", 
+	public static void registerArgumentTypes(Registry<?> reg) {
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_enum_set", 
 				EnumSetArgumentType.class, 
 				ConstantArgumentSerializer.of(() -> EnumSetArgumentType.of(Empty.class)));
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_filtered_set", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_filtered_set", 
 				FilteredSetArgumentType.class, 
 				ConstantArgumentSerializer.of(() -> FilteredSetArgumentType.of(new HashMap<>())));
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_float", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_float", 
 				ExtendedFloatArgumentType.class, 
 				ConstantArgumentSerializer.of(ExtendedFloatArgumentType::floatArg));
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_accessing_path", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_accessing_path", 
 				AccessingPathArgumentType.class, 
 				ConstantArgumentSerializer.of(AccessingPathArgumentType::accessingPathArg));
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_phase", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_phase", 
 				TickingPhaseArgumentType.class, 
 				ConstantArgumentSerializer.of(TickingPhaseArgumentType::phaseArg));
 	}

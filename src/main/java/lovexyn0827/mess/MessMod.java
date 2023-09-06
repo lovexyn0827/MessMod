@@ -81,7 +81,6 @@ public class MessMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		OptionManager.loadGlobal();
-		CommandUtil.registerArgumentTypes();
 	}
 	
 	public Mapping getMapping() {

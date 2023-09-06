@@ -53,6 +53,7 @@
     "DataCommandStorageAccessor", 
     "EnchantCommandMixin", 
     "EntityMixin", 
+    "ArgumentTypesAccessor", 
     "ArgumentTypesMixin"
   ],
   "client": [
