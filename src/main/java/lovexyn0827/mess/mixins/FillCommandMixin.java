@@ -7,10 +7,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
 import lovexyn0827.mess.options.OptionManager;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.command.argument.BlockStateArgument;
 import net.minecraft.entity.Entity;
@@ -55,6 +56,21 @@ public class FillCommandMixin {
 			Entity entity = source.getEntity();
 			if (entity instanceof ServerPlayerEntity) {
 				((ServerPlayerEntityInterface) entity).getBlockPlacementHistory().endOperation(true);
+			} 
+		}
+	}
+	
+	@Redirect(
+			method = "execute", 
+			at = @At(value = "INVOKE", target = "net/minecraft/util/Clearable.clear(Ljava/lang/Object;)V")
+	)
+	private static void onInventoryClean(Object blockEntity, ServerCommandSource source, BlockBox range, 
+			BlockStateArgument block, @Coerce Enum<?> mode, Predicate<CachedBlockPosition> filter) {
+		if(OptionManager.fillHistory) {
+			Entity entity = source.getEntity();
+			if (entity instanceof ServerPlayerEntity) {
+				((ServerPlayerEntityInterface) entity).getBlockPlacementHistory()
+						.preparePrevBlockEntityForTheNext((BlockEntity) blockEntity);
 			} 
 		}
 	}
