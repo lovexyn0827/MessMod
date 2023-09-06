@@ -45,7 +45,7 @@ public class MappingProvider {
 		Mapping dummy = new DummyMapping();
 		
 		try {
-			Class.forName("net.minecraft.entity.Entity");	// TODO Remove $827 if needed
+			Class.forName("net.minecraft.entity.Entity$823");	// TODO Remove $827 if needed
 			LOGGER.info("The Minecraft has probably been deobfuscated, the mapping won't be loaded");
 			return new DummyMapping();
 		} catch (ClassNotFoundException e) {

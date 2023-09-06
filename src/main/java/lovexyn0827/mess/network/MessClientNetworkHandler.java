@@ -35,7 +35,7 @@ public class MessClientNetworkHandler {
 			Identifier id = packet.getChannel();
 			PacketHandler handler = PACKET_HANDLERS.get(id);
 			if(handler != null) {
-				handler.onPacket(packet);
+				this.client.execute(() -> handler.onPacket(packet));
 				return true;
 			}
 		} catch (Exception e) {

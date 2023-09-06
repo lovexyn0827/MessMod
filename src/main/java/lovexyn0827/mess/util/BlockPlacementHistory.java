@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class BlockPlacementHistory {
 	private static final ThreadLocal<List<BlockChange>> CURRENT = new ThreadLocal<>();
+	private static final ThreadLocal<CompoundTag> NEXT_BE = new ThreadLocal<>();
 	private final ServerPlayerEntity player;
 	private final Stack<Operation> history = new Stack<>();
 	private final Stack<Operation> redoQueue = new Stack<>();
@@ -48,7 +49,16 @@ public class BlockPlacementHistory {
 			return;
 		}
 		
-		CURRENT.get().add(new BlockChange(world, pos.toImmutable(), prevState, prevBlockEntity, newState, newBlockEntity));
+		CompoundTag be = NEXT_BE.get();
+		CURRENT.get().add(new BlockChange(world, pos.toImmutable(), 
+				prevState, be == null ? prevBlockEntity : be, 
+				newState, newBlockEntity));
+	}
+	
+	public void preparePrevBlockEntityForTheNext(BlockEntity be) {
+		if(be != null) {
+			NEXT_BE.set(be.toTag(new CompoundTag()));
+		}
 	}
 	
 	public void endOperation(boolean abort) {
@@ -122,17 +132,30 @@ public class BlockPlacementHistory {
 		}
 
 		public void redo() {
-			this.world.setBlockState(this.pos, this.newState, 11, 0);
+			this.world.setBlockState(this.pos, this.newState, 2, 0);
 			if(this.newBlockEntity != null) {
-				this.world.setBlockEntity(this.pos, BlockEntity.createFromTag(this.newState, this.newBlockEntity));
+				BlockEntity be = this.world.getBlockEntity(this.pos);
+				if(be != null) {
+					be.fromTag(this.newState, appendLocationalData(this.newBlockEntity, this.pos));
+				}
 			}
 		}
 
 		public void undo() {
-			this.world.setBlockState(this.pos, this.prevState, 11, 0);
+			this.world.setBlockState(this.pos, this.prevState, 2, 0);
 			if (this.prevBlockEntity != null) {
-				this.world.setBlockEntity(this.pos, BlockEntity.createFromTag(this.prevState, this.prevBlockEntity));
+				BlockEntity be = this.world.getBlockEntity(this.pos);
+				if(be != null) {
+					be.fromTag(this.prevState, appendLocationalData(this.prevBlockEntity, this.pos));
+				}
 			}
+		}
+		
+		private static CompoundTag appendLocationalData(CompoundTag tag, BlockPos pos) {
+			tag.putInt("x", pos.getX());
+            tag.putInt("y", pos.getY());
+            tag.putInt("z", pos.getZ());
+            return tag;
 		}
 	}
 }
