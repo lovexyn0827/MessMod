@@ -33,7 +33,7 @@ public class MessServerNetworkHandler {
 			PacketByteBuf buf = accessor.getMessData();
 			PacketHandler handler = PACKET_HANDLERS.get(channel);
 			if(handler != null) {
-				this.server.execute(() -> handler.onPacket(player, channel, buf));
+				handler.onPacket(player, channel, buf);
 				return true;
 			}
 		} catch (Exception e) {
@@ -68,12 +68,16 @@ public class MessServerNetworkHandler {
 		});
 		register(Channels.UNDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().undo();
+				player.server.execute(() -> {
+					((ServerPlayerEntityInterface) player).getBlockPlacementHistory().undo();
+				});
 			}
 		});
 		register(Channels.REDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
+				player.server.execute(() -> {
+					((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
+				});
 			}
 		});
 	}
