@@ -3,6 +3,7 @@ package lovexyn0827.mess.export;
 public enum SaveComponent {
 	REGION, 
 	POI, 
+	ENTITY, 
 	RAID, 
 	MAP_LOCAL, 
 	MAP_OTHER,

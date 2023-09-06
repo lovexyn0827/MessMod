@@ -57,7 +57,8 @@ public final class ExportTask {
 	private static final Map<CommandOutput, ExportTask> TASKS = new HashMap<>();
 	private final Map<String, Region> regions = new HashMap<>();
 	private final MinecraftServer server;
-	private final EnumSet<SaveComponent> components = EnumSet.of(SaveComponent.REGION, SaveComponent.POI);
+	private final EnumSet<SaveComponent> components = EnumSet.of(
+			SaveComponent.REGION, SaveComponent.POI, SaveComponent.ENTITY);
 	private final ServerPlayerEntity owner;
 	
 	private ExportTask(CommandOutput k, MinecraftServer server) {
@@ -178,6 +179,10 @@ public final class ExportTask {
 		}
 		
 		Path origin = this.server.getSavePath(WorldSavePathMixin.create(dirName));
+		if(!Files.exists(origin)) {
+			return;
+		}
+		
 		Path dst = temp.resolve(dirName);
 		Files.createDirectories(dst);
 		for(Path p : Files.list(origin).toArray((i) -> new Path[i])) {
