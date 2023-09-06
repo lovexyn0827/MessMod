@@ -27,7 +27,7 @@ public abstract class WorldListWidgetEntryMixin {
 	private @Final SelectWorldScreen screen;
 	
 	@Shadow
-	protected abstract void method_29990();
+	protected abstract void start();
 	
 	@Inject(method = "play", at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/world/WorldListWidget$Entry."
 			+ "start()V"), cancellable = true)
@@ -36,7 +36,7 @@ public abstract class WorldListWidgetEntryMixin {
 				&& !new File(this.level.getFile().getParentFile(), "mcwmem.prop").exists()) {
 			BooleanConsumer bc = (bool) -> {
 				if(bool) {
-					this.method_29990();
+					this.start();
 					this.client.startIntegratedServer(this.level.getName());
 				} else {
 					this.client.setScreen(screen);

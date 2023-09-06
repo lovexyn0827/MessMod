@@ -33,7 +33,7 @@ public class MessServerNetworkHandler {
 			PacketByteBuf buf = accessor.getMessData();
 			PacketHandler handler = PACKET_HANDLERS.get(channel);
 			if(handler != null) {
-				handler.onPacket(player, channel, buf);
+				this.server.execute(() -> handler.onPacket(player, channel, buf));
 				return true;
 			}
 		} catch (Exception e) {
