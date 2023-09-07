@@ -10,7 +10,7 @@ import net.minecraft.command.argument.serialize.ArgumentSerializer;
 import net.minecraft.registry.Registry;
 
 @Mixin(ArgumentTypes.class)
-public interface ArgumentTypesMixin {
+public interface ArgumentTypesAccessor {
 	@Invoker("register")
 	static <A extends ArgumentType<?>, T extends ArgumentSerializer.ArgumentTypeProperties<A>> ArgumentSerializer<A, T> registerForMessMod(Registry<ArgumentSerializer<?, ?>> registry, String id, Class<? extends A> clazz, ArgumentSerializer<A, T> serializer) {
 		return serializer;

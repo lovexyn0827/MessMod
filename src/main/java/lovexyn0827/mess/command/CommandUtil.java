@@ -9,7 +9,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import lovexyn0827.mess.mixins.ArgumentTypesMixin;
+import lovexyn0827.mess.mixins.ArgumentTypesAccessor;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
@@ -201,19 +201,19 @@ public class CommandUtil {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void registerArgumentTypes() {
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_enum_set", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_enum_set", 
 				EnumSetArgumentType.class, 
 				new EnumSetArgumentType.Serializer());
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_filtered_set", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_filtered_set", 
 				FilteredSetArgumentType.class, 
 				new FilteredSetArgumentType.Serializer());
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_float", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_float", 
 				ExtendedFloatArgumentType.class, 
 				ConstantArgumentSerializer.of(ExtendedFloatArgumentType::floatArg));
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_accessing_path", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_accessing_path", 
 				AccessingPathArgumentType.class, 
 				ConstantArgumentSerializer.of(AccessingPathArgumentType::accessingPathArg));
-		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_phase", 
+		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_phase", 
 				TickingPhaseArgumentType.class, 
 				ConstantArgumentSerializer.of(TickingPhaseArgumentType::phaseArg));
 	}

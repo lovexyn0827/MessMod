@@ -53,7 +53,8 @@
     "DataCommandStorageAccessor", 
     "EnchantCommandMixin", 
     "EntityMixin", 
-    "ArgumentTypesMixin"
+    "ArgumentTypesMixin", 
+    "ArgumentTypesAccessor"
   ],
   "client": [
     "MinecraftClientMixin",
