@@ -45,7 +45,7 @@ public class MappingProvider {
 		Mapping dummy = new DummyMapping();
 		
 		try {
-			Class.forName("net.minecraft.entity.Entity$823");	// TODO Remove $827 if needed
+			Class.forName("net.minecraft.entity.Entity");	// TODO Remove $827 if needed
 			LOGGER.info("The Minecraft has probably been deobfuscated, the mapping won't be loaded");
 			return new DummyMapping();
 		} catch (ClassNotFoundException e) {
@@ -60,11 +60,11 @@ public class MappingProvider {
 				if(mappingFile.exists()) {
 					LOGGER.info("Found corresponding Tiny mapping, trying to load it...");
 					return new TinyMapping(mappingFile);
-				} else if(this.source == Source.YARN && FabricLoader.getInstance().isModLoaded("carpet-tis-addition")) {
-					return tryLoadMappingFromTisAddition().orElse(dummy);
 				} else if(this.source == Source.YARN && tryDownloadYarnMapping(mappingFile.toPath())) {
 					LOGGER.info("Downloaded the mapping successfully, loading it...");
 					return new TinyMapping(mappingFile);
+				} else if(this.source == Source.YARN && FabricLoader.getInstance().isModLoaded("carpet-tis-addition")) {
+					return tryLoadMappingFromTisAddition().orElse(dummy);
 				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
