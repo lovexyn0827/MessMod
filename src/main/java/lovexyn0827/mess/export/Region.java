@@ -3,19 +3,24 @@ package lovexyn0827.mess.export;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.List;
 
 import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RegionBasedStorageAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestStorage.OccupationStatus;
+import net.minecraft.world.storage.ChunkDataList;
+import net.minecraft.world.storage.EntityChunkDataAccess;
 import net.minecraft.world.storage.RegionBasedStorage;
 
 public final class Region {
@@ -54,6 +59,9 @@ public final class Region {
 		PointOfInterestStorage poiStorage = this.dimension.getPointOfInterestStorage();
 		PointOfInterestStorage poiDst = new PointOfInterestStorage(temp.resolve(dir).resolve("poi"), 
 				this.dimension.getServer().getDataFixer(), false, this.dimension);
+		EntityChunkDataAccess entityDst = new EntityChunkDataAccess(this.dimension, 
+				temp.resolve(dir).resolve("entities"), this.dimension.getServer().getDataFixer(), false, 
+				this.dimension.getServer());
 		for(int x = this.min.x; x <= this.max.x; x++) {
 			for(int z = this.min.z; z <= this.max.z; z++) {
 				ChunkPos pos = new ChunkPos(x, z);
@@ -67,12 +75,22 @@ public final class Region {
 						poiDst.add(poi.getPos(), poi.getType());
 					});
 				}
+				
+				if(components.contains(SaveComponent.ENTITY)) {
+					@SuppressWarnings("unchecked")
+					List<Entity> entities = (List<Entity>) this.dimension
+							.getEntitiesByType(TypeFilter.instanceOf(Entity.class), (e) -> {
+								return e.shouldSave() && e.getChunkPos().equals(pos);
+							});
+					entityDst.writeChunkData(new ChunkDataList<Entity>(pos, (List<Entity>) entities));
+				}
 			}
 		}
 		
 		storage.close();
 		// FIXME: POIs may be exported incorrectly
 		poiDst.tick(() -> true);
+		entityDst.close();
 		poiDst.close();
 	}
 
