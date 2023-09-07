@@ -356,15 +356,15 @@
 - `LOADING`：开始加载区块；
 - `UNLOADING`：开始卸载区块；
 - `GENERATION`：开始或继续生成区块；
-- `UPGARDE`：开始一个区块生成阶段；
+- `UPGRADE`：开始一个区块生成阶段；
 - `END_LOADING`：一个区块加载完成；
 - `END_UNLOADING`：一个区块卸载完成；
 - `END_GENERATION`：一个区块生成完成或暂停；
-- `END_UPGARDE`：一个区块的一个生成阶段完成；
+- `END_UPGRADE`：一个区块的一个生成阶段完成；
 - `SCHEDULER_LOADING`：计划加载一个区块；
 - `SCHEDULER_UNLOADING`：计划卸载一个区块；
 - `SCHEDULER_GENERATION`：计划生成一个区块；
-- `SCHEDULER_UPGARDE`：计划开始一个区块生成阶段；
+- `SCHEDULER_UPGRADE`：计划开始一个区块生成阶段；
 - `TICKET_ADDITION`：添加区块加载票；
 - `TICKET_REMOVAL`：移除区块加载票（不含过期）。
 

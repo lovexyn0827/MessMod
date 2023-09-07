@@ -35,7 +35,7 @@ public class MessClientNetworkHandler {
 			Identifier id = packet.getChannel();
 			PacketHandler handler = PACKET_HANDLERS.get(id);
 			if(handler != null) {
-				handler.onPacket(packet);
+				handler.onPacket(packet, this.client);
 				return true;
 			}
 		} catch (Exception e) {
@@ -46,7 +46,7 @@ public class MessClientNetworkHandler {
 	}
 
 	public void send(CustomPayloadC2SPacket packet) {
-		ClientPlayNetworkHandler handler = client.getNetworkHandler();
+		ClientPlayNetworkHandler handler = this.client.getNetworkHandler();
 		if(handler != null) {
 			handler.sendPacket(packet);
 		}
@@ -66,7 +66,7 @@ public class MessClientNetworkHandler {
 	}
 	
 	static {
-		register(Channels.HUD, (packet) -> {
+		register(Channels.HUD, (packet, client) -> {
 			PacketByteBuf buffer = packet.getData();
 			HudType type = buffer.readEnumConstant(HudType.class);
 			NbtCompound tag = buffer.readNbt();
@@ -75,19 +75,23 @@ public class MessClientNetworkHandler {
 				((RemoteHudDataStorage) cache).pushData(tag);
 			}
 		});
-		register(Channels.SHAPE, (packet) -> {
+		register(Channels.SHAPE, (packet, client) -> {
 			((RemoteShapeCache) MessMod.INSTANCE.shapeCache).handlePacket(packet);
 		});
-		register(Channels.OPTIONS, (packet) -> {
-			try {
-				OptionManager.loadFromServer(new ByteArrayInputStream(packet.getData().readString().getBytes()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		register(Channels.OPTIONS, (packet, client) -> {
+			ByteArrayInputStream options = new ByteArrayInputStream(packet.getData().readString().getBytes());
+			client.execute(() -> {
+				try {
+					OptionManager.loadFromServer(options);
+				} catch (IOException e) {
+					MessMod.LOGGER.error("Failed to load options from the server.");
+					e.printStackTrace();
+				}
+			});
 		});
 	}
 	
 	public interface PacketHandler {
-		void onPacket(CustomPayloadS2CPacket packet);
+		void onPacket(CustomPayloadS2CPacket packet, MinecraftClient client);
 	}
 }

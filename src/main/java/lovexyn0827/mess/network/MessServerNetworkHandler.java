@@ -68,12 +68,16 @@ public class MessServerNetworkHandler {
 		});
 		register(Channels.UNDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().undo();
+				player.server.execute(() -> {
+					((ServerPlayerEntityInterface) player).getBlockPlacementHistory().undo();
+				});
 			}
 		});
 		register(Channels.REDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
+				player.server.execute(() -> {
+					((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
+				});
 			}
 		});
 	}

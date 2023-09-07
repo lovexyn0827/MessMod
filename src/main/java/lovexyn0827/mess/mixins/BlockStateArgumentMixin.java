@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.BlockPlacementHistory;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.argument.BlockStateArgument;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
@@ -28,20 +27,9 @@ public class BlockStateArgumentMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD)
 	private void onSetBlock(ServerWorld serverWorld, BlockPos blockPos, int i, CallbackInfoReturnable<Boolean> cir, 
 			BlockState blockState) {
-		if(OptionManager.fillHistory) {
-			BlockEntity be = serverWorld.getBlockEntity(blockPos);
-			NbtCompound tag;
-			if(this.data != null) {
-				tag = data.copy();
-				tag.putInt("x", blockPos.getX());
-				tag.putInt("y", blockPos.getY());
-				tag.putInt("z", blockPos.getZ());
-			} else {
-				tag = null;
-			}
-			
+		if(OptionManager.fillHistory) {			
 			BlockPlacementHistory.appendBlockChange(serverWorld, blockPos, serverWorld.getBlockState(blockPos), 
-					blockState, be == null ? null : be.createNbtWithIdentifyingData(), tag);
+					blockState, null, this.data);
 		}
 	}
 }
