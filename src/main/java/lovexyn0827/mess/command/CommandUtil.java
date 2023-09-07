@@ -1,6 +1,5 @@
 package lovexyn0827.mess.command;
 
-import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -10,7 +9,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import lovexyn0827.mess.command.EnumSetArgumentType.Empty;
 import lovexyn0827.mess.mixins.ArgumentTypesMixin;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
@@ -201,13 +199,14 @@ public class CommandUtil {
 		};
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void registerArgumentTypes() {
 		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_enum_set", 
 				EnumSetArgumentType.class, 
-				ConstantArgumentSerializer.of(() -> EnumSetArgumentType.of(Empty.class)));
+				new EnumSetArgumentType.Serializer());
 		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_filtered_set", 
 				FilteredSetArgumentType.class, 
-				ConstantArgumentSerializer.of(() -> FilteredSetArgumentType.of(new HashMap<>())));
+				new FilteredSetArgumentType.Serializer());
 		ArgumentTypesMixin.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_float", 
 				ExtendedFloatArgumentType.class, 
 				ConstantArgumentSerializer.of(ExtendedFloatArgumentType::floatArg));

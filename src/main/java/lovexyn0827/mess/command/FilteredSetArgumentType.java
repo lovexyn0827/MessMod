@@ -1,17 +1,24 @@
 package lovexyn0827.mess.command;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import lovexyn0827.mess.util.NameFilter;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.argument.serialize.ArgumentSerializer;
+import net.minecraft.command.argument.serialize.ArgumentSerializer.ArgumentTypeProperties;
+import net.minecraft.network.PacketByteBuf;
 
 public class FilteredSetArgumentType<T> extends ElementSetArgumentType<T, FilteredSetArgumentType.ParseResult<T>> {
 	private final Map<String, T> elementsByName;
@@ -32,12 +39,13 @@ public class FilteredSetArgumentType<T> extends ElementSetArgumentType<T, Filter
 	
 	@SuppressWarnings("unchecked")
 	public static <T> Set<T> getFiltered(final CommandContext<?> context, final String name) {
-		return (Set<T>) context.getArgument(name, lovexyn0827.mess.command.FilteredSetArgumentType.ParseResult.class).set;
+		return (Set<T>) context.getArgument(name, FilteredSetArgumentType.ParseResult.class).set;
 	}
 	
 	@Override
-	protected lovexyn0827.mess.command.FilteredSetArgumentType.ParseResult<T> filter(NameFilter filter) {
-		return new lovexyn0827.mess.command.FilteredSetArgumentType.ParseResult<T>(Sets.newHashSet(filter.filterByKey(this.elementsByName, (a) -> a).values()));
+	protected FilteredSetArgumentType.ParseResult<T> filter(NameFilter filter) {
+		return new FilteredSetArgumentType.ParseResult<T>(
+				Sets.newHashSet(filter.filterByKey(this.elementsByName, (a) -> a).values()));
 	}
 
 	@Override
@@ -54,6 +62,61 @@ public class FilteredSetArgumentType<T> extends ElementSetArgumentType<T, Filter
 	static final class ParseResult<T> extends ElementSetArgumentType.ParseResult<T> {
 		public ParseResult(Set<T> set) {
 			super(set);
+		}
+	}
+	
+	public static class Serializer<T> implements ArgumentSerializer<FilteredSetArgumentType<T>, Prop<T>> {
+		@Override
+		public void writePacket(Prop<T> prop, PacketByteBuf buf) {
+			buf.writeInt(prop.elements.size());
+			prop.elements.forEach(buf::writeString);
+		}
+
+		@Override
+		public Prop<T> fromPacket(PacketByteBuf buf) {
+			int count = buf.readInt();
+			Set<String> elements = new HashSet<>();
+			for(int i = 0; i < count; i++) {
+				elements.add(buf.readString());
+			}
+			
+			return new Prop<T>(elements);
+		}
+
+		@Override
+		public void writeJson(Prop<T> prop, JsonObject json) {
+			JsonArray list = new JsonArray();
+			prop.elements.forEach(list::add);
+			json.add("elements", list);
+		}
+
+		@Override
+		public Prop<T> getArgumentTypeProperties(FilteredSetArgumentType<T> arg) {
+			return new Prop<>(arg);
+		}
+		
+	}
+	
+	public static class Prop<T> implements ArgumentTypeProperties<FilteredSetArgumentType<T>> {
+		protected final Set<String> elements;
+		
+		public Prop(FilteredSetArgumentType<T> t) {
+			this.elements = t.elementsByName.keySet();
+		}
+		
+		public Prop(Set<String> set) {
+			this.elements = set;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public FilteredSetArgumentType<T> createType(CommandRegistryAccess var1) {
+			return (FilteredSetArgumentType<T>) of(this.elements, (e) -> e);
+		}
+
+		@Override
+		public Serializer<T> getSerializer() {
+			return new Serializer<>();
 		}
 	}
 }
