@@ -1345,10 +1345,10 @@ Specify a regular expression matching the class (package name is optional) of se
 
 ## Mapping Loading
 
-1. If the minecraft is deobfuscated, the mapping won't be loaded.
-2. Check `mapping` folder for corresponding mapping (i.e.`<mcversion>.ting`, like `1.16.4.tiny`).
-3. Otherwise, if the TIS Carpet Addition is loaded, try to load its bundled mapping.
-4. Otherwise, try to download the latest compatible mapping form fabric's official maven repository.
+1. If Minecraft is deobfuscated, the mapping won't be loaded.
+2. Check the `mapping` folder for corresponding mapping (i.e.`<mcversion>.ting`, like `1.16.4.tiny`).
+3. Otherwise, try to download the latest compatible mapping from Fabric's official maven repository.
+4. Otherwise, if the TIS Carpet Addition is loaded, try to load its bundled mapping.
 5. Otherwise, the mapping won't be loaded.
 
 ## Other Features

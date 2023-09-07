@@ -1348,8 +1348,8 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 1. 如果Minecraft已经被反混淆为Yarn名（由Entity类判断），则Mapping不会被加载。
 2. 在`mapping`文件夹下查找对应的Mapping（`<Minecraft版本>.tiny`，如`1.16.4.tiny`）并加载。
-3. 否则，若安装有TIS Carpet Addition，则使用TIS Carpet Addition内置的Mapping。
-4. 否则，从Fabric的官方Maven仓库下载对应版本的最新Mapping。
+3. 否则，从Fabric的官方Maven仓库下载对应版本的最新Mapping。
+4. 否则，若安装有TIS Carpet Addition，则使用TIS Carpet Addition内置的Mapping。
 5. 若全部失败，Mapping不会被加载。
 
 ## 其他特性
