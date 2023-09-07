@@ -54,6 +54,5 @@ public abstract class ElementSetArgumentType<T, R extends ElementSetArgumentType
 		public ParseResult(Set<T> set) {
 			this.set = set;
 		}
-
 	}
 }
