@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import lovexyn0827.mess.command.CommandUtil;
+import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -111,6 +112,7 @@ public class MessMod implements ModInitializer {
 		this.blockInfoRederer.tick();
 		this.shapeSender.updateClientTime(server.getOverworld().getTime());
 		this.entityLogger.serverTick();
+		LagCommand.tick();
 	}
 	
 
