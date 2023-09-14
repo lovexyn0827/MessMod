@@ -68,7 +68,7 @@ public class ChunkBehaviorLogger extends AbstractAchivingLogger {
 			Object cause, Object addition) {
 		if(this.working && this.subscribedEvents.contains(event)) {
 			this.currentLog.println(event.name(), 
-					new ChunkPos(pos), 
+					pos == ChunkPos.MARKER ? null : new ChunkPos(pos), 
 					dim, 
 					this.server.getOverworld().getTime(), 
 					Util.getMeasuringTimeNano(), 

@@ -52,7 +52,9 @@
     "RaidManagerAccessor", 
     "DataCommandStorageAccessor", 
     "EnchantCommandMixin", 
-    "EntityMixin"
+    "EntityMixin", 
+    "ServerChunkManagerMainThreadExecutorMixin", 
+    "ChunkTicketManagerNearbyChunkTicketUpdaterMixin"
   ],
   "client": [
     "MinecraftClientMixin",
