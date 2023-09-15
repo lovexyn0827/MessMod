@@ -124,7 +124,7 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean chunkLogAutoArchiving;
 	
-	@Option(defaultValue = "false", 
+	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;
 	
