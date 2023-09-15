@@ -27,4 +27,15 @@ public class FloatParser implements OptionParser<Float> {
 			}
 		}
 	}
+	
+	public static class NaNablePositive extends Positive {
+		@Override
+		public Float tryParse(String str) throws InvalidOptionException {
+			if("NaN".equals(str)) {
+				return Float.NaN;
+			} else {
+				return super.tryParse(str);
+			}
+		}
+	}
 }

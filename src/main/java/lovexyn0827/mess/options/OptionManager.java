@@ -132,9 +132,9 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean craftingTableBUD;
 	
-	@Option(defaultValue = "0.05", 
-			suggestions = {"0.05", "0.10"}, 
-			parserClass = FloatParser.Positive.class)
+	@Option(defaultValue = "NaN", 
+			suggestions = {"0.05", "0.10", "NaN"}, 
+			parserClass = FloatParser.NaNablePositive.class)
 	public static float creativeUpwardsSpeed;
 	
 	@Option(defaultValue = "false", 
