@@ -8,7 +8,7 @@ import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerAbilities;
 
-@Mixin(ClientPlayerEntity.class)
+@Mixin(value = ClientPlayerEntity.class, priority = 900)
 public abstract class ClientPlayerEntityMixin {
 	@Redirect(method = "tickMovement", 
 			at = @At(value = "INVOKE", 
