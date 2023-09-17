@@ -162,6 +162,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	static {
 		CUSTOM_MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModNotLoaded("carpet", "1.4.25", null));
 		ADVANCED_MIXINS = ImmutableSet.<String>builder()
+				.add("ServerChunkManagerMainThreadExecutorMixin")
 				.build();
 		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);
 	}
