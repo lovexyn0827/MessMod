@@ -1,9 +1,11 @@
 package lovexyn0827.mess.util.access;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.jetbrains.annotations.Nullable;
@@ -20,13 +22,22 @@ import lovexyn0827.mess.options.OptionManager;
 class JavaAccessingPath implements AccessingPath {
 	private final LinkedList<Node> nodes;
 	private boolean initialized;
-	private final WeakHashMap<Object, JavaAccessingPath> initializedSubPaths = new WeakHashMap<>();
+	private final Map<Object, JavaAccessingPath> initializedSubPaths;
 	private final String originalStringRepresentation;
 	
 	protected JavaAccessingPath(List<Node> nodes, String strRep) {
 		this.nodes = new LinkedList<>();
 		this.nodes.addAll(nodes);
 		this.originalStringRepresentation = strRep;
+		this.initializedSubPaths = Collections.synchronizedMap(new WeakHashMap<>());
+	}
+
+	private JavaAccessingPath(LinkedList<Node> nodes, String strRep,
+			Map<Object, JavaAccessingPath> forkSet) {
+		this.nodes = new LinkedList<>();
+		this.nodes.addAll(nodes);
+		this.originalStringRepresentation = strRep;
+		this.initializedSubPaths = forkSet;
 	}
 
 	@Override
@@ -198,7 +209,7 @@ class JavaAccessingPath implements AccessingPath {
 	private JavaAccessingPath createCopyForInput(Object in) {
 		LinkedList<Node> newNodes = new LinkedList<>();
 		this.nodes.stream().map((n) -> n.createCopyForInput(in)).forEach(newNodes::add);
-		return new JavaAccessingPath(newNodes, this.originalStringRepresentation);
+		return new JavaAccessingPath(newNodes, this.originalStringRepresentation, this.initializedSubPaths);
 	}
 
 	@Override
