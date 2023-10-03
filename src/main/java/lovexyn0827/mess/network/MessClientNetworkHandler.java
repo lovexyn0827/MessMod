@@ -1,7 +1,5 @@
 package lovexyn0827.mess.network;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
@@ -79,14 +77,8 @@ public class MessClientNetworkHandler {
 			((RemoteShapeCache) MessMod.INSTANCE.shapeCache).handlePacket(packet);
 		});
 		register(Channels.OPTIONS, (packet, client) -> {
-			ByteArrayInputStream options = new ByteArrayInputStream(packet.getData().readString().getBytes());
 			client.execute(() -> {
-				try {
-					OptionManager.loadFromServer(options);
-				} catch (IOException e) {
-					MessMod.LOGGER.error("Failed to load options from the server.");
-					e.printStackTrace();
-				}
+				OptionManager.loadFromRemoteServer(packet.getData());
 			});
 		});
 	}

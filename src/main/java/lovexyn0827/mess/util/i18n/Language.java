@@ -4,19 +4,17 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.InvalidOptionException;
 import lovexyn0827.mess.options.OptionParser;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.command.ServerCommandSource;
 
 /**
  * A language definition. Only the in-game contents will be translated.
@@ -113,15 +111,14 @@ public class Language {
 		}
 		
 		@Override
-		public SuggestionProvider<ServerCommandSource> createSuggestions() {
-			return (ct, b) -> {
-				b.suggest("-FOLLOW_SYSTEM_SETTINGS-");
-				I18N.SUPPORTED_LANGUAGES.forEach((l) -> {
-					b.suggest(l);
-					b.suggest(l + "_FORCELOAD");
-				});
-				return b.buildFuture();
-			};
+		public Set<String> createSuggestions() {
+			Set<String> langs = new HashSet<>();
+			langs.add("-FOLLOW_SYSTEM_SETTINGS-");
+			I18N.SUPPORTED_LANGUAGES.forEach((l) -> {
+				langs.add(l);
+				langs.add(l + FORCELOAD_SUFFIX);
+			});
+			return langs;
 		}
 	}
 }

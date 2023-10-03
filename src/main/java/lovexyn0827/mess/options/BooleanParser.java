@@ -1,9 +1,8 @@
 package lovexyn0827.mess.options;
 
-import com.mojang.brigadier.suggestion.SuggestionProvider;
+import java.util.Set;
 
-import lovexyn0827.mess.command.CommandUtil;
-import net.minecraft.server.command.ServerCommandSource;
+import com.google.common.collect.Sets;
 
 public class BooleanParser implements OptionParser<Boolean> {
 
@@ -24,7 +23,7 @@ public class BooleanParser implements OptionParser<Boolean> {
 	}
 
 	@Override
-	public SuggestionProvider<ServerCommandSource> createSuggestions() {
-		return CommandUtil.immutableSuggestions("true", "false");
+	public Set<String> createSuggestions() {
+		return Sets.newHashSet("true", "false");
 	}
 }

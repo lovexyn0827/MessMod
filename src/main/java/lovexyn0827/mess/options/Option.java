@@ -9,7 +9,7 @@ import net.fabricmc.api.EnvType;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Option {
+@interface Option {
 	String defaultValue();
 	String[] suggestions() default {};
 	

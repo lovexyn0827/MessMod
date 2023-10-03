@@ -1,10 +1,8 @@
 package lovexyn0827.mess.options;
 
+import java.util.Set;
+
 import org.jetbrains.annotations.Nullable;
-
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-
-import net.minecraft.server.command.ServerCommandSource;
 
 /**
  * @author lovexyn0827
@@ -31,8 +29,12 @@ public interface OptionParser<T> {
 	}
 	
 	@Nullable
-	default SuggestionProvider<ServerCommandSource> createSuggestions() {
+	default Set<String> createSuggestions() {
 		return null;
+	}
+	
+	default void validate(String in) throws InvalidOptionException {
+		this.tryParse(in);
 	}
 	
 	static OptionParser<?> of(Option o) {
@@ -41,6 +43,16 @@ public interface OptionParser<T> {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		}
+	}
+	
+	@Nullable
+	static OptionParser<?> of(String optionName) {
+		OptionWrapper o = OptionManager.OPTIONS.get(optionName);
+		if(o != null) {
+			return of(o.option);
+		} else {
+			return null;
 		}
 	}
 }
