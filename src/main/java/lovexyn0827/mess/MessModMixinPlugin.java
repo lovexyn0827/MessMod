@@ -3,7 +3,6 @@ package lovexyn0827.mess;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -20,8 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -60,13 +57,14 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	}
 
 	@Override
-	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-		if(ADVANCED_MIXINS.contains(mixinClassName) && !ACTIVIATED_ADVANCED_MIXINS.contains(mixinClassName)) {
+	public boolean shouldApplyMixin(String targetClassName, String mixinClassNameFull) {
+		String mixinClassName = mixinClassNameFull.replace(MESSMOD_MIXINS, "");
+		if(ADVANCED_MIXINS.stream().anyMatch((m) -> m.name.equals(mixinClassName))
+				&& !ACTIVIATED_ADVANCED_MIXINS.contains(mixinClassName)) {
 			return false;
 		}
 		
 		try {
-			mixinClassName = mixinClassName.replace(MESSMOD_MIXINS, "");
 			if(CUSTOM_MINIX_REQUIREMENTS.containsKey(mixinClassName)) {
 				return CUSTOM_MINIX_REQUIREMENTS.get(mixinClassName).getAsBoolean();
 			}
