@@ -6,7 +6,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
@@ -44,10 +45,10 @@ import net.minecraft.server.world.ChunkTicketType;
  */
 // TODO Now the option manager is pretty messy!
 public class OptionManager{
-	public static final Map<String, OptionWrapper> OPTIONS = Stream.of(OptionManager.class.getFields())
+	public static final SortedMap<String, OptionWrapper> OPTIONS = Stream.of(OptionManager.class.getFields())
 			.filter((f) -> f.isAnnotationPresent(Option.class))
 			.sorted((a, b) -> Comparator.<String>naturalOrder().compare(a.getName(), b.getName()))
-			.collect(Collectors.toUnmodifiableMap(Field::getName, OptionWrapper::new));
+			.collect(TreeMap::new, (map, f) -> map.put(f.getName(), new OptionWrapper(f)), Map::putAll);
 	private static OptionSet activeOptionSet;
 	
 	/**
