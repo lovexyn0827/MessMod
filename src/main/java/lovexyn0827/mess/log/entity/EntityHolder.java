@@ -19,6 +19,7 @@ import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.phase.ClientTickingPhase;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhase;
+import net.minecraft.SharedConstants;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Pair;
@@ -96,7 +97,11 @@ public class EntityHolder {
 	}
 	
 	private static File getLogFile(Entity e, char type, EntityLogger logger) {
-		String entityName = e.getName().asString();
+		String entityName = e.getName().getString();
+		for (char c : SharedConstants.INVALID_CHARS_LEVEL_NAME) {
+			entityName = entityName.replace(c, '_');
+		}
+		
 		String name = String.format("%s@%d-%c-%s.csv", 
 				DATE_FORMAT.format(new Date()), 
 				e.getEntityId(), 
