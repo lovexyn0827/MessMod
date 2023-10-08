@@ -29,6 +29,7 @@ import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RaidManagerAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.rendering.RenderedBox;
+import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.FilledMapItem;
@@ -250,11 +251,16 @@ public final class ExportTask {
 	private boolean createArchive(String name, Path archive, Path temp)
 			throws IOException, FileNotFoundException {
 		MutableBoolean success = new MutableBoolean(true);
-		String fn = name + "-" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
+		for (char c : SharedConstants.INVALID_CHARS_LEVEL_NAME) {
+			name = name.replace(c, '_');
+		}
+		
+		String escapedName = name;
+		String fn = escapedName + "-" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
 		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive.resolve(fn).toFile()))) {
 			Files.walkFileTree(temp, new SimpleFileVisitor<Path>() {
 				public FileVisitResult visitFile(Path path, BasicFileAttributes attr) throws IOException {
-					String entryPath = name + '/' + temp.relativize(path).toString().replace('\\', '/');
+					String entryPath = escapedName + '/' + temp.relativize(path).toString().replace('\\', '/');
 					try {
 						zos.putNextEntry(new ZipEntry(entryPath));
 						zos.write(Files.readAllBytes(path));
