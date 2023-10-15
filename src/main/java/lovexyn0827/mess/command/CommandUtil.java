@@ -59,6 +59,7 @@ public class CommandUtil {
 			SetExplosionBlockCommand.reset();
 			LogPacketCommand.reset();
 			LazyLoadCommand.reset();
+			VariableCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}
