@@ -58,9 +58,8 @@ public interface HudDataSender {
 		return this.addCustomLine(lf);
 	}
 
-	default List<ListenedField> getListenedFields() {
+	default List<HudLine> getListenedFields() {
 		return this.getCustomLines().stream()
-				.filter(ListenedField.class::isInstance)
 				.map((l) -> (ListenedField) l)
 				.collect(Collectors.toList());
 	}
