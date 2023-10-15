@@ -16,9 +16,10 @@ public enum ServerTickingPhase implements TickingPhase {
 	BLOCK_EVENT(false),
 	ENTITY(false),
 	TILE_ENTITY(false),
-	REST(false), 
+	DIM_REST(false), 
 	TICKED_ALL_WORLDS(true), 
-	SERVER_TASKS(true);
+	SERVER_TASKS(true), 
+	REST(true);
 	
 	private static ServerTickingPhase current;
 	private final List<TickingPhase.Event> events = Lists.newArrayList();
