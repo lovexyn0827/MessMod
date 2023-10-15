@@ -24,6 +24,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.ArgumentListTokenizer;
@@ -67,13 +68,19 @@ public class VariableCommand {
 			});
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+		SuggestionProvider<ServerCommandSource> slotSuggestion = (ct, b) -> {
+			VARIABLES.keySet().forEach(b::suggest);
+			return b.buildFuture();
+		};
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("variable")
 				.requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("set")
 						.then(argument("slot", StringArgumentType.word())
+								.suggests(slotSuggestion)
 								.then(literal("new")
 										.then(argument("constructor", StringArgumentType.string())
-												.suggests(CommandUtil.immutableSuggestions("\"net.minecraft"))
+												.suggests(CommandUtil.immutableSuggestions(
+														"\"net/minecraft/", "java/lang/", "java/util/"))
 												.executes((ct) -> setNewObject(ct, false))
 												.then(argument("args", StringArgumentType.greedyString())
 														.executes((ct) -> setNewObject(ct, true)))))
@@ -89,13 +96,14 @@ public class VariableCommand {
 										.executes(VariableCommand::setBulitin))))
 				.then(literal("map")
 						.then(argument("slotSrc", StringArgumentType.word())
-								.suggests(CommandUtil.immutableSuggestions(VARIABLES.keySet().toArray()))
+								.suggests(slotSuggestion)
 								.then(argument("slotDst", StringArgumentType.word())
+										.suggests(slotSuggestion)
 										.then(argument("func", AccessingPathArgumentType.accessingPathArg())
 												.executes(VariableCommand::map)))))
 				.then(literal("print")
 						.then(argument("slot", StringArgumentType.word())
-								.suggests(CommandUtil.immutableSuggestions(VARIABLES.keySet().toArray()))
+								.suggests(slotSuggestion)
 								.then(literal("array")
 										.executes((ct) -> {
 											String slot = StringArgumentType.getString(ct, "slot");
@@ -123,7 +131,10 @@ public class VariableCommand {
 										}))))
 				.then(literal("list")
 						.executes((ct) -> {
-							VARIABLES.keySet().forEach((key) -> CommandUtil.feedbackRaw(ct, key));
+							VARIABLES.forEach((key, val) -> {
+								CommandUtil.feedbackRaw(ct, String.format("%s = %.48s", 
+										key, val == null ? "null" : val.toString()));
+							});
 							return Command.SINGLE_SUCCESS;
 						}));
 		dispatcher.register(command);
@@ -257,7 +268,8 @@ public class VariableCommand {
 			CommandUtil.error(ct, "cmd.variable.invconstructor");
 			return 0;
 		}
-		
+
+		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
 	
@@ -275,6 +287,7 @@ public class VariableCommand {
 		}
 		
 		VARIABLES.put(slot, val);
+		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
 	
@@ -282,6 +295,7 @@ public class VariableCommand {
 		String slot = StringArgumentType.getString(ct, "slot");
 		Entity e = EntityArgumentType.getEntity(ct, "selector");
 		VARIABLES.put(slot, e);
+		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
 	
@@ -295,7 +309,8 @@ public class VariableCommand {
 			CommandUtil.errorWithArgs(ct, "cmd.general.nodef", name);
 			return 0;
 		}
-		
+
+		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
 	
@@ -315,7 +330,8 @@ public class VariableCommand {
 			CommandUtil.errorWithArgs(ct, "cmd.general.nodef", slotS);
 			return 0;
 		}
-		
+
+		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
 	
