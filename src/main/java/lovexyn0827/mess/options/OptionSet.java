@@ -167,6 +167,11 @@ final class OptionSet {
 		this.backend.entrySet().forEach((e) -> {
 			String name = (String) e.getKey();
 			String valStr = (String) e.getValue();
+			if(!OptionManager.isValidOptionName(name)) {
+				LOGGER.warn("Ignored unrecognized option: {}={}", name, valStr);
+				return;
+			}
+			
 			OptionParser<?> parser = OptionParser.of(name);
 			try {
 				parser.validate(valStr);

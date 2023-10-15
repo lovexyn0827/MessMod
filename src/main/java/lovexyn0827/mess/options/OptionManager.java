@@ -335,13 +335,15 @@ public class OptionManager{
 	private static void setOptionSet(OptionSet set) {
 		activeOptionSet = set;
 		set.activiate();
-		MessMod.LOGGER.info("Loaded {} MessMod config from {}", 
-				OPTIONS.size(), set.getReadablePathStr());
-		OPTIONS.values().stream()
-				.map((o) -> {
-					return o.name + ": " + set.getSerialized(o.name);
-				})
-				.forEach(MessMod.LOGGER::info);
+		if(FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			MessMod.LOGGER.info("Loaded {} MessMod config from {}", 
+					OPTIONS.size(), set.getReadablePathStr());
+			OPTIONS.values().stream()
+					.map((o) -> {
+						return o.name + ": " + set.getSerialized(o.name);
+					})
+					.forEach(MessMod.LOGGER::info);
+		}
 	}
 	
 	public static boolean isValidOptionName(String name) {
