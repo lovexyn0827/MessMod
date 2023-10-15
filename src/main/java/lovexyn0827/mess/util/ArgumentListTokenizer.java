@@ -1,4 +1,4 @@
-package lovexyn0827.mess.util.access;
+package lovexyn0827.mess.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -6,9 +6,7 @@ import java.util.NoSuchElementException;
 import com.google.common.collect.Iterators;
 import com.mojang.brigadier.StringReader;
 
-import lovexyn0827.mess.util.TranslatableException;
-
-class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
+public final class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
 	private final StringReader input;
 	private boolean quoted = false;
 	

@@ -39,7 +39,7 @@ public class CommandUtil {
 		Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
 		EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
-		Reflection.getAvailableFields(clazz).forEach(builder::suggest);
+		Reflection.getAvailableFieldNames(clazz).forEach(builder::suggest);
 		builder.suggest("-THIS-");
 		return builder.buildFuture();
 	};

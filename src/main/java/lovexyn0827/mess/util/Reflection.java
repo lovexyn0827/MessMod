@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +116,9 @@ public class Reflection {
 	public static final Map<EntityType<?>, Class<?>> ENTITY_TYPE_TO_CLASS;
 	private static final ImmutableMap<String, Class<?>> PRIMITIVE_CLASSES;
 	public static final ImmutableBiMap<BlockEntityType<?>, Class<?>> BLOCK_ENTITY_TYPE_TO_CLASS;
-	// Map class => {Key class, Value class} (type arguments are represented by null)
+	/**
+	 *  Map class => {Key class, Value class} (type arguments are represented by null)
+	 */
 	public static final ImmutableMap<Class<?>, Pair<Class<?>, Class<?>>> MAP_TO_TYPES;
 	
 	public static boolean hasField(Class<?> clazz, final Field field) {
@@ -136,7 +139,11 @@ public class Reflection {
 		return false;
 	}
 	
-	public static Set<String> getAvailableFields(Class<?> entityClass) {
+	
+	/**
+	 * Gets the names of all fields declared by the given class or its super classes.
+	 */
+	public static Set<String> getAvailableFieldNames(Class<?> entityClass) {
 		Set<String> fieldSet = new TreeSet<>();
 		Mapping mapping = MessMod.INSTANCE.getMapping();
 		while(entityClass != Object.class) {
@@ -149,6 +156,24 @@ public class Reflection {
 			}
 			
 			entityClass = entityClass.getSuperclass();
+		}
+		
+		return fieldSet;
+	}
+	
+	/**
+	 * Gets all non-static fields declared by the given class or its super classes.
+	 */
+	public static Set<Field> getInstanceFields(Class<?> clazz) {
+		Set<Field> fieldSet = new TreeSet<>(Comparator.comparing(Field::getName));
+		while(clazz != Object.class) {
+			for(Field field : clazz.getDeclaredFields()) {
+				if(!Modifier.isStatic(field.getModifiers())) {
+					fieldSet.add(field);
+				}
+			}
+			
+			clazz = clazz.getSuperclass();
 		}
 		
 		return fieldSet;

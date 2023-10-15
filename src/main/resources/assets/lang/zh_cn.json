@@ -115,6 +115,10 @@
 		"cmd.tileentity.type" : "类型：%s", 
 		"cmd.tileentity.data" : "数据：%s", 
 		
+		//***** variable *****
+		"cmd.variable.reqarray" : "给定槽位中的对象应为数组", 
+		"cmd.variable.invconstructor" : "无法解析构造器\n应类似于java/lang/Integer<1>、java/lang/Integer<I>V或java/lang/Integer.", 
+		
 		//***** Exceptions *****
 		"exp.reqint" : "需要整数， 但是出现了%s", 
 		"exp.invaildInvocation" : "%s不是一个有效的方法调用", 
@@ -154,6 +158,7 @@
 		"exp.incomuncode" : "Unicode字符表示不完整", 
 		"exp.unknownescape" : "不支持的转义字符：%s", 
 		"exp.incompquote" : "不完整的字符引文", 
+		"exp.noconstructor" : "指定的构造器在%s中不存在", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 

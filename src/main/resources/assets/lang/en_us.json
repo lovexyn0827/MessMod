@@ -115,6 +115,10 @@
 		"cmd.tileentity.type" : "Type: %s", 
 		"cmd.tileentity.data" : "Data: %s", 
 		
+		//***** variable *****
+		"cmd.variable.reqarray" : "The object in this slot should be an array", 
+		"cmd.variable.invconstructor" : "Failed to parse constructor.\nShould be something like java/lang/Integer<1>, java/lang/Integer<I>V, or java/lang/Integer.", 
+		
 		//***** Exceptions *****
 		"exp.reqint" : "Requires an integer, but found %s", 
 		"exp.invaildInvocation" : "%s is not a valid method invocation", 
@@ -154,6 +158,7 @@
 		"exp.incomuncode" : "Incomplete Unicode character", 
 		"exp.unknownescape" : "Unsupported escape: %s", 
 		"exp.incompquote" : "Incomplete quote", 
+		"exp.noconstructor" : "Specified constructor was not found in %s",
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

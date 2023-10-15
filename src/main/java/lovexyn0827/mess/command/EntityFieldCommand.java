@@ -31,7 +31,7 @@ import net.minecraft.text.LiteralText;
 public class EntityFieldCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		SuggestionProvider<ServerCommandSource> suggests = (ct,builder)->{
-			for(String fieldName : Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass())) {
+			for(String fieldName : Reflection.getAvailableFieldNames(EntityArgumentType.getEntity(ct, "target").getClass())) {
 				builder = builder.suggest(fieldName);
 			}
 			
@@ -101,7 +101,7 @@ public class EntityFieldCommand {
 				.executes((ct) -> {
 					Set<String> fieldSet;
 					try {
-						fieldSet = Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass());
+						fieldSet = Reflection.getAvailableFieldNames(EntityArgumentType.getEntity(ct, "target").getClass());
 						String list = String.join("  ", fieldSet);
 						CommandUtil.feedback(ct, list);
 					} catch (Exception e) {

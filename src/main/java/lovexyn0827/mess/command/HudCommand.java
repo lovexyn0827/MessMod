@@ -82,7 +82,7 @@ public class HudCommand {
 						.then(literal("client").requires((s) -> !MessMod.isDedicatedEnv())
 								.then(argument("field", StringArgumentType.word())
 										.suggests((ct, builder) -> {
-											Reflection.getAvailableFields(ClientPlayerEntity.class).forEach(builder::suggest);
+											Reflection.getAvailableFieldNames(ClientPlayerEntity.class).forEach(builder::suggest);
 											return builder.buildFuture();
 										})
 										.executes((ct) -> {
@@ -102,7 +102,7 @@ public class HudCommand {
 						.then(literal("server")
 								.then(argument("field", StringArgumentType.word())
 										.suggests((ct, builder) -> {
-											Reflection.getAvailableFields(ServerPlayerEntity.class).forEach(builder::suggest);
+											Reflection.getAvailableFieldNames(ServerPlayerEntity.class).forEach(builder::suggest);
 											return builder.buildFuture();
 										})
 										.executes((ct) -> {
