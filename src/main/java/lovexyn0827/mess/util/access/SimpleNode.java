@@ -19,6 +19,8 @@ class SimpleNode<I, O> extends Node {
 			new SimpleNode<>(System::identityHashCode, "identityHash", Object.class, Integer.class, false);
 	static final SimpleNode<Object, Class<?>> CLASS = 
 			new SimpleNode<>(Object::getClass, "class", Object.class, Class.class, false);
+	static final SimpleNode<Object, Object> THIS = 
+			new SimpleNode<>((e) -> e, "this", Object.class, Object.class, true);
 	private final SerializableFunction<I, O> func;
 	private final String name;
 	private final Class<?> in;

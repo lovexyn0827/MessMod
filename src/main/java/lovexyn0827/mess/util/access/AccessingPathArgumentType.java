@@ -111,6 +111,8 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					return SimpleNode.IDENTITY_HASH;
 				case "class" :
 					return SimpleNode.CLASS;
+				case "this" : 
+					return SimpleNode.THIS;
 				case "size" : 
 					return new SizeNode();
 				default : 
