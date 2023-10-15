@@ -22,7 +22,7 @@ import net.minecraft.util.thread.ThreadExecutor;
 
 @Mixin(ServerChunkManager.MainThreadExecutor.class)
 public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadExecutor<Runnable> {
-	@Shadow(remap = false)
+	@Shadow()
 	private @Final ServerChunkManager field_18810;
 	
 	private static final AtomicLong NEXT_ID = new AtomicLong(0);

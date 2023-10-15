@@ -15,7 +15,7 @@ import net.minecraft.server.world.ChunkTicketManager;
 
 @Mixin(ChunkTicketManager.NearbyChunkTicketUpdater.class)
 public class ChunkTicketManagerNearbyChunkTicketUpdaterMixin {
-	@Shadow(remap = false)
+	@Shadow()
 	private ChunkTicketManager field_17463;
 	
 	@Inject(method = "updateTicket", at = @At("HEAD"))

@@ -209,7 +209,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			method = "<init>", 
 			at = @At(
 					value = "FIELD", 
-					target = "net/minecraft/server/world/ThreadedAnvilChunkStorage.ticketManager", 
+					target = "net/minecraft/server/world/ThreadedAnvilChunkStorage."
+							+ "ticketManager:Lnet/minecraft/server/world/ThreadedAnvilChunkStorage$TicketManager;", 
 					opcode = Opcodes.PUTFIELD, 
 					shift = At.Shift.AFTER
 			)
