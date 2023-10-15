@@ -20,8 +20,8 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
-import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
+import lovexyn0827.mess.rendering.FrozenUpdateMode;
 import lovexyn0827.mess.rendering.hud.AlignMode;
 import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.access.AccessingPath;
@@ -85,8 +85,8 @@ public class OptionManager{
 	public static BlamingMode blamingMode;
 	
 	@Option(defaultValue = "NORMALLY", 
-			parserClass = BlockInfoRenderer.FrozenUpdateMode.Parser.class)
-	public static BlockInfoRenderer.FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
+			parserClass = FrozenUpdateMode.Parser.class)
+	public static FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -292,6 +292,10 @@ public class OptionManager{
 	@Option(defaultValue = "-1", 
 			parserClass = FloatParser.class)
 	public static float serverSyncedBoxRenderRange;
+	
+	@Option(defaultValue = "NORMALLY", 
+			parserClass = FrozenUpdateMode.Parser.class)
+	public static FrozenUpdateMode serverSyncedBoxUpdateModeInFrozenTicks;
 	
 	@Option(defaultValue = "[]", 
 			parserClass = RangeParser.ChunkStatusRange.class)
