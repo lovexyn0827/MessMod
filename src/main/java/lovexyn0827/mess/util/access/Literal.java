@@ -96,7 +96,7 @@ public abstract class Literal<T> {
 			return new BlockPosL(strRep);
 		case '(' : 
 			return new Vec3dL(strRep);
-		case '<' : 
+		case 'V' : 
 			if(strRep.charAt(1) == '+') {
 				return new VarL(strRep);
 			}
@@ -459,7 +459,7 @@ public abstract class Literal<T> {
 
 		protected VarL(String strRep) throws CommandSyntaxException {
 			super(strRep);
-			this.slot = strRep.substring(1, strRep.length() - 1);
+			this.slot = strRep.substring(2);
 			this.compiled = false;
 		}
 
