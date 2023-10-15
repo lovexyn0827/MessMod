@@ -15,6 +15,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -319,5 +321,9 @@ public class VariableCommand {
 	
 	public static void reset() {
 		VARIABLES.clear();
+	}
+
+	public static @Nullable Object getVariable(String slot) {
+		return VARIABLES.get(slot);
 	}
 }
