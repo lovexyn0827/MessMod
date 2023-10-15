@@ -36,6 +36,8 @@ import lovexyn0827.mess.util.access.InvalidLiteralException;
 import lovexyn0827.mess.util.access.Literal;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -76,6 +78,9 @@ public class VariableCommand {
 								.then(literal("literal")
 										.then(argument("value",StringArgumentType.greedyString())
 												.executes(VariableCommand::setLiteral)))
+								.then(literal("entity")
+										.then(argument("selector", EntityArgumentType.entity())
+												.executes(VariableCommand::setEntity)))
 								.then(argument("objSrc", StringArgumentType.word())
 										.suggests(CommandUtil.immutableSuggestions(
 												BUILTIN_OBJECT_PROVIDERS.keySet().toArray()))
@@ -271,6 +276,13 @@ public class VariableCommand {
 		return Command.SINGLE_SUCCESS;
 	}
 	
+	private static int setEntity(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
+		String slot = StringArgumentType.getString(ct, "slot");
+		Entity e = EntityArgumentType.getEntity(ct, "selector");
+		VARIABLES.put(slot, e);
+		return Command.SINGLE_SUCCESS;
+	}
+	
 	private static int setBulitin(CommandContext<ServerCommandSource> ct) {
 		String slot = StringArgumentType.getString(ct, "slot");
 		String name = StringArgumentType.getString(ct, "objSrc");
@@ -303,5 +315,9 @@ public class VariableCommand {
 		}
 		
 		return Command.SINGLE_SUCCESS;
+	}
+	
+	public static void reset() {
+		VARIABLES.clear();
 	}
 }
