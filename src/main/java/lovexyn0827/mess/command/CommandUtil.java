@@ -36,7 +36,7 @@ public class CommandUtil {
 		return b.buildFuture();
 	};
 	public static final SuggestionProvider<ServerCommandSource> FIELDS_SUGGESTION = (ct, builder) -> {
-		Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+		Identifier id = new Identifier(StringArgumentType.getString(ct.getLastChild(), "entityType"));
 		EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 		Reflection.getAvailableFieldNames(clazz).forEach(builder::suggest);
