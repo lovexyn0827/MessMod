@@ -123,7 +123,7 @@ public class CustomNode extends Node {
 	}
 	
 	@Nullable
-	public static CustomNode create(String name) throws CommandSyntaxException {
+	public static CustomNode byName(String name) throws CommandSyntaxException {
 		Class<?> clazz = COMPILED_NODES_BY_NAME.get(name);
 		if(clazz != null) {
 			try {
