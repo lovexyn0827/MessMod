@@ -49,6 +49,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.village.raid.Raid;
 import net.minecraft.village.raid.RaidManager;
 import net.minecraft.world.ForcedChunkState;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.IdCountsState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
@@ -162,7 +163,7 @@ public final class ExportTask {
 		this.tryCopySingle(temp, "carpet.conf", SaveComponent.CARPET);
 		this.tryCopySingle(temp, "mcwmem.prop", SaveComponent.MESSMOD);
 		this.tryCopySingle(temp, "saved_accessing_paths.prop", SaveComponent.MESSMOD);
-		createLevelDat(name, wgType, temp);
+		this.createLevelDat(name, wgType, temp);
 		return createArchive(name, archive, temp);
 	}
 	
@@ -290,6 +291,10 @@ public final class ExportTask {
 		CompoundTag level = NbtIo.readCompressed(
 				this.server.getSavePath(WorldSavePathMixin.create("level.dat")).toFile());
 		level.getCompound("Data").putString("LevelName", name);
+		if(!this.components.contains(SaveComponent.GAMERULES)) {
+			level.getCompound("Data").put("GameRules", new GameRules().toNbt());
+		}
+		
 		CompoundTag wgConfig = level.getCompound("Data")
 				.getCompound("WorldGenSettings")
 				.getCompound("dimensions")
