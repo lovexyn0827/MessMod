@@ -55,6 +55,7 @@
 		"cmd.exportsave.success" : "已导出存档，耗时%f秒",
 		"cmd.exportsave.addcomp" : "添加了%d个存档组件：%s", 
 		"cmd.exportsave.remcomp" : "排除了%d个存档组件：%s", 
+		"cmd.exportsave.saveto" : "存档被导出到%s，单击以打开", 
 		
 		//***** fixedentityhud *****
 		"cmd.fixedentityhud.add" : "向Sidebar中添加了一行数据", 

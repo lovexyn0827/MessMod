@@ -4,6 +4,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Set;
 
 import com.mojang.brigadier.Command;
@@ -19,9 +20,12 @@ import lovexyn0827.mess.export.ExportTask;
 import lovexyn0827.mess.export.SaveComponent;
 import lovexyn0827.mess.export.WorldGenType;
 import lovexyn0827.mess.mixins.ServerCommandSourceAccessor;
+import lovexyn0827.mess.util.FormattedText;
 import net.minecraft.command.argument.ColumnPosArgumentType;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ColumnPos;
@@ -136,8 +140,10 @@ public class ExportSaveCommand {
 		long start = Util.getMeasuringTimeNano();
 		ExportTask task = getExportTask(ct);
 		WorldGenType wg = WorldGenType.valueOf(StringArgumentType.getString(ct, "worldgen"));
+		Path out;
 		try {
-			if(!task.export(StringArgumentType.getString(ct, "name"), wg)) {
+			out = task.export(StringArgumentType.getString(ct, "name"), wg);
+			if(out == null) {
 				CommandUtil.error(ct, "cmd.exportsave.failexp");
 				return 0;
 			}
@@ -148,6 +154,11 @@ public class ExportSaveCommand {
 		}
 		
 		CommandUtil.feedbackWithArgs(ct, "cmd.exportsave.success", (Util.getMeasuringTimeNano() - start) / 10E8D);
+		Text link = new FormattedText("cmd.exportsave.saveto", "n", true, out.getFileName())
+				.asMutableText()
+				.styled((s) -> s.withClickEvent(
+						new ClickEvent(ClickEvent.Action.OPEN_FILE, out.toAbsolutePath().toString())));
+		ct.getSource().sendFeedback(link, false);
 		return Command.SINGLE_SUCCESS;
 	}
 	

@@ -100,10 +100,10 @@ public final class ExportTask {
 		return this.components;
 	}
 	
-	public boolean export(String name, WorldGenType wgType) throws IOException {
-		Path archive = this.server.getSavePath(EXPORT_PATH);
-		if(!Files.exists(archive)) {
-			Files.createDirectories(archive);
+	public Path export(String name, WorldGenType wgType) throws IOException {
+		Path archivePath = this.server.getSavePath(EXPORT_PATH);
+		if(!Files.exists(archivePath)) {
+			Files.createDirectories(archivePath);
 		}
 		
 		Path temp = Files.createTempDirectory(this.server.getSavePath(EXPORT_PATH), "export_");
@@ -164,7 +164,7 @@ public final class ExportTask {
 		this.tryCopySingle(temp, "mcwmem.prop", SaveComponent.MESSMOD);
 		this.tryCopySingle(temp, "saved_accessing_paths.prop", SaveComponent.MESSMOD);
 		this.createLevelDat(name, wgType, temp);
-		return createArchive(name, archive, temp);
+		return createArchive(name, archivePath, temp);
 	}
 	
 	private void tryCopySingle(Path temp, String name, SaveComponent comp) throws IOException {
@@ -249,7 +249,7 @@ public final class ExportTask {
 		}
 	}
 
-	private boolean createArchive(String name, Path archive, Path temp)
+	private Path createArchive(String name, Path archiveDir, Path temp)
 			throws IOException, FileNotFoundException {
 		MutableBoolean success = new MutableBoolean(true);
 		for (char c : SharedConstants.INVALID_CHARS_LEVEL_NAME) {
@@ -258,7 +258,8 @@ public final class ExportTask {
 		
 		String escapedName = name;
 		String fn = escapedName + "-" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()) + ".zip";
-		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive.resolve(fn).toFile()))) {
+		Path archive = archiveDir.resolve(fn);
+		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(archive.toFile()))) {
 			Files.walkFileTree(temp, new SimpleFileVisitor<Path>() {
 				public FileVisitResult visitFile(Path path, BasicFileAttributes attr) throws IOException {
 					String entryPath = escapedName + '/' + temp.relativize(path).toString().replace('\\', '/');
@@ -284,7 +285,11 @@ public final class ExportTask {
 			zos.finish();
 		}
 		
-		return success.booleanValue();
+		if(success.booleanValue()) {
+			return archive;
+		} else {
+			return null;
+		}
 	}
 
 	private void createLevelDat(String name, WorldGenType wgType, Path temp) throws IOException {

@@ -55,6 +55,7 @@
 		"cmd.exportsave.success" : "Exported the save, %f seconds elapsed.", 
 		"cmd.exportsave.addcomp" : "Added %d save components: %s", 
 		"cmd.exportsave.remcomp" : "Excluded %d save components: %s", 
+		"cmd.exportsave.saveto" : "The save has been exported to %s, click here to open it.", 
 		
 		//***** fixedentityhud *****
 		"cmd.fixedentityhud.add" : "Added a new line to the sidebar.", 
