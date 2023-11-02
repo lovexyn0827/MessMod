@@ -18,4 +18,5 @@ public interface EntitySelectorReaderInterface {
 	Pattern getClassRegex();
 	void setInstanceofClass(Class<?> cl);
 	Class<?> getInstanceofClass();
+	boolean targetOnly();
 }

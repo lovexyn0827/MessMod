@@ -262,6 +262,7 @@
 		"misc.warnsur.title" : "MessMod Is Not For Survival", 
 		"misc.warnsur.msg" : "This save probably hasn't been opened with MessMod loaded before, and doing so may break vanilla mechanisms and result in accidental cheating. Procceed to open anyway?", 
 		"misc.instanceof.desc" : "A concrete class name of the super class or implemented (directly or indirectly) of the class of selected entities.", 
-		"misc.copyentitycmd" : "Click to copy the command to summon the entity."
+		"misc.copyentitycmd" : "Click to copy the command to summon the entity.", 
+		"misc.selector.att" : "Crosshair target"
 	}
 }
