@@ -34,6 +34,7 @@ public abstract class KeyboardMixin {
 			LookingAtEntityHud lookingHud = MessMod.INSTANCE.getClientHudManager().lookingHud;
 			if(lookingHud != null) {
 				lookingHud.toggleRender();
+				// This is not going to be changed, in memory of 2021...
 				this.client.player.sendChatMessage(
 						I18N.translate("hud.target") + (lookingHud.shouldRender ? "On" : "Off"));
 			}

@@ -12,7 +12,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
-// FIXME Boxes are still rendered when the corresponding entities have already been removed
 public class ServerSyncedBoxRenderer {
 	private static final ShapeSpace ENTITY_BOX_SPACE = new ShapeSpace("entity_box");
 	private final MinecraftServer server;

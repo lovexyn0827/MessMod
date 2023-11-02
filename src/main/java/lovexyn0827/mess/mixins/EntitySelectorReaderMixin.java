@@ -193,7 +193,8 @@ public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderI
 	@Inject(method = "readAtVariable", 
 			at = @At(
 					value = "INVOKE", 
-					target = "com/mojang/brigadier/StringReader.setCursor(I)V"
+					target = "com/mojang/brigadier/StringReader.setCursor(I)V", 
+					remap = false
 			), 
 			locals = LocalCapture.CAPTURE_FAILHARD, 
 			cancellable = true

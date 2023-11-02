@@ -5,7 +5,6 @@ import com.mojang.brigadier.StringReader;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
-import lovexyn0827.mess.util.i18n.I18N;
 import net.minecraft.command.argument.NbtPathArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -20,7 +19,6 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
@@ -34,13 +32,12 @@ public class EntityDataDumpHelper {
 		
 		ItemStack holding = player.getStackInHand(Hand.MAIN_HAND);
 		if(OptionManager.dumpTargetEntitySummonCommand) {
-			Text copyCmd = new LiteralText(I18N.translate("misc.copyentitycmd"))
+			Text copyCmd = new FormattedText("misc.copyentitycmd", "aon", true)
+					.asMutableText()
 					.styled((s) -> {
 						String cmd = asCommand(e, holding.hasEnchantments());
 						return s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(cmd)))
-								.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, cmd))
-								.withItalic(true)
-								.withColor(Formatting.GREEN);
+								.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, cmd));
 					});
 			player.sendSystemMessage(copyCmd, Util.NIL_UUID);
 		}
