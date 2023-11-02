@@ -188,6 +188,11 @@
 		"opt.disableEnchantCommandRestriction.desc" : "移除`/enchant`中对附魔等级与附魔兼容性的检查。", 
 		"opt.disableExplosionExposureCalculation.desc" : "禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。\n在安装Lithium后可能不能正常工作。", 
 		"opt.disableProjectileRandomness.desc" : "取消弹射物的随机速度，用于部分测试，不过不要忘记关闭。", 
+		"opt.dumpTargetEntityDataOnClient.desc" : "输出客户端实体信息而不是服务端实体信息。", 
+		"opt.dumpTargetEntityDataWithPaper.desc" : "主手持有纸的玩家右键实体时输出目标实体信息。", 
+		"opt.dumpTargetEntityDataWithCtrlC.desc" : "使用Ctrl + C时输出目标实体信息。", 
+		"opt.dumpTargetEntityNbt.desc" : "输出目标实体的NBT数据。如果玩家手持的物品有自定义名称，那么当物品没有附魔时该名称会被解析为一个作用于实体NBT的NBT路径，否则，这一名称会被作为应用于实体的Entity实例的一个Accessing Path。", 
+		"opt.dumpTargetEntitySummonCommand.desc" : "生成用于生成目标实体的一条指令。如果手持的物品被附魔，实体的完整NBT数据（不含UUID）会被添加到 指令中，否则，只有实体类型，维度、坐标、动量与朝向信息会出现在指令中。", 
 		"opt.enabledTools.desc" : "启用或禁用工具物品。\n - 骨头：`/tick step <骨头数目>` \n - 红砖：`/tick freeze` \n - 下界合金锭：`/kill @e[type!=player]`", 
 		"opt.endEyeTeleport.desc" : "在使用末影之眼时将玩家传送到玩家注视的地方。", 
 		"opt.entityExplosionInfluence.desc" : "爆炸影响到实体时在聊天栏输出实体被影响的情况。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。\n与Lithium不兼容。", 
@@ -255,6 +260,7 @@
 		"misc.protver.err" : "服务端上安装的MessMod的协议版本与您客户端上的不同，建议安装与服务端版本一致的MessMod。", 
 		"misc.warnsur.title" : "MessMod不适用于生存存档", 
 		"misc.warnsur.msg" : "该存档似乎还未被在安装有MessMod时打开过，若打开存档则可能会破坏原版游戏机制或造成意外作弊。是否继续加载生存存档？", 
-		"misc.instanceof.desc" : "选取的实体的类的超类或所实现的接口（直接或间接地）的具体名称"
+		"misc.instanceof.desc" : "选取的实体的类的超类或所实现的接口（直接或间接地）的具体名称", 
+		"misc.copyentitycmd" : "单击以复制生成该实体的指令"
 	}
 }

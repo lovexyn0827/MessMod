@@ -12,8 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.LookingAtEntityHud;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
+import lovexyn0827.mess.util.EntityDataDumpHelper;
 import lovexyn0827.mess.util.i18n.I18N;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
@@ -74,6 +76,15 @@ public abstract class KeyboardMixin {
 		} else if(key == 'Y' && Screen.hasControlDown() && isBeingPressed) {
 			if(mc.player != null) {
 				mc.player.networkHandler.sendPacket(new CustomPayloadC2SPacket(Channels.REDO, new PacketByteBuf(Unpooled.buffer())));
+			}
+		} else if(key == 'C' && Screen.hasControlDown() && isBeingPressed) {
+			if(OptionManager.dumpTargetEntityDataWithCtrlC && mc.player != null) {
+				if(OptionManager.dumpTargetEntityDataOnClient) {
+					EntityDataDumpHelper.tryDumpTarget(mc.player);
+				} else {
+					MessMod.INSTANCE.getClientNetworkHandler().send(
+							new CustomPayloadC2SPacket(Channels.ENTITY_DUMP, new PacketByteBuf(Unpooled.buffer())));
+				}
 			}
 		}
 	}

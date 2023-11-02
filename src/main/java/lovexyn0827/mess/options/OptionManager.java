@@ -149,6 +149,26 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityDataOnClient;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityDataWithPaper;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityDataWithCtrlC;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityNbt;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntitySummonCommand;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean enabledTools;
 	
 	@Option(defaultValue = "false", 

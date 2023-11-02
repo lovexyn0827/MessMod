@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.HudType;
-import lovexyn0827.mess.rendering.hud.LookingAtEntityHud;
 import lovexyn0827.mess.util.ListenedField;
+import lovexyn0827.mess.util.RaycastUtil;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.WrappedPath;
 import lovexyn0827.mess.util.access.AccessingPath;
@@ -82,7 +82,7 @@ public interface HudDataSender {
 	}
 	
 	default void updateLookingAtEntityData(ServerPlayerEntity player) {
-		this.updateData(LookingAtEntityHud.getTarget(player));
+		this.updateData(RaycastUtil.getTargetEntity(player));
 	}
 
 }
