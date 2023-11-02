@@ -413,7 +413,7 @@ public class OptionManager{
 	
 	public static void set(String name, String val, 
 			CommandContext<ServerCommandSource> ct) throws InvalidOptionException {
-		activeOptionSet.set(name, val);
+		activeOptionSet.set(name, val, ct);
 	}
 	
 	public static void setGlobal(String name, String val, 
@@ -437,7 +437,7 @@ public class OptionManager{
 			
 			// FIXME Only influences the sender?
 			if((Boolean) newValue) {
-				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool");
+				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool global");
 			}else {
 				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script unload tool");
 			}
