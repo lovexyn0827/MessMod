@@ -223,6 +223,7 @@
 		"opt.renderRedstoneGateInfo.desc" : "Display the output level of repeaters and comparators the player looks at.", 
 		"opt.serverSyncedBox.desc" : "Enable or disable the server-side hitbox renderer.", 
 		"opt.serverSyncedBoxRenderRange.desc" : "The maximum Cheshev distance between the player and the entities with their bounding boxes rendered. All non-positive values are considered as positive infinite.", 
+		"opt.serverSyncedBoxUpdateModeInFrozenTicks.desc" : "What the server-side hitbox renderer should do in ticks frozen by the Carpet.", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long-distance raycasts.", 
 		"opt.skippedGenerationStages.desc" : "Skip some stages in the world generation. Skipping stage `biome` and `full` is not supported, as the absence of them will make the server crash." , 
 		"opt.stableHudLocation.desc" : "Make the location of HUDs more stable when the length of lines change frequently.", 
