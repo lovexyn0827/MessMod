@@ -37,6 +37,7 @@ public class ExportSaveCommand {
 						.then(argument("name", StringArgumentType.word())
 								.then(argument("corner1", ColumnPosArgumentType.columnPos())
 										.then(argument("corner2", ColumnPosArgumentType.columnPos())
+												.executes(ExportSaveCommand::addRegionInCurrentDimension)
 												.then(argument("dimension", DimensionArgumentType.dimension())
 														.executes(ExportSaveCommand::addRegion))))))
 				.then(literal("deleteRegion")
@@ -89,6 +90,24 @@ public class ExportSaveCommand {
 				new ChunkPos(corner1.x >> 4, corner1.z >> 4), 
 				new ChunkPos(corner2.x >> 4, corner2.z >> 4), 
 				DimensionArgumentType.getDimensionArgument(ct, "dimension"));
+		CommandUtil.feedback(ct, "cmd.general.success");
+		return Command.SINGLE_SUCCESS;
+	}
+	
+	private static int addRegionInCurrentDimension(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
+		ExportTask task = getExportTask(ct);
+		String name = StringArgumentType.getString(ct, "name");
+		if(task.listRegionNames().contains(name)) {
+			CommandUtil.error(ct, "cmd.general.dupname");
+			return 0;
+		}
+		
+		ColumnPos corner1 = ColumnPosArgumentType.getColumnPos(ct, "corner1");
+		ColumnPos corner2 = ColumnPosArgumentType.getColumnPos(ct, "corner2");
+		task.addRegion(name, 
+				new ChunkPos(corner1.x >> 4, corner1.z >> 4), 
+				new ChunkPos(corner2.x >> 4, corner2.z >> 4), 
+				ct.getSource().getWorld());
 		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
