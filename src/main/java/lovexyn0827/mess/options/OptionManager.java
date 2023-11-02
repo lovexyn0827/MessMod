@@ -287,6 +287,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean quickStackedEntityKilling;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
 	
 	@Option(defaultValue = "[]", 

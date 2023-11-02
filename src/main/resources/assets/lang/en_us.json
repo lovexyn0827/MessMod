@@ -222,6 +222,7 @@
 		"opt.projectileChunkLoadingPermanence.desc" : "Projectiles load the chunks permanently when `projectileChunkLoading` is enabled.", 
 		"opt.projectileRandomnessScale.desc" : "The amount of the randomness of projectiles. Most projectiles will have their additional random initial speeds multipled by the value of this option.", 
 		"opt.quickMobMounting.desc" : "Placing mobs into vehicles.", 
+		"opt.quickStackedEntityKilling.desc" : "Kill the entity being knocked by a brick, along with all entities being at the same position as it.", 
 		"opt.railNoAutoConnection.desc" : "Prevent the shape of rails from being changed by surrounding rails.", 
 		"opt.rejectChunkTicket.desc" : "Prevent the chunks from being loaded in some ways.", 
 		"opt.renderBlockShape.desc" : "Enhanced block outline renderer.", 

@@ -222,6 +222,7 @@
 		"opt.projectileChunkLoadingPermanence.desc" : "弹射物在`projectileChunkLoading`启用时永久加载区块。", 
 		"opt.projectileRandomnessScale.desc" : "弹射物随机性大小。大部分弹射物附加的随机初始速度会被乘以该选项的值。", 
 		"opt.quickMobMounting.desc" : "潜行时用刷怪蛋向载具中放置生物。", 
+		"opt.quickStackedEntityKilling.desc" : "杀死被砖块敲击的实体以及所有位置与其相同的实体。", 
 		"opt.railNoAutoConnection.desc" : "防止铁轨的形态被邻近的铁轨影响。", 
 		"opt.rejectChunkTicket.desc" : "防止区块被以某种形式加载。", 
 		"opt.renderBlockShape.desc" : "方块轮廓渲染。", 
