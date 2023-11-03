@@ -57,307 +57,379 @@ public class OptionManager{
 	static final Map<String, CustomAction> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
 	
 	@Option(defaultValue = "STANDARD", 
-			parserClass = AccessingPath.InitializationStrategy.Parser.class)
+			parserClass = AccessingPath.InitializationStrategy.Parser.class, 
+			label = Label.MESSMOD)
 	public static AccessingPath.InitializationStrategy accessingPathInitStrategy;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean allowSelectingDeadEntities;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean allowTargetingSpecialEntities;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.RESEARCH)
 	public static boolean antiHostCheating;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean attackableTnt;
 	
 	@Option(defaultValue = "POSSIBLE", 
-			parserClass = Confidence.Parser.class)
+			parserClass = Confidence.Parser.class, 
+			label = Label.MESSMOD)
 	public static Confidence blameThreshold;
 	
 	@Option(defaultValue = "DISABLED", 
-			parserClass = BlamingMode.Parser.class)
+			parserClass = BlamingMode.Parser.class, 
+			label = Label.MESSMOD)
 	public static BlamingMode blamingMode;
 	
 	@Option(defaultValue = "NORMALLY", 
-			parserClass = FrozenUpdateMode.Parser.class)
+			parserClass = FrozenUpdateMode.Parser.class, 
+			label = Label.MESSMOD)
 	public static FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean blockPlacementHistory;
 	
 	@Option(defaultValue = "COLLISION", 
-			parserClass = ShapeType.Parser.class)
+			parserClass = ShapeType.Parser.class, 
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static ShapeType blockShapeToBeRendered;
 
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.RENDERER)
 	public static boolean chunkLoadingInfoRenderer;
 	
 	@Option(defaultValue = "4", 
-			parserClass = IntegerParser.NonNegative.class)
+			parserClass = IntegerParser.NonNegative.class, 
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static int chunkLoadingInfoRenderRadius;
 	
 	@Option(defaultValue = "true", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.MESSMOD)
 	public static boolean chunkLogAutoArchiving;
 	
 	@Option(defaultValue = "true", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.MESSMOD)
 	public static boolean commandExecutionRequirment;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.REDSTONE)
 	public static boolean craftingTableBUD;
 	
 	@Option(defaultValue = "NaN", 
 			suggestions = {"0.05", "0.10", "NaN"}, 
-			parserClass = FloatParser.NaNablePositive.class)
+			parserClass = FloatParser.NaNablePositive.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static float creativeUpwardsSpeed;
 	
 	@Option(defaultValue = "false", 
 			experimental = true, 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.INTERACTION_TWEAKS, Label.BUGFIX})
 	public static boolean debugStickSkipsInvaildState;
 	
 	@Option(defaultValue = "false", 
 			experimental = true, 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean dedicatedServerCommands;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean disableChunkLoadingCheckInCommands;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean disableEnchantCommandRestriction;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.EXPLOSION, Label.BREAKING_OPTIMIZATION })
 	public static boolean disableExplosionExposureCalculation;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.ENTITY, Label.RESEARCH})
 	public static boolean disableProjectileRandomness;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntityDataOnClient;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntityDataWithPaper;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntityDataWithCtrlC;
 	
 	@Option(defaultValue = "true", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntityNbt;
 	
 	@Option(defaultValue = "true", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntitySummonCommand;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean enabledTools;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean endEyeTeleport;
 	
 	@Option(defaultValue = "false", 
 			experimental = true, 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.EXPLOSION, Label.RESEARCH })
 	public static boolean entityExplosionInfluence;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.EXPLOSION, Label.RENDERER, Label.MESSMOD })
 	public static boolean entityExplosionRaysVisiblity;
 	
 	@Option(defaultValue = "300", 
-			parserClass = IntegerParser.class)
+			parserClass = IntegerParser.class, 
+			label = { Label.EXPLOSION, Label.RENDERER, Label.MESSMOD })
 	public static int entityExplosionRaysLifetime;
 	
 	@Option(defaultValue = "true", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.MESSMOD)
 	public static boolean entityLogAutoArchiving;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean fillHistory;
 	
 	@Option(defaultValue = "POSITIVE", 
-			parserClass = PulseRecorder.Mode.Parser.class)
+			parserClass = PulseRecorder.Mode.Parser.class, 
+			label = { Label.REDSTONE, Label.MESSMOD })
 	public static PulseRecorder.Mode fletchingTablePulseDetectingMode;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.REDSTONE)
 	public static boolean fletchingTablePulseDetector;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.CHUNK)
 	public static boolean generateChunkGrid;
 	
 	// TODO Assess the performance cost
 	@Option(defaultValue = "2.0", 
 			experimental = true, 
-			parserClass = FloatParser.Positive.class)
+			parserClass = FloatParser.Positive.class, 
+			label = { Label.RESEARCH, Label.ENTITY })
 	public static float getEntityRangeExpansion;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			globalOnly = true, 
-			environment = EnvType.CLIENT)
+			environment = EnvType.CLIENT, 
+			label = { Label.MISC, Label.MESSMOD })
 	public static boolean hideSurvivalSaves;
 	
 	@Option(defaultValue = "TOP_RIGHT", 
-			parserClass = AlignMode.Parser.class)
+			parserClass = AlignMode.Parser.class, 
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static AlignMode hudAlignMode;
 	
 	@Option(defaultValue = "(BL)^2/(mR)", 
-			parserClass = StringParser.class)
+			parserClass = StringParser.class, 
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static String hudStyles;
 	
 	@Option(defaultValue = "1.0", 
 			parserClass = FloatParser.Positive.class, 
-			experimental = true)
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static float hudTextSize;
 	
 	@Option(defaultValue = "9", 
-			parserClass = IntegerParser.HotbarLength.class)
+			parserClass = IntegerParser.HotbarLength.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static int hotbarLength;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean interactableB36;
 	
 	@Option(defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 
-			parserClass = Language.Parser.class)
+			parserClass = Language.Parser.class, 
+			label = Label.MESSMOD)
 	public static String language;
 	
 	@Option(defaultValue = "10", 
-			parserClass = IntegerParser.Positive.class)
+			parserClass = IntegerParser.Positive.class, 
+			label = { Label.RESEARCH, Label.BUGFIX })
 	public static int maxClientTicksPerFrame;
 	
 	@Option(defaultValue = "180", 
-			parserClass = FloatParser.Positive.class)
+			parserClass = FloatParser.Positive.class, 
+			label = { Label.INTERACTION_TWEAKS, Label.MESSMOD })
 	public static float maxEndEyeTpRadius;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean minecartPlacementOnNonRailBlocks;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean mobFastKill;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.ENTITY, Label.BREAKING_OPTIMIZATION })
 	public static boolean optimizedEntityPushing;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.CHUNK, Label.ENTITY })
 	public static boolean projectileChunkLoading;
 	
 	@Option(defaultValue = "3", 
-			parserClass = IntegerParser.NonNegative.class)
+			parserClass = IntegerParser.NonNegative.class, 
+			label = { Label.CHUNK, Label.ENTITY, Label.MESSMOD })
 	public static int projectileChunkLoadingRange;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.CHUNK, Label.ENTITY, Label.MESSMOD })
 	public static boolean projectileChunkLoadingPermanence;
 	
 	@Option(defaultValue = "1.0", 
-			parserClass = FloatParser.class)
+			parserClass = FloatParser.class, 
+			label = { Label.RESEARCH, Label.ENTITY })
 	public static float projectileRandomnessScale;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean quickMobMounting;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean quickStackedEntityKilling;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean railNoAutoConnection;
 	
 	@Option(defaultValue = "[]", 
-			parserClass = ListParser.Ticket.class)
+			parserClass = ListParser.Ticket.class, 
+			label = { Label.CHUNK, Label.RESEARCH })
 	public static List<ChunkTicketType<?>> rejectChunkTicket;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.RENDERER)
 	public static boolean renderBlockShape;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.RENDERER)
 	public static boolean renderFluidShape;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.RENDERER)
 	public static boolean renderRedstoneGateInfo;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.RENDERER)
 	public static boolean serverSyncedBox;
 	
 	@Option(defaultValue = "-1", 
-			parserClass = FloatParser.class)
+			parserClass = FloatParser.class, 
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static float serverSyncedBoxRenderRange;
 	
 	@Option(defaultValue = "NORMALLY", 
-			parserClass = FrozenUpdateMode.Parser.class)
+			parserClass = FrozenUpdateMode.Parser.class, 
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static FrozenUpdateMode serverSyncedBoxUpdateModeInFrozenTicks;
 	
 	@Option(defaultValue = "[]", 
-			parserClass = RangeParser.ChunkStatusRange.class)
+			parserClass = RangeParser.ChunkStatusRange.class, 
+			label = { Label.CHUNK, Label.RESEARCH })
 	public static List<ChunkStatusSorter> skippedGenerationStages;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.CHUNK, Label.BREAKING_OPTIMIZATION })
 	public static boolean skipUnloadedChunkInRaycasting;
 	
 	@Option(defaultValue = "true", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.MESSMOD, Label.RENDERER })
 	public static boolean stableHudLocation;
 	
 	// TODO
 	@Option(defaultValue = "false", 
 			experimental = true, 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.MESSMOD)
 	public static boolean strictAccessingPathParsing;
 	
 	@Option(defaultValue = "false", 
 			experimental = true, 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = Label.MISC)
 	public static boolean superSuperSecretSetting;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.CHUNK, Label.ENTITY })
 	public static boolean tntChunkLoading;
 	
 	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class)
+			parserClass = BooleanParser.class, 
+			label = { Label.CHUNK, Label.ENTITY, Label.MESSMOD })
 	public static boolean tntChunkLoadingPermanence;
 	
 	@Option(defaultValue = "3", 
-			parserClass = IntegerParser.NonNegative.class)
+			parserClass = IntegerParser.NonNegative.class, 
+			label = { Label.CHUNK, Label.ENTITY, Label.MESSMOD })
 	public static int tntChunkLoadingRange;
 	
 	@Option(defaultValue = "[]", 
-			parserClass = ListParser.DebugRender.class)
+			parserClass = ListParser.DebugRender.class, 
+			label = Label.RENDERER)
 	public static List<Either<Field, String>> vanillaDebugRenderers;
 	
 	private static void setOptionSet(OptionSet set) {
