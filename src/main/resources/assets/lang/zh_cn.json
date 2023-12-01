@@ -89,6 +89,7 @@
 		"cmd.messcfg.set" : "选项%s的值现在已被设为%s", 
 		"cmd.messcfg.setglobal" : "全局作用域中选项%s的值现在已被设为%s", 
 		"cmd.messcfg.globalonly" : "存档局部设置中不支持选项%s，请点击这里以在全局作用域中设置该选项", 
+		"cmd.messcfg.withtag" : "带有标签%s的选项：", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 

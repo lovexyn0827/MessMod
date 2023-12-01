@@ -83,4 +83,8 @@ public final class OptionWrapper {
 	public boolean globalOnly() {
 		return this.option.globalOnly();
 	}
+	
+	public Label[] labels() {
+		return this.option.label();
+	}
 }

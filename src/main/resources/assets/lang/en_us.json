@@ -89,6 +89,7 @@
 		"cmd.messcfg.set" : "Option %s is now set to %s", 
 		"cmd.messcfg.setglobal" : "Option %s is now set to %s globally", 
 		"cmd.messcfg.globalonly" : "Option %s isn't supported in save-local storage, please click here to set it globally.", 
+		"cmd.messcfg.withtag" : "Options with tag %s:", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
