@@ -137,7 +137,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	private static ImmutableSet<String> getActiviatedAdvancedMixins(ImmutableSet<MixinInfo> advancedMixins) {
 		try {
 			Properties config = new Properties();
-			if(!ADVANCED_MIXINS_CONFIGURATION.exists() || "true".equals(System.clearProperty("messmod.chooseMixin"))) {
+			if("true".equals(System.clearProperty("messmod.chooseMixin"))) {
 				ADVANCED_MIXINS_CONFIGURATION.createNewFile();
 				try {
 					MixinChoosingFrame frame = new MixinChoosingFrame();
@@ -148,7 +148,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 					LOGGER.error("Failed to display mixin choosing window!");
 					e.printStackTrace();
 					advancedMixins.forEach((entry) -> {
-						config.put(entry.name, "false");
+						config.put(entry.name, "true");
 					});
 				}
 				
