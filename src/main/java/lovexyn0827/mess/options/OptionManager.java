@@ -54,7 +54,8 @@ public class OptionManager{
 	/**
 	 * Actions taken right after an option is set to a given value.
 	 */
-	static final Map<String, CustomAction> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
+	static final Map<String, CustomOptionApplicator> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
+	static final Map<String, CustomOptionValidator> CUSTOM_OPTION_VALIDATORS = Maps.newHashMap();
 	
 	@Option(defaultValue = "STANDARD", 
 			parserClass = AccessingPath.InitializationStrategy.Parser.class, 
@@ -454,8 +455,18 @@ public class OptionManager{
 		setOptionSet(OptionSet.fromPacket(in));
 	}
 	
-	private static void registerCustomApplicationBehavior(String name, @Nullable CustomAction behavior) {
+	private static void registerCustomApplicator(String name, CustomOptionApplicator behavior) {
 		CUSTOM_APPLICATION_BEHAVIORS.put(name, behavior);
+	}
+	
+	private static void registerCustomValidator(String name, CustomOptionValidator validator) {
+		CUSTOM_OPTION_VALIDATORS.put(name, validator);
+	}
+	
+	private static void registerCustomHandlers(String name, CustomOptionValidator validator, 
+			CustomOptionApplicator behavior) {
+		CUSTOM_APPLICATION_BEHAVIORS.put(name, behavior);
+		CUSTOM_OPTION_VALIDATORS.put(name, validator);
 	}
 	
 	/**
@@ -475,74 +486,70 @@ public class OptionManager{
 		setOptionSet(OptionSet.fromPacket(data));
 	}
 	
-	public static String getSerialized(String name) {
-		return activeOptionSet.getSerialized(name);
-	}
-	
-	public static String getGlobalSerialized(String name) {
-		return OptionSet.GLOBAL.getSerialized(name);
-	}
-	
 	public static void reload() {
 		activeOptionSet.reload();
-	}
-	
-	public static void set(String name, String val, 
-			CommandContext<ServerCommandSource> ct) throws InvalidOptionException {
-		activeOptionSet.set(name, val, ct);
-	}
-	
-	public static void setGlobal(String name, String val, 
-			CommandContext<ServerCommandSource> ct) throws InvalidOptionException {
-		OptionSet.GLOBAL.set(name, val);
 	}
 	
 	public static void sendOptionsTo(ServerPlayerEntity player) {
 		player.networkHandler.sendPacket(activeOptionSet.toPacket());
 	}
 	
+	public static OptionSet getActiveOptionSet() {
+		return activeOptionSet;
+	}
+	
+	public static OptionSet getGlobalOptionSet() {
+		return OptionSet.GLOBAL;
+	}
+	
 	static{
-		registerCustomApplicationBehavior("enabledTools", (oldValue, newValue, ct) -> {
-			if(ct == null) {
-				return;
-			}
-			
+		registerCustomHandlers("enabledTools", (newValue, ct) -> {
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
 				throw new InvalidOptionException("opt.err.reqcarpet");
 			}
+		}, (newValue, ct) -> {
+			if(ct == null) {
+				// We cannot apply the change without a context.
+				return;
+			}
 			
-			// FIXME Only influences the sender?
+			// XXX Only influences the sender?
 			if((Boolean) newValue) {
 				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool global");
 			}else {
 				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script unload tool");
 			}
 		});
-		CustomAction checkLithium = (oldVal, newVal, ct) -> {
+		CustomOptionValidator checkLithium = (newVal, ct) -> {
 			if (FabricLoader.getInstance().isModLoaded("lithium") && (Boolean) newVal) {
 				throw new InvalidOptionException("opt.err.lithium");
 			}
 		};
-		registerCustomApplicationBehavior("entityExplosionInfluence", checkLithium);
-		registerCustomApplicationBehavior("disableExplosionExposureCalculation", checkLithium);
-		CustomAction requireCarpet = (oldVal, newVal, ct) -> {
+		registerCustomValidator("entityExplosionInfluence", checkLithium);
+		registerCustomValidator("disableExplosionExposureCalculation", checkLithium);
+		CustomOptionValidator requireCarpet = (newVal, ct) -> {
 			if (!FabricLoader.getInstance().isModLoaded("carpet") 
 					&& (!(newVal instanceof Boolean) || (Boolean) newVal)) {
 				throw new InvalidOptionException("opt.err.reqcarpet");
 			}
 		};
-		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", requireCarpet);
-		registerCustomApplicationBehavior("hudStyles", (oldVal, newVal, ct) -> {
+		registerCustomValidator("blockInfoRendererUpdateInFrozenTicks", requireCarpet);
+		registerCustomApplicator("hudStyles", (newVal, ct) -> {
 			if (!MessMod.isDedicatedServerEnv() && MessMod.INSTANCE.getClientHudManager() != null) {
 				MessMod.INSTANCE.getClientHudManager().updateStyle((String) newVal);
 			}
 		});
-		registerCustomApplicationBehavior("language", (oldVal, newVal, ct) -> {
+		registerCustomHandlers("language", (newVal, ct) -> {
+			boolean forceLoad = ((String) newVal).endsWith(Language.FORCELOAD_SUFFIX);
+			String id = ((String) newVal).replace(Language.FORCELOAD_SUFFIX, "");
+			if(!I18N.canUseLanguage(id, forceLoad)) {
+				throw new InvalidOptionException("Language " + id + " is unsupported or incomplete.");
+			}
+		}, (newVal, ct) -> {
 			boolean forceLoad = ((String) newVal).endsWith(Language.FORCELOAD_SUFFIX);
 			String id = ((String) newVal).replace(Language.FORCELOAD_SUFFIX, "");
 			if(!I18N.setLanguage(id, forceLoad)) {
-				// Needn't be translated
-				throw new InvalidOptionException("Language " + id + " is unsupported or incomplete.");
+				throw new IllegalStateException("Option language is not validated!");
 			}
 		});
 		OPTIONS.values().forEach((o) -> {
@@ -553,13 +560,21 @@ public class OptionManager{
 		setOptionSet(OptionSet.GLOBAL);
 	}
 	
-	@FunctionalInterface interface CustomAction {
+	@FunctionalInterface interface CustomOptionApplicator {
 		/**
-		 * Called after the new value of an option has been set. This method mainly perform some validations, and
-		 * some custom application steps.
+		 * Called after the new value of an option has been set. 
+		 * This method mainly perform custom application steps other than changing the value of an option.
+		 * @param newValue The new value, previously validated.
+		 */
+		void onOptionUpdate(Object newValue, @Nullable CommandContext<ServerCommandSource> ct);
+	}
+	
+	@FunctionalInterface interface CustomOptionValidator {
+		/**
+		 * Perform some non-generic validations.
 		 * @param oldValue The previous value of the updated option, or null not exist.
 		 */
-		void onOptionUpdate(@Nullable Object oldValue, Object newValue, 
-				@Nullable CommandContext<ServerCommandSource> ct)throws InvalidOptionException;
+		void validate(@Nullable Object newVal, @Nullable CommandContext<ServerCommandSource> ct)
+				throws InvalidOptionException;
 	}
 }

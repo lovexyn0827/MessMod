@@ -2,8 +2,12 @@ package lovexyn0827.mess.options;
 
 import java.lang.reflect.Field;
 
+import org.jetbrains.annotations.Nullable;
+
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
+import lovexyn0827.mess.options.OptionManager.CustomOptionApplicator;
 import lovexyn0827.mess.util.i18n.I18N;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -30,9 +34,13 @@ public final class OptionWrapper {
 		}
 	}
 	
-	public void set(Object o) {
+	public void set(Object o, @Nullable CommandContext<ServerCommandSource> ct) {
 		try {
 			this.field.set(null, o);
+			CustomOptionApplicator action = OptionManager.CUSTOM_APPLICATION_BEHAVIORS.get(name);
+			if(action != null) {
+				action.onOptionUpdate(o, ct);
+			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}

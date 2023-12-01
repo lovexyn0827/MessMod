@@ -17,19 +17,18 @@ import com.mojang.brigadier.context.CommandContext;
 
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.network.Channels;
-import lovexyn0827.mess.options.OptionManager.CustomAction;
+import lovexyn0827.mess.options.OptionManager.CustomOptionValidator;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.command.ServerCommandSource;
 
-final class OptionSet {
+public final class OptionSet {
 	private static final Logger LOGGER = LogManager.getLogger();
+	static final OptionSet DEFAULT = new OptionSet();
 	static final OptionSet GLOBAL = new OptionSet(
-			new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop"), null);
-	
+			new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop"), DEFAULT);
 	/**
 	 * The parent of this {@code OptionSet}, whose values are used as default values of this {@code OptionSet}.
 	 * 
@@ -39,7 +38,6 @@ final class OptionSet {
 	 */
 	private final OptionSet parent;
 	private final Properties backend = new Properties();
-	
 	@Nullable
 	private final File optionFile;
 	private boolean isActive;
@@ -49,19 +47,24 @@ final class OptionSet {
 	 */
 	private final boolean remote;
 	
+	/**
+	 * @param parent If null, the default OptionSet will be used.
+	 */
 	private OptionSet(File optionFile, @Nullable OptionSet parent) {
 		this.optionFile = optionFile;
-		this.parent = parent;
+		this.parent = parent == null ? DEFAULT : parent;
 		this.remote = optionFile == null;
 		this.reload();
+		this.activiate();
 	}
 	
 	private OptionSet(Reader r) {
 		this.optionFile = null;
-		this.parent = null;
+		this.parent = DEFAULT;
 		this.remote = true;
 		try {
 			this.backend.load(r);
+			this.activiate();
 		} catch (IOException e) {
 			LOGGER.error("Failed to load remote option set!");
 			e.printStackTrace();
@@ -70,6 +73,20 @@ final class OptionSet {
 		this.replaceInvalidValues();
 	}
 	
+	/**
+	 * Construct a new OptionSet using the default value of each option.
+	 */
+	private OptionSet() {
+		this.optionFile = null;
+		this.parent = null;
+		this.remote = true;
+		OptionManager.OPTIONS.forEach((name, opt) -> {
+			this.backend.put(name, opt.option.defaultValue());
+		});
+		// Normally we don't have to check that
+		//this.replaceInvalidValues();
+	}
+
 	public static OptionSet load(File optionFile) {
 		return new OptionSet(optionFile, GLOBAL);
 	}
@@ -88,21 +105,23 @@ final class OptionSet {
 		try {
 			// Validation I
 			Object parsed = OptionParser.of(name).tryParse(optionStr);
-			Object prevVal = OptionManager.OPTIONS.get(name).get();
 			// Validation II
-			CustomAction action = OptionManager.CUSTOM_APPLICATION_BEHAVIORS
-					.get(name);
-			if(action != null) {
-				action.onOptionUpdate(prevVal, parsed, ct);
+			CustomOptionValidator validator = OptionManager.CUSTOM_OPTION_VALIDATORS.get(name);
+			if(validator != null) {
+				validator.validate(parsed, ct);
 			}
 		} catch(InvalidOptionException e) {
-			sendErrorOrWarn(ct, e.getLocalizedMessage());
+			if(ct == null) {
+				// Since /messcfg itself prints error message, we needn't outputs it if ct != null.
+				MessMod.LOGGER.warn(e.getLocalizedMessage());
+			}
+			
 			throw e;
 		}
 		
 		this.backend.put(name, optionStr);
 		if(this.isActive) {
-			this.apply(name);
+			this.apply(name, ct);
 		}
 		
 		if(!this.remote) {
@@ -159,7 +178,6 @@ final class OptionSet {
 			}
 		});
 		sendOptionsToClientsIfNeeded();
-		this.activiate();
 		this.save();
 	}
 	
@@ -228,7 +246,7 @@ final class OptionSet {
 				throw new IllegalStateException(e);
 			}
 			
-			o.set(val);
+			o.set(val, null);
 		});
 		this.sendOptionsToClientsIfNeeded();
 		this.isActive = true;
@@ -238,13 +256,13 @@ final class OptionSet {
 		this.isActive = false;
 	}
 	
-	private void apply(String name) {
+	private void apply(String name, @Nullable CommandContext<ServerCommandSource> ct) {
 		if(!OptionManager.isValidOptionName(name)) {
 			throw new IllegalArgumentException("Trying to apply invalid option: " + name);
 		}
 		
 		try {
-			OptionManager.OPTIONS.get(name).set(OptionParser.of(name).tryParse(this.getSerialized(name)));
+			OptionManager.OPTIONS.get(name).set(OptionParser.of(name).tryParse(this.getSerialized(name)), ct);
 		} catch (InvalidOptionException e) {
 			LOGGER.fatal("Unstripped invalid option: {}={}", name, this.getSerialized(name));
 			throw new IllegalStateException(e);
@@ -260,14 +278,6 @@ final class OptionSet {
 			return new CustomPayloadS2CPacket(Channels.OPTIONS, buf);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-	}
-	
-	private static void sendErrorOrWarn(@Nullable CommandContext<ServerCommandSource> ct, String msg) {
-		if (ct != null) {
-			CommandUtil.error(ct, msg);
-		} else {
-			MessMod.LOGGER.warn(msg);
 		}
 	}
 

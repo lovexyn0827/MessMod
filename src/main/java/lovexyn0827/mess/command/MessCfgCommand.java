@@ -33,7 +33,7 @@ public class MessCfgCommand {
 					CommandUtil.feedbackRaw(ct, metadata.getDescription());
 					s.sendFeedback(new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
 					OptionManager.OPTIONS.forEach((name, opt) -> {
-						String v = OptionManager.getSerialized(name);
+						String v = OptionManager.getActiveOptionSet().getSerialized(name);
 						ClickEvent event = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/messcfg " + name);
 						MutableText text = new LiteralText(name + ": " + v)
 								.fillStyle(Style.EMPTY.withClickEvent(event)
@@ -68,13 +68,13 @@ public class MessCfgCommand {
 						
 						text.append(new LiteralText("\n" + opt.getDescription() + "\n")
 								.formatted(Formatting.GRAY));
-						String value = OptionManager.getSerialized(name);
+						String value = OptionManager.getActiveOptionSet().getSerialized(name);
 						text.append(new FormattedText("cmd.messcfg.current", "f", true, value).asMutableText());
 						if(!opt.getDefaultValue().equals(value)) {
 							text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
 						}
 						
-						String globalValue = OptionManager.getGlobalSerialized(name);
+						String globalValue = OptionManager.getGlobalOptionSet().getSerialized(name);
 						text.append(new FormattedText("cmd.messcfg.global", "f", true, globalValue).asMutableText());
 						if(!opt.getDefaultValue().equals(globalValue)) {
 							text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
@@ -98,7 +98,7 @@ public class MessCfgCommand {
 								}
 								
 								try {
-									OptionManager.set(name, value, ct);
+									OptionManager.getActiveOptionSet().set(name, value, ct);
 									CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.set", name, value);
 									return Command.SINGLE_SUCCESS;
 								} catch (InvalidOptionException e) {
@@ -113,7 +113,7 @@ public class MessCfgCommand {
 									.executes((ct) -> {
 										try {
 											String value = StringArgumentType.getString(ct, "value");
-											OptionManager.setGlobal(name, value, ct);
+											OptionManager.getGlobalOptionSet().set(name, value, ct);
 											CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.setglobal", name, value);
 											return Command.SINGLE_SUCCESS;
 										} catch (InvalidOptionException e) {
