@@ -22,8 +22,7 @@ public class EnumParser<T extends Enum<T>> implements OptionParser<Enum<T>> {
 		try {
 			return Enum.valueOf(clazz, str);
 		} catch(IllegalArgumentException e) {
-			InvalidOptionException e1 = new InvalidOptionException("The value of this option couldn't be " + 
-					str + ", beacuse " + e.getMessage());
+			InvalidOptionException e1 = new InvalidOptionException("opt.err.nodef", str);
 			e1.initCause(e);
 			throw e1;
 		}

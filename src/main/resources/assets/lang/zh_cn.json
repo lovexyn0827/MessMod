@@ -242,13 +242,15 @@
 		"opt.vanillaDebugRenderers.desc" : "启用一些原版调试渲染器。",
 		
 		//***** Errors in options
-		"opt.err.rpositive" : "需要一个整数", 
+		"opt.err.rpositive" : "需要一个正数", 
 		"opt.err.rnonnegative" : "需要一个非负数", 
 		"opt.err.rnum" : "给定的值不是一个数字", 
+		"opt.err.rint" : "给定的值不是一个整数", 
 		"opt.err.rhotbar" : "需要1～36之间的一个整数", 
 		"opt.err.nodef" : "%s未被定义", 
 		"opt.err.lithium" : "此选项与Lithium不兼容", 
 		"opt.err.reqcarpet" : "该选项需要安装Carpet", 
+		"opt.err.reqbool" : "只能使用true或false", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "id不能为负值", 

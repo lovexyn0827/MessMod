@@ -242,13 +242,15 @@
 		"opt.vanillaDebugRenderers.desc" : "Enable some vanilla debugging renderers, some of which won't actually work.",
 		
 		//***** Errors in options
-		"opt.err.rpositive" : "Requires a positive number", 
-		"opt.err.rnonnegative" : "Requires a non-negative number", 
-		"opt.err.rnum" : "The given value is not a number", 
-		"opt.err.rhotbar" : "Requires a number between 1 and 36", 
-		"opt.err.nodef" : "%s is not defined", 
+		"opt.err.rpositive" : "Requires a positive number!", 
+		"opt.err.rnonnegative" : "Requires a non-negative number!", 
+		"opt.err.rnum" : "The given value is not a number!", 
+		"opt.err.rint" : "The given value is not a integer!", 
+		"opt.err.rhotbar" : "Requires a number between 1 and 36!", 
+		"opt.err.nodef" : "%s is not defined!", 
 		"opt.err.lithium" : "This option is incompatible with Lithium!", 
 		"opt.err.reqcarpet" : "This option require Carpet to function!", 
+		"opt.err.reqbool" : "Use true of false here!", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 
