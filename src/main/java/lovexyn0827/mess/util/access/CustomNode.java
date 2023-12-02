@@ -103,6 +103,7 @@ public class CustomNode extends Node {
 				MessMod.LOGGER.warn("Couldn't parse saved nodes: {}", e);
 				e.printStackTrace();
 			}
+			
 			operation.accept(prop);
 			Writer writer = new FileWriter(file);
 			prop.store(writer, "Saved Custom Nodes");

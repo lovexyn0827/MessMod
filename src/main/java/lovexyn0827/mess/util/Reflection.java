@@ -120,6 +120,7 @@ public class Reflection {
 	 *  Map class => {Key class, Value class} (type arguments are represented by null)
 	 */
 	public static final ImmutableMap<Class<?>, Pair<Class<?>, Class<?>>> MAP_TO_TYPES;
+	public static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER;
 	
 	public static boolean hasField(Class<?> clazz, final Field field) {
 		return hasField(clazz, field.getName());
@@ -439,6 +440,10 @@ public class Reflection {
 		}
 	}
 	
+	public static Class<?> wrapPrimitiveType(Class<?> lastOutputClass) {
+		return PRIMITIVE_TO_WRAPPER.getOrDefault(lastOutputClass, lastOutputClass);
+	}
+	
 	/**
 	 * Gets a method with <b>exactly</b> matching name and descriptor, from a given class and its super types.
 	 */
@@ -601,6 +606,16 @@ public class Reflection {
 				.put(Char2ObjectMap.class, new Pair<>(char.class, null))
 				.put(Byte2ObjectMap.class, new Pair<>(byte.class, null))
 				.put(Short2ObjectMap.class, new Pair<>(short.class, null))
+				.build();
+		PRIMITIVE_TO_WRAPPER = ImmutableBiMap.<Class<?>, Class<?>>builder()
+				.put(int.class, Integer.class)
+				.put(long.class, Long.class)
+				.put(short.class, Short.class)
+				.put(byte.class, Byte.class)
+				.put(char.class, Character.class)
+				.put(float.class, Float.class)
+				.put(double.class, Double.class)
+				.put(boolean.class, Boolean.class)
 				.build();
 	}
 }
