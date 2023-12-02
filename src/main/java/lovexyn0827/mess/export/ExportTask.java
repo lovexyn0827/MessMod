@@ -28,6 +28,7 @@ import lovexyn0827.mess.mixins.DataCommandStorageAccessor;
 import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RaidManagerAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.RenderedBox;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
@@ -59,12 +60,13 @@ public final class ExportTask {
 	private static final Map<CommandOutput, ExportTask> TASKS = new HashMap<>();
 	private final Map<String, Region> regions = new HashMap<>();
 	private final MinecraftServer server;
-	private final EnumSet<SaveComponent> components = EnumSet.of(SaveComponent.REGION, SaveComponent.POI);
+	private final EnumSet<SaveComponent> components = EnumSet.noneOf(SaveComponent.class);
 	private final ServerPlayerEntity owner;
 	
 	private ExportTask(CommandOutput k, MinecraftServer server) {
 		this.owner = k instanceof ServerPlayerEntity ? (ServerPlayerEntity) k : null;
 		this.server = server;
+		this.components.addAll(OptionManager.defaultSaveComponents);
 	}
 
 	public static ExportTask of(CommandOutput output, MinecraftServer server) {

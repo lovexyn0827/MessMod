@@ -21,7 +21,6 @@ import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 

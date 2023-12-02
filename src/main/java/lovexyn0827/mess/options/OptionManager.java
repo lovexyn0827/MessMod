@@ -18,6 +18,7 @@ import com.mojang.datafixers.util.Either;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.CommandUtil;
+import lovexyn0827.mess.export.SaveComponent;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
@@ -154,6 +155,12 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean dedicatedServerCommands;
+	
+	@Option(defaultValue = "REGION,POI", 
+			parserClass = SaveComponent.DefaultListParser.class, 
+			suggestions = { "REGION,POI", "REGION,GAMERULES,POI", "[]" }, 
+			label = Label.MESSMOD)
+	public static List<SaveComponent> defaultSaveComponents;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
