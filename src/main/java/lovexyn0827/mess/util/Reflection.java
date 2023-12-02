@@ -141,12 +141,12 @@ public class Reflection {
 	
 	
 	/**
-	 * Gets the names of all fields declared by the given class or its super classes.
+	 * Gets the deobfuscated names of all fields declared by the given class or its super classes.
 	 */
 	public static Set<String> getAvailableFieldNames(Class<?> entityClass) {
 		Set<String> fieldSet = new TreeSet<>();
 		Mapping mapping = MessMod.INSTANCE.getMapping();
-		while(entityClass != Object.class) {
+		while(entityClass != null && entityClass != Object.class) {
 			for(Field field : entityClass.getDeclaredFields()) {
 				if(!mapping.isDummy()) {
 					fieldSet.add(MessMod.INSTANCE.getMapping().namedField(field.getName()));
@@ -166,7 +166,7 @@ public class Reflection {
 	 */
 	public static Set<Field> getInstanceFields(Class<?> clazz) {
 		Set<Field> fieldSet = new TreeSet<>(Comparator.comparing(Field::getName));
-		while(clazz != Object.class) {
+		while(clazz != null && clazz != Object.class) {
 			for(Field field : clazz.getDeclaredFields()) {
 				if(!Modifier.isStatic(field.getModifiers())) {
 					fieldSet.add(field);

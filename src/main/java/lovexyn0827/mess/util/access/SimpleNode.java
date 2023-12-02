@@ -10,6 +10,9 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import lovexyn0827.mess.util.Reflection;
@@ -90,6 +93,10 @@ class SimpleNode<I, O> extends Node {
 	@Nullable
 	static SimpleNode<?, ?> byName(String name) {
 		return NODES_BY_NAME.get(name);
+	}
+
+	static void appendSuggestions(SuggestionsBuilder builder) {
+		NODES_BY_NAME.keySet().forEach(builder::suggest);
 	}
 	
 	static {

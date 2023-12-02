@@ -134,8 +134,11 @@ public class CustomNode extends Node {
 			}
 		} else {
 			String pathStr = NODES_BY_NAME.get(name);
-			AccessingPath path = AccessingPathArgumentType.accessingPathArg()
-					.parse(new StringReader(pathStr));
+			if(pathStr == null) {
+				return null;
+			}
+			
+			AccessingPath path = AccessingPathArgumentType.accessingPathArg().parse(new StringReader(pathStr));
 			return new CustomNode(name, path);
 		}
 	}

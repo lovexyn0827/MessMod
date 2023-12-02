@@ -73,7 +73,7 @@ public class EntityLogCommand {
 													
 													return Command.SINGLE_SUCCESS;
 												})
-												.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+												.then(argument("path", CommandUtil.getPathArgForFieldListening("entityType", "field"))
 														.executes((ct) -> {
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 															EntityType<?> type = Registry.ENTITY_TYPE
@@ -107,7 +107,7 @@ public class EntityLogCommand {
 															
 															return Command.SINGLE_SUCCESS;
 														})
-														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+														.then(argument("path", CommandUtil.getPathArgForFieldListening("entityType", "field"))
 																.executes((ct) -> {
 																	EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 																	EntityType<?> type = Registry.ENTITY_TYPE

@@ -99,7 +99,11 @@ public class VariableCommand {
 								.suggests(slotSuggestion)
 								.then(argument("slotDst", StringArgumentType.word())
 										.suggests(slotSuggestion)
-										.then(argument("func", AccessingPathArgumentType.accessingPathArg())
+										.then(argument("func", AccessingPathArgumentType.accessingPathArg((ct) -> {
+											String slot = StringArgumentType.getString(ct, "slotSrc");
+											Object ob = VARIABLES.get(slot);
+											return ob == null ? Object.class : ob.getClass();
+										}))
 												.executes(VariableCommand::map)))))
 				.then(literal("print")
 						.then(argument("slot", StringArgumentType.word())

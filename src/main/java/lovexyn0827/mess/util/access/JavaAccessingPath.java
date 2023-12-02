@@ -24,6 +24,7 @@ class JavaAccessingPath implements AccessingPath {
 	private boolean initialized;
 	private final Map<Object, JavaAccessingPath> initializedSubPaths;
 	private final String originalStringRepresentation;
+	private Type initializingInputType;
 	
 	protected JavaAccessingPath(List<Node> nodes, String strRep) {
 		this.nodes = new LinkedList<>();
@@ -180,30 +181,32 @@ class JavaAccessingPath implements AccessingPath {
 		return sb.toString();
 	}
 	
-	private void initialize(Type startType) throws AccessingFailureException {
-		if (!this.initialized) {
-			Type lastType = startType;
-			for (Node n : this.nodes) {
-				try {
-					n.initialize(lastType);
-					lastType = n.outputType;
-				} catch (AccessingFailureException e) {
-					if(e.isRaw()) {
-						throw e.withNode(n);
-					} else {
-						throw e;
-					}
+	/**
+	 * Should be used for internal proposes, unless the path is no long used to access paths.
+	 */
+	void initialize(Type startType) throws AccessingFailureException {
+		this.initializingInputType = startType;
+		Type lastType = startType;
+		for (Node n : this.nodes) {
+			try {
+				n.initialize(lastType);
+				lastType = n.outputType;
+			} catch (AccessingFailureException e) {
+				if(e.isRaw()) {
+					throw e.withNode(n);
+				} else {
+					throw e;
 				}
 			}
-			
-			this.initialized = true;
 		}
+		
+		this.initialized = true;
 	}
 	
 	@Nullable
 	@Override
 	public Type getOutputType() {
-		return this.nodes.getLast().outputType;
+		return this.nodes.isEmpty() ? this.initializingInputType : this.nodes.getLast().outputType;
 	}
 	
 	private JavaAccessingPath createCopyForInput(Object in) {

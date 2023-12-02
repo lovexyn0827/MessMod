@@ -3,6 +3,8 @@ package lovexyn0827.mess.command;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.lang.reflect.Field;
+
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -19,6 +21,7 @@ import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 
@@ -41,7 +44,23 @@ public class EntitySidebarCommand {
 												.executes(EntitySidebarCommand::addSidebar)
 												.then(TickingPhase.commandArg()
 														.executes(EntitySidebarCommand::addSidebarWithPoint)
-														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+														.then(argument("path", AccessingPathArgumentType.accessingPathArg((ct) -> {
+															Entity entity;
+															try {
+																entity = EntityArgumentType.getEntity(ct, "target");
+															} catch (CommandSyntaxException e) {
+																entity = null;
+															}
+															
+															Class<?> eClass = entity == null ? Entity.class : entity.getClass();
+															String fName = StringArgumentType.getString(ct, "field");
+															if("-THIS-".equals(fName)) {
+																return eClass;
+															}
+															
+															Field field = Reflection.getFieldFromNamed(eClass, fName);
+															return field == null ? Object.class : field.getGenericType();
+														}))
 																.executes((EntitySidebarCommand::addSidebarWithPointAndPath))))))))
 				.then(literal("remove")
 						.then(argument("name",StringArgumentType.string())
