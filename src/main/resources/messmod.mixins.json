@@ -65,7 +65,6 @@
     "AbstractRedstoneGateBlockMixin",
     "LanguageManagerMixin", 
     "DebugRendererMixin",
-    "EntitySelectorMixin", 
     "WorldListWidgetMixin", 
     "WorldListWidgetEntryAccessor", 
     "InGameHudMixin", 
@@ -73,7 +72,11 @@
     "CreativeInventoryScreenMixin", 
     "StructureBlockBlockEntityMixin", 
     "GameRendererMixin", 
-    "WorldListWidgetEntryMixin"
+    "WorldListWidgetEntryMixin", 
+    "EntitySelectorMixin_Client"
+  ],
+  "server": [
+    "EntitySelectorMixin_Server"
   ],
   "injectors": {
     "defaultRequire": 1

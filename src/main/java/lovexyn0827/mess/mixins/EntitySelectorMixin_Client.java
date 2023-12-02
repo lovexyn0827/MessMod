@@ -33,7 +33,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 @Mixin(EntitySelector.class)
-public class EntitySelectorMixin implements EntitySelectorInterface {
+public class EntitySelectorMixin_Client implements EntitySelectorInterface {
 	private NetworkSide side;
 	private boolean targetOnly;
 	@Shadow
