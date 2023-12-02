@@ -185,6 +185,10 @@ class JavaAccessingPath implements AccessingPath {
 	 * Should be used for internal proposes, unless the path is no long used to access paths.
 	 */
 	void initialize(Type startType) throws AccessingFailureException {
+		if(this.initialized) {
+			this.nodes.forEach(Node::uninitialize);
+		}
+		
 		this.initializingInputType = startType;
 		Type lastType = startType;
 		for (Node n : this.nodes) {
