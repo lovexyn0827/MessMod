@@ -167,7 +167,8 @@
 		"hud.client" : "Client Player Information HUD: ", 
 		"hud.server" : "Server Player Information HUD: ", 
 		
-		//***** Options *****chunkLogAutoArchiving
+		//***** Options *****
+		"opt.accessingPathDynamicAutoCompletion.desc" : "Support suggestions for fields and methods when auto completing Accessing paths.", 
 		"opt.accessingPathInitStrategy.desc" : "There are there initializing strategies available: \n- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances and so on, will be used to handle all subsequent inputs.\n- Standard strategy: Accessing paths are parsed for every different inputs, and the parsed copies are cached until the inputs are discarded by the garbage collector.\n- Strict Strategy: Accessing paths are reinitialized each time they are used.", 
 		"opt.allowSelectingDeadEntities.desc" : "Allow entity selector `@e` dead entities.", 
 		"opt.allowTargetingSpecialEntities.desc" : "Allow the player to target entities like items, snowballs and arrows, enabling command suggestions for them.",

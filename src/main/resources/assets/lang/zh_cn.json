@@ -168,6 +168,7 @@
 		"hud.server" : "服务端玩家信息HUD: ", 
 		
 		//***** Options *****
+		"opt.accessingPathDynamicAutoCompletion.desc" : "支持自动补全Accessing Path中的字段名和方法名。", 
 		"opt.accessingPathInitStrategy.desc" : "共有3种初始化策略： \n - 旧版本模式：每个Accessing Path只在第一次被使用时进行初始化，然后这一结果用于访问后续的所有输入对象 \n - 标准模式：Accessing Path会对每个不同对象进行初始化，然后结果会被缓存直到相应对象被清理。\n - 严格模式：Accessing Path每次被使用时都会重新进行初始化。", 
 		"opt.allowSelectingDeadEntities.desc" : "允许目标选择器`@e`选中死亡的实体。", 
 		"opt.allowTargetingSpecialEntities.desc" : "允许玩家将光标对准物品、雪球和箭矢等实体以获取相应的指令建议。", 

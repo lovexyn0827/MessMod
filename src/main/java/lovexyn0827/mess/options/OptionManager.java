@@ -56,6 +56,11 @@ public class OptionManager{
 	 */
 	static final Map<String, CustomOptionApplicator> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
 	static final Map<String, CustomOptionValidator> CUSTOM_OPTION_VALIDATORS = Maps.newHashMap();
+
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class, 
+			label = Label.MESSMOD)
+	public static boolean accessingPathDynamicAutoCompletion;
 	
 	@Option(defaultValue = "STANDARD", 
 			parserClass = AccessingPath.InitializationStrategy.Parser.class, 

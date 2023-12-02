@@ -200,7 +200,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
         				.suggest(lastNodeStr + "::")
         				.buildFuture();
         	default:
-        		if(this.inputTypeGetter != null) {
+        		if(this.inputTypeGetter != null && OptionManager.accessingPathDynamicAutoCompletion) {
         			if(ct.getSource() instanceof ServerCommandSource) {
         				// Server side
         				@SuppressWarnings("unchecked")
