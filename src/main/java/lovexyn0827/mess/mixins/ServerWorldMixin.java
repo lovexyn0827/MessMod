@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import lovexyn0827.mess.options.OptionManager;
-import lovexyn0827.mess.util.TickingPhase;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.server.world.ServerWorld;
@@ -25,6 +25,7 @@ public abstract class ServerWorldMixin implements BlockView {
 	@Override
 	public BlockHitResult raycast(RaycastContext context2) {
 		return BlockView.raycast(context2.getStart(), context2.getEnd(), context2, (context, pos) -> {
+		// TODO Use better approach or copy newer code
 			if(OptionManager.skipUnloadedChunkInRaycasting) {
 				if(!((ServerWorld)(Object) this).isChunkLoaded(pos)) {
 					return null;
@@ -54,7 +55,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=chunkSource")
 			)
 	private void startChunkTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		TickingPhase.WEATHER_CYCLE.triggerEvents((ServerWorld)(Object) this);
+		ServerTickingPhase.WEATHER_CYCLE.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -63,7 +64,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=tickPending")
 			)
 	private void startScheduledTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		TickingPhase.CHUNK.triggerEvents((ServerWorld)(Object) this);
+		ServerTickingPhase.CHUNK.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -72,7 +73,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=raid")
 			)
 	private void startVillageTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		TickingPhase.SCHEDULED_TICK.triggerEvents((ServerWorld)(Object) this);
+		ServerTickingPhase.SCHEDULED_TICK.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -81,7 +82,7 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=blockEvents")
 			)
 	private void startBlockEventTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		TickingPhase.VILLAGE.triggerEvents((ServerWorld)(Object) this);
+		ServerTickingPhase.VILLAGE.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
@@ -90,20 +91,20 @@ public abstract class ServerWorldMixin implements BlockView {
 					args = "ldc=entities")
 			)
 	private void startEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		TickingPhase.BLOCK_EVENT.triggerEvents((ServerWorld)(Object) this);
+		ServerTickingPhase.BLOCK_EVENT.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tickBlockEntities()V")
 			)
 	private void startBlockEntityTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		TickingPhase.ENTITY.triggerEvents((ServerWorld)(Object) this);
+		ServerTickingPhase.ENTITY.triggerEvents((ServerWorld)(Object) this);
 	}
 	
 	@Inject(method = "tick", 
 			at = @At("RETURN")
 			)
 	private void endTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		TickingPhase.TILE_ENTITY.triggerEvents((ServerWorld)(Object) this);
+		ServerTickingPhase.TILE_ENTITY.triggerEvents((ServerWorld)(Object) this);
 	}
 }

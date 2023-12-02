@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -101,19 +100,18 @@ public abstract class EntityMixin {
 		}
 	}
 	
-	@Redirect(method = "move", 
-			at = @At(value = "INVOKE", 
+	@Inject(method = "move", 
+			at = @At(value = "INVOKE_ASSIGN", 
 					target = "Lnet/minecraft/entity/Entity;adjustMovementForPiston(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;"
-			)
+			), 
+			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private Vec3d onPistonMovementRestriction(Entity e, Vec3d movement) {
+	private void onPistonMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
 		Vec3d vec = this.adjustMovementForPiston(movement);
 		if(currentReport != null && !this.world.isClient) {
 			currentReport.add(new LiteralText("Restricted piston movement to " + vec));
 			lastMovement = vec;
 		}
-		
-		return vec;
 	}
 	
 	@Inject(method = "move", 
@@ -129,46 +127,43 @@ public abstract class EntityMixin {
 		}
 	}
 	
-	@Redirect(method = "move", 
-			at = @At(value = "INVOKE", 
+	@Inject(method = "move", 
+			at = @At(value = "INVOKE_ASSIGN", 
 					target = "Lnet/minecraft/entity/Entity;adjustMovementForSneaking(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/MovementType;)Lnet/minecraft/util/math/Vec3d;"
-			) 
+			), 
+			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private Vec3d onSneakingMovementRestriction(Entity e, Vec3d movement, MovementType type) {
+	private void onSneakingMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
 		Vec3d vec = this.adjustMovementForSneaking(movement, type);
 		if(currentReport != null && !vec.equals(movement) && !this.world.isClient) {
 			currentReport.add(new LiteralText("Sneaking restricted the movement to " + vec));
 			lastMovement = vec;
 		}
-		
-		return vec;
 	}
 	
-	@Redirect(method = "move", 
-			at = @At(value = "INVOKE", 
+	@Inject(method = "move", 
+			at = @At(value = "INVOKE_ASSIGN", 
 					target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;"
-			)
+			), 
+			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private Vec3d onCollisionMovementRestriction(Entity e, Vec3d movement) {
+	private void onCollisionMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci, Vec3d vec3d) {
 		Vec3d vec = this.adjustMovementForCollisions(movement);
 		if(currentReport != null && !vec.equals(movement) && !this.world.isClient) {
 			currentReport.add(new LiteralText("Collision restricted the movement to " + vec));
 			lastMovement = vec;
 		}
-		
-		return vec;
 	}
 	
 	@Inject(method = "move", 
-			at = @At("RETURN"), 
-			locals = LocalCapture.CAPTURE_FAILHARD
+			at = @At("RETURN")
 	)
 	private void postMove(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if(currentReport != null && !this.world.isClient) {
 			currentReport.add(new LiteralText("Final Motion: " + this.velocity));
 			currentReport.forEach((t) -> world.getServer().getPlayerManager().broadcastChatMessage(t, MessageType.CHAT, Util.NIL_UUID));
 			currentReport = null;
-			lastMovement = new Vec3d(Double.NaN, Double.NaN, Double.NaN);
+			lastMovement = null;
 		}
 	}
 }

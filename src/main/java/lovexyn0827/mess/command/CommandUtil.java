@@ -10,6 +10,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
+import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.i18n.I18N;
@@ -116,12 +117,18 @@ public class CommandUtil {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(I18N.translate(string) + ": " + I18N.translate(e.getMessage()))
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
+		if(OptionManager.superSuperSecretSetting) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, @NotNull Exception e) {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(str == null ? "[null]" : str)
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
+		if(OptionManager.superSuperSecretSetting) {
+			e.printStackTrace();
+		}
 	}
 
 	public static ServerCommandSource noreplySource() {
@@ -165,9 +172,19 @@ public class CommandUtil {
 				entity);
 	}
 	
-	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(String ... args) {
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestions(Object ... args) {
 		return (ct, builder) -> {
 			Stream.of(args)
+					.map(Object::toString)
+					.forEach(builder::suggest);
+			return builder.buildFuture();
+		};
+	}
+	
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<ChunkEvent> class1) {
+		return (ct, builder) -> {
+			Stream.of(class1.getEnumConstants())
+					.map(Enum::name)
 					.forEach(builder::suggest);
 			return builder.buildFuture();
 		};

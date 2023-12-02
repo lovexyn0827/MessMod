@@ -70,7 +70,7 @@ public class MessCfgCommand {
 				OptionParser<?> parser = o.parserClass().newInstance();
 				SuggestionProvider<ServerCommandSource> sp = parser.createSuggestions();
 				if(sp == null) {
-					sp = CommandUtil.immutableSuggestions(o.suggestions());
+					sp = CommandUtil.immutableSuggestions((Object[]) o.suggestions());
 				}
 				
 				command.then(literal(f.getName()).requires(CommandUtil.COMMAND_REQUMENT)
@@ -97,7 +97,7 @@ public class MessCfgCommand {
 								.executes((ct) -> {
 									String value = StringArgumentType.getString(ct, "value");
 									if(o.globalOnly()) {
-										MutableText errMsg = new LiteralText(I18N.translate("cmd.messcfg.globalonly"))
+										MutableText errMsg = new LiteralText(I18N.translate("cmd.messcfg.globalonly", f.getName()))
 												.fillStyle(Style.EMPTY
 														.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, 
 																"/messcfg setGlobal " + f.getName() + ' ' + value)));

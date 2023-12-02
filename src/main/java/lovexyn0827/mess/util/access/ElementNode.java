@@ -5,8 +5,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import com.google.common.collect.ImmutableCollection;
+import lovexyn0827.mess.util.Reflection;
 
-public class ElementNode extends Node {
+final class ElementNode extends Node {
 
 	private int index;
 
@@ -24,7 +27,7 @@ public class ElementNode extends Node {
 					return Array.get(previous, Array.getLength(previous) + this.index);
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
-				throw new AccessingFailureException(AccessingFailureException.Cause.OUT_OF_BOUND, this);
+				throw AccessingFailureException.create(FailureCause.OUT_OF_BOUND, this);
 			}
 		} else if(previous instanceof Collection<?>) {
 			Collection<?> c = (Collection<?>) previous;
@@ -36,10 +39,10 @@ public class ElementNode extends Node {
 				
 				return itr.next();
 			} else {
-				throw new AccessingFailureException(AccessingFailureException.Cause.OUT_OF_BOUND, this);
+				throw AccessingFailureException.create(FailureCause.OUT_OF_BOUND, this);
 			}
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.BAD_INPUT, this);
+			throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
 		}
 	}
 	
@@ -60,7 +63,7 @@ public class ElementNode extends Node {
 		
 		ElementNode other = (ElementNode) obj;
 		return this.index == other.index
-				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType));
+				&& (this.outputType == null ? other.outputType == null : this.outputType.equals(other.outputType));
 	}
 	
 	@Override
@@ -100,4 +103,48 @@ public class ElementNode extends Node {
 		return node;
 	}
 
+	@Override
+	boolean isWrittable() {
+		return true;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	void write(Object writeTo, Object newValue) throws AccessingFailureException {
+		if(ImmutableCollection.class.isAssignableFrom(Reflection.getRawType(inputType))) {
+			throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
+		} else {
+			if(writeTo.getClass().isArray()) {
+				try {
+					if(this.index >= 0) {
+						Array.set(writeTo, this.index, newValue);
+					} else {
+						Array.set(writeTo, Array.getLength(writeTo) + this.index, newValue);
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					throw AccessingFailureException.create(FailureCause.OUT_OF_BOUND, this);
+				}
+			} else if(writeTo instanceof Collection<?>) {
+				if(writeTo instanceof List<?>) {
+					if(newValue == null
+							|| Reflection.getRawType(this.outputType).isAssignableFrom(newValue.getClass())) {
+						try {
+							((List) writeTo).add(this.index, newValue);
+						} catch (IndexOutOfBoundsException e) {
+							throw AccessingFailureException.create(FailureCause.OUT_OF_BOUND, this);
+						} catch (UnsupportedOperationException e) {
+							throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
+						}
+					} else {
+						throw AccessingFailureException.createWithArgs(
+								FailureCause.INV_LAST_W, this, null, this, newValue);
+					}
+				} else {
+					throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, this);
+				}
+			} else {
+				throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
+			}
+		}
+	}
 }

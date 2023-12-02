@@ -9,6 +9,8 @@ import java.util.WeakHashMap;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import lovexyn0827.mess.options.EnumParser;
 import lovexyn0827.mess.options.OptionManager;
 
@@ -21,9 +23,7 @@ public final class AccessingPath {
 	public static final AccessingPath DUMMY = new AccessingPath(Collections.emptyList());
 	private final LinkedList<Node> nodes;
 	private boolean initialized;
-	
-	@Nullable
-	private WeakHashMap<Object, AccessingPath> initializedSubPaths = new WeakHashMap<>();
+	private final WeakHashMap<Object, AccessingPath> initializedSubPaths = new WeakHashMap<>();
 	
 	AccessingPath(List<Node> nodes) {
 		this.nodes = new LinkedList<>();
@@ -31,6 +31,10 @@ public final class AccessingPath {
 	}
 
 	public Object access(Object start, Type genericType) throws AccessingFailureException {
+		return this.getInitializedCopy(start, genericType).accessInternal(start);
+	}
+	
+	private AccessingPath getInitializedCopy(Object start, Type genericType) throws AccessingFailureException {
 		switch(OptionManager.accessingPathInitStrategy) {
 		case STANDARD: 
 			AccessingPath path = this.initializedSubPaths.get(start);
@@ -39,24 +43,24 @@ public final class AccessingPath {
 				if (!path.initialized) {
 					path.initialize(genericType);
 				}
+				
 				this.initializedSubPaths.put(start, path);
+				return path;
+			} else {
+				return path;
 			}
-			
-			return path.accessInternal(start);
 		case LEGACY: 
 			if (!this.initialized) {
 				this.initialize(genericType);
 			}
 			
-			return this.accessInternal(start);
+			return this;
 		case STRICT: 
 			this.initialize(genericType);
-			Object result = this.accessInternal(start);
-			this.uninitialize();
-			return result;
+			return this;
 		default:
 			throw new IllegalStateException();
-		}		
+		}
 	}
 
 	private Object accessInternal(Object start) throws AccessingFailureException {
@@ -68,20 +72,68 @@ public final class AccessingPath {
 				intermediate = n.access(intermediate);
 			} catch (NullPointerException e) {
 				e.printStackTrace();
-				throw new AccessingFailureException(AccessingFailureException.Cause.NULL, n, e);
+				throw AccessingFailureException.create(FailureCause.NULL, n, e);
 			} catch (AccessingFailureException e2) {
-				if(e2.getShortenedMsg() == null) {
-					throw new AccessingFailureException(e2.cause, n, e2.getCause(), e2.args);
+				if(e2.isRaw()) {
+					throw e2.withNode(n);
 				} else {
 					throw e2;
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, n, e1, e1);
+				throw AccessingFailureException.createWithArgs(FailureCause.ERROR, n, e1, e1);
 			}
 		}
 		
 		return intermediate;
+	}
+	
+	/**
+	 * Write a new value to the last node of the path.
+	 * @param value The string representation of the new value, in the form of literals.
+	 * @throws CommandSyntaxException 
+	 */
+	public void write(Object start, Type genericType, String value) 
+			throws AccessingFailureException, CommandSyntaxException {
+		this.getInitializedCopy(start, genericType).writeInternal(start, Literal.parse(value));
+	}
+
+	private void writeInternal(Object start, Literal<?> value) throws AccessingFailureException {
+		Object intermediate = start;
+		Iterator<Node> itr = this.nodes.iterator();
+		Node last = this.nodes.getLast();
+		if(!last.isWrittable()) {
+			throw AccessingFailureException.create(FailureCause.NOT_WRITTABLE, last);
+		}
+		
+		while(itr.hasNext()) {
+			Node n = itr.next();
+			if(n == last) {
+				break;
+			}
+			
+			try {
+				intermediate = n.access(intermediate);
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+				throw AccessingFailureException.create(FailureCause.NULL, n, e);
+			} catch (AccessingFailureException e2) {
+				if(e2.isRaw()) {
+					throw e2.withNode(n);
+				} else {
+					throw e2;
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				throw AccessingFailureException.createWithArgs(FailureCause.ERROR, n, e1, e1);
+			}
+		}
+		
+		try {
+			last.write(intermediate, value.get(last.outputType));
+		} catch (InvalidLiteralException e) {
+			throw AccessingFailureException.create(e, null);
+		}
 	}
 
 	@Override
@@ -124,8 +176,8 @@ public final class AccessingPath {
 					n.initialize(lastType);
 					lastType = n.outputType;
 				} catch (AccessingFailureException e) {
-					if(e.getShortenedMsg() == null) {
-						throw new AccessingFailureException(e.cause, n, e.getCause(), e.args);
+					if(e.isRaw()) {
+						throw e.withNode(n);
 					} else {
 						throw e;
 					}
@@ -134,10 +186,6 @@ public final class AccessingPath {
 			
 			this.initialized = true;
 		}
-	}
-	
-	private void uninitialize() {
-		this.initialized = false;
 	}
 	
 	@Nullable

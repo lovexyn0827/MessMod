@@ -21,6 +21,7 @@ public class SetExplosionBlockCommand {
 								executes((ct->{
 									blockState = BlockStateArgumentType.getBlockState(ct, "blockState").getBlockState();
 									fireState = BlockStateArgumentType.getBlockState(ct, "fireState").getBlockState();
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return 1;
 								}))));
 		dispatcher.register(command);

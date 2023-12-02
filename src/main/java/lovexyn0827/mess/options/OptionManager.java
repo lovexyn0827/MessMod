@@ -95,6 +95,18 @@ public class OptionManager{
 
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean chunkLoadingInfoRenderer;
+	
+	@Option(defaultValue = "4", 
+			parserClass = IntegerParser.NonNegative.class)
+	public static int chunkLoadingInfoRenderRadius;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class)
+	public static boolean chunkLogAutoArchiving;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;
 	
 	@Option(defaultValue = "false", 
@@ -110,6 +122,11 @@ public class OptionManager{
 			experimental = true, 
 			parserClass = BooleanParser.class)
 	public static boolean debugStickSkipsInvaildState;
+	
+	@Option(defaultValue = "false", 
+			experimental = true, 
+			parserClass = BooleanParser.class)
+	public static boolean dedicatedServerCommands;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -148,6 +165,10 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean entityLogAutoArchiving;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean generateChunkGrid;
+	
 	// TODO Assess the performance cost
 	@Option(defaultValue = "2.0", 
 			experimental = true, 
@@ -158,7 +179,7 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			globalOnly = true, 
 			environment = EnvType.CLIENT)
-	public static boolean hideSuvivalSaves;
+	public static boolean hideSurvivalSaves;
 	
 	@Option(defaultValue = "TOP_RIGHT", 
 			parserClass = AlignMode.Parser.class)
@@ -195,7 +216,15 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean minecartPlacementOnNonRailBlocks;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean mobFastKill;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean optimizedEntityPushing;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -212,6 +241,10 @@ public class OptionManager{
 	@Option(defaultValue = "1.0", 
 			parserClass = FloatParser.class)
 	public static float projectileRandomnessScale;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean quickMobMounting;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)

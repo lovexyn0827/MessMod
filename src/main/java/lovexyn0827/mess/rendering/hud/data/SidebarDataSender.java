@@ -7,24 +7,31 @@ import org.jetbrains.annotations.Nullable;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
-import lovexyn0827.mess.util.TickingPhase;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.WrappedPath;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.phase.ClientTickingPhase;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.World;
 
 public interface SidebarDataSender extends HudDataSender {
-	void updateData(TickingPhase phase, @Nullable ServerWorld world);
+	void updateData(TickingPhase phase, @Nullable World world);
 	
 	default void registerTickingEvents() {
-		TickingPhase.addEventToAll(this::updateData);
+		ServerTickingPhase.addEventToAll(this::updateData);
+		ClientTickingPhase.addEventToAll(this::updateData);
 	}
 	
-	static boolean shouldUpdate(SidebarLine line, TickingPhase phase, @Nullable ServerWorld world) {
-		return line.canGet() && line.updatePhase == phase && (line.entity.world == world || phase.notInAnyWorld);
-
+	static boolean shouldUpdate(SidebarLine line, TickingPhase phase, @Nullable World world) {
+		World entityWorld = line.entity.world;
+		return line.updatePhase == phase && line.canGet() && 
+				(entityWorld == world || phase.isNotInAnyWorld() ||
+				entityWorld instanceof ServerWorld && phase instanceof ClientTickingPhase ||
+				!(entityWorld instanceof ServerWorld) && phase instanceof ServerTickingPhase);
 	}
 
 	static SidebarDataSender create(MinecraftServer server) {

@@ -24,7 +24,7 @@ public abstract class WorldListWidgetMixin extends EntryListWidget {
 	)
 	private int hideSuvivalSaves(WorldListWidget list, EntryListWidget.Entry entry) {
 		LevelSummary summary = ((WorldListWidgetEntryAccessor) entry).getLevelSummary();
-		if(!OptionManager.hideSuvivalSaves || (summary.hasCheats() && !summary.getGameMode().isSurvivalLike())) {
+		if(!OptionManager.hideSurvivalSaves || (summary.hasCheats() && !summary.getGameMode().isSurvivalLike())) {
 			return this.addEntry(entry);
 		}
 		

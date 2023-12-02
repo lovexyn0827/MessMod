@@ -34,11 +34,13 @@ public class EntityConfigCommand {
 		LiteralArgumentBuilder<ServerCommandSource> dsh = literal("disableStepHeight").
 				executes((ct)->{
 					noStepHeightEntities.addAll(getEntities(ct));
+					CommandUtil.feedback(ct, "cmd.general.success");
 					return 1;
 				});
 		LiteralArgumentBuilder<ServerCommandSource> esh = literal("enableStepHeight").
 				executes((ct)->{
 					noStepHeightEntities.removeAll(getEntities(ct));
+					CommandUtil.feedback(ct, "cmd.general.success");
 					return 1;
 				});	
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("entityconfig").
@@ -48,11 +50,13 @@ public class EntityConfigCommand {
 						then(literal("disableStepHeight").
 								executes((ct)->{
 									noStepHeightEntities.add(MinecraftClient.getInstance().player);
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return 1;
 								})).
 						then(literal("enableStepHeight").
 								executes((ct)->{
 									noStepHeightEntities.remove(MinecraftClient.getInstance().player);
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return 1;
 								})));
 		dispatcher.register(command);

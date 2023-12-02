@@ -1,12 +1,13 @@
 package lovexyn0827.mess.util.access;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import lovexyn0827.mess.util.Reflection;
 
-class FieldNode extends Node {
+final class FieldNode extends Node {
 
 	private final String fieldName;
 	private Field field;
@@ -22,11 +23,11 @@ class FieldNode extends Node {
 			return this.field.get(previous);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, this, e, 
+			throw AccessingFailureException.createWithArgs(FailureCause.NO_FIELD, this, e, 
 					this.fieldName, previous.getClass().getSimpleName());
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
-			throw new AccessingFailureException(AccessingFailureException.Cause.ERROR, this);
+			throw AccessingFailureException.create(FailureCause.ERROR, this, e);
 		}
 	}
 	
@@ -47,7 +48,7 @@ class FieldNode extends Node {
 		
 		FieldNode other = (FieldNode) obj;
 		return (this.field == null ? this.fieldName.equals(other.fieldName) : this.field.equals(other.field))
-				&& (this.outputType == null && other.outputType == null || this.outputType.equals(other.outputType));
+				&& (this.outputType == null ? other.outputType == null : this.outputType.equals(other.outputType));
 	}
 	
 	@Override
@@ -83,7 +84,7 @@ class FieldNode extends Node {
 			this.outputType = f.getGenericType();
 			return this.outputType;
 		} else {
-			throw new AccessingFailureException(AccessingFailureException.Cause.NO_FIELD, this, 
+			throw AccessingFailureException.createWithArgs(FailureCause.NO_FIELD, this, null, 
 					this.fieldName, lastOutType.getTypeName());
 		}
 	}
@@ -93,5 +94,22 @@ class FieldNode extends Node {
 		FieldNode node = new FieldNode(this.fieldName);
 		node.ordinary = this.ordinary;
 		return node;
+	}
+	
+	@Override
+	boolean isWrittable() {
+		return (this.field != null) && !Modifier.isFinal(this.field.getModifiers());
+	}
+	
+	@Override
+	void write(Object writeTo, Object newValue) throws AccessingFailureException {
+		try {
+			this.field.set(writeTo, newValue);
+		} catch (IllegalArgumentException e) {
+			throw AccessingFailureException.createWithArgs(FailureCause.BAD_ARG, this, e, 
+					newValue == null ? "null" : newValue, this.fieldName);
+		} catch (IllegalAccessException e) {
+			throw AccessingFailureException.create(FailureCause.ERROR, this, e);
+		}
 	}
 }

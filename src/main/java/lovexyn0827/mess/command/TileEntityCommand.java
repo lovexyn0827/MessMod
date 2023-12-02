@@ -60,6 +60,7 @@ public class TileEntityCommand {
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								executes((ct)->{
 									ct.getSource().getWorld().removeBlockEntity(BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return 1;
 								})));
 		dispatcher.register(command);

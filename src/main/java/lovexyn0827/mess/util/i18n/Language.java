@@ -1,8 +1,9 @@
 package lovexyn0827.mess.util.i18n;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.InvaildOptionException;
 import lovexyn0827.mess.options.OptionParser;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.command.ServerCommandSource;
 
 /**
@@ -31,9 +33,12 @@ public class Language {
 	 */
 	public Language(String id) throws Exception {
 		this.id = id;
-		try(Reader r = new InputStreamReader(
-				Language.class.getResourceAsStream("/assets/lang/" + id + ".json"))) {
-			JsonObject def = new JsonParser().parse(r).getAsJsonObject();
+		Path langFile = FabricLoader.getInstance().getModContainer("messmod")
+				.get().getRootPath().resolve("assets/lang/" + id + ".json");
+		try {
+			JsonObject def = new JsonParser()
+					.parse(new String(Files.readAllBytes(langFile), Charset.forName("GBK")))
+					.getAsJsonObject();
 			this.readableName = def.get("readableName").getAsString();
 			def.getAsJsonObject("translations")
 					.entrySet()

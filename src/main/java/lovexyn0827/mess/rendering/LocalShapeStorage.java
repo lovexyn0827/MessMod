@@ -1,6 +1,5 @@
 package lovexyn0827.mess.rendering;
 
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -15,12 +14,10 @@ public class LocalShapeStorage extends ShapeCache implements ShapeSender {
 	LocalShapeStorage() {
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public synchronized void addShape(Shape shape, RegistryKey<World> dim, ShapeSpace space) {
 		Set<Shape> set = this.getShapesInDimension(dim)
 				.computeIfAbsent(space, (ss) -> Sets.newHashSet());
-		Map<?, ?> map = this.getShapesInDimension(dim);
 		set.add(shape);
 	}
 
