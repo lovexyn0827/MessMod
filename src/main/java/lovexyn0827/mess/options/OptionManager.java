@@ -44,7 +44,6 @@ import net.minecraft.server.world.ChunkTicketType;
  * @author lovexyn0827
  * Date: April 2, 2022
  */
-// TODO Now the option manager is pretty messy!
 public class OptionManager{
 	public static final SortedMap<String, OptionWrapper> OPTIONS = Stream.of(OptionManager.class.getFields())
 			.filter((f) -> f.isAnnotationPresent(Option.class))
