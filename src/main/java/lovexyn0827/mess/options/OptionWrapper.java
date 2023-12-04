@@ -72,6 +72,7 @@ public final class OptionWrapper {
 				b.suggest(s);
 			}
 			
+			b.suggest(this.getDefaultValue());
 			return b.buildFuture();
 		};
 	}
