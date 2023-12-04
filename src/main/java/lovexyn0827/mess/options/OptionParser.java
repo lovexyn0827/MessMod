@@ -1,7 +1,9 @@
 package lovexyn0827.mess.options;
 
+import java.util.Collections;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -28,9 +30,9 @@ public interface OptionParser<T> {
 		return serialize((T) val);
 	}
 	
-	@Nullable
+	@NotNull
 	default Set<String> createSuggestions() {
-		return null;
+		return Collections.emptySet();
 	}
 	
 	default void validate(String in) throws InvalidOptionException {
