@@ -294,6 +294,11 @@ public class OptionManager{
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
+	public static boolean independentEntityPickerForInfomation;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean interactableB36;
 	
 	@Option(defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 

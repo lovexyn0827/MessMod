@@ -213,6 +213,7 @@
 		"opt.hudAlignMode.desc" : "Move the HUDs to a given location.", 
 		"opt.hudStyles.desc" : "The style of the HUDs, containing zero or more flags below: \n - B: Render a gray background\n - L: Align the headers on the left and the data on the right\n - R: Change the color of headers to red", 
 		"opt.hudTextSize.desc" : "Set the size of the text in the HUDs.", 
+		"opt.independentEntityPickerForInfomation.desc" : "Pick crosshair-targeted entities for information providers (currently only the UUID suggestor) independently.", 
 		"opt.interactableB36.desc" : "Allow players to break block-36s and place something against it.", 
 		"opt.language.desc" : "The main language of the Mod.", 
 		"opt.maxClientTicksPerFrame.desc" : "The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.", 

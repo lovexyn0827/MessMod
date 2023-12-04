@@ -11,9 +11,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.MinecraftClientInterface;
 import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.EntityDataDumpHelper;
+import lovexyn0827.mess.util.RaycastUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
@@ -30,12 +32,12 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 
 @Mixin(MinecraftClient.class)
-public abstract class MinecraftClientMixin {
+public abstract class MinecraftClientMixin implements MinecraftClientInterface {
 	@Shadow @Final ClientPlayerEntity player;
 	@Shadow @Final IntegratedServer server;
 	@Shadow @Final HitResult crosshairTarget;
 	@Shadow private int itemUseCooldown;
-	EntityHitResult crossHairTargetForCommandSuggestions;	// FIXME: Unused
+	private Entity crossHairTargetForCommandSuggestions;
 	
 	@Shadow abstract Window getWindow();
 	
@@ -51,6 +53,12 @@ public abstract class MinecraftClientMixin {
 	
 	@Inject(method = "tick", at = @At(value = "RETURN"))
 	private void onTickEnd(CallbackInfo ci) {
+		if(OptionManager.independentEntityPickerForInfomation && this.player != null) {
+			this.crossHairTargetForCommandSuggestions = RaycastUtil.getTargetEntity(this.player);
+		} else {
+			this.crossHairTargetForCommandSuggestions = null;
+		}
+		
 		MessMod.INSTANCE.onClientTicked();
 	}
 
@@ -101,5 +109,10 @@ public abstract class MinecraftClientMixin {
 				ci.cancel();
 			}
 		}
+	}
+
+	@Override
+	public Entity getTargetForCommandSuggestions() {
+		return this.crossHairTargetForCommandSuggestions;
 	}
 }

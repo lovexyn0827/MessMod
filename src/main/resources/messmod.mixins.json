@@ -73,7 +73,8 @@
     "StructureBlockBlockEntityMixin", 
     "GameRendererMixin", 
     "WorldListWidgetEntryMixin", 
-    "EntitySelectorMixin_Client"
+    "EntitySelectorMixin_Client", 
+    "ClientCommandSourceMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"
