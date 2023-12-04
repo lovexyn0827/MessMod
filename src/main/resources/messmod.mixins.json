@@ -54,7 +54,9 @@
     "EnchantCommandMixin", 
     "EntityMixin", 
     "ServerChunkManagerMainThreadExecutorMixin", 
-    "ChunkTicketManagerNearbyChunkTicketUpdaterMixin"
+    "ChunkTicketManagerNearbyChunkTicketUpdaterMixin", 
+    "WorldMixin_GetEntityExpansion", 
+    "WorldChunkMixin_GetEntityExpansion"
   ],
   "client": [
     "MinecraftClientMixin",

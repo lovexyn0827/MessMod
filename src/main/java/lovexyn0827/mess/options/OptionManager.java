@@ -257,11 +257,11 @@ public class OptionManager{
 			label = Label.CHUNK)
 	public static boolean generateChunkGrid;
 	
-	// TODO Assess the performance cost
 	@Option(defaultValue = "2.0", 
 			experimental = true, 
 			parserClass = FloatParser.Positive.class, 
-			label = { Label.RESEARCH, Label.ENTITY })
+			label = { Label.RESEARCH, Label.ENTITY }, 
+			suggestions = { "2.0" })
 	public static float getEntityRangeExpansion;
 	
 	@Option(defaultValue = "false", 

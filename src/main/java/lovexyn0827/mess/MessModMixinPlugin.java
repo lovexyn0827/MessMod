@@ -147,8 +147,9 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 				} catch (Throwable e) {
 					LOGGER.error("Failed to display mixin choosing window!");
 					e.printStackTrace();
+					// XXX
 					advancedMixins.forEach((entry) -> {
-						config.put(entry.name, "true");
+						config.computeIfAbsent(entry.name, (k) -> "true");
 					});
 				}
 				
@@ -162,9 +163,10 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
 			try(FileReader fr = new FileReader(ADVANCED_MIXINS_CONFIGURATION)) {
 				config.load(fr);
-				config.forEach((k, v) -> {
-					if(Boolean.parseBoolean((String) v)) {
-						builder.add((String) k);
+				ADVANCED_MIXINS.forEach((info) -> {
+					if(Boolean.parseBoolean((String) config.computeIfAbsent(info.name, (k) -> "true"))) {
+						builder.add(info.name);
+						config.put(info.name, "true");
 					}
 				});
 			}
@@ -181,6 +183,8 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		CUSTOM_MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModNotLoaded("carpet", "1.4.25", null));
 		ADVANCED_MIXINS = AdvancedMixinInfoBuilder.create()
 				.add("ServerChunkManagerMainThreadExecutorMixin").addUsages("Chunk events").costly().risky()
+				.add("WorldMixin_GetEntityExpansion").addUsages("getEntityRangeExpansion").costly()
+				.add("WorldChunkMixin_GetEntityExpansion").addUsages("getEntityRangeExpansion").costly()
 				.build();
 		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);
 	}
