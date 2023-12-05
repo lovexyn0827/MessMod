@@ -8,11 +8,17 @@ import java.util.Set;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
+import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
 
 public class LogChunkBehaviorCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -87,7 +93,52 @@ public class LogChunkBehaviorCommand {
 							}
 							
 							return Command.SINGLE_SUCCESS;
-						}));
+						}))
+				.then(literal("addColumn")
+						.then(argument("name", StringArgumentType.word())
+								.then(argument("path", AccessingPathArgumentType.accessingPathArg(ServerWorld.class))
+										.executes((ct) -> {
+											if(addColumn(ct, 
+													StringArgumentType.getString(ct, "name"), 
+													AccessingPathArgumentType.getAccessingPath(ct, "path"))) {
+												CommandUtil.feedback(ct, "cmd.general.success");
+												return Command.SINGLE_SUCCESS;
+											} else {
+												return 0;
+											}
+										}))))
+				.then(literal("removeColumn")
+						.then(argument("name", StringArgumentType.word())
+								.suggests((ct, builder) -> {
+									MessMod.INSTANCE.getChunkLogger().getColumns().forEach(builder::suggest);
+									return builder.buildFuture();
+								})
+								.executes((ct) -> {
+									String name = StringArgumentType.getString(ct, "name");
+									if(MessMod.INSTANCE.getChunkLogger().removeColumn(name)) {
+										CommandUtil.feedback(ct, "cmd.general.success");
+										return Command.SINGLE_SUCCESS;
+									} else {
+										CommandUtil.errorWithArgs(ct, "cmd.general.nodef", name);
+										return 0;
+									}
+								})));
 		dispatcher.register(command);
+	}
+	
+	// Also responsible for sending error messages
+	private static boolean addColumn(CommandContext<ServerCommandSource> ct, String name, AccessingPath path) {
+		ChunkBehaviorLogger logger = MessMod.INSTANCE.getChunkLogger();
+		if(logger.isWorking()) {
+			CommandUtil.error(ct, "cmd.logchunkbehavior.reqidle");
+			return false;
+		} else {
+			if(logger.getColumns().contains(name)) {
+				CommandUtil.error(ct, "cmd.general.dupname");
+				return false;
+			} else {
+				return logger.addColumn(name, path);
+			}
+		}
 	}
 }
