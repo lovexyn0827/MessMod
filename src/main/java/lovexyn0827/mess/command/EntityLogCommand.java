@@ -42,7 +42,7 @@ public class EntityLogCommand {
 						.then(argument("entityType", StringArgumentType.word())
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.then(argument("field", StringArgumentType.word())
-										.suggests(CommandUtil.FIELDS_SUGGESTION)
+										.suggests(CommandUtil.ENTITY_FIELDS_SUGGESTION)
 										.executes((ct) -> {
 											EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 											EntityType<?> type = Registry.ENTITY_TYPE

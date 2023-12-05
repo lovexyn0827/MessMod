@@ -7,7 +7,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,6 +48,8 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	private static final Map<String, BooleanSupplier> CUSTOM_MINIX_REQUIREMENTS = new HashMap<>();
 	private static final ImmutableSet<MixinInfo> ADVANCED_MIXINS;
 	private static final ImmutableSet<String> ACTIVIATED_ADVANCED_MIXINS;
+	private static final Map<String, Set<String>> ADVANCED_MIXINS_BY_USAGES = new HashMap<>();
+	private static final Map<String, Set<String>> ABSENT_ADVANCED_MIXINS_BY_USAGES = new HashMap<>();
 	
 	@Override
 	public void onLoad(String mixinPackage) {
@@ -147,17 +151,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 				} catch (Throwable e) {
 					LOGGER.error("Failed to display mixin choosing window!");
 					e.printStackTrace();
-					// XXX
-					advancedMixins.forEach((entry) -> {
-						config.computeIfAbsent(entry.name, (k) -> "true");
-					});
 				}
-				
-				try(FileWriter fw = new FileWriter(ADVANCED_MIXINS_CONFIGURATION)) {
-					config.store(fw, "Advanced Mixins of MessMod");
-				}
-				
-				return ImmutableSet.of();
 			}
 			
 			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
@@ -171,6 +165,13 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 				});
 			}
 			
+			advancedMixins.forEach((entry) -> {
+				config.computeIfAbsent(entry.name, (k) -> "true");
+			});
+			try(FileWriter fw = new FileWriter(ADVANCED_MIXINS_CONFIGURATION)) {
+				config.store(fw, "Advanced Mixins of MessMod");
+			}
+			
 			return builder.build();
 		} catch (Exception e) {
 			LOGGER.fatal("Failed to load activation config of advanced mixins!");
@@ -179,14 +180,34 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		}
 	}
 	
+	public static Set<String> getAbsentMixins(String usage) {
+		return Collections.unmodifiableSet(ABSENT_ADVANCED_MIXINS_BY_USAGES.get(usage));
+	}
+	
+	public static boolean isFeatureAvailable(String usage) {
+		return ABSENT_ADVANCED_MIXINS_BY_USAGES.get(usage) == null;
+	}
+	
 	static {
 		CUSTOM_MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModNotLoaded("carpet", "1.4.25", null));
 		ADVANCED_MIXINS = AdvancedMixinInfoBuilder.create()
-				.add("ServerChunkManagerMainThreadExecutorMixin").addUsages("Chunk events").costly().risky()
-				.add("WorldMixin_GetEntityExpansion").addUsages("getEntityRangeExpansion").costly()
-				.add("WorldChunkMixin_GetEntityExpansion").addUsages("getEntityRangeExpansion").costly()
+				.add("ServerChunkManagerMainThreadExecutorMixin")
+				.addUsages("ASYNC_TASKS", "ASYNC_TASK_SINGLE", "ASYNC_TASK_ADDITION").costly().risky()
+				.add("WorldMixin_GetEntityExpansion").
+				addUsages("getEntityRangeExpansion").costly()
+				.add("WorldChunkMixin_GetEntityExpansion")
+				.addUsages("getEntityRangeExpansion").costly()
 				.build();
 		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);
+		ADVANCED_MIXINS.forEach((info) -> {
+			for(String usage : info.usages) {
+				ADVANCED_MIXINS_BY_USAGES.computeIfAbsent(usage, (k) -> new HashSet<>()).add(info.name);
+				if(!ACTIVIATED_ADVANCED_MIXINS.contains(info.name)) {
+					ABSENT_ADVANCED_MIXINS_BY_USAGES.computeIfAbsent(usage, (k) -> new HashSet<>()).add(info.name);
+				}
+			}
+		});
+		
 	}
 	
 	private static final class MixinChoosingFrame extends JFrame {
@@ -203,7 +224,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 				JCheckBox check = new JCheckBox(s.name);
 				this.mixins.put(s.name, check);
 				this.add(check);
-				this.add(new JLabel(s.usages));
+				this.add(new JLabel(String.join(", ", s.usages)));
 				this.add(new JLabel(s.impacts));
 			});
 			JButton doneBtn = new JButton("OK");
@@ -230,7 +251,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	private static final class AdvancedMixinInfoBuilder {
 		private List<MixinInfo> infoList = new ArrayList<>();
 		private String currentMixin;
-		private String usages;
+		private Set<String> usages;
 		private String impacts;
 		
 		protected static AdvancedMixinInfoBuilder create() {
@@ -243,13 +264,16 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 			}
 			
 			this.currentMixin = name;
-			this.usages = "";
+			this.usages = new HashSet<>();
 			this.impacts = "";
 			return this;
 		}
 		
 		protected AdvancedMixinInfoBuilder addUsages(String ... usages) {
-			this.usages += ", " + String.join(", ", usages);
+			for(String usage : usages) {
+				this.usages.add(usage);
+			}
+			
 			return this;
 		}
 		
@@ -292,12 +316,12 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	
 	private static final class MixinInfo {
 		public final String name;
-		public final String usages;
+		public final String[] usages;
 		public final String impacts;
 		
-		public MixinInfo(String name, String usages, String impacts) {
+		public MixinInfo(String name, Set<String> usages, String impacts) {
 			this.name = name;
-			this.usages = usages;
+			this.usages = usages.toArray(String[]::new);
 			this.impacts = impacts;
 		}
 	}

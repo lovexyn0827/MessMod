@@ -35,7 +35,7 @@ public class HudCommand {
 								.then(argument("entityType", StringArgumentType.word())
 										.suggests(CommandUtil.ENTITY_TYPES)
 										.then(argument("field", StringArgumentType.word())
-												.suggests(CommandUtil.FIELDS_SUGGESTION)
+												.suggests(CommandUtil.ENTITY_FIELDS_SUGGESTION)
 												.executes((ct) -> {
 													EntityType<?> type = Registry.ENTITY_TYPE
 															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));

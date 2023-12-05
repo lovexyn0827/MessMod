@@ -4,6 +4,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Set;
 
 import com.mojang.brigadier.Command;
@@ -13,6 +14,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.MessModMixinPlugin;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.util.access.AccessingPath;
@@ -69,6 +71,19 @@ public class LogChunkBehaviorCommand {
 									}
 									
 									Set<ChunkEvent> set = EnumSetArgumentType.<ChunkEvent>getEnums(ct, "events");
+									Iterator<ChunkEvent> itr = set.iterator();
+									while(itr.hasNext()) {
+										ChunkEvent event = itr.next();
+										if(!MessModMixinPlugin.isFeatureAvailable(event.name())) {
+											for(String mixin : MessModMixinPlugin.getAbsentMixins(event.name())) {
+												CommandUtil.errorWithArgs(ct, "cmd.general.reqmixin", 
+														event.name(), mixin);
+											}
+											
+											itr.remove();
+										}
+									}
+									
 									MessMod.INSTANCE.getChunkLogger().subscribeAll(set);
 									CommandUtil.feedbackWithArgs(ct,"cmd.general.submulti", set.size(), set);
 									return Command.SINGLE_SUCCESS;

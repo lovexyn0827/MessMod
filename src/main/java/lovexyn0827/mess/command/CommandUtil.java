@@ -37,7 +37,7 @@ public class CommandUtil {
 		Registry.ENTITY_TYPE.getIds().stream().map(Identifier::getPath).forEach(b::suggest);
 		return b.buildFuture();
 	};
-	public static final SuggestionProvider<ServerCommandSource> FIELDS_SUGGESTION = (ct, builder) -> {
+	public static final SuggestionProvider<ServerCommandSource> ENTITY_FIELDS_SUGGESTION = (ct, builder) -> {
 		Identifier id = new Identifier(StringArgumentType.getString(ct.getLastChild(), "entityType"));
 		EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);

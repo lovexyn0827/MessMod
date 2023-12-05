@@ -22,6 +22,7 @@
 		"cmd.general.stopautosubname" : "Entity with name %s won't be subscribed automatically", 
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
+		"cmd.general.reqmixin" : "%s requires advanced mixin %s", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 
