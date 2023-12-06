@@ -81,6 +81,11 @@ public class MessClientNetworkHandler {
 				OptionManager.loadFromRemoteServer(packet.getData());
 			});
 		});
+		register(Channels.OPTION_SINGLE, (packet, client) -> {
+			client.execute(() -> {
+				OptionManager.loadSingleFromRemoteServer(packet.getData());
+			});
+		});
 	}
 	
 	public interface PacketHandler {

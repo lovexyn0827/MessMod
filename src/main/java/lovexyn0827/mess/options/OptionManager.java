@@ -516,6 +516,21 @@ public class OptionManager{
 		setOptionSet(OptionSet.fromPacket(data));
 	}
 	
+	public static void loadSingleFromRemoteServer(PacketByteBuf data) {
+		if(activeOptionSet == OptionSet.GLOBAL) {
+			MessMod.LOGGER.error("Trying to load options to global option set!");
+			return;
+		}
+		
+		String name = data.readString();
+		String value = data.readString();
+		try {
+			activeOptionSet.set(name, value);
+		} catch (InvalidOptionException e) {
+			MessMod.LOGGER.error("Received incorrect option {}={}: {}", name, value, e.getLocalizedMessage());
+		}
+	}
+	
 	public static void reload() {
 		activeOptionSet.reload();
 	}

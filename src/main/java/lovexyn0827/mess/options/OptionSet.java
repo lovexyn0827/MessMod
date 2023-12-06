@@ -41,6 +41,10 @@ public final class OptionSet {
 	@Nullable
 	private final File optionFile;
 	private boolean isActive;
+	/**
+	 * Whether to send options to clients wholly instead of one by one.
+	 */
+	private boolean shouldBatchOptions = false;
 	
 	/**
 	 * {@code true} if this {@code OptionSet} is sent from a server and has no underlying local file.
@@ -203,8 +207,20 @@ public final class OptionSet {
 	}
 
 	private void sendOptionsToClientsIfNeeded() {
-		if(MessMod.isDedicatedEnv() && MessMod.INSTANCE.getServerNetworkHandler() != null) {
+		if(this.isActive && MessMod.isDedicatedEnv() && MessMod.INSTANCE.getServerNetworkHandler() != null) {
 			MessMod.INSTANCE.getServerNetworkHandler().sendToEveryone(this.toPacket());
+		}
+	}
+	
+	private void sendSingleOptionToClientsIfNeeded(String name, String value) {
+		if(this.isActive && !this.shouldBatchOptions 
+				&& MessMod.isDedicatedEnv() && MessMod.INSTANCE.getServerNetworkHandler() != null) {
+			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+			buf.writeString(name);
+			buf.writeString(value);
+			MessMod.INSTANCE
+					.getServerNetworkHandler()
+					.sendToEveryone(new CustomPayloadS2CPacket(Channels.OPTION_SINGLE, buf));
 		}
 	}
 
@@ -237,6 +253,7 @@ public final class OptionSet {
 	 * and send this {@code OptionSet} to the clients.
 	 */
 	public void activiate() {
+		this.shouldBatchOptions = true;
 		OptionManager.OPTIONS.forEach((n, o) -> {
 			Object val;
 			try {
@@ -248,8 +265,9 @@ public final class OptionSet {
 			
 			o.set(val, null);
 		});
-		this.sendOptionsToClientsIfNeeded();
 		this.isActive = true;
+		this.sendOptionsToClientsIfNeeded();
+		this.shouldBatchOptions = false;
 	}
 	
 	public void inactiviate() {
@@ -263,6 +281,7 @@ public final class OptionSet {
 		
 		try {
 			OptionManager.OPTIONS.get(name).set(OptionParser.of(name).tryParse(this.getSerialized(name)), ct);
+			this.sendSingleOptionToClientsIfNeeded(name, this.getSerialized(name));
 		} catch (InvalidOptionException e) {
 			LOGGER.fatal("Unstripped invalid option: {}={}", name, this.getSerialized(name));
 			throw new IllegalStateException(e);
