@@ -65,7 +65,7 @@ public class TickingPhaseArgumentType implements ArgumentType<TickingPhase> {
 		return ct.getArgument(argName, TickingPhase.class);
 	}
 	
-	static {
+	public static void registerArgumentType() {
 		ArgumentTypes.register("mess_phase", TickingPhaseArgumentType.class, 
 				new ConstantArgumentSerializer<TickingPhaseArgumentType>(TickingPhaseArgumentType::phaseArg));
 	}

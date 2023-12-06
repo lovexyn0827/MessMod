@@ -57,7 +57,8 @@
     "ChunkTicketManagerNearbyChunkTicketUpdaterMixin", 
     "WorldMixin_GetEntityExpansion", 
     "WorldChunkMixin_GetEntityExpansion", 
-    "ItemCooldownManagerMixin"
+    "ItemCooldownManagerMixin", 
+    "ArgumentTypesMixin"
   ],
   "client": [
     "MinecraftClientMixin",

@@ -271,7 +271,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
         }
     }
 
-	static {
+	public static void registerArgumentType() {
 		ArgumentTypes.register("mess_accessing_path", AccessingPathArgumentType.class, 
 				new ConstantArgumentSerializer<AccessingPathArgumentType>(AccessingPathArgumentType::accessingPathArg));
 	}
