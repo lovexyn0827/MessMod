@@ -181,6 +181,10 @@ public final class OptionSet {
 				this.backend.put(name, opt.getDefaultValue());
 			}
 		});
+		if(this.isActive) {
+			this.activiate();
+		}
+		
 		sendOptionsToClientsIfNeeded();
 		this.save();
 	}
