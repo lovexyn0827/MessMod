@@ -192,6 +192,7 @@
 		"opt.disableChunkLoadingCheckInCommands.desc" : "禁用指令中对方块是否被加载的检查。", 
 		"opt.disableEnchantCommandRestriction.desc" : "移除`/enchant`中对附魔等级与附魔兼容性的检查。", 
 		"opt.disableExplosionExposureCalculation.desc" : "禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。\n在安装Lithium后可能不能正常工作。", 
+		"opt.disableItemUsageCooldown.desc" : "禁用末影珍珠和紫颂果等物品的的使用冷却时长。", 
 		"opt.disableProjectileRandomness.desc" : "取消弹射物的随机速度，用于部分测试，不过不要忘记关闭。", 
 		"opt.dumpTargetEntityDataOnClient.desc" : "输出客户端实体信息而不是服务端实体信息。", 
 		"opt.dumpTargetEntityDataWithPaper.desc" : "主手持有纸的玩家右键实体时输出目标实体信息。", 

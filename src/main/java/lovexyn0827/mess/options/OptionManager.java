@@ -178,6 +178,11 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean disableItemUsageCooldown;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = { Label.ENTITY, Label.RESEARCH})
 	public static boolean disableProjectileRandomness;
 	

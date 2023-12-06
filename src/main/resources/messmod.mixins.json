@@ -56,7 +56,8 @@
     "ServerChunkManagerMainThreadExecutorMixin", 
     "ChunkTicketManagerNearbyChunkTicketUpdaterMixin", 
     "WorldMixin_GetEntityExpansion", 
-    "WorldChunkMixin_GetEntityExpansion"
+    "WorldChunkMixin_GetEntityExpansion", 
+    "ItemCooldownManagerMixin"
   ],
   "client": [
     "MinecraftClientMixin",
