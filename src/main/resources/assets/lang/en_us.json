@@ -205,6 +205,7 @@
 		"opt.entityExplosionRaysVisiblity.desc" : "Explosion ray (used in the calculation of the exposure of entities) renderer. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.", 
 		"opt.entityExplosionRaysLifetime.desc" : "The number of ticks the rendered rays remains. ", 
 		"opt.entityLogAutoArchiving.desc" : "Archive the entity log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/entitylog/archives`.", 
+		"opt.expandedStructureBlockRenderingRange.desc" : "Expand the maximum visible distance of structure blocks.", 
 		"opt.fillHistory.desc" : "Record block changes caused by `/fill` so that they can be undone or redone later.", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "Specify which type of pulses are recorded.", 
 		"opt.fletchingTablePulseDetector.desc" : "Record the lengths of redstone signal pulses received by fletching tables.", 
@@ -257,6 +258,7 @@
 		"opt.err.lithium" : "This option is incompatible with Lithium!", 
 		"opt.err.reqcarpet" : "This option require Carpet to function!", 
 		"opt.err.reqbool" : "Use true of false here!", 
+		"opt.err.conflict.carpet.1425" : "This option conflicts with Carpet 1.4.25 and above!", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 

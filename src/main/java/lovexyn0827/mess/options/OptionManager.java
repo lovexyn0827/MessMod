@@ -10,6 +10,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
@@ -32,6 +33,9 @@ import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.SemanticVersion;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -241,6 +245,11 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			label = Label.MESSMOD)
 	public static boolean entityLogAutoArchiving;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean expandedStructureBlockRenderingRange;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
@@ -571,6 +580,26 @@ public class OptionManager{
 			String id = ((String) newVal).replace(Language.FORCELOAD_SUFFIX, "");
 			if(!I18N.setLanguage(id, forceLoad)) {
 				throw new IllegalStateException("Option language is not validated!");
+			}
+		});
+		// TODO Use less hard-coded validator
+		registerCustomValidator("expandedStructureBlockRenderingRange", (newVal, ct) -> {
+			MutableBoolean conflict = new MutableBoolean(false);
+			FabricLoader.getInstance().getModContainer("carpet").ifPresentOrElse((mod) -> {
+				Version ver = mod.getMetadata().getVersion();
+				if(ver instanceof SemanticVersion) {
+					SemanticVersion semVer = (SemanticVersion) ver;
+					try {
+						conflict.setValue(SemanticVersion.parse("1.4.24").compareTo(semVer) <= 0);
+					} catch (VersionParsingException e) {
+						conflict.setFalse();
+					}
+				} else {
+					conflict.setFalse();
+				}
+			}, () -> conflict.setFalse());
+			if(conflict.booleanValue()) {
+				throw new InvalidOptionException("opt.err.conflict.carpet.1425");
 			}
 		});
 		OPTIONS.values().forEach((o) -> {
