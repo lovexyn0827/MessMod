@@ -321,7 +321,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		
 		public MixinInfo(String name, Set<String> usages, String impacts) {
 			this.name = name;
-			this.usages = usages.toArray(String[]::new);
+			this.usages = usages.toArray(new String[usages.size()]);
 			this.impacts = impacts;
 		}
 	}

@@ -600,19 +600,16 @@ public class OptionManager{
 		// TODO Use less hard-coded validator
 		registerCustomValidator("expandedStructureBlockRenderingRange", (newVal, ct) -> {
 			MutableBoolean conflict = new MutableBoolean(false);
-			FabricLoader.getInstance().getModContainer("carpet").ifPresentOrElse((mod) -> {
+			FabricLoader.getInstance().getModContainer("carpet").ifPresent((mod) -> {
 				Version ver = mod.getMetadata().getVersion();
 				if(ver instanceof SemanticVersion) {
 					SemanticVersion semVer = (SemanticVersion) ver;
 					try {
 						conflict.setValue(SemanticVersion.parse("1.4.24").compareTo(semVer) <= 0);
 					} catch (VersionParsingException e) {
-						conflict.setFalse();
 					}
-				} else {
-					conflict.setFalse();
 				}
-			}, () -> conflict.setFalse());
+			});
 			if(conflict.booleanValue()) {
 				throw new InvalidOptionException("opt.err.conflict.carpet.1425");
 			}
