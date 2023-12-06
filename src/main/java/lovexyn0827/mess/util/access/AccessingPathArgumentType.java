@@ -94,11 +94,13 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 		
 		if(sr.peek() == '!') {
 			sr.skip();
+			// This is fine since dots are invalid in field names.
 			String nodeStr = sr.readStringUntil('.');
 			return new FieldNode(nodeStr);
 		} else if(sr.peek() == '[') {
 			//Element
 			sr.skip();
+			// This is fine as only numbers are allowed here.
 			String nodeStr = sr.readStringUntil(']');
 			sr.skip();
 			try {
@@ -108,13 +110,12 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			}
 		} else if(sr.peek() == '<') {
 			//Map
-			sr.skip();
-			String nodeStr = sr.readStringUntil('>');
+			String nodeStr = readWrapped(sr, '<', '>');
 			sr.skip();
 			return new ValueOfMapNode(Literal.parse(nodeStr));
 		} else if(sr.peek() == '>') {
 			sr.skip();
-			String nodeStr = sr.readStringUntil('.');
+			String nodeStr = readUntil(sr, '.');
 			return new MapperNode(nodeStr);
 		} else if(sr.peek() == '(') {
 			sr.skip();
@@ -122,7 +123,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			sr.skip();
 			return new ClassCastNode(nodeStr);
 		} else {
-			String nodeStr = sr.readStringUntil('.');
+			String nodeStr = readUntil(sr, '.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
 			if(matcher.matches()) {
 				return new MethodNode(matcher.group("name"), matcher.group("types"), matcher.group("args"));
@@ -150,6 +151,64 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					}
 				}
 			}
+		}
+	}
+	
+	private static String readWrapped(StringReader sr, char openCh, char closeCh) throws CommandSyntaxException {
+		int depth = 0;
+		int start = sr.getCursor();
+		int end = -1;
+		while(sr.canRead()) {
+			char ch = sr.read();
+			if(ch == '\\') {
+				sr.skip();
+				continue;
+			}
+			
+			if(ch == openCh) {
+				depth++;
+				continue;
+			}
+			
+			if(ch == closeCh) {
+				if(--depth == 0) {
+					end = sr.getCursor();
+					break;
+				}
+				
+				continue;
+			}
+		}
+		
+		if(end == -1) {
+			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
+					.readerExpectedEndOfQuote()
+					.createWithContext(sr);
+		} else {
+			return sr.getString().substring(start + 1, end - 1);
+		}
+	}
+	
+	private static String readUntil(StringReader sr, char endCh) throws CommandSyntaxException {
+		int start = sr.getCursor();
+		int end = -1;
+		while(sr.canRead()) {
+			char ch = sr.read();
+			if(ch == '\\') {
+				sr.skip();
+				continue;
+			}
+			
+			if(ch == endCh) {
+				end = sr.getCursor();
+				break;
+			}
+		}
+		
+		if(end == -1) {
+			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedEndOfQuote().createWithContext(sr);
+		} else {
+			return sr.getString().substring(start, end - 1);
 		}
 	}
 	
