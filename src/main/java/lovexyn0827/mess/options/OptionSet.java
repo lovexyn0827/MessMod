@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.brigadier.context.CommandContext;
@@ -28,7 +29,7 @@ public final class OptionSet {
 	private static final Logger LOGGER = LogManager.getLogger();
 	static final OptionSet DEFAULT = new OptionSet();
 	static final OptionSet GLOBAL = new OptionSet(
-			new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop"), DEFAULT);
+			new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop"), DEFAULT, "GLOBAL");
 	/**
 	 * The parent of this {@code OptionSet}, whose values are used as default values of this {@code OptionSet}.
 	 * 
@@ -50,22 +51,25 @@ public final class OptionSet {
 	 * {@code true} if this {@code OptionSet} is sent from a server and has no underlying local file.
 	 */
 	private final boolean remote;
+	private final String optionSetName;
 	
 	/**
 	 * @param parent If null, the default OptionSet will be used.
 	 */
-	private OptionSet(File optionFile, @Nullable OptionSet parent) {
+	private OptionSet(File optionFile, @Nullable OptionSet parent, String name) {
 		this.optionFile = optionFile;
 		this.parent = parent == null ? DEFAULT : parent;
 		this.remote = optionFile == null;
+		this.optionSetName = name;
 		this.reload();
 		this.activiate();
 	}
 	
-	private OptionSet(Reader r) {
+	private OptionSet(Reader r, String name) {
 		this.optionFile = null;
 		this.parent = DEFAULT;
 		this.remote = true;
+		this.optionSetName = name;
 		try {
 			this.backend.load(r);
 			this.activiate();
@@ -84,6 +88,7 @@ public final class OptionSet {
 		this.optionFile = null;
 		this.parent = null;
 		this.remote = true;
+		this.optionSetName = "DEFAULT";
 		OptionManager.OPTIONS.forEach((name, opt) -> {
 			this.backend.put(name, opt.option.defaultValue());
 		});
@@ -91,12 +96,12 @@ public final class OptionSet {
 		//this.replaceInvalidValues();
 	}
 
-	public static OptionSet load(File optionFile) {
-		return new OptionSet(optionFile, GLOBAL);
+	public static OptionSet load(@NotNull File optionFile) {
+		return new OptionSet(optionFile, GLOBAL, optionFile.getAbsolutePath().toString());
 	}
 	
 	public static OptionSet fromPacket(PacketByteBuf in) {
-		return new OptionSet(new StringReader(in.readString()));
+		return new OptionSet(new StringReader(in.readString()), "REMOTE");
 	}
 	
 	public void set(String name, String optionStr, @Nullable CommandContext<ServerCommandSource> ct) 
@@ -306,5 +311,10 @@ public final class OptionSet {
 
 	public String getReadablePathStr() {
 		return this.remote ? "remote server" : this.optionFile.getAbsolutePath();
+	}
+
+	@Override
+	public String toString() {
+		return "OptionSet [" + this.optionSetName + "]";
 	}
 }
