@@ -4,6 +4,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Set;
 
 import com.mojang.brigadier.Command;
@@ -19,9 +20,12 @@ import lovexyn0827.mess.export.ExportTask;
 import lovexyn0827.mess.export.SaveComponent;
 import lovexyn0827.mess.export.WorldGenType;
 import lovexyn0827.mess.mixins.ServerCommandSourceAccessor;
+import lovexyn0827.mess.util.FormattedText;
 import net.minecraft.command.argument.ColumnPosArgumentType;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ColumnPos;
@@ -37,6 +41,7 @@ public class ExportSaveCommand {
 						.then(argument("name", StringArgumentType.word())
 								.then(argument("corner1", ColumnPosArgumentType.columnPos())
 										.then(argument("corner2", ColumnPosArgumentType.columnPos())
+												.executes(ExportSaveCommand::addRegionInCurrentDimension)
 												.then(argument("dimension", DimensionArgumentType.dimension())
 														.executes(ExportSaveCommand::addRegion))))))
 				.then(literal("deleteRegion")
@@ -49,7 +54,7 @@ public class ExportSaveCommand {
 								.then(argument("ticks", IntegerArgumentType.integer(0, 1000000))
 										.executes(ExportSaveCommand::addPreview))))
 				.then(literal("export")
-						.then(argument("name", StringArgumentType.word())
+						.then(argument("name", StringArgumentType.string())
 								.then(argument("worldgen", StringArgumentType.word())
 										.suggests((CommandUtil.immutableSuggestions((Object[]) WorldGenType.values())))
 										.executes(ExportSaveCommand::export))))
@@ -93,6 +98,24 @@ public class ExportSaveCommand {
 		return Command.SINGLE_SUCCESS;
 	}
 	
+	private static int addRegionInCurrentDimension(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
+		ExportTask task = getExportTask(ct);
+		String name = StringArgumentType.getString(ct, "name");
+		if(task.listRegionNames().contains(name)) {
+			CommandUtil.error(ct, "cmd.general.dupname");
+			return 0;
+		}
+		
+		ColumnPos corner1 = ColumnPosArgumentType.getColumnPos(ct, "corner1");
+		ColumnPos corner2 = ColumnPosArgumentType.getColumnPos(ct, "corner2");
+		task.addRegion(name, 
+				new ChunkPos(corner1.x() >> 4, corner1.z() >> 4), 
+				new ChunkPos(corner2.x() >> 4, corner2.z() >> 4), 
+				ct.getSource().getWorld());
+		CommandUtil.feedback(ct, "cmd.general.success");
+		return Command.SINGLE_SUCCESS;
+	}
+	
 	private static int delRegion(CommandContext<ServerCommandSource> ct) {
 		ExportTask task = getExportTask(ct);
 		String name = StringArgumentType.getString(ct, "name");
@@ -117,8 +140,10 @@ public class ExportSaveCommand {
 		long start = Util.getMeasuringTimeNano();
 		ExportTask task = getExportTask(ct);
 		WorldGenType wg = WorldGenType.valueOf(StringArgumentType.getString(ct, "worldgen"));
+		Path out;
 		try {
-			if(!task.export(StringArgumentType.getString(ct, "name"), wg)) {
+			out = task.export(StringArgumentType.getString(ct, "name"), wg);
+			if(out == null) {
 				CommandUtil.error(ct, "cmd.exportsave.failexp");
 				return 0;
 			}
@@ -129,6 +154,11 @@ public class ExportSaveCommand {
 		}
 		
 		CommandUtil.feedbackWithArgs(ct, "cmd.exportsave.success", (Util.getMeasuringTimeNano() - start) / 10E8D);
+		Text link = new FormattedText("cmd.exportsave.saveto", "n", true, out.getFileName())
+				.asMutableText()
+				.styled((s) -> s.withClickEvent(
+						new ClickEvent(ClickEvent.Action.OPEN_FILE, out.toAbsolutePath().toString())));
+		ct.getSource().sendFeedback(() -> link, false);
 		return Command.SINGLE_SUCCESS;
 	}
 	

@@ -22,6 +22,7 @@
 		"cmd.general.stopautosubname" : "Entity with name %s won't be subscribed automatically", 
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
+		"cmd.general.reqmixin" : "%s requires advanced mixin %s", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 
@@ -55,6 +56,7 @@
 		"cmd.exportsave.success" : "Exported the save, %f seconds elapsed.", 
 		"cmd.exportsave.addcomp" : "Added %d save components: %s", 
 		"cmd.exportsave.remcomp" : "Excluded %d save components: %s", 
+		"cmd.exportsave.saveto" : "The save has been exported to %s, click here to open it.", 
 		
 		//***** fixedentityhud *****
 		"cmd.fixedentityhud.add" : "Added a new line to the sidebar.", 
@@ -88,6 +90,7 @@
 		"cmd.messcfg.set" : "Option %s is now set to %s", 
 		"cmd.messcfg.setglobal" : "Option %s is now set to %s globally", 
 		"cmd.messcfg.globalonly" : "Option %s isn't supported in save-local storage, please click here to set it globally.", 
+		"cmd.messcfg.withtag" : "Options with tag %s:", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -114,6 +117,10 @@
 		"cmd.tileentity.usage" : "TODO", 
 		"cmd.tileentity.type" : "Type: %s", 
 		"cmd.tileentity.data" : "Data: %s", 
+		
+		//***** variable *****
+		"cmd.variable.reqarray" : "The object in this slot should be an array", 
+		"cmd.variable.invconstructor" : "Failed to parse constructor.\nShould be something like java/lang/Integer<1>, java/lang/Integer<I>V, or java/lang/Integer.", 
 		
 		//***** Exceptions *****
 		"exp.reqint" : "Requires an integer, but found %s", 
@@ -154,13 +161,15 @@
 		"exp.incomuncode" : "Incomplete Unicode character", 
 		"exp.unknownescape" : "Unsupported escape: %s", 
 		"exp.incompquote" : "Incomplete quote", 
+		"exp.noconstructor" : "Specified constructor was not found in %s",
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 
 		"hud.client" : "Client Player Information HUD: ", 
 		"hud.server" : "Server Player Information HUD: ", 
-
-		//***** Options *****chunkLogAutoArchiving
+		
+		//***** Options *****
+		"opt.accessingPathDynamicAutoCompletion.desc" : "Support suggestions for fields and methods when auto completing Accessing paths.", 
 		"opt.accessingPathInitStrategy.desc" : "There are there initializing strategies available: \n- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances and so on, will be used to handle all subsequent inputs.\n- Standard strategy: Accessing paths are parsed for every different inputs, and the parsed copies are cached until the inputs are discarded by the garbage collector.\n- Strict Strategy: Accessing paths are reinitialized each time they are used.", 
 		"opt.allowSelectingDeadEntities.desc" : "Allow entity selector `@e` dead entities.", 
 		"opt.allowTargetingSpecialEntities.desc" : "Allow the player to target entities like items, snowballs and arrows, enabling command suggestions for them.",
@@ -173,22 +182,30 @@
 		"opt.blockShapeToBeRendered.desc" : "The type of block shape rendered when `renderBlockShape` is enabled. The `COLLIDER` shape is the shape used to do calculations about collisions, while the `OUTLINE` shape is the shape used to let the game know which block the player is looking at. See the wiki on Github for details.", 
 		"opt.chunkLoadingInfoRenderer.desc" : "Display the loading status when holding a nautilus shell. May be moved to the ChunkMap later.", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "The radius of the area where chunk loading statuses are displayed, in chunks.", 
-		"opt.chunkLogAutoArchiving.desc" : "Archive the chunk behavior log produced within a single session automatically. These archives can be found in the folder `World Folder/chunklog/archives`.", 
+		"opt.chunkLogAutoArchiving.desc" : "Archive the chunk behavior log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/chunklog/archives`.", 
 		"opt.commandExecutionRequirment.desc" : "Whether or not the execution of commands defined by this mod require OP permission.",  
 		"opt.craftingTableBUD.desc" : "Detect the block updates received by crafting tables.", 
-		"opt.creativeUpwardsSpeed.desc" : "Set the vertical speed flying speed in the creative mode.", 
-		"opt.debugStickSkipsInvaildState.desc" : "PPrevent debug sticks from changing blocks to an invalid state. By now, the option doesn't work in many cases, for example, changing the `shape` property of a rail can still turn the rail into an illegal state and have the rail broken. ", 
+		"opt.creativeUpwardsSpeed.desc" : "Set the vertical speed flying speed in the creative mode. The actual terminal speed (in m/s) of players is roughly 150 * `creativeUpwardsSpeed`.", 
+		"opt.debugStickSkipsInvaildState.desc" : "Prevent debug sticks from changing blocks to an invalid state. By now, the option doesn't work in many cases, for example, changing the `shape` property of a rail can still turn the rail into an illegal state and have the rail broken. ", 
 		"opt.dedicatedServerCommands.desc" : "Enable commands for dedicated servers in single-player games.", 
+		"opt.defaultSaveComponents.desc" : "Save components that are included in export saves by default.", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "As the name says, you can fill some blocks in unloaded chunks.", 
+		"opt.disableItemUsageCooldown.desc" : "Disable item usages cooldown for ender pearls and chorus fruits, etc.", 
 		"opt.disableEnchantCommandRestriction.desc" : "Remove the restriction on enchantment level and compatibility from `/enchant`.", 
 		"opt.disableExplosionExposureCalculation.desc" : "Disable the calculation of explosion exposure to reduce the lag caused by stacked TNT explosions, especially when the TNTs are at the same spot. This will also mean that blocks cannot prevent entities from being influenced by explosions. \nThis feature may not work properly if the Lithium is loaded.", 
 		"opt.disableProjectileRandomness.desc" : "Remove the random speed of projectiles. It could be used to test pearl cannons, but don't forget to disable it if not needed.", 
+		"opt.dumpTargetEntityDataOnClient.desc" : "Output the information of the client-side entity instead of the one of server-side one.", 
+		"opt.dumpTargetEntityDataWithPaper.desc" : "Output the data of currently target entity by right clicking while holding a paper.", 
+		"opt.dumpTargetEntityDataWithCtrlC.desc" : "Output the data of currently target entity with Ctrl + C.", 
+		"opt.dumpTargetEntityNbt.desc" : "Output the NBT data of targeted entity. If the item on the main hand of the player has a custom name, the name will be interpreted as a NBT path to be applied to the NBT data of the entity when the item has no enchantment, or be served as an Accessing Path to be applied to the Entity instance of the entity.", 
+		"opt.dumpTargetEntitySummonCommand.desc" : "Generate a command to summon the target entity. If the held item is enchanted, the full NBT data with UUID(s) stripped off are included in the generated command, otherwise, only the entity type, dimension, position, motion and rotation are present in the command.", 
 		"opt.enabledTools.desc" : "Item tools, which make bone and bricks useful. Requires carpet-fabric.\n - Bone: `/tick step <countOfBones>` \n - Brick: `/tick freeze` \n - Netherite Ingot: `/kill @e[type!=player]`", 
 		"opt.endEyeTeleport.desc" : "When the player uses ender eyes, teleport it to where it looks at.", 
 		"opt.entityExplosionInfluence.desc" : "Tell you how entities are affected by explosions. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.\nIncompatible with Lithium.", 
 		"opt.entityExplosionRaysVisiblity.desc" : "Explosion ray (used in the calculation of the exposure of entities) renderer. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.", 
 		"opt.entityExplosionRaysLifetime.desc" : "The number of ticks the rendered rays remains. ", 
-		"opt.entityLogAutoArchiving.desc" : "Archive the entity log produced within a single session automatically. These archives can be found in the folder `World Folder/entitylog/archives`.", 
+		"opt.entityLogAutoArchiving.desc" : "Archive the entity log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/entitylog/archives`.", 
+		"opt.expandedStructureBlockRenderingRange.desc" : "Expand the maximum visible distance of structure blocks.", 
 		"opt.fillHistory.desc" : "Record block changes caused by `/fill` so that they can be undone or redone later.", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "Specify which type of pulses are recorded.", 
 		"opt.fletchingTablePulseDetector.desc" : "Record the lengths of redstone signal pulses received by fletching tables.", 
@@ -199,9 +216,10 @@
 		"opt.hudAlignMode.desc" : "Move the HUDs to a given location.", 
 		"opt.hudStyles.desc" : "The style of the HUDs, containing zero or more flags below: \n - B: Render a gray background\n - L: Align the headers on the left and the data on the right\n - R: Change the color of headers to red", 
 		"opt.hudTextSize.desc" : "Set the size of the text in the HUDs.", 
+		"opt.independentEntityPickerForInfomation.desc" : "Pick crosshair-targeted entities for information providers (currently only the UUID suggestor) independently.", 
 		"opt.interactableB36.desc" : "Allow players to break block-36s and place something against it.", 
 		"opt.language.desc" : "The main language of the Mod.", 
-		"opt.maxClientTicksPerFrame.desc" : "The maximum number of ticks can be processed within a single frame when the FPS is lower than 20.", 
+		"opt.maxClientTicksPerFrame.desc" : "The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.", 
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleportation with `endEyeTeleport`.", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "Allow players to place minecarts directly on the ground.", 
 		"opt.mobFastKill.desc" : "`/kill` kill mobs by removing them directly instead of damaging them.", 
@@ -209,8 +227,9 @@
 		"opt.projectileChunkLoading.desc" : "Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.", 
 		"opt.projectileChunkLoadingRange.desc" : "Set the radius of entity processing chunks loaded by `projectileChunkLoading`.", 
 		"opt.projectileChunkLoadingPermanence.desc" : "Projectiles load the chunks permanently when `projectileChunkLoading` is enabled.", 
-		"opt.projectileRandomnessScale.desc" : "The amount of the randomness of projectiles.", 
+		"opt.projectileRandomnessScale.desc" : "The amount of the randomness of projectiles. Most projectiles will have their additional random initial speeds multipled by the value of this option.", 
 		"opt.quickMobMounting.desc" : "Placing mobs into vehicles.", 
+		"opt.quickStackedEntityKilling.desc" : "Kill the entity being knocked by a brick, along with all entities being at the same position as it.", 
 		"opt.railNoAutoConnection.desc" : "Prevent the shape of rails from being changed by surrounding rails.", 
 		"opt.rejectChunkTicket.desc" : "Prevent the chunks from being loaded in some ways.", 
 		"opt.renderBlockShape.desc" : "Enhanced block outline renderer.", 
@@ -218,6 +237,7 @@
 		"opt.renderRedstoneGateInfo.desc" : "Display the output level of repeaters and comparators the player looks at.", 
 		"opt.serverSyncedBox.desc" : "Enable or disable the server-side hitbox renderer.", 
 		"opt.serverSyncedBoxRenderRange.desc" : "The maximum Cheshev distance between the player and the entities with their bounding boxes rendered. All non-positive values are considered as positive infinite.", 
+		"opt.serverSyncedBoxUpdateModeInFrozenTicks.desc" : "What the server-side hitbox renderer should do in ticks frozen by the Carpet.", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long-distance raycasts.", 
 		"opt.skippedGenerationStages.desc" : "Skip some stages in the world generation. Skipping stage `biome` and `full` is not supported, as the absence of them will make the server crash." , 
 		"opt.stableHudLocation.desc" : "Make the location of HUDs more stable when the length of lines change frequently.", 
@@ -229,13 +249,16 @@
 		"opt.vanillaDebugRenderers.desc" : "Enable some vanilla debugging renderers, some of which won't actually work.",
 
 		//***** Errors in options
-		"opt.err.rpositive" : "Requires a positive number", 
-		"opt.err.rnonnegative" : "Requires a non-negative number", 
-		"opt.err.rnum" : "The given value is not a number", 
-		"opt.err.rhotbar" : "Requires a number between 1 and 36", 
-		"opt.err.nodef" : "%s is not defined", 
+		"opt.err.rpositive" : "Requires a positive number!", 
+		"opt.err.rnonnegative" : "Requires a non-negative number!", 
+		"opt.err.rnum" : "The given value is not a number!", 
+		"opt.err.rint" : "The given value is not a integer!", 
+		"opt.err.rhotbar" : "Requires a number between 1 and 36!", 
+		"opt.err.nodef" : "%s is not defined!", 
 		"opt.err.lithium" : "This option is incompatible with Lithium!", 
 		"opt.err.reqcarpet" : "This option require Carpet to function!", 
+		"opt.err.reqbool" : "Use true of false here!", 
+		"opt.err.conflict.carpet.1425" : "This option conflicts with Carpet 1.4.25 and above!", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 
@@ -249,6 +272,8 @@
 		"misc.protver.err" : "The protcol version of the MessMod installed on the server is different from the one on your client,it is recommended to install MessMod with the same version as the server.", 
 		"misc.warnsur.title" : "MessMod Is Not For Survival", 
 		"misc.warnsur.msg" : "This save probably hasn't been opened with MessMod loaded before, and doing so may break vanilla mechanisms and result in accidental cheating. Procceed to open anyway?", 
-		"misc.instanceof.desc" : "A concrete class name of the super class or implemented (directly or indirectly) of the class of selected entities."
+		"misc.instanceof.desc" : "A concrete class name of the super class or implemented (directly or indirectly) of the class of selected entities.", 
+		"misc.copyentitycmd" : "Click to copy the command to summon the entity.", 
+		"misc.selector.att" : "Crosshair target"
 	}
 }

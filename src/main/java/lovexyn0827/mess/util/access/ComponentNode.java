@@ -84,22 +84,27 @@ abstract class ComponentNode extends Node {
 				Type type = ctx.getLastOutputClass();
 				InsnList insns = new InsnList();
 				Class<?> rawType = Reflection.getRawType(type);
+				Class<?> out;
 				if(Entity.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/entity/Entity"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
 							"net/minecraft/entity/Entity", "getX", "()D"));
+					out = double.class;
 				} else if(Vec3d.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/util/math/Vec3d"));
 					insns.add(new FieldInsnNode(Opcodes.GETFIELD, 
 							"net/minecraft/util/math/Vec3d", "x", "D"));
+					out = double.class;
 				} else if(Vec3i.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/util/math/Vec3i"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
 							"net/minecraft/util/math/Vec3i", "getX", "()I"));
+					out = int.class;
 				} else if(ChunkPos.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/util/math/ChunkPos"));
 					insns.add(new FieldInsnNode(Opcodes.GETFIELD, 
 							"net/minecraft/util/math/ChunkPos", "x", "D"));
+					out = int.class;
 				} else if(BlockEntity.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/block/entity/BlockEntity"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
@@ -107,10 +112,12 @@ abstract class ComponentNode extends Node {
 							"()Lnet/minecraft/util/math/BlockPos"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
 							"net/minecraft/util/math/Vec3i", "getX", "()I"));
+					out = int.class;
 				} else {
 					throw new CompilationException(FailureCause.INV_LAST, this);
 				}
 				
+				ctx.endNode(out);
 				return insns;
 			};
 		}
@@ -149,18 +156,22 @@ abstract class ComponentNode extends Node {
 				Type type = ctx.getLastOutputType();
 				InsnList insns = new InsnList();
 				Class<?> rawType = Reflection.getRawType(type);
+				Class<?> out;
 				if(Entity.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/entity/Entity"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
 							"net/minecraft/entity/Entity", "getY", "()D"));
+					out = double.class;
 				} else if(Vec3d.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/util/math/Vec3d"));
 					insns.add(new FieldInsnNode(Opcodes.GETFIELD, 
 							"net/minecraft/util/math/Vec3d", "y", "D"));
+					out = double.class;
 				} else if(Vec3i.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/util/math/Vec3i"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
 							"net/minecraft/util/math/Vec3i", "getY", "()I"));
+					out = int.class;
 				} else if(BlockEntity.class.isAssignableFrom(rawType)) {
 					insns.add(new TypeInsnNode(Opcodes.CHECKCAST, "net/minecraft/block/entity/BlockEntity"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
@@ -168,10 +179,12 @@ abstract class ComponentNode extends Node {
 							"()Lnet/minecraft/util/math/BlockPos"));
 					insns.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, 
 							"net/minecraft/util/math/Vec3i", "getY", "()I"));
+					out = int.class;
 				} else {
 					throw new CompilationException(FailureCause.INV_LAST, this);
 				}
 				
+				ctx.endNode(out);
 				return insns;
 			};
 		}

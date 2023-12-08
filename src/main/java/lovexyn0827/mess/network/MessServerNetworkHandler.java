@@ -10,6 +10,7 @@ import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
 import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
+import lovexyn0827.mess.util.EntityDataDumpHelper;
 import lovexyn0827.mess.util.FormattedText;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -79,6 +80,12 @@ public class MessServerNetworkHandler {
 					((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
 				});
 			}
+		});
+		register(Channels.ENTITY_DUMP, (player, channel, buf) -> {
+			// It it the client's responsibility to check whether to dump the target.
+			player.server.execute(() -> {
+				EntityDataDumpHelper.tryDumpTarget(player);
+			});
 		});
 	}
 	

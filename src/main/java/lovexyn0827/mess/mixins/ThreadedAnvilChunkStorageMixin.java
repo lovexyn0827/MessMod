@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,24 +15,37 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.ChunkTicketManagerInterface;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.util.blame.StackTrace;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.thread.ThreadExecutor;
+import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkProvider;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.ChunkStatusChangeListener;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.level.storage.LevelStorage;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
-public abstract class ThreadedAnvilChunkStorageMixin {
+public abstract class ThreadedAnvilChunkStorageMixin {	
 	@Shadow @Final
 	private ServerWorld world;
+	
+	@Shadow @Final
+	private ThreadedAnvilChunkStorage.TicketManager ticketManager;
 	
 	@Inject(method = "loadChunk", 
 			at = @At(value = "HEAD")
@@ -192,5 +207,25 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UPGRADE, holder.getPos().toLong(), 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), 
 				Registries.CHUNK_STATUS.getId(status));
+	}
+	
+	@Inject(
+			method = "<init>", 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/server/world/ThreadedAnvilChunkStorage."
+							+ "ticketManager:Lnet/minecraft/server/world/ThreadedAnvilChunkStorage$TicketManager;", 
+					opcode = Opcodes.PUTFIELD, 
+					shift = At.Shift.AFTER
+			)
+	)
+	private void onCreatedTicketManager(ServerWorld world, LevelStorage.Session session, DataFixer dataFixer, 
+			StructureTemplateManager structureTemplateManager, Executor executor, 
+			ThreadExecutor<Runnable> mainThreadExecutor, ChunkProvider chunkProvider, ChunkGenerator chunkGenerator, 
+			WorldGenerationProgressListener worldGenerationProgressListener, 
+			ChunkStatusChangeListener chunkStatusChangeListener, 
+			Supplier<PersistentStateManager> persistentStateManagerFactory, int viewDistance, boolean dsync, 
+			CallbackInfo ci) {
+		((ChunkTicketManagerInterface) this.ticketManager).initWorld(world);
 	}
 }

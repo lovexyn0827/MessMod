@@ -3,13 +3,14 @@ package lovexyn0827.mess.util;
 import org.jetbrains.annotations.NotNull;
 
 import lovexyn0827.mess.log.entity.EntityLogColumn;
+import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudLine;
 import lovexyn0827.mess.util.access.AccessingFailureException;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
 
-public class WrappedPath implements HudLine {
+public class WrappedPath implements HudLine, Comparable<HudLine> {
 	protected final AccessingPath path;
 	protected final String name;
 
@@ -84,6 +85,15 @@ public class WrappedPath implements HudLine {
 	@Override
 	public String toString() {
 		return String.format("%s(%s)", this.name, this.path);
+	}
+
+	@Override
+	public int compareTo(HudLine o) {
+		if(o instanceof BuiltinHudInfo) {
+			return 1;
+		} else {
+			return this.getName().compareTo(o.getName());
+		}
 	}
 
 	public static class Phased extends WrappedPath implements EntityLogColumn {

@@ -1,5 +1,6 @@
 package lovexyn0827.mess.command;
 
+import java.lang.reflect.Field;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -38,11 +39,11 @@ public class CommandUtil {
 		Registries.ENTITY_TYPE.getIds().stream().map(Identifier::getPath).forEach(b::suggest);
 		return b.buildFuture();
 	};
-	public static final SuggestionProvider<ServerCommandSource> FIELDS_SUGGESTION = (ct, builder) -> {
-		Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+	public static final SuggestionProvider<ServerCommandSource> ENTITY_FIELDS_SUGGESTION = (ct, builder) -> {
+		Identifier id = new Identifier(StringArgumentType.getString(ct.getLastChild(), "entityType"));
 		EntityType<?> type = Registries.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
-		Reflection.getAvailableFields(clazz).forEach(builder::suggest);
+		Reflection.getAvailableFieldNames(clazz).forEach(builder::suggest);
 		builder.suggest("-THIS-");
 		return builder.buildFuture();
 	};
@@ -62,6 +63,7 @@ public class CommandUtil {
 			SetExplosionBlockCommand.reset();
 			LogPacketCommand.reset();
 			LazyLoadCommand.reset();
+			VariableCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public boolean shouldReceiveFeedback() {
@@ -213,9 +215,23 @@ public class CommandUtil {
 				ConstantArgumentSerializer.of(ExtendedFloatArgumentType::floatArg));
 		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_accessing_path", 
 				AccessingPathArgumentType.class, 
-				ConstantArgumentSerializer.of(AccessingPathArgumentType::accessingPathArg));
+				ConstantArgumentSerializer.of(() -> AccessingPathArgumentType.accessingPathArg()));
 		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_phase", 
 				TickingPhaseArgumentType.class, 
 				ConstantArgumentSerializer.of(TickingPhaseArgumentType::phaseArg));
+	}
+	
+	public static AccessingPathArgumentType getPathArgForFieldListening(String entityTypeArg, String fieldArg) {
+		return AccessingPathArgumentType.accessingPathArg((ct) -> {
+			EntityType<?> type = Registries.ENTITY_TYPE
+					.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+			String fName = StringArgumentType.getString(ct, "field");
+			if("-THIS-".equals(fName)) {
+				return Reflection.ENTITY_TYPE_TO_CLASS.get(type);
+			}
+			
+			Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), fName);
+			return f == null ? Object.class : f.getType();
+		});
 	}
 }
