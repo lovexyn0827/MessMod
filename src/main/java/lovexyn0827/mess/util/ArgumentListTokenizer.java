@@ -94,10 +94,13 @@ public final class ArgumentListTokenizer implements Iterable<String>, Iterator<S
 		case 'u':
 			if(in.canRead(4)) {
 				String hexStr = in.getString().substring(in.getCursor(), in.getCursor() + 4);
+				in.setCursor(in.getCursor() + 4);
 				return Character.valueOf((char) Integer.parseUnsignedInt(hexStr, 16)).toString();
 			} else {
 				throw new TranslatableException("exp.unknownescape");
 			}
+		case '.':
+			return ".";
 		default :
 			throw new TranslatableException("exp.unknownescape", c);
 		}

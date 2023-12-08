@@ -7,7 +7,7 @@ public class FloatParser implements OptionParser<Float> {
 		try {
 			return Float.valueOf(str);
 		} catch (NumberFormatException e) {
-			throw new InvalidOptionException("The given value is not a number!");
+			throw new InvalidOptionException("opt.err.rnum");
 		}
 	}
 
@@ -23,7 +23,7 @@ public class FloatParser implements OptionParser<Float> {
 			if(f > 0) {
 				return f;
 			} else {
-				throw new InvalidOptionException("Use a positive number here");
+				throw new InvalidOptionException("opt.err.rpositive");
 			}
 		}
 	}

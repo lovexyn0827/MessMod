@@ -58,7 +58,10 @@
     "ChunkTicketManagerNearbyChunkTicketUpdaterMixin", 
     "ServerEntityManagerMixin", 
     "ServerPlayNetworkHandler_1Mixin", 
-    "ServerWorldAccessor"
+    "ServerWorldAccessor", 
+    "SectionedEntityCacheMixin", 
+    "ItemCooldownManagerMixin", 
+    "ArgumentTypesMixin"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -77,7 +80,8 @@
     "CreativeInventoryScreenMixin", 
     "GameRendererMixin", 
     "WorldListWidgetEntryMixin", 
-    "EntitySelectorMixin_Client"
+    "EntitySelectorMixin_Client", 
+    "ClientCommandSourceMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"

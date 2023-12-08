@@ -22,6 +22,7 @@
 		"cmd.general.stopautosubname" : "不再自动监听名为%s的实体", 
 		"cmd.general.flush" : "已将新内容保存到磁盘", 
 		"cmd.general.count" : "共有%d个被监视实体", 
+		"cmd.general.reqmixin" : "%s需要高级Mixin %s", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "无法加载保存的自定义节点：%s", 
@@ -89,6 +90,7 @@
 		"cmd.messcfg.set" : "选项%s的值现在已被设为%s", 
 		"cmd.messcfg.setglobal" : "全局作用域中选项%s的值现在已被设为%s", 
 		"cmd.messcfg.globalonly" : "存档局部设置中不支持选项%s，请点击这里以在全局作用域中设置该选项", 
+		"cmd.messcfg.withtag" : "带有标签%s的选项：", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -167,6 +169,7 @@
 		"hud.server" : "服务端玩家信息HUD: ", 
 		
 		//***** Options *****
+		"opt.accessingPathDynamicAutoCompletion.desc" : "支持自动补全Accessing Path中的字段名和方法名。", 
 		"opt.accessingPathInitStrategy.desc" : "共有3种初始化策略： \n - 旧版本模式：每个Accessing Path只在第一次被使用时进行初始化，然后这一结果用于访问后续的所有输入对象 \n - 标准模式：Accessing Path会对每个不同对象进行初始化，然后结果会被缓存直到相应对象被清理。\n - 严格模式：Accessing Path每次被使用时都会重新进行初始化。", 
 		"opt.allowSelectingDeadEntities.desc" : "允许目标选择器`@e`选中死亡的实体。", 
 		"opt.allowTargetingSpecialEntities.desc" : "允许玩家将光标对准物品、雪球和箭矢等实体以获取相应的指令建议。", 
@@ -185,9 +188,11 @@
 		"opt.creativeUpwardsSpeed.desc" : "调节创造模式下玩家向上飞行（加）速度大小。以m/s为单位，玩家真正的最终速度大约为该选项值的150倍。", 
 		"opt.debugStickSkipsInvaildState.desc" : "防止调试棒将方块调整到非法状态。目前这个选项在一些情况下不能正常工作，例如调整铁轨的shape属性时仍可以将其调整到非法状态使其掉落。", 
 		"opt.dedicatedServerCommands.desc" : "在单人游戏中启用专用于服务器的指令。", 
+		"opt.defaultSaveComponents.desc" : "默认包含在导出的存档中的存档组件。", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "禁用指令中对方块是否被加载的检查。", 
 		"opt.disableEnchantCommandRestriction.desc" : "移除`/enchant`中对附魔等级与附魔兼容性的检查。", 
 		"opt.disableExplosionExposureCalculation.desc" : "禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。\n在安装Lithium后可能不能正常工作。", 
+		"opt.disableItemUsageCooldown.desc" : "禁用末影珍珠和紫颂果等物品的的使用冷却时长。", 
 		"opt.disableProjectileRandomness.desc" : "取消弹射物的随机速度，用于部分测试，不过不要忘记关闭。", 
 		"opt.dumpTargetEntityDataOnClient.desc" : "输出客户端实体信息而不是服务端实体信息。", 
 		"opt.dumpTargetEntityDataWithPaper.desc" : "主手持有纸的玩家右键实体时输出目标实体信息。", 
@@ -200,6 +205,7 @@
 		"opt.entityExplosionRaysVisiblity.desc" : "启用或禁用实体爆炸射线渲染。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。", 
 		"opt.entityExplosionRaysLifetime.desc" : "设置实体爆炸射线的显示时长，单位为刻。", 
 		"opt.entityLogAutoArchiving.desc" : "自动存档一个会话内产生的实体数据记录（若有），存档文件可在`世界文件夹/entitylog/archives`找到。", 
+		"opt.expandedStructureBlockRenderingRange.desc" : "增加结构方块的渲染距离。", 
 		"opt.fillHistory.desc" : "记录`/fill`产生的方块变更以便在将来撤销或重做。", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "指定被记录的脉冲类型。", 
 		"opt.fletchingTablePulseDetector.desc" : "记录制箭台接收到的红石脉冲的长度。", 
@@ -210,6 +216,7 @@
 		"opt.hudAlignMode.desc" : "设置实体信息HUD的位置。", 
 		"opt.hudStyles.desc" : "HUD的渲染样式, 包括了下面的零个至多个标志: \n - B：渲染背景\n - L：左对齐行标题并右对齐数据\n - R：将行标题改为红色", 
 		"opt.hudTextSize.desc" : "调节HUD字体大小。", 
+		"opt.independentEntityPickerForInfomation.desc" : "独立地为信息提供者（目前只包含指令UUID建议）选取目标实体。", 
 		"opt.interactableB36.desc" : "允许玩家破坏36号方块或对准它放置物品。", 
 		"opt.language.desc" : "该Mod的主要语言。", 
 		"opt.maxClientTicksPerFrame.desc" : "FPS低于20时每帧可以运行多少个客户端游戏刻。", 
@@ -242,13 +249,16 @@
 		"opt.vanillaDebugRenderers.desc" : "启用一些原版调试渲染器。",
 		
 		//***** Errors in options
-		"opt.err.rpositive" : "需要一个整数", 
+		"opt.err.rpositive" : "需要一个正数", 
 		"opt.err.rnonnegative" : "需要一个非负数", 
 		"opt.err.rnum" : "给定的值不是一个数字", 
+		"opt.err.rint" : "给定的值不是一个整数", 
 		"opt.err.rhotbar" : "需要1～36之间的一个整数", 
 		"opt.err.nodef" : "%s未被定义", 
 		"opt.err.lithium" : "此选项与Lithium不兼容", 
 		"opt.err.reqcarpet" : "该选项需要安装Carpet", 
+		"opt.err.reqbool" : "只能使用true或false", 
+		"opt.err.conflict.carpet.1425" : "该选项与Carpet 1.4.25以上版本冲突", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "id不能为负值", 

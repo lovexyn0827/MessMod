@@ -20,4 +20,5 @@ import net.fabricmc.api.EnvType;
 	Class<? extends OptionParser<?>> parserClass();
 	boolean globalOnly() default false;
 	EnvType[] environment() default {EnvType.CLIENT, EnvType.SERVER};
+	Label[] label();
 }

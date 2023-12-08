@@ -13,7 +13,7 @@ public class BooleanParser implements OptionParser<Boolean> {
 		} else if ("false".equals(str)) {
 			return false;
 		} else {
-			throw new InvalidOptionException("Use true of false here");
+			throw new InvalidOptionException("opt.err.reqbool");
 		}
 	}
 

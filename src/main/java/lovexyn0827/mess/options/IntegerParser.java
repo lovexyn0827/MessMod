@@ -6,7 +6,7 @@ public class IntegerParser implements OptionParser<Integer> {
 		try {
 			return Integer.valueOf(str);
 		} catch (NumberFormatException e) {
-			throw new InvalidOptionException("The given value is not a number!");
+			throw new InvalidOptionException("opt.err.rint");
 		}
 	}
 
@@ -22,7 +22,7 @@ public class IntegerParser implements OptionParser<Integer> {
 			if(i > 0) {
 				return i;
 			} else {
-				throw new InvalidOptionException("Use a positive number here");
+				throw new InvalidOptionException("opt.err.rpositive");
 			}
 		}
 	}
@@ -34,7 +34,7 @@ public class IntegerParser implements OptionParser<Integer> {
 			if(i >= 0) {
 				return i;
 			} else {
-				throw new InvalidOptionException("Use a non-negative number here");
+				throw new InvalidOptionException("opt.err.rnonnegative");
 			}
 		}
 	}
@@ -46,7 +46,7 @@ public class IntegerParser implements OptionParser<Integer> {
 			if(i > 0 && i <= 36) {
 				return i;
 			} else {
-				throw new InvalidOptionException("Use a number between 1 and 36 here");
+				throw new InvalidOptionException("opt.err.rhotbar");
 			}
 		}
 	}

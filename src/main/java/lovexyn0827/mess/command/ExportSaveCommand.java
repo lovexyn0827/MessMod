@@ -54,7 +54,7 @@ public class ExportSaveCommand {
 								.then(argument("ticks", IntegerArgumentType.integer(0, 1000000))
 										.executes(ExportSaveCommand::addPreview))))
 				.then(literal("export")
-						.then(argument("name", StringArgumentType.word())
+						.then(argument("name", StringArgumentType.string())
 								.then(argument("worldgen", StringArgumentType.word())
 										.suggests((CommandUtil.immutableSuggestions((Object[]) WorldGenType.values())))
 										.executes(ExportSaveCommand::export))))

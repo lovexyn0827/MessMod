@@ -3,6 +3,7 @@ package lovexyn0827.mess.command;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 
 import com.mojang.authlib.GameProfile;
@@ -20,6 +21,7 @@ import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -33,7 +35,7 @@ public class HudCommand {
 								.then(argument("entityType", StringArgumentType.word())
 										.suggests(CommandUtil.ENTITY_TYPES)
 										.then(argument("field", StringArgumentType.word())
-												.suggests(CommandUtil.FIELDS_SUGGESTION)
+												.suggests(CommandUtil.ENTITY_FIELDS_SUGGESTION)
 												.executes((ct) -> {
 													EntityType<?> type = Registry.ENTITY_TYPE
 															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
@@ -61,7 +63,7 @@ public class HudCommand {
 																return 0;
 															}
 														})
-														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+														.then(argument("path", CommandUtil.getPathArgForFieldListening("entityType", "field"))
 																.executes((ct) -> {
 																	EntityType<?> type = Registry.ENTITY_TYPE
 																			.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
@@ -94,7 +96,12 @@ public class HudCommand {
 													addListenedWithName(ct, MessMod.INSTANCE.getServerHudManager().playerHudC, ClientPlayerEntity.class);
 													return Command.SINGLE_SUCCESS;
 												})
-												.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+												.then(argument("path", AccessingPathArgumentType.accessingPathArg((ct) -> {
+													String fName = StringArgumentType.getString(ct, "field");
+													Field f = Reflection.getFieldFromNamed(
+															MessMod.isDedicatedServerEnv() ? PlayerEntity.class : ClientPlayerEntity.class, fName);
+													return f == null ? Object.class : f.getGenericType();
+												}))
 														.executes(ct -> {
 															addListenedWithNameAndPath(ct, MessMod.INSTANCE.getServerHudManager().playerHudC, ClientPlayerEntity.class);
 															return Command.SINGLE_SUCCESS;
@@ -114,7 +121,11 @@ public class HudCommand {
 													addListenedWithName(ct, MessMod.INSTANCE.getServerHudManager().playerHudS, ServerPlayerEntity.class);
 													return Command.SINGLE_SUCCESS;
 												})
-												.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+												.then(argument("path", AccessingPathArgumentType.accessingPathArg((ct) -> {
+													String fName = StringArgumentType.getString(ct, "field");
+													Field f = Reflection.getFieldFromNamed(ServerPlayerEntity.class, fName);
+													return f == null ? Object.class : f.getGenericType();
+												}))
 														.executes(ct -> {
 															addListenedWithNameAndPath(ct, MessMod.INSTANCE.getServerHudManager().playerHudS, ServerPlayerEntity.class);
 															return Command.SINGLE_SUCCESS;

@@ -45,7 +45,7 @@ public class EnumSetArgumentType extends ElementSetArgumentType<Enum<?>, EnumSet
 		return builder.buildFuture();
 	}
 	
-	static {
+	public static void registerArgumentType() {
 		ArgumentTypes.register("mess_enum", EnumSetArgumentType.class, new Serializer());
 	}
 

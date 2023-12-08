@@ -103,6 +103,7 @@ public class CustomNode extends Node {
 				MessMod.LOGGER.warn("Couldn't parse saved nodes: {}", e);
 				e.printStackTrace();
 			}
+			
 			operation.accept(prop);
 			Writer writer = new FileWriter(file);
 			prop.store(writer, "Saved Custom Nodes");
@@ -134,8 +135,11 @@ public class CustomNode extends Node {
 			}
 		} else {
 			String pathStr = NODES_BY_NAME.get(name);
-			AccessingPath path = AccessingPathArgumentType.accessingPathArg()
-					.parse(new StringReader(pathStr));
+			if(pathStr == null) {
+				return null;
+			}
+			
+			AccessingPath path = AccessingPathArgumentType.accessingPathArg().parse(new StringReader(pathStr));
 			return new CustomNode(name, path);
 		}
 	}

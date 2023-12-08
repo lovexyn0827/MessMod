@@ -37,7 +37,7 @@ public abstract class AbstractAchivingLogger {
 			} catch (IOException e) {
 				LOGGER.fatal("Failed to create folder for entity logs!");
 				e.printStackTrace();
-				// XXX rethrow
+				// We don't rethrow the IOException to reduce crashes.
 			}
 		}
 	}
