@@ -4,4 +4,5 @@ import net.minecraft.network.NetworkSide;
 
 public interface EntitySelectorInterface {
 	void setSide(NetworkSide side);
+	void setTargetOnly(boolean targetOnly);
 }

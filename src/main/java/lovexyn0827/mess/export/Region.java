@@ -120,6 +120,7 @@ public final class Region {
 	@Override
 	public String toString() {
 		return new StringBuilder(this.name)
-				.append('{').append(this.min).append('-').append(this.max).append('}').toString();
+				.append('{').append(this.min).append('-').append(this.max).append('}')
+				.append('@').append(this.dimension.getRegistryKey().getValue()).toString();
 	}
 }

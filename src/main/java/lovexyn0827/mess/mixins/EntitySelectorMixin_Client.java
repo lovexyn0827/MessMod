@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntitySelectorInterface;
+import lovexyn0827.mess.util.RaycastUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.EntitySelector;
@@ -32,8 +33,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 @Mixin(EntitySelector.class)
-public class EntitySelectorMixin implements EntitySelectorInterface {
+public class EntitySelectorMixin_Client implements EntitySelectorInterface {
 	private NetworkSide side;
+	private boolean targetOnly;
 	@Shadow
 	private boolean includesNonPlayers;
 	@Shadow
@@ -110,7 +112,7 @@ public class EntitySelectorMixin implements EntitySelectorInterface {
 	)
 	private void selectClientSideEntities(ServerCommandSource serverCommandSource, 
 			CallbackInfoReturnable<List<? extends Entity>> cir) {
-		if(side == NetworkSide.CLIENTBOUND && !MessMod.isDedicatedEnv()) {
+		if(side == NetworkSide.CLIENTBOUND && !MessMod.isDedicatedEnv() && !this.targetOnly) {
 			this.checkSourcePermission(serverCommandSource);
 			List<Entity> result = Lists.newArrayList();
 			MinecraftClient mc = MinecraftClient.getInstance();
@@ -163,5 +165,44 @@ public class EntitySelectorMixin implements EntitySelectorInterface {
 				}
 			}
 		}
+	}
+	
+	@Inject(method = "getEntities(Lnet/minecraft/server/command/ServerCommandSource;)Ljava/util/List;", 
+			at = @At("HEAD"), 
+			cancellable = true
+	)
+	private void selectTarget(ServerCommandSource serverCommandSource, 
+			CallbackInfoReturnable<List<? extends Entity>> cir) {
+		if(this.targetOnly) {
+			this.checkSourcePermission(serverCommandSource);
+			List<Entity> result = Lists.newArrayList();
+			if(this.side == NetworkSide.CLIENTBOUND && !MessMod.isDedicatedEnv()) {
+				MinecraftClient mc = MinecraftClient.getInstance();
+				Entity senderer = serverCommandSource.getEntity();
+				if(senderer != null && mc.cameraEntity != null 
+						&& senderer.getId() == mc.cameraEntity.getId()) {
+					Entity target = RaycastUtil.getTargetEntity(mc.cameraEntity);
+					if(target != null) {
+						result.add(target);
+					}
+				}
+			} else {
+				Entity senderer = serverCommandSource.getEntity();
+				if(senderer != null) {
+					Entity target = RaycastUtil.getTargetEntity(senderer);
+					if(target != null) {
+						result.add(target);
+					}
+				}
+			}
+			
+			cir.setReturnValue(result);
+			cir.cancel();
+		}
+	}
+
+	@Override
+	public void setTargetOnly(boolean targetOnly) {
+		this.targetOnly = targetOnly;
 	}
 }

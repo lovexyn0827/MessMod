@@ -39,6 +39,7 @@ import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
+import lovexyn0827.mess.command.VariableCommand;
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
@@ -81,6 +82,7 @@ public abstract class CommandMixin {
         LogChunkBehaviorCommand.register(this.dispatcher);
         LazyLoadCommand.register(this.dispatcher);
         CountEntitiesCommand.register(this.dispatcher);
+        VariableCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 

@@ -556,7 +556,7 @@
 
 ##### `allowSelectingDeadEntities`
 
-允许目标选择器`@e`选中死亡的实体
+允许目标选择器`@e`选中死亡的实体。
 
 可能取值：`true`或`false`
 
@@ -564,7 +564,7 @@
 
 ##### `allowTargetingSpecialEntities`
 
-允许玩家将光标对准物品、雪球和箭矢等实体以获取相应的指令建议
+允许玩家将光标对准物品、雪球和箭矢等实体以获取相应的指令建议。
 
 可能取值：`true`或`false`
 
@@ -572,7 +572,7 @@
 
 ##### `antiHostCheating`
 
-对局域网游戏的房主启用反作弊
+对局域网游戏的房主启用反作弊。
 
 可能取值：`true`或`false`
 
@@ -580,7 +580,7 @@
 
 ##### `attackableTnt`
 
-TNT可以被玩家的攻击杀死
+TNT可以被玩家的攻击杀死。
 
 可能取值：`true`或`false`
 
@@ -620,7 +620,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `blockInfoRendererUpdateInFrozenTicks`
 
-游戏运算被地毯端中/tick指令暂停时方块信息渲染器的行为
+游戏运算被地毯端中/tick指令暂停时方块信息渲染器的行为。
 
 可能取值：
 
@@ -670,7 +670,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `chunkLogAutoArchiving`
 
-自动存档一个会话内产生的区块行为记录，存档文件可在`世界文件夹/chunklog/archives`找到
+自动存档一个会话内产生的区块行为记录（若有），存档文件可在`世界文件夹/chunklog/archives`找到。
 
 可能取值：`true`或`false`
 
@@ -694,7 +694,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `creativeUpwardsSpeed`
 
-调节创造模式下玩家向上飞行（加）速度大小。
+调节创造模式下玩家向上飞行（加）速度大小。以m/s为单位，玩家真正的最终速度大约为该选项值的150倍。
 
 可能取值：任意正实数
 
@@ -710,7 +710,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `dedicatedServerCommands`
 
-在单人游戏中启用专用于服务器的指令
+在单人游戏中启用专用于服务器的指令。
 
 可能取值：`true`或`false`
 
@@ -718,7 +718,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `disableChunkLoadingCheckInCommands`
 
-禁用指令中对方块是否被加载的检查
+禁用指令中对方块是否被加载的检查。
 
 可能取值：`true`或`false`
 
@@ -726,7 +726,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `disableEnchantCommandRestriction`
 
-移除`/enchant`中对附魔等级与附魔兼容性的检查
+移除`/enchant`中对附魔等级与附魔兼容性的检查。
 
 可能取值：`true`或`false`
 
@@ -796,7 +796,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `entityLogAutoArchiving`
 
-自动存档一个会话内产生的实体数据记录，存档文件可在`世界文件夹/entitylog/archives`找到
+自动存档一个会话内产生的实体数据记录（若有），存档文件可在`世界文件夹/entitylog/archives`找到。
 
 可能取值：`true`或`false`
 
@@ -804,7 +804,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `fillHistory`
 
-记录`/fill`产生的方块变更以便在将来撤销或重做
+记录`/fill`产生的方块变更以便在将来撤销或重做。
 
 可能取值：`true`或`false`
 
@@ -812,7 +812,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `fletchingTablePulseDetectingMode`
 
-指定被记录的脉冲类型
+指定被记录的脉冲类型。
 
 可能取值：
 
@@ -824,7 +824,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `fletchingTablePulseDetector`
 
-记录制箭台接收到的红石脉冲的长度
+记录制箭台接收到的红石脉冲的长度。
 
 可能取值：`true`或`false`
 
@@ -832,7 +832,7 @@ TNT可以被玩家的攻击杀死
 
 ##### `generateChunkGrid`
 
-在地表生层一层玻璃来标记区块
+在地表生层一层玻璃来标记区块。
 
 可能取值：`true`或`false`
 
@@ -897,7 +897,7 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 ##### `interactableB36`
 
-允许玩家破坏36号方块或对准它放置物品
+允许玩家破坏36号方块或对准它放置物品。
 
 可能取值：`true`或`false`
 
@@ -919,7 +919,7 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 ##### `maxClientTicksPerFrame`
 
-FPS低于20时每帧客户端可以运行多少个游戏刻
+FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 可能取值：任意正整数
 
@@ -983,7 +983,7 @@ FPS低于20时每帧客户端可以运行多少个游戏刻
 
 ##### `projectileRandomnessScale`
 
-弹射物随机性大小
+弹射物随机性大小。大部分弹射物附加的随机初始速度会被乘以该选项的值。
 
 可能取值：任意实数
 
@@ -991,7 +991,7 @@ FPS低于20时每帧客户端可以运行多少个游戏刻
 
 ##### `quickMobMounting`
 
-潜行时用刷怪蛋向载具中放置生物
+潜行时用刷怪蛋向载具中放置生物。
 
 可能取值：`true`或`false`
 
@@ -1092,7 +1092,7 @@ FPS低于20时每帧客户端可以运行多少个游戏刻
 
 ##### `stableHudLocation`
 
-使HUD的位置在数据长度频繁变化是更加稳定。
+使HUD的位置在数据长度频繁变化时更加稳定。
 
 可能取值：`true`或`false`
 
@@ -1116,7 +1116,7 @@ wlujkgfdhlqcmyfdhj...千万不要打开！
 
 ##### `tntChunkLoading`
 
-允许TNT实体在其运算过程中自动加载区块
+允许TNT实体在其运算过程中自动加载区块。
 
 可能取值：`true`或`false`
 

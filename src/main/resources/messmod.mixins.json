@@ -54,7 +54,12 @@
     "EnchantCommandMixin", 
     "EntityMixin", 
     "ArgumentTypesMixin", 
-    "ArgumentTypesAccessor"
+    "ArgumentTypesAccessor", 
+    "ServerChunkManagerMainThreadExecutorMixin", 
+    "ChunkTicketManagerNearbyChunkTicketUpdaterMixin", 
+    "ItemCooldownManagerMixin", 
+    "SectionedEntityCacheMixin", 
+    "ServerPlayNetworkHandler_1Mixin"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -66,14 +71,18 @@
     "LanguageManagerMixin", 
     "StructureBlockBlockEntityRendererMixin", 
     "DebugRendererMixin",
-    "EntitySelectorMixin", 
     "WorldListWidgetMixin", 
     "WorldListWidgetEntryAccessor", 
     "InGameHudMixin", 
     "PlayerInventoryMixin_Client", 
     "CreativeInventoryScreenMixin", 
     "GameRendererMixin", 
-    "WorldListWidgetEntryMixin"
+    "WorldListWidgetEntryMixin", 
+    "EntitySelectorMixin_Client", 
+    "ClientCommandSourceMixin"
+  ],
+  "server": [
+    "EntitySelectorMixin_Server"
   ],
   "injectors": {
     "defaultRequire": 1

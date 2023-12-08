@@ -685,7 +685,7 @@ Default value: `false`
 
 ##### `chunkLogAutoArchiving`
 
-Archive the chunk behavior log produced within a single session automatically. These archives can be found in the folder `World Folder/chunklog/archives`.
+Archive the chunk behavior log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/chunklog/archives`.
 
 Available values: `true` / `false`
 
@@ -709,7 +709,7 @@ Default value: `false`
 
 ##### `creativeUpwardsSpeed`
 
-Set the vertical speed flying speed in the creative mode.
+Set the vertical speed flying speed in the creative mode. The actual terminal speed (in m/s) of players is roughly 150 * `creativeUpwardsSpeed`.
 
 Available values: Any positive real number
 
@@ -811,7 +811,7 @@ Default value: `false`
 
 ##### `entityLogAutoArchiving`
 
-Archive the entity log produced within a single session automatically. These archives can be found in the folder `World Folder/entitylog/archives`.
+Archive the entity log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/entitylog/archives`.
 
 Available values: `true` / `false`
 
@@ -934,7 +934,7 @@ Default value: `-FOLLOW_SYSTEM_SETTINGS-`
 
 ##### `maxClientTicksPerFrame`
 
-The maximum number of ticks can be processed within a single frame when the FPS is lower than 20.
+The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.
 
 Available values: Any positive integer
 
@@ -998,7 +998,7 @@ Default value: `3`
 
 ##### `projectileRandomnessScale`
 
-The amount of the randomness of projectiles.
+The amount of the randomness of projectiles. Most projectiles will have their additional random initial speeds multipled by the value of this option.
 
 Available values: Any real number
 

@@ -42,7 +42,7 @@ public class EntityLogCommand {
 						.then(argument("entityType", StringArgumentType.word())
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.then(argument("field", StringArgumentType.word())
-										.suggests(CommandUtil.FIELDS_SUGGESTION)
+										.suggests(CommandUtil.ENTITY_FIELDS_SUGGESTION)
 										.executes((ct) -> {
 											EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 											EntityType<?> type = Registries.ENTITY_TYPE
@@ -73,7 +73,7 @@ public class EntityLogCommand {
 													
 													return Command.SINGLE_SUCCESS;
 												})
-												.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+												.then(argument("path", CommandUtil.getPathArgForFieldListening("entityType", "field"))
 														.executes((ct) -> {
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 															EntityType<?> type = Registries.ENTITY_TYPE
@@ -107,7 +107,7 @@ public class EntityLogCommand {
 															
 															return Command.SINGLE_SUCCESS;
 														})
-														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+														.then(argument("path", CommandUtil.getPathArgForFieldListening("entityType", "field"))
 																.executes((ct) -> {
 																	EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 																	EntityType<?> type = Registries.ENTITY_TYPE

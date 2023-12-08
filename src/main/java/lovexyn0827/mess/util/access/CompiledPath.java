@@ -74,11 +74,6 @@ public abstract class CompiledPath implements AccessingPath {
 	}
 
 	@Override
-	public Type getOutputType() {
-		return Object.class;
-	}
-
-	@Override
 	public Class<?> compile(List<Class<?>> nodeInputTypes, String name) throws CompilationException {
 		return this.getClass();
 	}

@@ -29,10 +29,10 @@ public class RemoteShapeCache extends ShapeCache {
 					this.waitForTasks();
 				}
 			}, "MessMod Shape Handler");
-			t.start();
 			t.setUncaughtExceptionHandler((th, e) -> {
 				MessMod.LOGGER.warn("Failed to handle shapes: {}", e);
 			});
+			t.start();
 			return t;
 		}
 
