@@ -9,7 +9,7 @@ import net.fabricmc.api.EnvType;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Option {
+@interface Option {
 	String defaultValue();
 	String[] suggestions() default {};
 	
@@ -20,4 +20,5 @@ public @interface Option {
 	Class<? extends OptionParser<?>> parserClass();
 	boolean globalOnly() default false;
 	EnvType[] environment() default {EnvType.CLIENT, EnvType.SERVER};
+	Label[] label();
 }

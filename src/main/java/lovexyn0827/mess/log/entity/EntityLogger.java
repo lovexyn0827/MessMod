@@ -99,7 +99,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 		this.clientLoggingEntries.values().forEach(EntityHolder::flush);
 	}
 
-	public void closeAll() {
+	public synchronized void closeAll() {
 		this.serverLoggingEntries.values().forEach(EntityHolder::close);
 		this.serverLoggingEntries.clear();
 		this.clientLoggingEntries.values().forEach(EntityHolder::close);
@@ -152,7 +152,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 	/**
 	 * @return The number of newly subscribed entities
 	 */
-	public int subscribe(Collection<? extends Entity> entities, SideLogStoragePolicy policy) {
+	public synchronized int subscribe(Collection<? extends Entity> entities, SideLogStoragePolicy policy) {
 		this.hasCreatedAnyLog = true;
 		MutableInt i = new MutableInt();
 		MutableInt j = new MutableInt();
@@ -191,7 +191,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 	/**
 	 * @return The number of successfully unsubscribed entities
 	 */
-	public int unsubscribe(Collection<? extends Entity> entities) {
+	public synchronized int unsubscribe(Collection<? extends Entity> entities) {
 		MutableInt i = new MutableInt();
 		MutableInt j = new MutableInt();
 		entities.stream()

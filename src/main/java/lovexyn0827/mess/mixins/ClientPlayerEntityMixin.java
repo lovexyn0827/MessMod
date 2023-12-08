@@ -8,22 +8,19 @@ import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerAbilities;
 
-@Mixin(ClientPlayerEntity.class)
+@Mixin(value = ClientPlayerEntity.class, priority = 900)
 public abstract class ClientPlayerEntityMixin {
-	
-	private static float speed = Float.NaN;
-	
 	@Redirect(method = "tickMovement", 
 			at = @At(value = "INVOKE", 
 					target = "Lnet/minecraft/entity/player/PlayerAbilities;getFlySpeed()F"
 			))
 	private float modifySpeed(PlayerAbilities abilities) {
-		speed = OptionManager.creativeUpwardsSpeed;
-		if(Float.isFinite(speed) && speed > 0) {
-			return speed;
+		float speed = OptionManager.creativeUpwardsSpeed;
+		if(abilities.creativeMode) {
+			return Float.isFinite(speed) ? speed : abilities.getFlySpeed();
+		} else {
+			return abilities.getFlySpeed();
 		}
-		
-		return abilities.getFlySpeed();
 	}
 	
 }

@@ -54,7 +54,8 @@ public class ChunkStatusMixin {
 	@Inject(method = "runGenerationTask", at = @At(value = "RETURN"), cancellable = true)
 	private void generateChunkGrid(Executor executor, ServerWorld world, ChunkGenerator generator, StructureManager structureManager, ServerLightingProvider lightingProvider, Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> fullChunkConverter, List<Chunk> chunks, boolean bl, CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
 		ChunkStatus s = (ChunkStatus)(Object) this;
-		if(OptionManager.generateChunkGrid && s == ChunkStatus.SURFACE) {
+		if(OptionManager.generateChunkGrid && (s == ChunkStatus.SURFACE && !world.getDimension().hasCeiling()
+				|| s == ChunkStatus.FEATURES && world.getDimension().hasCeiling())) {
 			Chunk chunk = chunks.get(chunks.size() / 2);
 			ChunkPos chunkPos = chunk.getPos();
 			BlockPos start = chunkPos.getStartPos();

@@ -29,7 +29,7 @@ public class ExtendedFloatArgumentType implements ArgumentType<Float> {
 		return ct.getArgument(string, Float.class);
 	}
 	
-	static {
+	public static void registerArgumentType() {
 		ArgumentTypes.register("mess_float", ExtendedFloatArgumentType.class, 
 				new ConstantArgumentSerializer<ExtendedFloatArgumentType>(ExtendedFloatArgumentType::floatArg));
 	}

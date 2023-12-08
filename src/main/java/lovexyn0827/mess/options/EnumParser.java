@@ -1,10 +1,8 @@
 package lovexyn0827.mess.options;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
-
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-
-import net.minecraft.server.command.ServerCommandSource;
 
 public class EnumParser<T extends Enum<T>> implements OptionParser<Enum<T>> {
 
@@ -24,20 +22,16 @@ public class EnumParser<T extends Enum<T>> implements OptionParser<Enum<T>> {
 		try {
 			return Enum.valueOf(clazz, str);
 		} catch(IllegalArgumentException e) {
-			InvalidOptionException e1 = new InvalidOptionException("The value of this option couldn't be " + 
-					str + ", beacuse " + e.getMessage());
+			InvalidOptionException e1 = new InvalidOptionException("opt.err.nodef", str);
 			e1.initCause(e);
 			throw e1;
 		}
 	}
 
 	@Override
-	public SuggestionProvider<ServerCommandSource> createSuggestions() {
-		return (ct, builder) -> {
-			Stream.of(this.clazz.getEnumConstants())
-					.map(Enum::name)
-					.forEach(builder::suggest);
-			return builder.buildFuture();
-		};
+	public Set<String> createSuggestions() {
+		return Stream.of(this.clazz.getEnumConstants())
+				.map(Enum::name)
+				.collect(HashSet::new, Set::add, Set::addAll);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.CarpetUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -12,19 +13,22 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
-// FIXME Boxes are still rendered when the corresponding entities have already been removed
 public class ServerSyncedBoxRenderer {
+	private static final ShapeSpace ENTITY_BOX_SPACE = new ShapeSpace("entity_box");
 	private final MinecraftServer server;
-	private long lastUpdated;
 	
 	public ServerSyncedBoxRenderer(MinecraftServer server) {
 		this.server = server;
 	}
 	
-	private void updateBox(ServerPlayerEntity player, ServerWorld world) {
+	private void addBoxes(ServerPlayerEntity player, boolean frozen, FrozenUpdateMode mode) {
 		ShapeSender sr = MessMod.INSTANCE.shapeSender;
-		this.lastUpdated = world.getTime();
 		float r = OptionManager.serverSyncedBoxRenderRange;
+		ServerWorld world = player.getWorld();
+		if(!(frozen && mode == FrozenUpdateMode.NO_REMOVAL)) {
+			MessMod.INSTANCE.shapeSender.clearSpaceFromServer(ENTITY_BOX_SPACE, player);
+		}
+		
 		List<Entity> list;
 		if(r > 0) {
 			Vec3d pos = player.getPos();
@@ -37,7 +41,7 @@ public class ServerSyncedBoxRenderer {
 		for(Entity entity : list) {
 			if(entity instanceof ServerPlayerEntity) continue;
 			sr.addShape(new RenderedBox(entity.getBoundingBox(), 0x31f38bFF, 0, 0, world.getTime()), 
-					world.getRegistryKey(), player);
+					world.getRegistryKey(), ENTITY_BOX_SPACE, player);
 		}
 	}
 	
@@ -46,12 +50,16 @@ public class ServerSyncedBoxRenderer {
 			return;
 		}
 		
-		if(this.server.getOverworld().getTime() == this.lastUpdated) {
+		boolean frozen = CarpetUtil.isTickFrozen();
+		FrozenUpdateMode mode = OptionManager.serverSyncedBoxUpdateModeInFrozenTicks;
+		if(frozen && mode == FrozenUpdateMode.PAUSE) {
 			return;
 		}
 		
 		for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-			this.server.getWorlds().forEach((world) -> this.updateBox(player, world));
+			if(player.getWorld() != null) {
+				this.addBoxes(player, frozen, mode);
+			}
 		}
 	}
 }

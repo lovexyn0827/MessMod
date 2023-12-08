@@ -1,9 +1,15 @@
 package lovexyn0827.mess;
 
+import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +17,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -36,8 +46,10 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	private static final String MESSMOD_MIXINS = "lovexyn0827.mess.mixins.";
 	private static final File ADVANCED_MIXINS_CONFIGURATION = new File("advanced_mixins.prop");
 	private static final Map<String, BooleanSupplier> CUSTOM_MINIX_REQUIREMENTS = new HashMap<>();
-	private static final ImmutableSet<String> ADVANCED_MIXINS;
+	private static final ImmutableSet<MixinInfo> ADVANCED_MIXINS;
 	private static final ImmutableSet<String> ACTIVIATED_ADVANCED_MIXINS;
+	private static final Map<String, Set<String>> ADVANCED_MIXINS_BY_USAGES = new HashMap<>();
+	private static final Map<String, Set<String>> ABSENT_ADVANCED_MIXINS_BY_USAGES = new HashMap<>();
 	
 	@Override
 	public void onLoad(String mixinPackage) {
@@ -49,13 +61,14 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	}
 
 	@Override
-	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-		if(ADVANCED_MIXINS.contains(mixinClassName) && !ACTIVIATED_ADVANCED_MIXINS.contains(mixinClassName)) {
+	public boolean shouldApplyMixin(String targetClassName, String mixinClassNameFull) {
+		String mixinClassName = mixinClassNameFull.replace(MESSMOD_MIXINS, "");
+		if(ADVANCED_MIXINS.stream().anyMatch((m) -> m.name.equals(mixinClassName))
+				&& !ACTIVIATED_ADVANCED_MIXINS.contains(mixinClassName)) {
 			return false;
 		}
 		
 		try {
-			mixinClassName = mixinClassName.replace(MESSMOD_MIXINS, "");
 			if(CUSTOM_MINIX_REQUIREMENTS.containsKey(mixinClassName)) {
 				return CUSTOM_MINIX_REQUIREMENTS.get(mixinClassName).getAsBoolean();
 			}
@@ -126,30 +139,38 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		return () -> !isModLoaded(id, minVer, maxVer).getAsBoolean();
 	}
 
-	private static ImmutableSet<String> getActiviatedAdvancedMixins(ImmutableSet<String> advancedMixins) {
+	private static ImmutableSet<String> getActiviatedAdvancedMixins(ImmutableSet<MixinInfo> advancedMixins) {
 		try {
 			Properties config = new Properties();
-			if(!ADVANCED_MIXINS_CONFIGURATION.exists()) {
+			if("true".equals(System.clearProperty("messmod.chooseMixin"))) {
 				ADVANCED_MIXINS_CONFIGURATION.createNewFile();
-				advancedMixins.forEach((entry) -> {
-					config.put(entry, "false");
-				});
-				
-				try(FileWriter fw = new FileWriter(ADVANCED_MIXINS_CONFIGURATION)) {
-					config.store(fw, "Advanced Mixins of MessMod");
+				try {
+					MixinChoosingFrame frame = new MixinChoosingFrame();
+					frame.setVisible(true);
+					while(frame.choosing && frame.isVisible());
+					frame.writeChoices(config);
+				} catch (Throwable e) {
+					LOGGER.error("Failed to display mixin choosing window!");
+					e.printStackTrace();
 				}
-				
-				return ImmutableSet.of();
 			}
 			
 			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
 			try(FileReader fr = new FileReader(ADVANCED_MIXINS_CONFIGURATION)) {
 				config.load(fr);
-				config.forEach((k, v) -> {
-					if(Boolean.parseBoolean((String) v)) {
-						builder.add((String) k);
+				ADVANCED_MIXINS.forEach((info) -> {
+					if(Boolean.parseBoolean((String) config.computeIfAbsent(info.name, (k) -> "true"))) {
+						builder.add(info.name);
+						config.put(info.name, "true");
 					}
 				});
+			}
+			
+			advancedMixins.forEach((entry) -> {
+				config.computeIfAbsent(entry.name, (k) -> "true");
+			});
+			try(FileWriter fw = new FileWriter(ADVANCED_MIXINS_CONFIGURATION)) {
+				config.store(fw, "Advanced Mixins of MessMod");
 			}
 			
 			return builder.build();
@@ -160,10 +181,149 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		}
 	}
 	
+	public static Set<String> getAbsentMixins(String usage) {
+		return Collections.unmodifiableSet(ABSENT_ADVANCED_MIXINS_BY_USAGES.get(usage));
+	}
+	
+	public static boolean isFeatureAvailable(String usage) {
+		return ABSENT_ADVANCED_MIXINS_BY_USAGES.get(usage) == null;
+	}
+	
 	static {
 		CUSTOM_MINIX_REQUIREMENTS.put("StructureBlockBlockEntityMixin", isModNotLoaded("carpet", "1.4.25", null));
-		ADVANCED_MIXINS = ImmutableSet.<String>builder()
+		ADVANCED_MIXINS = AdvancedMixinInfoBuilder.create()
+				.add("ServerChunkManagerMainThreadExecutorMixin")
+				.addUsages("ASYNC_TASKS", "ASYNC_TASK_SINGLE", "ASYNC_TASK_ADDITION").costly().risky()
+				.add("WorldMixin_GetEntityExpansion").
+				addUsages("getEntityRangeExpansion").costly()
+				.add("WorldChunkMixin_GetEntityExpansion")
+				.addUsages("getEntityRangeExpansion").costly()
 				.build();
 		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);
+		ADVANCED_MIXINS.forEach((info) -> {
+			for(String usage : info.usages) {
+				ADVANCED_MIXINS_BY_USAGES.computeIfAbsent(usage, (k) -> new HashSet<>()).add(info.name);
+				if(!ACTIVIATED_ADVANCED_MIXINS.contains(info.name)) {
+					ABSENT_ADVANCED_MIXINS_BY_USAGES.computeIfAbsent(usage, (k) -> new HashSet<>()).add(info.name);
+				}
+			}
+		});
+		
+	}
+	
+	private static final class MixinChoosingFrame extends JFrame {
+		private static final long serialVersionUID = 2370884454946517091L;
+		private final Map<String, JCheckBox> mixins = new HashMap<>();
+		protected volatile boolean choosing = true;
+		
+		protected MixinChoosingFrame() {
+			this.setLayout(new GridLayout(0, 3, 3, 3));
+			this.add(new JLabel("Name of Mixin"));
+			this.add(new JLabel("Usage"));
+			this.add(new JLabel("Impacts"));
+			ADVANCED_MIXINS.forEach((s) -> {
+				JCheckBox check = new JCheckBox(s.name);
+				this.mixins.put(s.name, check);
+				this.add(check);
+				this.add(new JLabel(String.join(", ", s.usages)));
+				this.add(new JLabel(s.impacts));
+			});
+			JButton doneBtn = new JButton("OK");
+			doneBtn.addActionListener((ae) -> {
+				this.choosing = false;
+				this.dispose();
+			});
+			this.add(doneBtn);
+			this.setSize(800, ADVANCED_MIXINS.size() * 32 + 64);
+			this.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosed(WindowEvent e) {
+					MixinChoosingFrame.this.choosing = false;
+					MixinChoosingFrame.this.dispose();
+				}
+			});
+		}
+
+		public void writeChoices(Properties config) {
+			this.mixins.forEach((name, check) -> config.put(name, Boolean.toString(check.isSelected())));
+		}
+	}
+	
+	private static final class AdvancedMixinInfoBuilder {
+		private List<MixinInfo> infoList = new ArrayList<>();
+		private String currentMixin;
+		private Set<String> usages;
+		private String impacts;
+		
+		protected static AdvancedMixinInfoBuilder create() {
+			return new AdvancedMixinInfoBuilder();
+		}
+		
+		protected AdvancedMixinInfoBuilder add(String name) {
+			if(this.currentMixin != null) {
+				this.infoList.add(new MixinInfo(this.currentMixin, this.usages, this.impacts));
+			}
+			
+			this.currentMixin = name;
+			this.usages = new HashSet<>();
+			this.impacts = "";
+			return this;
+		}
+		
+		protected AdvancedMixinInfoBuilder addUsages(String ... usages) {
+			for(String usage : usages) {
+				this.usages.add(usage);
+			}
+			
+			return this;
+		}
+		
+		protected AdvancedMixinInfoBuilder costly() {
+			this.impacts += "High performance cost|";
+			return this;
+		}
+		
+		protected AdvancedMixinInfoBuilder risky() {
+			this.impacts += "Poiential issues|";
+			return this;
+		}
+		
+		@SuppressWarnings("unused")
+		protected AdvancedMixinInfoBuilder compatibility() {
+			this.impacts += "Compatibility issues|";
+			return this;
+		}
+		
+		@SuppressWarnings("unused")
+		protected AdvancedMixinInfoBuilder compatibility(String ... modids) {
+			this.impacts += "Compatibility issues with " + String.join(", ", modids) + '|';
+			return this;
+		}
+		
+		@SuppressWarnings("unused")
+		protected AdvancedMixinInfoBuilder experimantal(String ... modids) {
+			this.impacts += "Experimantal|";
+			return this;
+		}
+		
+		protected ImmutableSet<MixinInfo> build() {
+			if(this.currentMixin != null) {
+				this.infoList.add(new MixinInfo(this.currentMixin, this.usages, this.impacts));
+			}
+			
+			return ImmutableSet.copyOf(this.infoList);
+		}
+	}
+	
+	private static final class MixinInfo {
+		public final String name;
+		public final String[] usages;
+		public final String impacts;
+		
+		public MixinInfo(String name, Set<String> usages, String impacts) {
+			this.name = name;
+			this.usages = usages.toArray(new String[usages.size()]);
+			this.impacts = impacts;
+		}
 	}
 }

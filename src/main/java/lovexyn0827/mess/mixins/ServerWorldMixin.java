@@ -127,7 +127,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 			at = @At("RETURN")
 			)
 	private void endTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.REST.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.DIM_REST.begin((ServerWorld)(Object) this);
 	}
 	
 	@Override
@@ -142,8 +142,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 					target = "net/minecraft/server/world/ChunkTicketManager.shouldTickEntities(J)Z"
 			), 
 			cancellable = true, 
-			locals = LocalCapture.CAPTURE_FAILHARD, 
-			remap = false
+			locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	public void skipTickingEntityIfNeeded(Profiler profiler, Entity entity, CallbackInfo ci) {
 		if(((EntityInterface) entity).isFrozen()) {
