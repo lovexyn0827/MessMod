@@ -2,6 +2,7 @@ package lovexyn0827.mess.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.StructureBlockBlockEntity;
@@ -17,6 +18,6 @@ public abstract class StructureBlockBlockEntityMixin extends BlockEntity {
 
 	@Override
 	public double getSquaredRenderDistance() {
-		return 10E8D;
+		return OptionManager.expandedStructureBlockRenderingRange ? 10E8D : super.getSquaredRenderDistance();
 	}
 }

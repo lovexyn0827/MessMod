@@ -50,19 +50,25 @@
     "BlockStateArgumentMixin", 
     "FillCommandMixin", 
     "RaidManagerAccessor", 
-    "DataCommandStorageAccessor"
+    "DataCommandStorageAccessor", 
+    "EnchantCommandMixin", 
+    "EntityMixin", 
+    "ServerChunkManagerMainThreadExecutorMixin", 
+    "ChunkTicketManagerNearbyChunkTicketUpdaterMixin", 
+    "WorldMixin_GetEntityExpansion", 
+    "WorldChunkMixin_GetEntityExpansion", 
+    "ItemCooldownManagerMixin", 
+    "ArgumentTypesMixin"
   ],
   "client": [
     "MinecraftClientMixin",
     "KeyboardMixin",
     "ClientPlayNetworkHandlerMixin",
-    "EntityMixin",
     "WorldRendererMixin",
     "ClientPlayerEntityMixin",
     "AbstractRedstoneGateBlockMixin",
     "LanguageManagerMixin", 
     "DebugRendererMixin",
-    "EntitySelectorMixin", 
     "WorldListWidgetMixin", 
     "WorldListWidgetEntryAccessor", 
     "InGameHudMixin", 
@@ -70,7 +76,12 @@
     "CreativeInventoryScreenMixin", 
     "StructureBlockBlockEntityMixin", 
     "GameRendererMixin", 
-    "WorldListWidgetEntryMixin"
+    "WorldListWidgetEntryMixin", 
+    "EntitySelectorMixin_Client", 
+    "ClientCommandSourceMixin"
+  ],
+  "server": [
+    "EntitySelectorMixin_Server"
   ],
   "injectors": {
     "defaultRequire": 1

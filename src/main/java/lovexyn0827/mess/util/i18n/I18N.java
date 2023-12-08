@@ -3,6 +3,7 @@ package lovexyn0827.mess.util.i18n;
 import com.google.common.collect.ImmutableSet;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.util.DocumentGenerator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
@@ -28,9 +29,26 @@ public class I18N {
 		return String.format(translate(translationKey), args);
 	}
 	
+	public static boolean canUseLanguage(String name, boolean forceLoad) {
+		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {
+			return true;
+		}
+		
+		if(SUPPORTED_LANGUAGES.contains(name)) {
+			try {
+				return forceLoad || new Language(name).vaildate();
+			} catch (Exception e) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
 	@SuppressWarnings("resource")
 	public static boolean setLanguage(String name, boolean forceLoad) {
 		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {
+			forceLoad = true;
 			if (!MessMod.isDedicatedEnv() && MinecraftClient.getInstance().options != null) {
 				String sysLang = MinecraftClient.getInstance().options.language;
 				if (I18N.SUPPORTED_LANGUAGES.contains(sysLang)) {
@@ -47,6 +65,7 @@ public class I18N {
 			Language lang = new Language(name);
 			if(forceLoad || lang.vaildate()) {
 				currentLanguage = lang;
+				DocumentGenerator.optionDoc();
 				return true;
 			} else {
 				return false;

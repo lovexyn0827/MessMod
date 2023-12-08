@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import lovexyn0827.mess.command.CommandUtil;
+import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -82,7 +83,6 @@ public class MessMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		OptionManager.loadGlobal();
 	}
 	
 	public Mapping getMapping() {
@@ -95,7 +95,6 @@ public class MessMod implements ModInitializer {
 			Files.createDirectories(scriptPath);
 		}
 		
-		// TODO
 		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/" + name + ".sc"), 
 				Paths.get(this.scriptDir, name + ".sc"), 
 				StandardCopyOption.REPLACE_EXISTING);
@@ -112,6 +111,7 @@ public class MessMod implements ModInitializer {
 		this.blockInfoRederer.tick();
 		this.shapeSender.updateClientTime(server.getOverworld().getTime());
 		this.entityLogger.serverTick();
+		LagCommand.tick();
 	}
 	
 
@@ -161,10 +161,14 @@ public class MessMod implements ModInitializer {
 		this.entityLogger = null;
 		this.chunkLogger = null;
 		CommandUtil.updateServer(null);
-		OptionManager.loadGlobal();
+		OptionManager.updateServer(null);
 	}
 
 	public void onServerPlayerSpawned(ServerPlayerEntity player) {
+		if(isDedicatedServerEnv()) {
+			OptionManager.sendOptionsTo(player);
+		}
+		
 		CommandUtil.tryUpdatePlayer(player);
 		try {
 			this.scriptDir = server.getSavePath(WorldSavePathMixin.create("scripts")).toAbsolutePath().toString();
@@ -175,7 +179,6 @@ public class MessMod implements ModInitializer {
 							"/script load tool global");
 				}
 			}
-			OptionManager.sendOptionsTo(player);
 		} catch (IOException e) {
 			LOGGER.error("Scarpet scripts couldn't be loaded.");
 			e.printStackTrace();

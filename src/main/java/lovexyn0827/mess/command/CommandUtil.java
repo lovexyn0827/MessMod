@@ -1,5 +1,6 @@
 package lovexyn0827.mess.command;
 
+import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -12,6 +13,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
+import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import lovexyn0827.mess.util.i18n.I18N;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -35,11 +37,11 @@ public class CommandUtil {
 		Registry.ENTITY_TYPE.getIds().stream().map(Identifier::getPath).forEach(b::suggest);
 		return b.buildFuture();
 	};
-	public static final SuggestionProvider<ServerCommandSource> FIELDS_SUGGESTION = (ct, builder) -> {
-		Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+	public static final SuggestionProvider<ServerCommandSource> ENTITY_FIELDS_SUGGESTION = (ct, builder) -> {
+		Identifier id = new Identifier(StringArgumentType.getString(ct.getLastChild(), "entityType"));
 		EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
-		Reflection.getAvailableFields(clazz).forEach(builder::suggest);
+		Reflection.getAvailableFieldNames(clazz).forEach(builder::suggest);
 		builder.suggest("-THIS-");
 		return builder.buildFuture();
 	};
@@ -59,6 +61,7 @@ public class CommandUtil {
 			SetExplosionBlockCommand.reset();
 			LogPacketCommand.reset();
 			LazyLoadCommand.reset();
+			VariableCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}
@@ -104,10 +107,16 @@ public class CommandUtil {
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendError(new LiteralText(I18N.translate(ob.toString())));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 	
 	public static void errorWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
 		ct.getSource().sendError(new LiteralText(String.format(I18N.translate(fmt), args)));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 
 	public static void error(CommandContext<ServerCommandSource> ct, String string, Exception e) {
@@ -116,6 +125,7 @@ public class CommandUtil {
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
 		if(OptionManager.superSuperSecretSetting) {
 			e.printStackTrace();
+			Thread.dumpStack();
 		}
 	}
 	
@@ -125,6 +135,7 @@ public class CommandUtil {
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
 		if(OptionManager.superSuperSecretSetting) {
 			e.printStackTrace();
+			Thread.dumpStack();
 		}
 	}
 
@@ -178,7 +189,6 @@ public class CommandUtil {
 		};
 	}
 	
-	@Deprecated
 	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<? extends Enum<?>> class1) {
 		return (ct, builder) -> {
 			Stream.of(class1.getEnumConstants())
@@ -186,5 +196,19 @@ public class CommandUtil {
 					.forEach(builder::suggest);
 			return builder.buildFuture();
 		};
+	}
+	
+	public static AccessingPathArgumentType getPathArgForFieldListening(String entityTypeArg, String fieldArg) {
+		return AccessingPathArgumentType.accessingPathArg((ct) -> {
+			EntityType<?> type = Registry.ENTITY_TYPE
+					.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+			String fName = StringArgumentType.getString(ct, "field");
+			if("-THIS-".equals(fName)) {
+				return Reflection.ENTITY_TYPE_TO_CLASS.get(type);
+			}
+			
+			Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), fName);
+			return f == null ? Object.class : f.getType();
+		});
 	}
 }

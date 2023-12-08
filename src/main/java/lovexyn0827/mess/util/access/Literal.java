@@ -10,10 +10,10 @@ import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.command.VariableCommand;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 import net.minecraft.util.math.BlockPos;
@@ -73,24 +73,35 @@ public abstract class Literal<T> {
 		// I & N are reserved for special floating-point numbers.
 		switch(strRep.charAt(0)) {
 		case '"' : 
-			return new StringL(new StringReader(strRep).readStringUntil('"') + '"');
+			return new StringL(strRep);
 		case 'E' : 
 			if(strRep.charAt(1) == '+') {
 				return new EnumL(strRep);
 			}
+			
+			break;
 		case 'S' : 
 			if(strRep.charAt(1) == '+') {
 				return new StaticFieldL(strRep);
 			}
+			
+			break;
 		case 'C' : 
 			if(strRep.charAt(1) == '+') {
 				return new ClassL(strRep);
 			}
+			
+			break;
 		case '[' : 
 			return new BlockPosL(strRep);
 		case '(' : 
 			return new Vec3dL(strRep);
-		case '<' : 
+		case 'V' : 
+			if(strRep.charAt(1) == '+') {
+				return new VarL(strRep);
+			}
+			
+			break;
 		default : 
 			Matcher matcher = NUMBER_PATTERN.matcher(strRep);
 			if("null".equals(strRep)) {
@@ -131,6 +142,8 @@ public abstract class Literal<T> {
 				};
 			}
 		}
+		
+		throw new TranslatableException("exp.invliteral", strRep);
 	}
 
 	/**
@@ -156,7 +169,7 @@ public abstract class Literal<T> {
 		
 		protected StringL(String strRep) {
 			super(strRep);
-			strRep.substring(1, strRep.length() - 2);
+			this.string = strRep.substring(1, strRep.length() - 1);
 			this.compiled = true;
 		}
 
@@ -245,8 +258,7 @@ public abstract class Literal<T> {
 
 		@Override
 		public Enum<?> get(Type clazz) throws InvalidLiteralException {
-			// FIXME Non-necessary non-null check
-			if(this.compiled && this.enumConstant != null) {
+			if(this.compiled) {
 				return this.enumConstant;
 			}
 			
@@ -259,7 +271,6 @@ public abstract class Literal<T> {
 			if(cl != null && cl.isEnum()) {
 				String f = MessMod.INSTANCE.getMapping().srgField(cl.getName(), this.stringRepresentation);
 				try {
-					// XXX
 					@SuppressWarnings({ "unchecked", "rawtypes" })
 					Enum<?> e = Enum.valueOf((Class) cl, f);
 					this.enumConstant = e;
@@ -409,7 +420,7 @@ public abstract class Literal<T> {
 			
 			String className = this.stringRepresentation.substring(2).replace('/', '.');
 			try {
-				this.classVal = Class.forName(className);
+				this.classVal = Reflection.getClassIncludingPrimitive(className);
 				this.compiled = true;
 				return this.classVal;
 			} catch (ClassNotFoundException e) {
@@ -441,5 +452,21 @@ public abstract class Literal<T> {
 			return this.vec3d;
 		}
 
+	}
+	
+	public static class VarL extends Literal<Object> {
+		private final String slot;
+
+		protected VarL(String strRep) throws CommandSyntaxException {
+			super(strRep);
+			this.slot = strRep.substring(2);
+			this.compiled = false;
+		}
+
+		@Override
+		public @Nullable Object get(@Nullable Type type) throws InvalidLiteralException {
+			return VariableCommand.getVariable(this.slot);
+		}
+		
 	}
 }

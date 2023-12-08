@@ -3,7 +3,7 @@ package lovexyn0827.mess.options;
 public class StringParser implements OptionParser<String> {
 
 	@Override
-	public String tryParse(String str) throws InvaildOptionException {
+	public String tryParse(String str) throws InvalidOptionException {
 		return str;
 	}
 

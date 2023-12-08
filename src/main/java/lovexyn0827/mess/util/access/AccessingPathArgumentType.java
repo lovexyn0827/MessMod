@@ -1,8 +1,12 @@
 package lovexyn0827.mess.util.access;
 
+import java.lang.reflect.Type;
 import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
@@ -10,16 +14,41 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
+import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.ServerCommandSource;
 
 public final class AccessingPathArgumentType implements ArgumentType<AccessingPath> {
-
-	private AccessingPathArgumentType() {}
+	private final Function<CommandContext<ServerCommandSource>, Type> inputTypeGetter;
+	
+	private AccessingPathArgumentType() {
+		this.inputTypeGetter = null;
+	}
+	
+	private AccessingPathArgumentType(Function<CommandContext<ServerCommandSource>, Type> inputTypeGetter) {
+		this.inputTypeGetter = inputTypeGetter;
+	}
 
 	public static AccessingPathArgumentType accessingPathArg() {
 		return new AccessingPathArgumentType();
+	}
+	
+	public static AccessingPathArgumentType accessingPathArg(
+			Function<CommandContext<ServerCommandSource>, Type> inputTypeGetter) {
+		return new AccessingPathArgumentType(inputTypeGetter);
+	}
+	
+	public static AccessingPathArgumentType accessingPathArg(Class<?> out) {
+		return new AccessingPathArgumentType((ct) -> out);
 	}
 	
 	public static AccessingPath getAccessingPath(CommandContext<ServerCommandSource> ct, String string) {
@@ -65,11 +94,13 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 		
 		if(sr.peek() == '!') {
 			sr.skip();
+			// This is fine since dots are invalid in field names.
 			String nodeStr = sr.readStringUntil('.');
 			return new FieldNode(nodeStr);
 		} else if(sr.peek() == '[') {
 			//Element
 			sr.skip();
+			// This is fine as only numbers are allowed here.
 			String nodeStr = sr.readStringUntil(']');
 			sr.skip();
 			try {
@@ -79,13 +110,12 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			}
 		} else if(sr.peek() == '<') {
 			//Map
-			sr.skip();
-			String nodeStr = sr.readStringUntil('>');
+			String nodeStr = readWrapped(sr, '<', '>');
 			sr.skip();
 			return new ValueOfMapNode(Literal.parse(nodeStr));
 		} else if(sr.peek() == '>') {
 			sr.skip();
-			String nodeStr = sr.readStringUntil('.');
+			String nodeStr = readUntil(sr, '.');
 			return new MapperNode(nodeStr);
 		} else if(sr.peek() == '(') {
 			sr.skip();
@@ -93,7 +123,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			sr.skip();
 			return new ClassCastNode(nodeStr);
 		} else {
-			String nodeStr = sr.readStringUntil('.');
+			String nodeStr = readUntil(sr, '.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
 			if(matcher.matches()) {
 				return new MethodNode(matcher.group("name"), matcher.group("types"), matcher.group("args"));
@@ -105,20 +135,204 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					return new ComponentNode.Y();
 				case "z" : 
 					return new ComponentNode.Z();
-				case "identityHash" : 
-					return SimpleNode.IDENTITY_HASH;
 				case "size" : 
 					return new SizeNode();
 				default : 
-					CustomNode node = CustomNode.create(nodeStr);
-					if(node != null) {
+					Node node;
+					if((node = SimpleNode.byName(nodeStr)) != null) {
 						return node;
 					} else {
-						throw new TranslatableException("exp.unknownnode", nodeStr);
+						node = CustomNode.byName(nodeStr);
+						if(node != null) {
+							return node;
+						} else {
+							throw new TranslatableException("exp.unknownnode", nodeStr);
+						}
 					}
 				}
 			}
 		}
 	}
+	
+	private static String readWrapped(StringReader sr, char openCh, char closeCh) throws CommandSyntaxException {
+		int depth = 0;
+		int start = sr.getCursor();
+		int end = -1;
+		while(sr.canRead()) {
+			char ch = sr.read();
+			if(ch == '\\') {
+				sr.skip();
+				continue;
+			}
+			
+			if(ch == openCh) {
+				depth++;
+				continue;
+			}
+			
+			if(ch == closeCh) {
+				if(--depth == 0) {
+					end = sr.getCursor();
+					break;
+				}
+				
+				continue;
+			}
+		}
+		
+		if(end == -1) {
+			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS
+					.readerExpectedEndOfQuote()
+					.createWithContext(sr);
+		} else {
+			return sr.getString().substring(start + 1, end - 1);
+		}
+	}
+	
+	private static String readUntil(StringReader sr, char endCh) throws CommandSyntaxException {
+		int start = sr.getCursor();
+		int end = -1;
+		while(sr.canRead()) {
+			char ch = sr.read();
+			if(ch == '\\') {
+				sr.skip();
+				continue;
+			}
+			
+			if(ch == endCh) {
+				end = sr.getCursor();
+				break;
+			}
+		}
+		
+		if(end == -1) {
+			throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedEndOfQuote().createWithContext(sr);
+		} else {
+			return sr.getString().substring(start, end - 1);
+		}
+	}
+	
+	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> ct, 
+			SuggestionsBuilder unoffsetedBuilder) {
+		String in = unoffsetedBuilder.getRemaining();
+    	int len = in.length();
+    	int lastNotEscapedDot = -1;	// Tricky
+    	for(int i = 0; i < len; i++) {
+    		char c = in.charAt(i);
+    		if(c == '\\') {
+    			i++;
+    		} else if(c == '.') {
+    			lastNotEscapedDot = i;
+    		}
+    	}
 
+    	
+    	int offset = unoffsetedBuilder.getStart() + lastNotEscapedDot + 1;
+    	SuggestionsBuilder builder = unoffsetedBuilder.createOffset(offset);
+        if(lastNotEscapedDot == len -1) {
+        	// The last node is empty
+        	CustomNode.listSuggestions(builder);
+        	SimpleNode.appendSuggestions(builder);
+        	return builder
+            		.suggest(">")
+            		.suggest("!")
+            		.suggest("<")
+            		.suggest("[")
+            		.suggest("(")
+            		.suggest("x")
+            		.suggest("y")
+            		.suggest("z")
+            		.suggest("size")
+            		.buildFuture();
+        } else {
+        	String lastNodeStr = in.substring(lastNotEscapedDot + 1);
+        	switch(lastNodeStr.charAt(0)) {
+        	case '>':
+        		return builder
+        				.suggest(">java/lang/")
+        				.suggest(">java/util/")
+        				.suggest(">net/minecraft/")
+        				.suggest(">net/minecraft/block")
+        				.suggest(">net/minecraft/entity")
+        				.suggest(">net/minecraft/world")
+        				.suggest(">net/minecraft/util")
+        				.suggest(lastNodeStr + "::")
+        				.buildFuture();
+        	default:
+        		if(OptionManager.accessingPathDynamicAutoCompletion) {
+        			if(ct.getSource() instanceof ServerCommandSource 
+        					&& this.inputTypeGetter != null) {
+        				// Server side
+        				@SuppressWarnings("unchecked")
+    					Type inType = this.inputTypeGetter.apply((CommandContext<ServerCommandSource>) ct);
+            			String prefix;
+            			AccessingPath completed;
+            			String completedStr = in.substring(0, lastNotEscapedDot + 1);
+            			try {
+    						completed = completedStr.isEmpty() ? 
+    								AccessingPath.DUMMY : this.parse(new StringReader(completedStr));
+    					} catch (CommandSyntaxException e) {
+    						completed = AccessingPath.DUMMY;
+    					}
+            			
+            			if(completed instanceof JavaAccessingPath) {
+            				try {
+    							((JavaAccessingPath) completed).initialize(inType);
+    						} catch (AccessingFailureException e) {
+    							return builder.buildFuture();
+    						}
+            			}
+            			
+            			if(lastNodeStr.charAt(0) == '!') {
+            				prefix = lastNodeStr.substring(1);
+            				Reflection.getAvailableFieldNames(Reflection.getRawType(completed.getOutputType()))
+        							.stream()
+        							.filter((fn) -> fn.contains(prefix) || prefix.isEmpty())
+        							.forEach((fn) -> builder.suggest("!" + fn));
+            				builder.suggest(".");
+            			} else {
+            				prefix = lastNodeStr;
+            				MutableBoolean anyExactlyMatching = new MutableBoolean(false);
+            				Reflection.getAllMethods(Reflection.getRawType(completed.getOutputType()))
+        							.stream()
+        							.filter((m) -> m.getName().contains(prefix))
+        							.map((m) -> {
+        								return MessMod.INSTANCE
+        										.getMapping()
+        										.namedMethod(m.getName(), org.objectweb.asm.Type.getMethodDescriptor(m));
+        							})
+        							.distinct()
+        							.forEach((mn) -> {
+        								builder.suggest(mn);
+        								if(mn.equals(prefix)) {
+        									anyExactlyMatching.setTrue();
+        								}
+        							});
+            				if(anyExactlyMatching.booleanValue()) {
+                				builder.suggest("<")
+                						.suggest("(");
+            				}
+            			}
+        			} else {
+        				// Client side
+        				try {
+        					@SuppressWarnings("unchecked")
+							CommandContext<CommandSource> clientCt = (CommandContext<CommandSource>) ct;
+							return SuggestionProviders.ASK_SERVER.getSuggestions(clientCt, builder);
+						} catch (CommandSyntaxException e) {
+							MessMod.LOGGER.error("Unable to ask the server for suggestions!");
+							e.printStackTrace();
+						}
+        			}
+        		}
+        	}
+
+			return builder.buildFuture();
+        }
+    }
+
+	public static void registerArgumentType() {
+		ArgumentTypes.register("mess_accessing_path", AccessingPathArgumentType.class, 
+				new ConstantArgumentSerializer<AccessingPathArgumentType>(AccessingPathArgumentType::accessingPathArg));
+	}
 }

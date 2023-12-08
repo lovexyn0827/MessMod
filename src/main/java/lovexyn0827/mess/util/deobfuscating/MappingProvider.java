@@ -60,11 +60,11 @@ public class MappingProvider {
 				if(mappingFile.exists()) {
 					LOGGER.info("Found corresponding Tiny mapping, trying to load it...");
 					return new TinyMapping(mappingFile);
-				} else if(this.source == Source.YARN && FabricLoader.getInstance().isModLoaded("carpet-tis-addition")) {
-					return tryLoadMappingFromTisAddition().orElse(dummy);
 				} else if(this.source == Source.YARN && tryDownloadYarnMapping(mappingFile.toPath())) {
 					LOGGER.info("Downloaded the mapping successfully, loading it...");
 					return new TinyMapping(mappingFile);
+				} else if(this.source == Source.YARN && FabricLoader.getInstance().isModLoaded("carpet-tis-addition")) {
+					return tryLoadMappingFromTisAddition().orElse(dummy);
 				}
 			} catch (IOException e1) {
 				e1.printStackTrace();

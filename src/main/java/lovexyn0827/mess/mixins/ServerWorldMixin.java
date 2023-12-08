@@ -122,7 +122,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 			at = @At("RETURN")
 			)
 	private void endTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
-		ServerTickingPhase.REST.begin((ServerWorld)(Object) this);
+		ServerTickingPhase.DIM_REST.begin((ServerWorld)(Object) this);
 	}
 	
 	@Override

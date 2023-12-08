@@ -20,6 +20,7 @@ import org.objectweb.asm.tree.InsnNode;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.util.ArgumentListTokenizer;
 import lovexyn0827.mess.util.MethodDescriptor;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
@@ -247,7 +248,7 @@ public class MapperNode extends Node {
 					Literal<?> l = this.arguments[i];
 					if(l != null) {
 						try {
-							argObjs[i] = l.get(argTypes[i]);	// XXX Generic type
+							argObjs[i] = l.get(argTypes[i]);
 						} catch (InvalidLiteralException e) {
 							throw AccessingFailureException.create(e, this);
 						}

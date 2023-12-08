@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -115,8 +116,11 @@ public class Reflection {
 	public static final Map<EntityType<?>, Class<?>> ENTITY_TYPE_TO_CLASS;
 	private static final ImmutableMap<String, Class<?>> PRIMITIVE_CLASSES;
 	public static final ImmutableBiMap<BlockEntityType<?>, Class<?>> BLOCK_ENTITY_TYPE_TO_CLASS;
-	// Map class => {Key class, Value class} (type arguments are represented by null)
+	/**
+	 *  Map class => {Key class, Value class} (type arguments are represented by null)
+	 */
 	public static final ImmutableMap<Class<?>, Pair<Class<?>, Class<?>>> MAP_TO_TYPES;
+	public static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER;
 	
 	public static boolean hasField(Class<?> clazz, final Field field) {
 		return hasField(clazz, field.getName());
@@ -136,10 +140,14 @@ public class Reflection {
 		return false;
 	}
 	
-	public static Set<String> getAvailableFields(Class<?> entityClass) {
+	
+	/**
+	 * Gets the deobfuscated names of all fields declared by the given class or its super classes.
+	 */
+	public static Set<String> getAvailableFieldNames(Class<?> entityClass) {
 		Set<String> fieldSet = new TreeSet<>();
 		Mapping mapping = MessMod.INSTANCE.getMapping();
-		while(entityClass != Object.class) {
+		while(entityClass != null && entityClass != Object.class) {
 			for(Field field : entityClass.getDeclaredFields()) {
 				if(!mapping.isDummy()) {
 					fieldSet.add(MessMod.INSTANCE.getMapping().namedField(field.getName()));
@@ -155,21 +163,46 @@ public class Reflection {
 	}
 	
 	/**
+	 * Gets all non-static fields declared by the given class or its super classes.
+	 */
+	public static Set<Field> getInstanceFields(Class<?> clazz) {
+		Set<Field> fieldSet = new TreeSet<>(Comparator.comparing(Field::getName));
+		while(clazz != null && clazz != Object.class) {
+			for(Field field : clazz.getDeclaredFields()) {
+				if(!Modifier.isStatic(field.getModifiers())) {
+					fieldSet.add(field);
+				}
+			}
+			
+			clazz = clazz.getSuperclass();
+		}
+		
+		return fieldSet;
+	}
+	
+	/**
 	 * This method could be replaced by {@code getField(Class, String)}, as the process of getting the srg name of 
 	 * the field needs the name of the class declaring the field.
 	 * @param fieldName Use the srg name
 	 * @return A Field instance if the specified field exists in the given class or its super classes, null otherwise.
 	 */
 	@Nullable
-	public static Field getFieldFromNamed(Class<?> targetClass, String fieldName) {
+	public static Field getFieldFromNamed(Class<?> targetClass, @NotNull String fieldName) {
 		Mapping mapping = MessMod.INSTANCE.getMapping();
 		while(targetClass != null && targetClass != Object.class) {
 			String srg = mapping.srgField(targetClass.getName(), fieldName);
+			try {
+				return targetClass.getDeclaredField(fieldName);
+			} catch (NoSuchFieldException e) {
+			} catch (SecurityException e) {
+			}
+			
 			if(srg != null) {
 				try {
 					return targetClass.getDeclaredField(srg);
 				} catch (NoSuchFieldException e) {
-				} catch (SecurityException e) {}
+				} catch (SecurityException e) {
+				}
 			}
 			
 			targetClass = targetClass.getSuperclass();
@@ -407,6 +440,10 @@ public class Reflection {
 		}
 	}
 	
+	public static Class<?> wrapPrimitiveType(Class<?> lastOutputClass) {
+		return PRIMITIVE_TO_WRAPPER.getOrDefault(lastOutputClass, lastOutputClass);
+	}
+	
 	/**
 	 * Gets a method with <b>exactly</b> matching name and descriptor, from a given class and its super types.
 	 */
@@ -569,6 +606,16 @@ public class Reflection {
 				.put(Char2ObjectMap.class, new Pair<>(char.class, null))
 				.put(Byte2ObjectMap.class, new Pair<>(byte.class, null))
 				.put(Short2ObjectMap.class, new Pair<>(short.class, null))
+				.build();
+		PRIMITIVE_TO_WRAPPER = ImmutableBiMap.<Class<?>, Class<?>>builder()
+				.put(int.class, Integer.class)
+				.put(long.class, Long.class)
+				.put(short.class, Short.class)
+				.put(byte.class, Byte.class)
+				.put(char.class, Character.class)
+				.put(float.class, Float.class)
+				.put(double.class, Double.class)
+				.put(boolean.class, Boolean.class)
 				.build();
 	}
 }

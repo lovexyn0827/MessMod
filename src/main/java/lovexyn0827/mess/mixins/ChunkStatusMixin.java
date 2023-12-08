@@ -56,7 +56,8 @@ public class ChunkStatusMixin {
 			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> function, List<Chunk> chunks, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
 		ChunkStatus s = (ChunkStatus)(Object) this;
-		if(OptionManager.generateChunkGrid && s == ChunkStatus.SURFACE) {
+		if(OptionManager.generateChunkGrid && (s == ChunkStatus.SURFACE && !world.getDimension().hasCeiling()
+				|| s == ChunkStatus.FEATURES && world.getDimension().hasCeiling())) {
 			Chunk chunk = chunks.get(chunks.size() / 2);
 			ChunkPos chunkPos = chunk.getPos();
 			BlockPos start = chunkPos.getStartPos();

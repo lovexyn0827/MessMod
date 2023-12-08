@@ -10,6 +10,7 @@ import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
 import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
+import lovexyn0827.mess.util.EntityDataDumpHelper;
 import lovexyn0827.mess.util.FormattedText;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -68,13 +69,23 @@ public class MessServerNetworkHandler {
 		});
 		register(Channels.UNDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().undo();
+				player.server.execute(() -> {
+					((ServerPlayerEntityInterface) player).getBlockPlacementHistory().undo();
+				});
 			}
 		});
 		register(Channels.REDO, (player, channel, buf) -> {
 			if(OptionManager.blockPlacementHistory) {
-				((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
+				player.server.execute(() -> {
+					((ServerPlayerEntityInterface) player).getBlockPlacementHistory().redo();
+				});
 			}
+		});
+		register(Channels.ENTITY_DUMP, (player, channel, buf) -> {
+			// It it the client's responsibility to check whether to dump the target.
+			player.server.execute(() -> {
+				EntityDataDumpHelper.tryDumpTarget(player);
+			});
 		});
 	}
 	

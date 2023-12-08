@@ -46,6 +46,10 @@ public class EntitySelectorOptionsMixin {
 				
 				return new LiteralText(I18N.translate("misc.invregex", msg));
 			});
+	private static final DynamicCommandExceptionType NO_CLASS_EXCEPTION = 
+			new DynamicCommandExceptionType((e) -> {
+				return new LiteralText(I18N.translate("exp.noclass", e));
+			});
 	
 	@Shadow
 	private static final Map<String, ?> options = Maps.newHashMap();
@@ -143,5 +147,23 @@ public class EntitySelectorOptionsMixin {
 		}, (selectorReader) -> {
 			return ((EntitySelectorReaderInterface) selectorReader).getClassRegex() == null;
 		}, new LiteralText(I18N.translate("misc.class.desc")));
+		
+		putOption("instanceof", (selectorReader) -> {
+			int i = selectorReader.getReader().getCursor();
+			String str = selectorReader.getReader().readQuotedString();
+			selectorReader.setSuggestionProvider((builder, consumer) -> {
+				return CommandSource.suggestMatching(new String[] {"\""}, builder);
+			});
+			String className = MessMod.INSTANCE.getMapping().srgClass(str.replace('/', '.'));
+			try {
+				Class<?> cl = Class.forName(className);
+				((EntitySelectorReaderInterface) selectorReader).setInstanceofClass(cl);
+			} catch (ClassNotFoundException e) {
+				selectorReader.getReader().setCursor(i);
+				throw NO_CLASS_EXCEPTION.create(className);
+			}
+		}, (selectorReader) -> {
+			return ((EntitySelectorReaderInterface) selectorReader).getNameRegex() == null;
+		}, new LiteralText(I18N.translate("misc.instanceof.desc")));
     }
 }

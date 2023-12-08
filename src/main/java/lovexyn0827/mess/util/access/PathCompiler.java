@@ -33,6 +33,7 @@ import com.google.common.collect.Lists;
 import com.mojang.brigadier.StringReader;
 
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.Reflection;
 
 class PathCompiler {
 	private final LinkedList<Node> nodes = new LinkedList<>();
@@ -104,7 +105,15 @@ class PathCompiler {
 			}
 		}
 		
-		// 8. Generate and load class
+		// 8. Generate getOutputType() method
+		MethodNode getOutputType = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, 
+				"getOutputType", "()Ljava/lang/reflect/Type;", null, new String[0]);
+		InsnList gOTInsns = getOutputType.instructions;
+		gOTInsns.add(new LdcInsnNode(org.objectweb.asm.Type.getType(
+				Reflection.wrapPrimitiveType(ctx.getLastOutputClass()))));
+		gOTInsns.add(new InsnNode(Opcodes.ARETURN));
+		this.classFile.methods.add(getOutputType);
+		// 9. Generate and load class
 		this.classFile.accept(wrappedCw);
 		byte[] clBytes = cw.toByteArray();
 		try {

@@ -16,9 +16,10 @@ public enum ServerTickingPhase implements TickingPhase {
 	BLOCK_EVENT(false),
 	ENTITY(false),
 	TILE_ENTITY(false),
-	REST(false), 
+	DIM_REST(false), 
 	TICKED_ALL_WORLDS(true), 
-	SERVER_TASKS(true);
+	SERVER_TASKS(true), 
+	REST(true);
 	
 	private static ServerTickingPhase current;
 	private final List<TickingPhase.Event> events = Lists.newArrayList();
@@ -34,17 +35,17 @@ public enum ServerTickingPhase implements TickingPhase {
 		this.triggerEvents(world);
 	}
 
-	protected void triggerEvents(@Nullable World world) {
+	protected synchronized void triggerEvents(@Nullable World world) {
 		this.events.forEach((e) -> e.trigger(this, world));
 	}
 	
 	@Override
-	public void addEvent(TickingPhase.Event event) {
+	public synchronized void addEvent(TickingPhase.Event event) {
 		this.events.add(event);
 	}
 
 	@Override
-	public void removeEvent(TickingPhase.Event event) {
+	public synchronized void removeEvent(TickingPhase.Event event) {
 		this.events.remove(event);
 	}
 
@@ -69,5 +70,11 @@ public enum ServerTickingPhase implements TickingPhase {
 	@Nullable
 	public static ServerTickingPhase current() {
 		return current;
+	}
+	
+	public static void removeEventFromAll(TickingPhase.Event event) {
+		for(ServerTickingPhase phase : values()) {
+			phase.removeEvent(event);
+		}
 	}
 }

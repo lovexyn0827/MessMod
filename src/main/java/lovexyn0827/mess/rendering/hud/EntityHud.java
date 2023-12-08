@@ -84,7 +84,7 @@ public abstract class EntityHud {
 	public void toggleRender() {
 		this.shouldRender ^= true;
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeEnumConstant(type);
+		buf.writeEnumConstant(this.type);
 		buf.writeBoolean(this.shouldRender);
 		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(Channels.HUD, buf);
 		MessMod.INSTANCE.getClientNetworkHandler().send(packet);

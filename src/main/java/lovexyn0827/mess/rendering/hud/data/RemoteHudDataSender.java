@@ -35,7 +35,7 @@ public class RemoteHudDataSender implements HudDataSender {
 	
 	public void updateData(Entity entity) {
 		CompoundTag data = new CompoundTag();
-		List<String> unused = Lists.newArrayList(lastData.getKeys());
+		List<String> unused = Lists.newArrayList(this.lastData.getKeys());
 		Stream<HudLine> lines = this.streamAllLines();
 		if (entity != null) {
 			lines.forEach((l) -> {
@@ -45,9 +45,11 @@ public class RemoteHudDataSender implements HudDataSender {
 			});
 		}
 		
+		this.lastData = this.lastData.copyFrom(data);
 		ListTag toRemove = new ListTag();
 		unused.forEach((n) -> {
 			toRemove.add(StringTag.of(n));
+			this.lastData.remove(n);
 		});
 		data.put("ToRemove", toRemove);
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
@@ -63,6 +65,9 @@ public class RemoteHudDataSender implements HudDataSender {
 		return Stream.concat(Stream.of(BuiltinHudInfo.values()), this.customLines.stream());
 	}
 
+	/**
+	 * @return true if the line is applicable for the given entity, false otherwise.
+	 */
 	private boolean tryPutData(Entity entity, HudLine l, CompoundTag data) {
 		String name = l.getName();
 		if(l.canGetFrom(entity)) {
@@ -122,6 +127,7 @@ public class RemoteHudDataSender implements HudDataSender {
 				
 				unused.remove(l.getName());
 			});
+			this.lastData = this.lastData.copyFrom(data);
 			ListTag toRemove = new ListTag();
 			unused.forEach((n) -> {
 				toRemove.add(StringTag.of(n));

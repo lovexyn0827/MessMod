@@ -79,6 +79,6 @@ public class ChunkLoadingInfoRenderer {
 	}
 	
 	public void close() {
-		ServerTickingPhase.CHUNK.addEvent(this.updateEvent);
+		ServerTickingPhase.CHUNK.removeEvent(this.updateEvent);
 	}
 }

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import lovexyn0827.mess.options.OptionManager;
-import lovexyn0827.mess.rendering.hud.LookingAtEntityHud;
+import lovexyn0827.mess.util.RaycastUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -37,7 +37,7 @@ public abstract class SpawnEggItemMixin {
 		if(OptionManager.quickMobMounting && user instanceof ServerPlayerEntity && user.isSneaking()) {
 			ServerPlayerEntity splayer = (ServerPlayerEntity) user;
 			ItemStack stack = user.getStackInHand(hand);
-			Entity vehicle = LookingAtEntityHud.getTarget(splayer);
+			Entity vehicle = RaycastUtil.getTargetEntity(splayer);
 			if(vehicle != null) {
 				BlockPos pos = vehicle.getBlockPos();
 				Entity entity = this.getEntityType(stack.getTag())
