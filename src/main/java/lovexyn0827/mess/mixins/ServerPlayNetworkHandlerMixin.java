@@ -91,7 +91,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements HudDataSubscribeS
 			), 
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private void onCustomPayload(PlayerInteractEntityC2SPacket packet, CallbackInfo ci, 
+	private void tryKillStackedEntities(PlayerInteractEntityC2SPacket packet, CallbackInfo ci, 
 			Entity entity, Hand hand, ItemStack itemStack, Optional<?> optional) {
 		if(OptionManager.quickStackedEntityKilling && this.player.getMainHandStack().getItem() == Items.BRICK) {
 			int count = 0;
