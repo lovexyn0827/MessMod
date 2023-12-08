@@ -32,7 +32,8 @@ public class ServerChunkManagerMixin {
 			cir.cancel();
 		} else if(!LazyLoadCommand.LAZY_CHUNKS.isEmpty()) {
 			long pos = ChunkPos.toLong(MathHelper.floor(entity.getX()) >> 4, MathHelper.floor(entity.getZ()) >> 4);
-			if(LazyLoadCommand.LAZY_CHUNKS.contains(pos)) {
+			if(LazyLoadCommand.LAZY_CHUNKS.containsKey(this.world.getRegistryKey())
+					&& LazyLoadCommand.LAZY_CHUNKS.get(this.world.getRegistryKey()).contains(pos)) {
 				cir.setReturnValue(false);
 				cir.cancel();
 			}
