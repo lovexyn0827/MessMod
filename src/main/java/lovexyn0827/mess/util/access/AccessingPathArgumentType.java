@@ -92,38 +92,40 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			return null;
 		}
 		
-		if(sr.peek() == '!') {
+		String nodeStr;
+		switch(sr.peek()) {
+		case '!':
 			sr.skip();
 			// This is fine since dots are invalid in field names.
-			String nodeStr = sr.readStringUntil('.');
+			nodeStr = sr.readStringUntil('.');
 			return new FieldNode(nodeStr);
-		} else if(sr.peek() == '[') {
+		case '[':
 			//Element
 			sr.skip();
 			// This is fine as only numbers are allowed here.
-			String nodeStr = sr.readStringUntil(']');
+			nodeStr = sr.readStringUntil(']');
 			sr.skip();
 			try {
 				return new ElementNode(Integer.parseInt(nodeStr));
 			} catch (NumberFormatException e) {
 				throw new TranslatableException("exp.reqint", nodeStr);
 			}
-		} else if(sr.peek() == '<') {
+		case '<':
 			//Map
-			String nodeStr = readWrapped(sr, '<', '>');
+			nodeStr = readWrapped(sr, '<', '>');
 			sr.skip();
 			return new ValueOfMapNode(Literal.parse(nodeStr));
-		} else if(sr.peek() == '>') {
+		case '>':
 			sr.skip();
-			String nodeStr = readUntil(sr, '.');
+			nodeStr = readUntil(sr, '.');
 			return new MapperNode(nodeStr);
-		} else if(sr.peek() == '(') {
+		case '(':
 			sr.skip();
-			String nodeStr = sr.readStringUntil(')');
+			nodeStr = sr.readStringUntil(')');
 			sr.skip();
 			return new ClassCastNode(nodeStr);
-		} else {
-			String nodeStr = readUntil(sr, '.');
+		default:
+			nodeStr = readUntil(sr, '.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
 			if(matcher.matches()) {
 				return new MethodNode(matcher.group("name"), matcher.group("types"), matcher.group("args"));
