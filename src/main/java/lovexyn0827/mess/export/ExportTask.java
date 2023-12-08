@@ -183,6 +183,10 @@ public final class ExportTask {
 		}
 		
 		Path origin = this.server.getSavePath(WorldSavePathMixin.create(dirName));
+		if(!Files.exists(origin)) {
+			return;
+		}
+		
 		Path dst = temp.resolve(dirName);
 		Files.createDirectories(dst);
 		for(Path p : Files.list(origin).toArray((i) -> new Path[i])) {

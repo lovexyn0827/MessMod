@@ -8,6 +8,7 @@ public enum SaveComponent {
 	REGION, 
 	POI, 
 	GAMERULES, 
+	ENTITY, 
 	RAID, 
 	MAP_LOCAL, 
 	MAP_OTHER,
