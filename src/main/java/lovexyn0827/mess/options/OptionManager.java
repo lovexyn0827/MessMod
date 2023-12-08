@@ -159,9 +159,9 @@ public class OptionManager{
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean dedicatedServerCommands;
 	
-	@Option(defaultValue = "REGION,POI", 
+	@Option(defaultValue = "REGION,POI,ENTITY", 
 			parserClass = SaveComponent.DefaultListParser.class, 
-			suggestions = { "REGION,POI", "REGION,GAMERULES,POI", "[]" }, 
+			suggestions = { "REGION,POI,ENTITY", "REGION,GAMERULES,ENTITY,POI", "[]" }, 
 			label = Label.MESSMOD)
 	public static List<SaveComponent> defaultSaveComponents;
 	
