@@ -15,7 +15,7 @@ import lovexyn0827.mess.rendering.RenderedBox;
 import lovexyn0827.mess.rendering.ShapeSender;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -109,7 +109,7 @@ public class PoiCommand {
 						then(argument("center",BlockPosArgumentType.blockPos()).
 								then(argument("radius",IntegerArgumentType.integer(0)).
 										then(argument("type",StringArgumentType.word()).suggests(sp).
-												executes((ct) -> forEachPoi(ct, (poi) -> visualize(poi, ct.getSource().getWorld())))))));
+												executes((ct) -> forEachPoi(ct, (poi) -> visualize(poi, ct.getSource())))))));
 		dispatcher.register(command);
 	}
 
@@ -148,11 +148,12 @@ public class PoiCommand {
 		}
 	}
 	
-	private static void visualize(PointOfInterest poi, ServerWorld world) {
+	private static void visualize(PointOfInterest poi, ServerCommandSource source) {
 		ShapeSender ss = MessMod.INSTANCE.shapeSender;
 		BlockPos pos = poi.getPos();
-		long time = world.getTime();
-		RegistryKey<World> key = world.getRegistryKey();
-		ss.addShape(new RenderedBox(new Box(pos).expand(0.02), poi.isOccupied() ? 0xFF0000FF : 0x69604EFF , 0x4E9A6960, 300, time), key);
+		long time = source.getWorld().getTime();
+		RegistryKey<World> key = source.getWorld().getRegistryKey();
+		ss.addShape(new RenderedBox(new Box(pos).expand(0.02), poi.isOccupied() ? 0xFF0000FF : 0x69604EFF , 0x4E9A6960, 300, time), 
+				key, source.getEntity() instanceof ServerPlayerEntity ? (ServerPlayerEntity) source.getEntity() : null);
 	}
 }

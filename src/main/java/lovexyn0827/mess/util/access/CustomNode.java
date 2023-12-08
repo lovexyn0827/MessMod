@@ -7,13 +7,18 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.Nullable;
-
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -27,6 +32,7 @@ import net.minecraft.util.WorldSavePath;
 public class CustomNode extends Node {
 	private static final WorldSavePath SAVED_NODES = WorldSavePathMixin.create("saved_accessing_paths.prop");
 	private static final TreeMap<String, String> NODES_BY_NAME = new TreeMap<>();
+	private static final TreeMap<String, Class<?>> COMPILED_NODES_BY_NAME = new TreeMap<>();
 	public static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_]+");
 	private final String name;
 	private final AccessingPath backend;
@@ -42,13 +48,13 @@ public class CustomNode extends Node {
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
+	protected Type resolveOutputType(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
 		return this.backend.getOutputType();
 	}
 
 	public static void define(String name, String path, boolean permanent, MinecraftServer server)
 			throws CommandSyntaxException {
-		if(NODES_BY_NAME.containsKey(name)) {
+		if(NODES_BY_NAME.containsKey(name) || COMPILED_NODES_BY_NAME.containsKey(name)) {
 			throw new TranslatableException("cmd.general.dupname");
 		} else {
 			// Validate the given accessing path. 
@@ -60,8 +66,20 @@ public class CustomNode extends Node {
 		}
 	}
 	
+	public static void defineCompiled(String name, List<Class<?>> nodeTypes)
+			throws CommandSyntaxException, CompilationException {
+		if(!NODES_BY_NAME.containsKey(name)) {
+			throw new TranslatableException("%s was not defined", name);
+		} else {
+			String pathStr = NODES_BY_NAME.get(name);
+			AccessingPath path = AccessingPathArgumentType.accessingPathArg().parse(new StringReader(pathStr));
+			COMPILED_NODES_BY_NAME.put(name, path.compile(nodeTypes, name));
+		}
+	}
+	
 	public static void reload(MinecraftServer server){
 		NODES_BY_NAME.clear();
+		COMPILED_NODES_BY_NAME.clear();
 		operateSavedNodes(server, (p) -> p.forEach((name, path) -> NODES_BY_NAME.put((String) name, (String) path)));
 	}
 	
@@ -105,19 +123,20 @@ public class CustomNode extends Node {
 	}
 	
 	@Nullable
-	public static CustomNode create(String name) {
-		String pathStr = NODES_BY_NAME.get(name);
-		if(pathStr != null) {
-			AccessingPath path;
+	public static CustomNode byName(String name) throws CommandSyntaxException {
+		Class<?> clazz = COMPILED_NODES_BY_NAME.get(name);
+		if(clazz != null) {
 			try {
-				path = AccessingPathArgumentType.accessingPathArg()
-						.parse(new StringReader(pathStr));
-				return new CustomNode(name, path);
-			} catch (CommandSyntaxException e) {
+				return new CustomNode(name, (CompiledPath) clazz.getConstructor().newInstance());
+			} catch (Throwable e) {
+				e.printStackTrace();
 				return null;
 			}
 		} else {
-			return null;
+			String pathStr = NODES_BY_NAME.get(name);
+			AccessingPath path = AccessingPathArgumentType.accessingPathArg()
+					.parse(new StringReader(pathStr));
+			return new CustomNode(name, path);
 		}
 	}
 	
@@ -138,5 +157,21 @@ public class CustomNode extends Node {
 			sb.append('\n');
 		});
 		return sb.toString();
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		return (ctx) -> {
+			int cid = ctx.allocateSubPath(this.backend);
+			InsnList insns = new InsnList();
+			BytecodeHelper.appendReferenceConstantGetter(ctx, insns, "SUBPATHS", cid);
+			insns.add(new InsnNode(Opcodes.SWAP));
+			insns.add(new LdcInsnNode(org.objectweb.asm.Type.getType(ctx.getLastOutputClass())));
+			insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, 
+					org.objectweb.asm.Type.getInternalName(AccessingPath.class), 
+					"access", "(Ljava/lang/Object;Ljava/lang/reflect/Type;)Ljava/lang/Object;"));
+			ctx.endNode(Object.class);
+			return insns;
+		};
 	}
 }

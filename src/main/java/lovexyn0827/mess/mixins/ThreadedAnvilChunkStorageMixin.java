@@ -3,7 +3,9 @@ package lovexyn0827.mess.mixins;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,51 +14,60 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.ChunkTicketManagerInterface;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
+import lovexyn0827.mess.util.blame.StackTrace;
+import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
+import net.minecraft.structure.StructureManager;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.thread.ThreadExecutor;
+import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkProvider;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.ChunkStatusChangeListener;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.level.storage.LevelStorage;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
-public abstract class ThreadedAnvilChunkStorageMixin {
+public abstract class ThreadedAnvilChunkStorageMixin {	
 	@Shadow @Final
 	private ServerWorld world;
 	
-	private boolean shouldSkip() {
-		ChunkBehaviorLogger logger = MessMod.INSTANCE.getChunkLogger();
-		return logger == null || !logger.isWorking();
-	}
+	@Shadow @Final
+	private ThreadedAnvilChunkStorage.TicketManager ticketManager;
 	
 	@Inject(method = "loadChunk", 
 			at = @At(value = "HEAD")
 	)
 	private void onSchedulingChunkLoad(ChunkPos pos, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_LOADING, pos.toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 
 	@Inject(method = "tryUnloadChunk", 
 			at = @At(value = "HEAD")
 	)
 	private void onSchedulingChunkUnload(long pos, ChunkHolder chunkHolder, CallbackInfo ci) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_UNLOADING, pos, 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "convertToFullChunk", 
@@ -64,12 +75,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onSchedulingChunkGeneration(ChunkHolder chunkHolder, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_GENERATION, chunkHolder.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "upgradeChunk", 
@@ -77,12 +88,13 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onSchedulingChunkUdgrade(ChunkHolder holder, ChunkStatus requiredStatus, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
-		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_UPGARDE, holder.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, requiredStatus.getId());
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.SCHEDULER_UPGRADE, holder.getPos().toLong(), 
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), 
+				StackTrace.blameCurrent(), requiredStatus.getId());
 	}
 	
 	@Inject(method = "method_17256", 
@@ -91,24 +103,24 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onChunkLoad(ChunkPos pos, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.LOADING, pos.toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "save(Lnet/minecraft/world/chunk/Chunk;)Z", 
 			at = @At(value = "HEAD")
 	)
 	private void onChunkUnload(Chunk chunk, CallbackInfoReturnable<Boolean> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.UNLOADING, chunk.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "method_20460", 
@@ -117,12 +129,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onChunkGeneration(ChunkHolder holder, Either<?, ?> either, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.GENERATION, holder.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "method_17225", 
@@ -131,12 +143,13 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onChunkUpgrade(ChunkPos pos, ChunkHolder holder, ChunkStatus status, Executor  e, List<?> list, 
 			CallbackInfoReturnable<Boolean> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
-		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.UPGARDE, holder.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, status.getId());
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.UPGRADE, holder.getPos().toLong(), 
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), 
+				StackTrace.blameCurrent(), status.getId());
 	}
 	
 	@Inject(method = "method_17256", 
@@ -145,24 +158,24 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onChunkLoadFinish(ChunkPos pos, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_LOADING, pos.toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "save(Lnet/minecraft/world/chunk/Chunk;)Z", 
 			at = @At(value = "RETURN")
 	)
 	private void onChunkUnloadFinish(Chunk chunk, CallbackInfoReturnable<Boolean> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UNLOADING, chunk.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "method_20460", 
@@ -171,12 +184,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onChunkGenerationFinish(ChunkHolder holder, Either<?, ?> either, 
 			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_GENERATION, holder.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, null);
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
 	@Inject(method = "method_17225", 
@@ -185,11 +198,31 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	)
 	private void onChunkUpgradeFinish(ChunkPos pos, ChunkHolder holder, ChunkStatus status, Executor e, List<?> list, 
 			CallbackInfoReturnable<Boolean> cir) {
-		if(shouldSkip()) {
+		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
 		
-		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UPGARDE, holder.getPos().toLong(), 
-				this.world.getRegistryKey().getValue(), Thread.currentThread(), null, status.getId());
+		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.END_UPGRADE, holder.getPos().toLong(), 
+				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), status.getId());
+	}
+	
+	@Inject(
+			method = "<init>", 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/server/world/ThreadedAnvilChunkStorage."
+							+ "ticketManager:Lnet/minecraft/server/world/ThreadedAnvilChunkStorage$TicketManager;", 
+					opcode = Opcodes.PUTFIELD, 
+					shift = At.Shift.AFTER
+			)
+	)
+	private void onCreatedTicketManager(ServerWorld world, LevelStorage.Session session, DataFixer dataFixer, 
+			StructureManager structureManager, Executor executor, ThreadExecutor<Runnable> mainThreadExecutor, 
+			ChunkProvider chunkProvider, ChunkGenerator chunkGenerator, 
+			WorldGenerationProgressListener worldGenerationProgressListener, 
+			ChunkStatusChangeListener chunkStatusChangeListener, 
+			Supplier<PersistentStateManager> persistentStateManagerFactory, int viewDistance, boolean dsync, 
+			CallbackInfo ci) {
+		((ChunkTicketManagerInterface) this.ticketManager).initWorld(world);
 	}
 }

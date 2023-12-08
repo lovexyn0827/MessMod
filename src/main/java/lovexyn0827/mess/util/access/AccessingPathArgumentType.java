@@ -12,6 +12,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.TranslatableException;
+import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.server.command.ServerCommandSource;
 
 public final class AccessingPathArgumentType implements ArgumentType<AccessingPath> {
@@ -54,7 +56,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			nodes.add(n);
 		}
 		
-		return new AccessingPath(nodes);
+		return new JavaAccessingPath(nodes, stringRepresentation);
 	}
 
 	@Nullable
@@ -105,20 +107,27 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 					return new ComponentNode.Y();
 				case "z" : 
 					return new ComponentNode.Z();
-				case "identityHash" : 
-					return SimpleNode.IDENTITY_HASH;
 				case "size" : 
 					return new SizeNode();
 				default : 
-					CustomNode node = CustomNode.create(nodeStr);
-					if(node != null) {
+					Node node;
+					if((node = SimpleNode.byName(nodeStr)) != null) {
 						return node;
 					} else {
-						throw new TranslatableException("exp.unknownnode", nodeStr);
+						node = CustomNode.byName(nodeStr);
+						if(node != null) {
+							return node;
+						} else {
+							throw new TranslatableException("exp.unknownnode", nodeStr);
+						}
 					}
 				}
 			}
 		}
 	}
 
+	static {
+		ArgumentTypes.register("mess_accessing_path", AccessingPathArgumentType.class, 
+				new ConstantArgumentSerializer<AccessingPathArgumentType>(AccessingPathArgumentType::accessingPathArg));
+	}
 }

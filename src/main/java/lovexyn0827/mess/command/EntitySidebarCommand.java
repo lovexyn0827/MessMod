@@ -30,7 +30,7 @@ public class EntitySidebarCommand {
 						.then(argument("target",EntityArgumentType.entity())
 								.then(argument("field",StringArgumentType.string())
 										.suggests((ct,builder)->{
-											for(String fieldName : Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass())) {
+											for(String fieldName : Reflection.getAvailableFieldNames(EntityArgumentType.getEntity(ct.getLastChild(), "target").getClass())) {
 												builder = builder.suggest(fieldName);
 											}
 											

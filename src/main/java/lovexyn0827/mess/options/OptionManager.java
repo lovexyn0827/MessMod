@@ -1,51 +1,41 @@
 package lovexyn0827.mess.options;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.datafixers.util.Either;
 
-import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
-import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
-import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
+import lovexyn0827.mess.rendering.FrozenUpdateMode;
 import lovexyn0827.mess.rendering.hud.AlignMode;
+import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.access.AccessingPath;
+import lovexyn0827.mess.util.blame.BlamingMode;
+import lovexyn0827.mess.util.blame.Confidence;
 import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.i18n.Language;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
 
 /**
  * <p>There are three layers in the option storage, that is, hard-coded global default values, global option value, and the save-local values.</p>
@@ -55,23 +45,28 @@ import net.minecraft.util.crash.CrashReport;
  */
 // TODO Now the option manager is pretty messy!
 public class OptionManager{
-	private static final File GLOBAL_OPTION_FILE = new File(FabricLoader.getInstance().getGameDir().toString() + "/mcwmem.prop");
-	private static final Properties GLOBAL_OPTION_SERIALIZER = new Properties();
-	public static final List<Field> OPTIONS = Stream.of(OptionManager.class.getFields())
+	public static final SortedMap<String, OptionWrapper> OPTIONS = Stream.of(OptionManager.class.getFields())
 			.filter((f) -> f.isAnnotationPresent(Option.class))
 			.sorted((a, b) -> Comparator.<String>naturalOrder().compare(a.getName(), b.getName()))
-			.collect(Collectors.toList());
-	private static File localOptionFile;
-	private static Properties localOptionSerializer;
+			.collect(TreeMap::new, (map, f) -> map.put(f.getName(), new OptionWrapper(f)), Map::putAll);
+	private static OptionSet activeOptionSet;
 	
 	/**
 	 * Actions taken right after an option is set to a given value.
 	 */
-	public static final Map<String, BiConsumer<String, CommandContext<ServerCommandSource>>> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
+	static final Map<String, CustomAction> CUSTOM_APPLICATION_BEHAVIORS = Maps.newHashMap();
 	
 	@Option(defaultValue = "STANDARD", 
 			parserClass = AccessingPath.InitializationStrategy.Parser.class)
 	public static AccessingPath.InitializationStrategy accessingPathInitStrategy;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean allowSelectingDeadEntities;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean allowTargetingSpecialEntities;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -81,9 +76,17 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean attackableTnt;
 	
+	@Option(defaultValue = "POSSIBLE", 
+			parserClass = Confidence.Parser.class)
+	public static Confidence blameThreshold;
+	
+	@Option(defaultValue = "DISABLED", 
+			parserClass = BlamingMode.Parser.class)
+	public static BlamingMode blamingMode;
+	
 	@Option(defaultValue = "NORMALLY", 
-			parserClass = BlockInfoRenderer.FrozenUpdateMode.Parser.class)
-	public static BlockInfoRenderer.FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
+			parserClass = FrozenUpdateMode.Parser.class)
+	public static FrozenUpdateMode blockInfoRendererUpdateInFrozenTicks;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -105,7 +108,7 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean chunkLogAutoArchiving;
 	
-	@Option(defaultValue = "false", 
+	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class)
 	public static boolean commandExecutionRequirment;
 	
@@ -113,9 +116,9 @@ public class OptionManager{
 			parserClass = BooleanParser.class)
 	public static boolean craftingTableBUD;
 	
-	@Option(defaultValue = "0.05", 
-			suggestions = {"0.05", "0.10"}, 
-			parserClass = FloatParser.Positive.class)
+	@Option(defaultValue = "NaN", 
+			suggestions = {"0.05", "0.10", "NaN"}, 
+			parserClass = FloatParser.NaNablePositive.class)
 	public static float creativeUpwardsSpeed;
 	
 	@Option(defaultValue = "false", 
@@ -134,11 +137,35 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean disableEnchantCommandRestriction;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean disableExplosionExposureCalculation;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
 	public static boolean disableProjectileRandomness;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityDataOnClient;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityDataWithPaper;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityDataWithCtrlC;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntityNbt;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class)
+	public static boolean dumpTargetEntitySummonCommand;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -164,6 +191,18 @@ public class OptionManager{
 	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class)
 	public static boolean entityLogAutoArchiving;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean fillHistory;
+	
+	@Option(defaultValue = "POSITIVE", 
+			parserClass = PulseRecorder.Mode.Parser.class)
+	public static PulseRecorder.Mode fletchingTablePulseDetectingMode;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
+	public static boolean fletchingTablePulseDetector;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
@@ -248,6 +287,10 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class)
+	public static boolean quickStackedEntityKilling;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class)
 	public static boolean railNoAutoConnection;
 	
 	@Option(defaultValue = "[]", 
@@ -273,6 +316,10 @@ public class OptionManager{
 	@Option(defaultValue = "-1", 
 			parserClass = FloatParser.class)
 	public static float serverSyncedBoxRenderRange;
+	
+	@Option(defaultValue = "NORMALLY", 
+			parserClass = FrozenUpdateMode.Parser.class)
+	public static FrozenUpdateMode serverSyncedBoxUpdateModeInFrozenTicks;
 	
 	@Option(defaultValue = "[]", 
 			parserClass = RangeParser.ChunkStatusRange.class)
@@ -313,350 +360,134 @@ public class OptionManager{
 			parserClass = ListParser.DebugRender.class)
 	public static List<Either<Field, String>> vanillaDebugRenderers;
 	
-	private static void loadFromProperties(Properties options) {
-		for(Field f : OPTIONS) {
-			String serialized;
-			String name = f.getName();
-			Option o = f.getAnnotation(Option.class);
-			try {
-				@SuppressWarnings("deprecation")
-				OptionParser<?> parser = o.parserClass().newInstance();
-				try {
-					options.computeIfAbsent(name, 
-							(t) -> GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (key) -> o.defaultValue()));
-					serialized = (String) options.get(name);
-					f.set(null, parser.tryParse(serialized));
-					saveGlobal();
-				} catch (InvaildOptionException e) {
-					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", name, e.getMessage());
-					String dV;
-					if(isVaild(parser, (String) GLOBAL_OPTION_SERIALIZER.get(name))) {
-						dV = GLOBAL_OPTION_SERIALIZER.getProperty(name);
-						options.put(name, dV);
-					} else {
-						dV = o.defaultValue();
-						GLOBAL_OPTION_SERIALIZER.put(name, dV);
-						options.put(name, dV);
-					}
-
-					serialized = dV;
-					try {
-						f.set(null, parser.tryParse(dV));
-					} catch (IllegalArgumentException | IllegalAccessException | InvaildOptionException e1) {
-						e1.printStackTrace();
-					}
-				}
-
-				BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
-				if(behavior != null) {
-					behavior.accept(serialized, null);
-				}
-			} catch (SecurityException | IllegalAccessException | InstantiationException e1) {
-				e1.printStackTrace();
-				
-			}
-		}
-		
-		if(MessMod.LOGGER.isDebugEnabled()) {
-			MessMod.LOGGER.debug("Loaded {} MessMod config from {}", OPTIONS.size(), localOptionFile.getAbsolutePath());
-			OPTIONS.stream()
-			.map((f) -> {
-				return f.getName() + ": " + getString(f);
-			})
-			.forEach(MessMod.LOGGER::debug);
+	private static void setOptionSet(OptionSet set) {
+		activeOptionSet = set;
+		set.activiate();
+		if(FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			MessMod.LOGGER.info("Loaded {} MessMod config from {}", 
+					OPTIONS.size(), set.getReadablePathStr());
+			OPTIONS.values().stream()
+					.map((o) -> {
+						return o.name + ": " + set.getSerialized(o.name);
+					})
+					.forEach(MessMod.LOGGER::info);
 		}
 	}
 	
-	public static void loadFromServer(InputStream in) throws IOException {
-		Properties options = new Properties();
-		options.load(in);
-		loadFromProperties(options);
+	public static boolean isValidOptionName(String name) {
+		return OPTIONS.containsKey(name);
 	}
 	
-	/**
-	 * Refresh the save-local option storage
-	 */
-	public static synchronized void reload() {
-		if(localOptionFile.exists()) {
-			try (FileInputStream in = new FileInputStream(localOptionFile)) {
-				localOptionSerializer.load(in);
-			} catch (IOException e) {
-				MessMod.LOGGER.fatal("Failed to open mcwmem.prop, the Minecraft may crash later.");
-				e.printStackTrace();
-			}
-		} else {
-			MessMod.LOGGER.info("Couldn't find mcwmem.prop, creating a new one.");
-			writeDefault();
-		}
-		
-		loadFromProperties(localOptionSerializer);
-		sendOptionsToClientsIfNeeded();
-	}
-
-	// Only calls from MessMod.onInitialize() are permitted
-	public static void loadGlobal() {
-		if(GLOBAL_OPTION_FILE.exists()) {
-			try (FileInputStream in = new FileInputStream(GLOBAL_OPTION_FILE)) {
-				GLOBAL_OPTION_SERIALIZER.load(in);
-			} catch (IOException e) {
-				MessMod.LOGGER.fatal("Failed to open mcwmem.prop, the Minecraft may crash later.");
-				e.printStackTrace();
-			}
-		} else {
-			MessMod.LOGGER.info("Couldn't find mcwmem.prop, creating a new one.");
-			writeDefault();
-		}
-		
-		for(Field f : OPTIONS) {
-			String name = f.getName();
-			String serialized;
-			Option o = f.getAnnotation(Option.class);
-			try {
-				@SuppressWarnings("deprecation")
-				OptionParser<?> parser = o.parserClass().newInstance();
-				try {
-					GLOBAL_OPTION_SERIALIZER.computeIfAbsent(name, (k) -> o.defaultValue());
-					serialized = (String) GLOBAL_OPTION_SERIALIZER.get(name);
-					f.set(null, parser.tryParse(serialized));
-					saveGlobal();
-				} catch (InvaildOptionException e) {
-					MessMod.LOGGER.warn("The value of option {} is invaild, restoring it to the default value: {}", name, e.getMessage());
-					String dV = o.defaultValue();
-					serialized = dV;
-					GLOBAL_OPTION_SERIALIZER.put(name, dV);
-					try {
-						f.set(null, parser.tryParse(dV));
-					} catch (IllegalArgumentException | IllegalAccessException | InvaildOptionException e1) {
-						e1.printStackTrace();
-					}
-				}
-				
-
-				BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
-				if(behavior != null) {
-					behavior.accept(serialized, null);
-				}
-			} catch (SecurityException | IllegalAccessException | InstantiationException e1) {
-				e1.printStackTrace();
-			}
-		}
+	public static void onReceivedOptions(PacketByteBuf in) throws IOException {
+		setOptionSet(OptionSet.fromPacket(in));
 	}
 	
-	private static boolean isVaild(OptionParser<?> parser, String val) {
-		try {
-			return (parser.tryParse(val) != null);
-		} catch (InvaildOptionException e) {
-			return false;
-		}
-	}
-	
-	private static void writeDefault() {
-		OPTIONS.forEach((f) -> GLOBAL_OPTION_SERIALIZER.put(f.getName(), f.getAnnotation(Option.class).defaultValue()));
-		saveGlobal();
-	}
-
-	private static void writeDefaultLocally() {
-		OPTIONS.forEach((f) -> localOptionSerializer.put(f.getName(), 
-				GLOBAL_OPTION_SERIALIZER.computeIfAbsent(f.getName(), (key) -> f.getAnnotation(Option.class).defaultValue())));
-		save();
-	}
-
-	public static synchronized void save() {
-		try (FileOutputStream in = new FileOutputStream(localOptionFile)) {
-			localOptionSerializer.store(in, "MessMod Options");
-		} catch (IOException e) {
-			LogManager.getLogger().fatal("Failed to write mcwmem.prop!");
-			e.printStackTrace();
-		}
-	}
-
-	private static void saveGlobal() {
-		try (FileOutputStream in = new FileOutputStream(GLOBAL_OPTION_FILE)) {
-			GLOBAL_OPTION_SERIALIZER.store(in, "MessMod Options");
-		} catch (IOException e) {
-			LogManager.getLogger().fatal("Failed to write mcwmem.prop!");
-			e.printStackTrace();
-		}
-	}
-
-	public static void set(Field f, Object obj) {
-		set(f, obj, null);
-	}
-
-	public static void set(Field f, Object obj, @Nullable CommandContext<ServerCommandSource> ct) {
-		try {
-			f.set(null, obj);
-			@SuppressWarnings("deprecation")
-			String serialized = f.getAnnotation(Option.class).parserClass()
-					.newInstance().serializeObj(obj);
-			localOptionSerializer.put(f.getName(), serialized);
-			save();
-			BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior = CUSTOM_APPLICATION_BEHAVIORS.get(f.getName());
-			if(behavior != null) {
-				behavior.accept(serialized, ct);
-			}
-			
-			sendOptionsToClientsIfNeeded();
-		} catch (IllegalArgumentException e) {
-			MessMod.LOGGER.fatal("Couldn't set the value of option {}, that shouldn't happed!", f.getName());
-			e.printStackTrace();
-		} catch (IllegalAccessException | InstantiationException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@SuppressWarnings("deprecation")
-	public static void setGlobal(Field f, Object obj) {
-		try {
-			GLOBAL_OPTION_SERIALIZER.put(f.getName(), f.getAnnotation(Option.class).parserClass()
-					.newInstance().serializeObj(obj));
-			saveGlobal();
-		} catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		
-		set(f, obj);
-	}
-
-	private static void sendOptionsToClientsIfNeeded() {
-		if(MessMod.isDedicatedEnv() && MessMod.INSTANCE.getServerNetworkHandler() != null) {
-			MessMod.INSTANCE.getServerNetworkHandler().sendToEveryone(toPacket());
-		}
-	}
-
-	public static void sendOptionsTo(ServerPlayerEntity player) {
-		player.networkHandler.sendPacket(toPacket());
-	}
-	
-	private static CustomPayloadS2CPacket toPacket() {
-		try {
-			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			StringWriter sw = new StringWriter();
-			localOptionSerializer.store(sw, "MessMod Options");
-			buf.writeString(sw.toString());
-			return new CustomPayloadS2CPacket(Channels.OPTIONS, buf);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static String getString(Field f) {
-		return localOptionSerializer.get(f.getName()).toString();
-	}
-	
-	public static String getGlobalString(Field f) {
-		return GLOBAL_OPTION_SERIALIZER.get(f.getName()).toString();
-	}
-
-	private static void registerCustomApplicationBehavior(String name, 
-			@Nullable BiConsumer<String, @Nullable CommandContext<ServerCommandSource>> behavior) {
+	private static void registerCustomApplicationBehavior(String name, @Nullable CustomAction behavior) {
 		CUSTOM_APPLICATION_BEHAVIORS.put(name, behavior);
 	}
 	
 	/**
-	 * Update the 
-	 * @param ms The current MinecraftServer, or null if closed.
+	 * @param ms The current single-player server, or null if exiting.
 	 */
 	public static void updateServer(@Nullable MinecraftServer ms) {
 		if(ms != null) {
-			localOptionSerializer = new Properties();
 			Path p = ms.getSavePath(WorldSavePathMixin.create("mcwmem.prop"));
-			localOptionFile = p.toFile();
-			if(!Files.exists(p)) {
-				try {
-					Files.createFile(p);
-					writeDefaultLocally();
-				} catch (IOException e) {
-					throw new CrashException(new CrashReport("Failed to create config file for MessMod.", e));
-				}
-			}
-			
-			reload();
+			setOptionSet(OptionSet.load(p.toFile()));
 		} else {
-			save();
-			localOptionSerializer = null;
-			localOptionFile = null;
+			activeOptionSet.save();
+			setOptionSet(OptionSet.GLOBAL);
 		}
 	}
-
-	private static void sendErrorOrWarn(@Nullable CommandContext<ServerCommandSource> ct, String msg) {
-		if (ct != null) {
-			CommandUtil.error(ct, msg);
-		} else {
-			MessMod.LOGGER.warn(msg);
-		}
+	
+	public static void loadFromRemoteServer(PacketByteBuf data) {
+		setOptionSet(OptionSet.fromPacket(data));
 	}
-
-	public static boolean isSupportedInCurrentEnv(Option o) {
-		EnvType currentEnv = FabricLoader.getInstance().getEnvironmentType();
-		for(EnvType env : o.environment()) {
-			if(env == currentEnv) {
-				return true;
-			}
-		}
-		
-		return false;
+	
+	public static String getSerialized(String name) {
+		return activeOptionSet.getSerialized(name);
 	}
-
-	public static String getDescription(String name) {
-		return I18N.translate("opt." + name + ".desc");
+	
+	public static String getGlobalSerialized(String name) {
+		return OptionSet.GLOBAL.getSerialized(name);
 	}
-
-	@SuppressWarnings("deprecation")
-	private static void loadDefaults() {
-		OPTIONS.forEach((f) -> {
-			Option o = f.getAnnotation(Option.class);
-			try {
-				f.set(null, o.parserClass().newInstance().tryParse(o.defaultValue()));
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
-		});
+	
+	public static void reload() {
+		activeOptionSet.reload();
+	}
+	
+	public static void set(String name, String val, 
+			CommandContext<ServerCommandSource> ct) throws InvalidOptionException {
+		activeOptionSet.set(name, val, ct);
+	}
+	
+	public static void setGlobal(String name, String val, 
+			CommandContext<ServerCommandSource> ct) throws InvalidOptionException {
+		OptionSet.GLOBAL.set(name, val);
+	}
+	
+	public static void sendOptionsTo(ServerPlayerEntity player) {
+		player.networkHandler.sendPacket(activeOptionSet.toPacket());
 	}
 	
 	static{
-		registerCustomApplicationBehavior("enabledTools", (val, ct) -> {
+		registerCustomApplicationBehavior("enabledTools", (oldValue, newValue, ct) -> {
 			if(ct == null) {
 				return;
 			}
 			
 			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
-				sendErrorOrWarn(ct, "Please install the carpet mod!");
+				throw new InvalidOptionException("opt.err.reqcarpet");
 			}
 			
-			try {
-				if(new BooleanParser().tryParse(val)) {
-					CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool");
-				}else {
-					CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script unload tool");
-				}
-			} catch (InvaildOptionException e) {
-				e.printStackTrace();
+			// FIXME Only influences the sender?
+			if((Boolean) newValue) {
+				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool global");
+			}else {
+				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script unload tool");
 			}
 		});
-		BiConsumer<String, CommandContext<ServerCommandSource>> checkLithium = (val, ct) -> {
-			if (FabricLoader.getInstance().isModLoaded("lithium")) {
-				sendErrorOrWarn(ct, "Warning: This feature is not compatible with lithium. Maybe it won't work properly");
+		CustomAction checkLithium = (oldVal, newVal, ct) -> {
+			if (FabricLoader.getInstance().isModLoaded("lithium") && (Boolean) newVal) {
+				throw new InvalidOptionException("opt.err.lithium");
 			}
 		};
 		registerCustomApplicationBehavior("entityExplosionInfluence", checkLithium);
 		registerCustomApplicationBehavior("disableExplosionExposureCalculation", checkLithium);
-		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", (val, ct) -> {
-			if (!FabricLoader.getInstance().isModLoaded("carpet")) {
-				sendErrorOrWarn(ct, "Please install the carpet mod!");
+		CustomAction requireCarpet = (oldVal, newVal, ct) -> {
+			if (!FabricLoader.getInstance().isModLoaded("carpet") 
+					&& (!(newVal instanceof Boolean) || (Boolean) newVal)) {
+				throw new InvalidOptionException("opt.err.reqcarpet");
 			}
-		});
-		registerCustomApplicationBehavior("hudStyles", (val, ct) -> {
+		};
+		registerCustomApplicationBehavior("blockInfoRendererUpdateInFrozenTicks", requireCarpet);
+		registerCustomApplicationBehavior("hudStyles", (oldVal, newVal, ct) -> {
 			if (!MessMod.isDedicatedServerEnv() && MessMod.INSTANCE.getClientHudManager() != null) {
-				MessMod.INSTANCE.getClientHudManager().updateStyle(val);
+				MessMod.INSTANCE.getClientHudManager().updateStyle((String) newVal);
 			}
 		});
-		OPTIONS.forEach((o) -> {
-			if(!I18N.EN_US.containsKey(String.format("opt.%s.desc", o.getName()))) {
-				MessMod.LOGGER.warn("The description of option {} is missing!", o.getName());
+		registerCustomApplicationBehavior("language", (oldVal, newVal, ct) -> {
+			boolean forceLoad = ((String) newVal).endsWith(Language.FORCELOAD_SUFFIX);
+			String id = ((String) newVal).replace(Language.FORCELOAD_SUFFIX, "");
+			if(!I18N.setLanguage(id, forceLoad)) {
+				// Needn't be translated
+				throw new InvalidOptionException("Language " + id + " is unsupported or incomplete.");
 			}
 		});
-		loadDefaults();
+		OPTIONS.values().forEach((o) -> {
+			if(!I18N.EN_US.containsKey(String.format("opt.%s.desc", o.name))) {
+				MessMod.LOGGER.warn("The description of option {} is missing!", o.name);
+			}
+		});
+		setOptionSet(OptionSet.GLOBAL);
+	}
+	
+	@FunctionalInterface interface CustomAction {
+		/**
+		 * Called after the new value of an option has been set. This method mainly perform some validations, and
+		 * some custom application steps.
+		 * @param oldValue The previous value of the updated option, or null not exist.
+		 */
+		void onOptionUpdate(@Nullable Object oldValue, Object newValue, 
+				@Nullable CommandContext<ServerCommandSource> ct)throws InvalidOptionException;
 	}
 }

@@ -1,4 +1,4 @@
-package lovexyn0827.mess.util.access;
+package lovexyn0827.mess.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import com.google.common.collect.Iterators;
 import com.mojang.brigadier.StringReader;
 
-class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
+public final class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
 	private final StringReader input;
 	private boolean quoted = false;
 	
@@ -61,7 +61,7 @@ class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
 		}
 		
 		if(this.quoted == true) {
-			throw new IllegalStateException("Incomplete quote");
+			throw new TranslatableException("exp.incompquote");
 		}
 		
 		return sb.toString();
@@ -70,7 +70,7 @@ class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
 	private String readEscape() {
 		StringReader in = this.input;
 		if(!in.canRead()) {
-			throw new IllegalStateException("Incomplete escape");
+			throw new TranslatableException("exp.incomescape");
 		}
 		
 		char c = in.read();
@@ -96,10 +96,10 @@ class ArgumentListTokenizer implements Iterable<String>, Iterator<String> {
 				String hexStr = in.getString().substring(in.getCursor(), in.getCursor() + 4);
 				return Character.valueOf((char) Integer.parseUnsignedInt(hexStr, 16)).toString();
 			} else {
-				throw new IllegalStateException("Incomplete Unicode character");
+				throw new TranslatableException("exp.unknownescape");
 			}
 		default :
-			throw new IllegalStateException("Unsupported escape: " + c);
+			throw new TranslatableException("exp.unknownescape", c);
 		}
 	}
 

@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.brigadier.CommandDispatcher;
 
 import lovexyn0827.mess.command.AccessingPathCommand;
+import lovexyn0827.mess.command.CountEntitiesCommand;
 import lovexyn0827.mess.command.EnsureCommand;
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
@@ -22,6 +23,7 @@ import lovexyn0827.mess.command.FreezeEntityCommand;
 import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LagCommand;
+import lovexyn0827.mess.command.LazyLoadCommand;
 import lovexyn0827.mess.command.LogChunkBehaviorCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.LogPacketCommand;
@@ -37,6 +39,7 @@ import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
+import lovexyn0827.mess.command.VariableCommand;
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -75,6 +78,9 @@ public abstract class CommandMixin {
         AccessingPathCommand.register(this.dispatcher);
         ExportSaveCommand.register(this.dispatcher);
         LogChunkBehaviorCommand.register(this.dispatcher);
+        LazyLoadCommand.register(this.dispatcher);
+        CountEntitiesCommand.register(this.dispatcher);
+        VariableCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 

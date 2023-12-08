@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,62 +19,131 @@ import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.phase.ClientTickingPhase;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhase;
+import net.minecraft.SharedConstants;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntityHolder {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 	final Entity entity;
-	private final int entityId;;
+	private final int entityId;
 	private final CsvWriter writer;
 	private int age;
-	private Map<EntityLogColumn, Object> listenedFields = Maps.newHashMap();
-	private boolean closed;
-	final boolean isClient;
+	private final Map<EntityLogColumn, Object> listenedFields;
+	private volatile boolean closed;
+	final boolean shouldTickClient;
+	final boolean shouldTickServer;
+	final SideLogStoragePolicy policy;
+	private boolean fresh = true;
+	private final TickingPhase.Event dataUpdater;
 	
-	EntityHolder(Entity e, EntityLogger logger, boolean isClient) {
+	EntityHolder(Entity e, EntityLogger logger, boolean isClient, SideLogStoragePolicy policy) {
 		this.entity = e;
 		this.entityId = entity.getId();
-		this.isClient = isClient;
-		String entityName = e.getName().asString();
-		String name = DATE_FORMAT.format(new Date()) 
-				+ "@" + this.entityId + '-' + (isClient ? 'C' : 'S') + '-'
-				+ (entityName.length() == 0 ? entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "") : 
-						entityName) + ".csv";
-		File f = logger.getLogPath().resolve(name).toFile();
+		this.shouldTickServer = !isClient;
+		this.shouldTickClient = isClient;
+		this.policy = policy;
+		this.listenedFields = Maps.newHashMap();
 		try {
-			FileWriter w = new FileWriter(f);
-			CsvWriter.Builder builder = new CsvWriter.Builder().addColumn("tick").addColumn("x").addColumn("y").addColumn("z")
-				.addColumn("vx").addColumn("vy").addColumn("vz");
+			FileWriter w = new FileWriter(getLogFile(e, isClient ? 'C' : 'S', logger));
+			CsvWriter.Builder builder = new CsvWriter.Builder().addColumn("tick")
+					.addColumn("x").addColumn("y").addColumn("z")
+					.addColumn("vx").addColumn("vy").addColumn("vz");
 			if(e instanceof LivingEntity) {
 				builder.addColumn("health");
 			}
 			
 			Mapping map = MessMod.INSTANCE.getMapping();
 			logger.getListenedFields().values().forEach((field) -> {
-				boolean sideMatched = (field.getPhase() instanceof ClientTickingPhase) == isClient;
+				boolean sideMatched = (field.getPhase() instanceof ClientTickingPhase) && this.shouldTickClient 
+						|| (field.getPhase() instanceof ServerTickingPhase) && this.shouldTickServer;
 				if(sideMatched && field.canGetFrom(e)) {
 					builder.addColumn(map.namedField(field.getName()));
 					this.listenedFields.put(field, ToBeReplaced.INSTANCE);
 				}
-			});
-			
+			});	
 			this.writer = builder.build(w);
 		} catch (IOException e1) {
 			throw new TranslatableException("exp.log.holder", e1);
 		}
 		
-		if(!MessMod.isDedicatedServerEnv() && isClient) {
-			ClientTickingPhase.addEventToAll(this::updateServerData);
-		} else {
-			ServerTickingPhase.addEventToAll(this::updateServerData);
+		this.dataUpdater = this::updateData;
+		if(!MessMod.isDedicatedServerEnv() && this.shouldTickClient) {
+			ClientTickingPhase.addEventToAll(this.dataUpdater);
+		} else if(this.shouldTickServer) {
+			ServerTickingPhase.addEventToAll(this.dataUpdater);
+		}
+	}
+	
+	private EntityHolder(Entity e, EntityLogger logger, boolean isClient, 
+			CsvWriter writer, List<EntityLogColumn> columns) {
+		this.entity = e;
+		this.entityId = entity.getId();
+		this.shouldTickServer = !isClient;
+		this.shouldTickClient = isClient;
+		this.policy = SideLogStoragePolicy.MIXED;
+		this.listenedFields = Maps.newHashMap();
+		columns.forEach((c) -> this.listenedFields.put(c, ToBeReplaced.INSTANCE));
+		this.writer = writer;
+		this.dataUpdater = this::updateData;
+		if(!MessMod.isDedicatedServerEnv() && this.shouldTickClient) {
+			ClientTickingPhase.addEventToAll(this.dataUpdater);
+		} else if(this.shouldTickServer) {
+			ServerTickingPhase.addEventToAll(this.dataUpdater);
+		}
+	}
+	
+	private static File getLogFile(Entity e, char type, EntityLogger logger) {
+		String entityName = e.getName().getString();
+		for (char c : SharedConstants.INVALID_CHARS_LEVEL_NAME) {
+			entityName = entityName.replace(c, '_');
+		}
+		
+		String name = String.format("%s@%d-%c-%s.csv", 
+				DATE_FORMAT.format(new Date()), 
+				e.getId(), 
+				type, 
+				(entityName.length() == 0 ? e.getType()
+						.getTranslationKey()
+						.replaceFirst("^.+\\u002e", "") : entityName));
+		return logger.getLogPath().resolve(name).toFile();
+	}
+	
+	/**
+	 * 
+	 * @return Pair(Client, Server)
+	 */
+	static Pair<EntityHolder, EntityHolder> createMixedHolderPair(Entity e, EntityLogger logger){
+		try {
+			FileWriter w = new FileWriter(getLogFile(e, 'M', logger));
+			CsvWriter.Builder builder = new CsvWriter.Builder().addColumn("tick")
+					.addColumn("x").addColumn("y").addColumn("z")
+					.addColumn("vx").addColumn("vy").addColumn("vz");
+			if(e instanceof LivingEntity) {
+				builder.addColumn("health");
+			}
+			
+			Mapping map = MessMod.INSTANCE.getMapping();
+			List<EntityLogColumn> columns = new ArrayList<>();
+			logger.getListenedFields().values().forEach((field) -> {
+				if(field.canGetFrom(e)) {
+					builder.addColumn(map.namedField(field.getName()));
+					columns.add(field);
+				}
+			});	
+			CsvWriter writer = builder.build(w);
+			return new Pair<>(new EntityHolder(e, logger, true, writer, columns), 
+					new EntityHolder(e, logger, false, writer, columns));
+		} catch (IOException e1) {
+			throw new TranslatableException("exp.log.holder", e1);
 		}
 	}
 
 	public void serverTick() {
-		if(this.isClient) {
+		if(!this.shouldTickServer) {
 			throw new IllegalStateException("Shouldn't be called!");
 		}
 		
@@ -86,21 +156,26 @@ public class EntityHolder {
 		
 		this.listenedFields.forEach((field, value) -> {
 			if(field.getPhase() instanceof ClientTickingPhase) {
+				if(this.policy == SideLogStoragePolicy.MIXED) {
+					obs.add("");
+				}
+				
 				return;
 			}
 			
-			if(value == ToBeReplaced.INSTANCE) {
-				throw new IllegalStateException("The value of " + field + " is not ready!");
+			if(value == ToBeReplaced.INSTANCE && !this.fresh) {
+				throw new IllegalStateException("The value of " + field + " hasn't been set!");
 			}
 			
 			obs.add(value);
 		});
 		this.listenedFields.entrySet().forEach((entry) -> entry.setValue(ToBeReplaced.INSTANCE));
 		this.writer.println(obs.toArray());
+		this.fresh = false;
 	}
 	
 	public void clientTick() {
-		if(!this.isClient) {
+		if(!this.shouldTickClient) {
 			throw new IllegalStateException("Shouldn't be called!");
 		}
 		
@@ -113,20 +188,25 @@ public class EntityHolder {
 		
 		this.listenedFields.forEach((field, value) -> {
 			if(field.getPhase() instanceof ServerTickingPhase) {
+				if(this.policy == SideLogStoragePolicy.MIXED) {
+					obs.add("");
+				}
+				
 				return;
 			}
 			
-			if(value == ToBeReplaced.INSTANCE) {
-				throw new IllegalStateException("The value of " + field + " is not ready!");
+			if(value == ToBeReplaced.INSTANCE && !this.fresh) {
+				throw new IllegalStateException("The value of " + field + " hasn't been set!");
 			}
 			
 			obs.add(value);
 		});
 		this.listenedFields.entrySet().forEach((entry) -> entry.setValue(ToBeReplaced.INSTANCE));
 		this.writer.println(obs.toArray());
+		this.fresh = false;
 	}
 	
-	public void updateServerData(TickingPhase phase, World world) {
+	public void updateData(TickingPhase phase, World world) {
 		if(this.closed) {
 			return;
 		}
@@ -135,7 +215,7 @@ public class EntityHolder {
 			boolean isEntityWorld = e.getKey().getPhase().isNotInAnyWorld() || world == this.entity.world;
 			if(e.getKey().getPhase() == phase && isEntityWorld) {
 				if(e.getValue() != ToBeReplaced.INSTANCE) {
-					throw new IllegalStateException("The value of " + e.getKey() + " is already set!");
+					throw new IllegalStateException("The value of " + e.getKey() + " has already been set!");
 				}
 
 				e.setValue(e.getKey().getFrom(this.entity));
@@ -160,6 +240,13 @@ public class EntityHolder {
 		try {
 			this.writer.close();
 			this.closed = true;
+			if(this.shouldTickClient) {
+				ClientTickingPhase.removeEventFromAll(this.dataUpdater);
+			}
+			
+			if(this.shouldTickServer) {
+				ServerTickingPhase.removeEventFromAll(this.dataUpdater);
+			}
 		} catch (IOException e) {
 			MessMod.LOGGER.warn("Failed to close: " + this.entityId);
 			e.printStackTrace();
@@ -170,7 +257,7 @@ public class EntityHolder {
 		return this.entityId;
 	}
 	
-	// TODO Use something better
+	// Use something better (maybe alternative other than employing ObjectHolders doesn't exist)
 	private static enum ToBeReplaced {
 		INSTANCE
 	}

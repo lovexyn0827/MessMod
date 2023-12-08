@@ -1,10 +1,8 @@
 package lovexyn0827.mess.options;
 
+import java.util.Set;
+
 import org.jetbrains.annotations.Nullable;
-
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-
-import net.minecraft.server.command.ServerCommandSource;
 
 /**
  * @author lovexyn0827
@@ -15,9 +13,9 @@ public interface OptionParser<T> {
 	/**
 	 * Translate a string representation of a value of an option to its runtime representation.
 	 * @return The runtime representation of {@code str}
-	 * @throws InvaildOptionException If the given string representation is not qualified.
+	 * @throws InvalidOptionException If the given string representation is not qualified.
 	 */
-	T tryParse(String str) throws InvaildOptionException;
+	T tryParse(String str) throws InvalidOptionException;
 	
 	/**
 	 * Translate a runtime representation of a value of an option to its string representation.
@@ -31,7 +29,30 @@ public interface OptionParser<T> {
 	}
 	
 	@Nullable
-	default SuggestionProvider<ServerCommandSource> createSuggestions() {
+	default Set<String> createSuggestions() {
 		return null;
+	}
+	
+	default void validate(String in) throws InvalidOptionException {
+		this.tryParse(in);
+	}
+	
+	static OptionParser<?> of(Option o) {
+		try {
+			return o.parserClass().getConstructor().newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Nullable
+	static OptionParser<?> of(String optionName) {
+		OptionWrapper o = OptionManager.OPTIONS.get(optionName);
+		if(o != null) {
+			return of(o.option);
+		} else {
+			return null;
+		}
 	}
 }

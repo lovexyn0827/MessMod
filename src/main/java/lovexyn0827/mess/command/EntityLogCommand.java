@@ -13,18 +13,16 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.log.entity.EntityLogger;
-import lovexyn0827.mess.util.phase.TickingPhase;
+import lovexyn0827.mess.log.entity.SideLogStoragePolicy;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
-import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
@@ -33,7 +31,10 @@ public class EntityLogCommand {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("entitylog").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("sub")
 						.then(argument("target", EntityArgumentType.entities())
-								.executes(EntityLogCommand::subscribe)))
+								.executes(EntityLogCommand::subscribe)
+								.then(argument("policy", StringArgumentType.word())
+										.suggests(CommandUtil.immutableSuggestionsOfEnum(SideLogStoragePolicy.class))
+										.executes(EntityLogCommand::subscribeWithPolicy))))
 				.then(literal("unsub")
 						.then(argument("target", EntityArgumentType.entities())
 								.executes(EntityLogCommand::unsubscribe)))
@@ -43,7 +44,6 @@ public class EntityLogCommand {
 								.then(argument("field", StringArgumentType.word())
 										.suggests(CommandUtil.FIELDS_SUGGESTION)
 										.executes((ct) -> {
-											sendRestartWarnings(ct);
 											EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 											EntityType<?> type = Registry.ENTITY_TYPE
 													.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
@@ -59,7 +59,6 @@ public class EntityLogCommand {
 										})
 										.then(argument("name", StringArgumentType.word())
 												.executes((ct) -> {
-													sendRestartWarnings(ct);
 													EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 													EntityType<?> type = Registry.ENTITY_TYPE
 															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
@@ -76,7 +75,6 @@ public class EntityLogCommand {
 												})
 												.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 														.executes((ct) -> {
-															sendRestartWarnings(ct);
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 															EntityType<?> type = Registry.ENTITY_TYPE
 																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
@@ -94,7 +92,6 @@ public class EntityLogCommand {
 														}))
 												.then(TickingPhase.commandArg()
 														.executes((ct) -> {
-															sendRestartWarnings(ct);
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 															EntityType<?> type = Registry.ENTITY_TYPE
 																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
@@ -112,7 +109,6 @@ public class EntityLogCommand {
 														})
 														.then(argument("path", AccessingPathArgumentType.accessingPathArg())
 																.executes((ct) -> {
-																	sendRestartWarnings(ct);
 																	EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 																	EntityType<?> type = Registry.ENTITY_TYPE
 																			.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
@@ -196,7 +192,24 @@ public class EntityLogCommand {
 							CommandUtil.feedbackWithArgs(ct, "cmd.general.count", 
 									MessMod.INSTANCE.getEntityLogger().countLoggedEntities());
 							return Command.SINGLE_SUCCESS;
-						}));
+						}))
+				.then(literal("setDefaultStoragePolicy")
+						.then(argument("policy", StringArgumentType.word())
+								.suggests(CommandUtil.immutableSuggestionsOfEnum(SideLogStoragePolicy.class))
+								.executes((ct) -> {
+									SideLogStoragePolicy policy;
+									String name = StringArgumentType.getString(ct, "policy");
+									try {
+										policy = SideLogStoragePolicy.valueOf(name);
+									} catch (IllegalArgumentException e) {
+										CommandUtil.errorWithArgs(ct, "cmd.general.nodef", name);
+										return 0;
+									}
+									
+									MessMod.INSTANCE.getEntityLogger().setDefaultStoragePolicy(policy);
+									CommandUtil.feedback(ct, "cmd.general.success");
+									return Command.SINGLE_SUCCESS;
+								})));
 		dispatcher.register(command);
 	}
 
@@ -208,6 +221,23 @@ public class EntityLogCommand {
 		return Command.SINGLE_SUCCESS;
 	}
 	
+	private static int subscribeWithPolicy(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
+		SideLogStoragePolicy policy;
+		String name = StringArgumentType.getString(ct, "policy");
+		try {
+			policy = SideLogStoragePolicy.valueOf(name);
+		} catch (IllegalArgumentException e) {
+			CommandUtil.errorWithArgs(ct, "cmd.general.nodef", name);
+			return 0;
+		}
+		
+		EntityLogger l = MessMod.INSTANCE.getEntityLogger();
+		Collection<? extends Entity> list = EntityArgumentType.getEntities(ct, "target");
+		int i = l.subscribe(list, policy);
+		CommandUtil.feedbackWithArgs(ct, "cmd.general.sub", list.size(), i);
+		return Command.SINGLE_SUCCESS;
+	}
+	
 	private static int unsubscribe(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
 		EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 		Collection<? extends Entity> list = EntityArgumentType.getEntities(ct, "target");
@@ -215,14 +245,8 @@ public class EntityLogCommand {
 		CommandUtil.feedbackWithArgs(ct, "cmd.general.unsub", list.size(), i);
 		return Command.SINGLE_SUCCESS;
 	}
-	
-	private static void sendRestartWarnings(CommandContext<ServerCommandSource> ct) {
-		ct.getSource().sendFeedback(new LiteralText(I18N.translate("cmd.entitylog.restart"))
-				.formatted(Formatting.RED), false);
-	}
 
 	private static int unlistenField(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
-		sendRestartWarnings(ct);
 		EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 		String name = StringArgumentType.getString(ct, "field");
 		try {

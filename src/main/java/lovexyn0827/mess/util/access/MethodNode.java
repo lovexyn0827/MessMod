@@ -11,10 +11,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
-
+import org.objectweb.asm.tree.InsnList;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.ArgumentListTokenizer;
+import lovexyn0827.mess.util.MethodDescriptor;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
@@ -22,7 +25,6 @@ import lovexyn0827.mess.util.deobfuscating.Mapping;
 final class MethodNode extends Node implements Cloneable {
 	static final Pattern METHOD_PATTERN = Pattern.compile(
 			"^(?<name>[$_a-zA-Z0-9]+)(?:\\<(?<types>[^>]*)\\>)?\\((?<args>.*)\\)$");
-
 	private final String name;
 	@Nullable
 	private final Class<?>[] types;
@@ -30,12 +32,15 @@ final class MethodNode extends Node implements Cloneable {
 	@Nullable
 	private Method method;
 	private final Integer argNum;
+	@Nullable
+	private final Class<?> returnTypes;
 	
 	MethodNode(String name, String types, String args) {
 		this.name = name;
 		if(types != null) {
 			if(types.matches("[0-9]+")) {
 				this.types = null;
+				this.returnTypes = null;
 				try {
 					this.argNum = Integer.parseInt(types);
 				} catch (NumberFormatException e) {
@@ -43,11 +48,15 @@ final class MethodNode extends Node implements Cloneable {
 				}
 			} else {
 				this.argNum = null;
-				this.types = parseDescriptor(types);
+				MethodDescriptor desc = MethodDescriptor.parse(
+						MessMod.INSTANCE.getMapping().srgMethodDescriptor(types));
+				this.types = desc.argTypes;
+				this.returnTypes = desc.returnType;
 			}
 		} else {
 			this.types = null;
 			this.argNum = null;
+			this.returnTypes = null;
 		}
 		
 		try {
@@ -69,7 +78,7 @@ final class MethodNode extends Node implements Cloneable {
 			Type[] argTypes = this.method.getGenericParameterTypes();
 			for(int i = 0; i < argsL.length; i++) {
 				try {
-					argObjs[i] = argsL[i].get(argTypes[i]);	// XXX Generic type
+					argObjs[i] = argsL[i].get(argTypes[i]);
 				} catch (InvalidLiteralException e) {
 					throw AccessingFailureException.create(e, this);
 				}
@@ -87,17 +96,21 @@ final class MethodNode extends Node implements Cloneable {
 		} catch (AccessingFailureException e) {
 			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
-			MessMod.LOGGER.info("Failed to invoke " + this.method);
+			if(OptionManager.superSuperSecretSetting) {
+				e.printStackTrace();
+				MessMod.LOGGER.info("Failed to invoke " + this.method);
+			}
 			throw AccessingFailureException.createWithArgs(FailureCause.ERROR, this, e, e);
 		}
 	}
 	
-	private void resolveMethod(Class<? extends Object> clazz) throws AccessingFailureException {
+	private void resolveAndSetMethod(Class<? extends Object> clazz) throws AccessingFailureException {
 		Mutable<String> srg = new MutableObject<>();
 		Mapping map = MessMod.INSTANCE.getMapping();
 		final List<Method> candidates = Reflection.listMethods(clazz).stream()
 				.filter((m) -> {
+					// Determine whether or not a method can be a valid candidate.
+					// FIXME When multiple methods has the same types of parameters, the method be chosen inaccurately
 					String descriptor = org.objectweb.asm.Type.getMethodDescriptor(m);
 					srg.setValue(map.srgMethodRecursively(clazz, this.name, descriptor));
 					if(m.getName().equals(srg.getValue())) {
@@ -112,15 +125,14 @@ final class MethodNode extends Node implements Cloneable {
 						return false;
 					}
 				})
-				.filter((m) -> !m.isSynthetic())
 				.map(Reflection::getDeepestOverridenMethod)
 				.distinct()
 				.collect(Collectors.toList());
 		if(candidates.size() == 1) {
-			this.method = candidates.iterator().next();
+			this.method = candidates.get(0);
 		} else if(candidates.size() == 0) {
 			throw AccessingFailureException.createWithArgs(FailureCause.NO_METHOD, this, null, 
-					srg.getValue(), clazz.getSimpleName());	// XXX Deobfusciation
+					srg.getValue(), clazz.getSimpleName());
 		} else {
 			throw AccessingFailureException.create(FailureCause.MULTI_TARGET, this);
 		}
@@ -187,37 +199,17 @@ final class MethodNode extends Node implements Cloneable {
 		return n.outputType != null && Reflection.listMethods(
 				Reflection.getRawType(n.outputType)).contains(this.method);
 	}
-
+	
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException {
+	void initialize(Type lastOutType) throws AccessingFailureException  {
 		Class<?> cl = Reflection.getRawType(lastOutType);
-		this.resolveMethod(cl == null ? Object.class : cl);
-		this.outputType = this.method.getGenericReturnType();
-		return this.outputType;
+		this.resolveAndSetMethod(cl);
+		super.initialize(lastOutType);
 	}
 
-	public static Class<?>[] parseDescriptor(String descriptor) {
-		Mapping map = MessMod.INSTANCE.getMapping();
-		org.objectweb.asm.Type[] args;
-		try {
-			args = org.objectweb.asm.Type.getArgumentTypes(descriptor);
-		} catch (RuntimeException e) {
-			throw new TranslatableException("exp.descriptor");
-		}
-		
-		Class<?>[] result = new Class<?>[args.length];
-		for(int i = 0; i < args.length; i++) {
-			String clName = map.srgClass(args[i].getClassName());	// XXX Srg or named
-			try {
-				result[i] = Reflection.getClassIncludingPrimitive(clName);
-			} catch (ClassNotFoundException e) {
-				TranslatableException e1 = new TranslatableException("exp.noclass", clName);
-				e1.initCause(e);
-				throw e1;
-			}
-		}
-		
-		return result;
+	@Override
+	protected Type resolveOutputType(Type lastOutType){
+		return this.method.getGenericReturnType();
 	}
 
 	public static Literal<?>[] parseArgs(String argsStr) throws CommandSyntaxException {
@@ -260,5 +252,29 @@ final class MethodNode extends Node implements Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError();
 		}
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		return (ctx) -> {
+			InsnList insns = new InsnList();
+			if(this.method == null) {
+				throw new CompilationException(FailureCause.ERROR);
+			} else {
+				// 1. Prepare arguments
+				int argsLength = this.args.length;
+				Class<?>[] argTypes = this.method.getParameterTypes();
+				for(int i = 0; i < argsLength; i++) {
+					Literal<?> literal = this.args[i];
+					BytecodeHelper.appendConstantLoader(ctx, insns, literal, argTypes[i]);
+				}
+				
+				// 2. Invoke underlying method
+				BytecodeHelper.appendCaller(insns, this.method, CompilationContext.CallableType.INVOKER);
+			}
+			
+			ctx.endNode(this.method.getGenericReturnType());
+			return insns;
+		};
 	}
 }

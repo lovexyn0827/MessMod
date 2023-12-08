@@ -3,18 +3,18 @@ package lovexyn0827.mess.options;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Lists;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.datafixers.util.Either;
 
 import lovexyn0827.mess.MessMod;
 import net.minecraft.client.render.debug.DebugRenderer;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ChunkTicketType;
 
 public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
@@ -26,7 +26,7 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 	}
 	
 	@Override
-	public List<T> tryParse(String str) throws InvaildOptionException {
+	public List<T> tryParse(String str) throws InvalidOptionException {
 		if(EMPTY_LIST.equals(str) || str.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -37,14 +37,14 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 			if(element != null) {
 				result.add(element);
 			} else {
-				throw new InvaildOptionException("cmd.general.nodef", elementStr);
+				throw new InvalidOptionException("cmd.general.nodef", elementStr);
 			}
 		}
 		
 		return result;
 	}
 
-	protected T parseElement(String elementStr) throws InvaildOptionException {
+	protected T parseElement(String elementStr) throws InvalidOptionException {
 		return this.elements.get(elementStr);
 	}
 
@@ -63,12 +63,10 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 	}
 	
 	@Override
-	public SuggestionProvider<ServerCommandSource> createSuggestions() {
-		return (ct, b) -> {
-			this.elements.keySet().forEach(b::suggest);
-			b.suggest(EMPTY_LIST);
-			return b.buildFuture();
-		};
+	public Set<String> createSuggestions() {
+		Set<String> suggestions = new HashSet<>(this.elements.keySet());
+		suggestions.add(EMPTY_LIST);
+		return suggestions;
 	}
 	
 	public static class Ticket extends ListParser<ChunkTicketType<?>> {
@@ -104,12 +102,12 @@ public abstract class ListParser<T> implements OptionParser<List<? extends T>> {
 		}
 		
 		@Override
-		public List<Either<Field, String>> tryParse(String str) throws InvaildOptionException {
+		public List<Either<Field, String>> tryParse(String str) throws InvalidOptionException {
 			return super.tryParse(str);
 		}
 		
 		@Override
-		protected Either<Field, String> parseElement(String elementStr) throws InvaildOptionException {
+		protected Either<Field, String> parseElement(String elementStr) throws InvalidOptionException {
 			if(MessMod.isDedicatedServerEnv()) {
 				return Either.right(elementStr);
 			} else {

@@ -10,7 +10,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.i18n.I18N;
@@ -37,10 +36,10 @@ public class CommandUtil {
 		return b.buildFuture();
 	};
 	public static final SuggestionProvider<ServerCommandSource> FIELDS_SUGGESTION = (ct, builder) -> {
-		Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+		Identifier id = new Identifier(StringArgumentType.getString(ct.getLastChild(), "entityType"));
 		EntityType<?> type = Registry.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
-		Reflection.getAvailableFields(clazz).forEach(builder::suggest);
+		Reflection.getAvailableFieldNames(clazz).forEach(builder::suggest);
 		builder.suggest("-THIS-");
 		return builder.buildFuture();
 	};
@@ -57,11 +56,10 @@ public class CommandUtil {
 			noreplyPlayerSource = null;
 			commandManager = null;
 			firstPlayerJoined = false;
-			EntityConfigCommand.reset();
 			SetExplosionBlockCommand.reset();
-			LogMovementCommand.reset();
-			FreezeEntityCommand.reset();
 			LogPacketCommand.reset();
+			LazyLoadCommand.reset();
+			VariableCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}
@@ -107,10 +105,16 @@ public class CommandUtil {
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendError(new LiteralText(I18N.translate(ob.toString())));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 	
 	public static void errorWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
 		ct.getSource().sendError(new LiteralText(String.format(I18N.translate(fmt), args)));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
 	}
 
 	public static void error(CommandContext<ServerCommandSource> ct, String string, Exception e) {
@@ -119,6 +123,7 @@ public class CommandUtil {
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
 		if(OptionManager.superSuperSecretSetting) {
 			e.printStackTrace();
+			Thread.dumpStack();
 		}
 	}
 	
@@ -128,6 +133,7 @@ public class CommandUtil {
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
 		if(OptionManager.superSuperSecretSetting) {
 			e.printStackTrace();
+			Thread.dumpStack();
 		}
 	}
 
@@ -181,7 +187,7 @@ public class CommandUtil {
 		};
 	}
 	
-	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<ChunkEvent> class1) {
+	public static SuggestionProvider<ServerCommandSource> immutableSuggestionsOfEnum(Class<? extends Enum<?>> class1) {
 		return (ct, builder) -> {
 			Stream.of(class1.getEnumConstants())
 					.map(Enum::name)

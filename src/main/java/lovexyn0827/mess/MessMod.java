@@ -11,8 +11,9 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import lovexyn0827.mess.command.CommandUtil;
-import lovexyn0827.mess.log.entity.EntityLogger;
+import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
+import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.network.MessClientNetworkHandler;
 import lovexyn0827.mess.network.MessServerNetworkHandler;
@@ -26,7 +27,6 @@ import lovexyn0827.mess.rendering.ShapeSender;
 import lovexyn0827.mess.rendering.hud.ClientHudManager;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
 import lovexyn0827.mess.rendering.hud.ServerHudManager;
-import lovexyn0827.mess.util.BlockPlacementHistory;
 import lovexyn0827.mess.util.access.CustomNode;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import lovexyn0827.mess.util.deobfuscating.MappingProvider;
@@ -69,9 +69,9 @@ public class MessMod implements ModInitializer {
 	@Environment(EnvType.CLIENT)
 	private MessClientNetworkHandler clientNetworkHandler;
 	private MessServerNetworkHandler serverNetworkHandler;
-	private BlockPlacementHistory placementHistory;
 	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
 	private ChunkBehaviorLogger chunkLogger;
+	private long gameTime;
 
 	private MessMod() {
 		this.reloadMapping();
@@ -83,7 +83,6 @@ public class MessMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		OptionManager.loadGlobal();
 	}
 	
 	public Mapping getMapping() {
@@ -96,7 +95,6 @@ public class MessMod implements ModInitializer {
 			Files.createDirectories(scriptPath);
 		}
 		
-		// TODO
 		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/" + name + ".sc"), 
 				Paths.get(this.scriptDir, name + ".sc"), 
 				StandardCopyOption.REPLACE_EXISTING);
@@ -113,6 +111,7 @@ public class MessMod implements ModInitializer {
 		this.blockInfoRederer.tick();
 		this.shapeSender.updateClientTime(server.getOverworld().getTime());
 		this.entityLogger.serverTick();
+		LagCommand.tick();
 	}
 	
 
@@ -124,7 +123,6 @@ public class MessMod implements ModInitializer {
 		this.boxRenderer = new ServerSyncedBoxRenderer(server);
 		this.blockInfoRederer.initializate(server);
 		this.hudManagerS = new ServerHudManager(server);
-		this.placementHistory = new BlockPlacementHistory();
 		CustomNode.reload(server);
 		this.chunkLoadingInfoRenderer = new ChunkLoadingInfoRenderer();
 		this.entityLogger = new EntityLogger(server);
@@ -139,10 +137,9 @@ public class MessMod implements ModInitializer {
 		this.hudManagerS = null;
 		this.entityLogger.closeAll();
 		this.serverNetworkHandler = null;
-		this.placementHistory = null;
 		this.chunkLoadingInfoRenderer.close();
 		this.chunkLoadingInfoRenderer = null;
-		ServerTickingPhase.removeAllEvents();
+		ServerTickingPhase.initialize();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
 				this.entityLogger.archiveLogs();
@@ -164,9 +161,14 @@ public class MessMod implements ModInitializer {
 		this.entityLogger = null;
 		this.chunkLogger = null;
 		CommandUtil.updateServer(null);
+		OptionManager.updateServer(null);
 	}
 
 	public void onServerPlayerSpawned(ServerPlayerEntity player) {
+		if(isDedicatedServerEnv()) {
+			OptionManager.sendOptionsTo(player);
+		}
+		
 		CommandUtil.tryUpdatePlayer(player);
 		try {
 			this.scriptDir = server.getSavePath(WorldSavePathMixin.create("scripts")).toAbsolutePath().toString();
@@ -177,7 +179,6 @@ public class MessMod implements ModInitializer {
 							"/script load tool global");
 				}
 			}
-			OptionManager.sendOptionsTo(player);
 		} catch (IOException e) {
 			LOGGER.error("Scarpet scripts couldn't be loaded.");
 			e.printStackTrace();
@@ -209,12 +210,12 @@ public class MessMod implements ModInitializer {
 
 	@Environment(EnvType.CLIENT)
 	public void onClientTickStart() {
-		ClientTickingPhase.CLIENT_TICK_START.triggerEvents(null);
+		ClientTickingPhase.CLIENT_TICK_START.begin(null);
 	}
 
 	@Environment(EnvType.CLIENT)
 	public void onClientTicked() {
-		ClientTickingPhase.CLIENT_TICK_END.triggerEvents(null);
+		ClientTickingPhase.CLIENT_TICK_END.begin(null);
 		ServerHudManager shm = this.getServerHudManager();
 		if (this.entityLogger != null) {
 			this.entityLogger.clientTick();
@@ -296,10 +297,6 @@ public class MessMod implements ModInitializer {
 	public MessClientNetworkHandler getClientNetworkHandler() {
 		return this.clientNetworkHandler;
 	}
-
-	public BlockPlacementHistory getPlacementHistory() {
-		return this.placementHistory;
-	}
 	
 	public static boolean isDedicatedServerEnv() {
 		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
@@ -315,5 +312,13 @@ public class MessMod implements ModInitializer {
 
 	public ChunkBehaviorLogger getChunkLogger() {
 		return this.chunkLogger;
+	}
+
+	public long getGameTime() {
+		return this.gameTime;
+	}
+
+	public void updateTime(long time) {
+		this.gameTime = time;
 	}
 }

@@ -6,11 +6,21 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.IincInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
+
 import com.google.common.collect.ImmutableCollection;
 import lovexyn0827.mess.util.Reflection;
 
 final class ElementNode extends Node {
-
 	private int index;
 
 	ElementNode(int index) {
@@ -78,21 +88,18 @@ final class ElementNode extends Node {
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) {
+	protected Type resolveOutputType(Type lastOutType) {
 		if(lastOutType instanceof ParameterizedType) {
 			Type typeArg = ((ParameterizedType) lastOutType).getActualTypeArguments()[0];
-			this.outputType = typeArg;
 			return typeArg;
 		} else if(lastOutType instanceof Class<?>) {
 			Class<?> cl = (Class<?>) lastOutType;
 			if(cl.isArray()) {
 				Class<?> compType = cl.getComponentType();
-				this.outputType = compType;
 				return compType;
 			}
 		}
 		
-		this.outputType = Object.class;
 		return Object.class;
 	}
 
@@ -146,5 +153,105 @@ final class ElementNode extends Node {
 				throw AccessingFailureException.createWithArgs(FailureCause.INV_LAST, this, null, this);
 			}
 		}
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		return (ctx) -> {
+			Type inType = ctx.getLastOutputType();
+			InsnList insns = new InsnList();
+			Class<?> rawType = Reflection.getRawType(inType);
+			Class<?> out;
+			if(rawType.isArray()) {
+				/* (Load index)
+				 * ~ALOAD
+				 * (Wrap)?
+				 */
+				BytecodeHelper.appendArrayElementLoader(insns, this.index, rawType.getComponentType());
+				out = rawType.getComponentType();
+			} else if(Collection.class.isAssignableFrom(rawType)) {
+				/* checkcast List / Collection
+				 * dup
+				 * invoke size()I
+				 * (Load index)
+				 * dup_x1	// List, index, size, index
+				 * if_icmpgt l1	//if index > size
+				 * (throw)
+				 * l1:
+				 * 	get stuff
+				 */
+				boolean isList = List.class.isAssignableFrom(rawType);
+				insns.add(new TypeInsnNode(Opcodes.CHECKCAST, isList ? "java/util/List" : "java/util/Collection"));
+				insns.add(new InsnNode(Opcodes.DUP));
+				insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/Collection", 
+						"size", "()I"));
+				BytecodeHelper.appendIntegerLoader(insns, this.index);
+				if(isList) {
+					insns.add(new InsnNode(Opcodes.DUP_X1));
+				}
+				
+				LabelNode ifInBound = new LabelNode();
+				insns.add(new JumpInsnNode(Opcodes.IF_ICMPGT, ifInBound));
+				BytecodeHelper.appendAccessingFailureException(insns, FailureCause.OUT_OF_BOUND);
+				insns.add(ifInBound);
+				// List, int / Collection
+				if(isList) {
+					insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/List", 
+							"get", "(I)Ljava/lang/Object;"));
+				} else {
+					insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/Collection", 
+							"iterator", "()Ljava/util/Iterator;"));
+					if(this.index >= 0 && this.index <= -1) {
+						// Possibly better solution for smaller indexes
+						for(int i = 0; i < this.index; i++) {
+							insns.add(new InsnNode(Opcodes.DUP));
+							insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/Iterator", 
+									"next", "()Ljava/lang/Object;"));
+							insns.add(new InsnNode(Opcodes.POP));
+						}
+						
+						insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/Iterator", 
+								"next", "()Ljava/lang/Object;"));
+					} else {
+						/* (load index)
+						 * istore var
+						 * aconst_null
+						 * loop:
+						 * 	pop
+						 * 	dup
+						 * 	invoke next()
+						 * 	iinc var
+						 * 	iload var
+						 * 	ifge loop // jump if var >= 0
+						 * invoke next()
+						 */
+						int var = ctx.allocateLocalVar();
+						BytecodeHelper.appendIntegerLoader(insns, this.index);
+						insns.add(new VarInsnNode(Opcodes.ISTORE, var));
+						insns.add(new InsnNode(Opcodes.ACONST_NULL));
+						LabelNode beginLoop = new LabelNode();
+						// ...,Iterator, Object
+						insns.add(beginLoop);
+						insns.add(new InsnNode(Opcodes.POP));
+						insns.add(new InsnNode(Opcodes.DUP));
+						// ..., Iterator, Iterator
+						insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/Iterator", 
+								"next", "()Ljava/lang/Object;"));
+						// ..., Iterator, Object
+						insns.add(new IincInsnNode(var, -1));
+						insns.add(new VarInsnNode(Opcodes.ILOAD, var));
+						// ..., Iterator, Object, int
+						insns.add(new JumpInsnNode(Opcodes.IFGE, beginLoop));
+					}
+				}
+				
+				out = Reflection.getTypeArgOrObject(inType, 0);
+			} else {
+				throw new CompilationException(FailureCause.INV_LAST, this);
+			}
+			
+			ctx.endNode(out);
+			return insns;
+		};
 	}
 }

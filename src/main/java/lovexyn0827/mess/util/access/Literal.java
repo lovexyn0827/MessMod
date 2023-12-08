@@ -10,10 +10,10 @@ import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.command.VariableCommand;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +26,7 @@ public abstract class Literal<T> {
 	protected final String stringRepresentation;
 	/**
 	 * Whether or not the value could be determined from the string representation directly
-	 * and won't change since created.
+	 * and won't change since created or initialized for the first time.
 	 */
 	protected boolean compiled;
 
@@ -62,35 +62,46 @@ public abstract class Literal<T> {
 	}
 
 	/**
-	 * @param type The type which the literal is expected to be parsed as.
+	 * @param type The type which the literal is expected to be parsed as, or null if unknown.
 	 * @throws InvalidLiteralException 
 	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
 	 */
 	@Nullable
-	public abstract T get(Type type) throws InvalidLiteralException;
+	public abstract T get(@Nullable Type type) throws InvalidLiteralException;
 	
 	public static Literal<?> parse(String strRep) throws CommandSyntaxException {
 		// I & N are reserved for special floating-point numbers.
 		switch(strRep.charAt(0)) {
-		case '\"' : 
-			return new StringL(new StringReader(strRep.substring(1)).readStringUntil('"'));
+		case '"' : 
+			return new StringL(strRep);
 		case 'E' : 
 			if(strRep.charAt(1) == '+') {
-				return new EnumL(strRep.substring(2));
+				return new EnumL(strRep);
 			}
+			
+			break;
 		case 'S' : 
 			if(strRep.charAt(1) == '+') {
-				return new StaticFieldL(strRep.substring(2));
+				return new StaticFieldL(strRep);
 			}
+			
+			break;
 		case 'C' : 
 			if(strRep.charAt(1) == '+') {
-				return new ClassL(strRep.substring(2));
+				return new ClassL(strRep);
 			}
+			
+			break;
 		case '[' : 
 			return new BlockPosL(strRep);
 		case '(' : 
 			return new Vec3dL(strRep);
-		case '<' : 
+		case 'V' : 
+			if(strRep.charAt(1) == '+') {
+				return new VarL(strRep);
+			}
+			
+			break;
 		default : 
 			Matcher matcher = NUMBER_PATTERN.matcher(strRep);
 			if("null".equals(strRep)) {
@@ -131,6 +142,8 @@ public abstract class Literal<T> {
 				};
 			}
 		}
+		
+		throw new TranslatableException("exp.invliteral", strRep);
 	}
 
 	/**
@@ -140,14 +153,29 @@ public abstract class Literal<T> {
 		return this;
 	}
 	
+	/**
+	 * @return Whether or not the literal is immutable and always represent the same value in a single run.
+	 */
+	public boolean isStatic() {
+		return this.compiled;
+	}
+	
+	public String serialize() {
+		return this.stringRepresentation;
+	}
+	
 	static class StringL extends Literal<String> {
+		private String string;
+		
 		protected StringL(String strRep) {
 			super(strRep);
+			this.string = strRep.substring(1, strRep.length() - 1);
+			this.compiled = true;
 		}
 
 		@Override
 		public String get(Type clazz) {
-			return this.stringRepresentation;
+			return this.string;
 		}
 	}
 	
@@ -165,53 +193,53 @@ public abstract class Literal<T> {
 				return this.fieldVal;
 			}
 			
-			if(clazz == null) {
-				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null,  
-						this.stringRepresentation);
-			}
-			
 			Class<?> cl = Reflection.getRawType(clazz);
-			if(cl != null) {
-				Field f = Reflection.getFieldFromNamed(cl, this.stringRepresentation);
-				if(f != null && Modifier.isStatic(f.getModifiers())) {
-					f.setAccessible(true);
-					try {
-						return f.get(null);
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						e.printStackTrace();
-						throw InvalidLiteralException.createWithArgs(FailureCause.ERROR, this, e, e);
+			String[] clAndF = this.stringRepresentation.substring(2).split("#");
+			if(clAndF.length == 2) {
+				String cN = MessMod.INSTANCE.getMapping().srgClass(clAndF[0].replace('/', '.'));
+				try {
+					Class<?> decC = Class.forName(MessMod.INSTANCE.getMapping().srgClass(cN));
+					Field f = Reflection.getFieldFromNamed(decC, clAndF[1]);
+					if(f != null) {
+						f.setAccessible(true);
+						this.fieldVal = f.get(null);
+						this.compiled = Modifier.isFinal(f.getModifiers());
+						return this.fieldVal;
+					} else {
+						throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
+								clAndF[1], clAndF[0]);
 					}
-				} else {
-					String[] clAndF = this.stringRepresentation.split("#");
-					if(clAndF.length == 2) {
-						String cN = MessMod.INSTANCE.getMapping().srgClass(clAndF[0].replace('/', '.'));
+				} catch (ClassNotFoundException e) {
+					throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, e, clAndF[0]);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					e.printStackTrace();
+					throw InvalidLiteralException.createWithArgs(FailureCause.ERROR, this, e, e);
+				}
+			} else if(clAndF.length == 1) {
+				String fieldName = this.stringRepresentation.substring(2);
+				if(cl != null) {
+					// Try simple mode (E+FIELD_NAME)
+					Field f = Reflection.getFieldFromNamed(cl, fieldName);
+					if(f != null && Modifier.isStatic(f.getModifiers())) {
+						f.setAccessible(true);
 						try {
-							Class<?> decC = Class.forName(MessMod.INSTANCE.getMapping().srgClass(cN));
-							Field f2 = Reflection.getFieldFromNamed(decC, clAndF[1]);
-							if(f2 != null) {
-								f2.setAccessible(true);
-								this.fieldVal = f2.get(null);
-								this.compiled = Modifier.isFinal(f2.getModifiers());
-								return this.fieldVal;
-							}
-						} catch (ClassNotFoundException e) {
-							throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, e, 
-									clAndF[0]);
-							
+							this.fieldVal = f.get(null);
+							this.compiled = Modifier.isFinal(f.getModifiers());
+							return this.fieldVal;
 						} catch (IllegalArgumentException | IllegalAccessException e) {
 							e.printStackTrace();
 							throw InvalidLiteralException.createWithArgs(FailureCause.ERROR, this, e, e);
 						}
 					} else {
-						throw InvalidLiteralException.create(FailureCause.INV_STATIC, this);
+						throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
+								clazz.getTypeName(), fieldName);
 					}
-					
-					throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
-							clAndF[1], clAndF[0]);
+				} else {
+					throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, 
+							fieldName);
 				}
 			} else {
-				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, 
-						this.stringRepresentation);
+				throw InvalidLiteralException.create(FailureCause.INV_STATIC, this);
 			}
 		}
 
@@ -230,8 +258,7 @@ public abstract class Literal<T> {
 
 		@Override
 		public Enum<?> get(Type clazz) throws InvalidLiteralException {
-			// FIXME Non-necessary non-null check
-			if(this.compiled && this.enumConstant != null) {
+			if(this.compiled) {
 				return this.enumConstant;
 			}
 			
@@ -244,7 +271,6 @@ public abstract class Literal<T> {
 			if(cl != null && cl.isEnum()) {
 				String f = MessMod.INSTANCE.getMapping().srgField(cl.getName(), this.stringRepresentation);
 				try {
-					// XXX
 					@SuppressWarnings({ "unchecked", "rawtypes" })
 					Enum<?> e = Enum.valueOf((Class) cl, f);
 					this.enumConstant = e;
@@ -253,7 +279,6 @@ public abstract class Literal<T> {
 				} catch (IllegalArgumentException e) {
 					throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
 							this.stringRepresentation, clazz.getTypeName());
-					
 				}
 			} else {
 				throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, this.stringRepresentation);
@@ -381,17 +406,25 @@ public abstract class Literal<T> {
 	
 
 	public static class ClassL extends Literal<Class<?>> {
+		private Class<?> classVal;
+		
 		protected ClassL(String strRep) {
 			super(strRep);
 		}
 
 		@Override
 		public Class<?> get(Type type) throws InvalidLiteralException {
-			String className = this.stringRepresentation.replace('/', '.');
+			if(this.compiled) {
+				return this.classVal;
+			}
+			
+			String className = this.stringRepresentation.substring(2).replace('/', '.');
 			try {
-				return Class.forName(className);
+				this.classVal = Reflection.getClassIncludingPrimitive(className);
+				this.compiled = true;
+				return this.classVal;
 			} catch (ClassNotFoundException e) {
-				throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, null, className);
+				throw InvalidLiteralException.createWithArgs(FailureCause.NO_CLASS, this, e, className);
 			}
 		}
 
@@ -419,5 +452,21 @@ public abstract class Literal<T> {
 			return this.vec3d;
 		}
 
+	}
+	
+	public static class VarL extends Literal<Object> {
+		private final String slot;
+
+		protected VarL(String strRep) throws CommandSyntaxException {
+			super(strRep);
+			this.slot = strRep.substring(2);
+			this.compiled = false;
+		}
+
+		@Override
+		public @Nullable Object get(@Nullable Type type) throws InvalidLiteralException {
+			return VariableCommand.getVariable(this.slot);
+		}
+		
 	}
 }

@@ -14,17 +14,21 @@ public enum ClientTickingPhase implements TickingPhase {
 	private final List<TickingPhase.Event> events = Lists.newArrayList();
 	
 	@Override
-	public void triggerEvents(@Nullable World world) {
+	public void begin(@Nullable World world) {
+		this.triggerEvents(world);
+	}
+	
+	protected synchronized void triggerEvents(@Nullable World world) {
 		this.events.forEach((e) -> e.trigger(this, world));
 	}
 
 	@Override
-	public void addEvent(TickingPhase.Event event) {
+	public synchronized void addEvent(TickingPhase.Event event) {
 		this.events.add(event);
 	}
 
 	@Override
-	public void removeEvent(TickingPhase.Event event) {
+	public synchronized void removeEvent(TickingPhase.Event event) {
 		this.events.remove(event);
 	}
 
@@ -42,6 +46,12 @@ public enum ClientTickingPhase implements TickingPhase {
 	public static void removeAllEvents() {
 		for(ClientTickingPhase phase : values()) {
 			phase.events.clear();
+		}
+	}
+	
+	public static void removeEventFromAll(TickingPhase.Event event) {
+		for(ClientTickingPhase phase : values()) {
+			phase.removeEvent(event);
 		}
 	}
 }

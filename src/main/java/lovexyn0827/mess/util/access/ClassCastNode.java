@@ -3,7 +3,10 @@ package lovexyn0827.mess.util.access;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-import lovexyn0827.mess.util.Reflection;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.TypeInsnNode;
+
 import lovexyn0827.mess.util.TranslatableException;
 
 public class ClassCastNode extends Node {
@@ -11,7 +14,7 @@ public class ClassCastNode extends Node {
 	
 	public ClassCastNode(String className) {
 		try {
-			this.castTo = Reflection.getClassIncludingPrimitive(className.replace('/', '.'));
+			this.castTo = Class.forName(className.replace('/', '.'));
 		} catch (ClassNotFoundException e) {
 			TranslatableException e1 = new TranslatableException("exp.noclass", className);
 			e1.initCause(e);
@@ -30,7 +33,7 @@ public class ClassCastNode extends Node {
 	}
 
 	@Override
-	protected Type prepare(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
+	protected Type resolveOutputType(Type lastOutType) throws AccessingFailureException, InvalidLiteralException {
 		return this.castTo;
 	}
 
@@ -60,6 +63,17 @@ public class ClassCastNode extends Node {
 		
 		ClassCastNode other = (ClassCastNode) obj;
 		return Objects.equals(this.castTo, other.castTo);
+	}
+
+	@Override
+	NodeCompiler getCompiler() {
+		this.ensureInitialized();
+		return (ctx) -> {
+			InsnList insns = new InsnList();
+			insns.add(new TypeInsnNode(Opcodes.CHECKCAST, org.objectweb.asm.Type.getInternalName(this.castTo)));
+			ctx.endNode(this.castTo);
+			return insns;
+		};
 	}
 
 	

@@ -14,8 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.google.common.collect.Lists;
 
-import lovexyn0827.mess.command.EntityConfigCommand;
-import lovexyn0827.mess.command.LogMovementCommand;
+import lovexyn0827.mess.fakes.EntityInterface;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -31,7 +30,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin {
+public abstract class EntityMixin implements EntityInterface {
 	@Shadow private Vec3d pos;
 	@Shadow private Vec3d velocity;
 	@Shadow private int id;
@@ -39,10 +38,9 @@ public abstract class EntityMixin {
 	@Shadow private EntityType<?> type;
 	private static List<Text> currentReport;
 	private static Vec3d lastMovement;
-
-	@Shadow protected abstract Vec3d adjustMovementForPiston(Vec3d movement);
-	@Shadow protected abstract Vec3d adjustMovementForSneaking(Vec3d movement, MovementType type);
-	@Shadow protected abstract Vec3d adjustMovementForCollisions(Vec3d movement);
+	private boolean isFrozen;
+	private boolean isStepHeightDisabled;
+	private boolean shouldLogMovement;
 	
 	@SuppressWarnings("rawtypes")
 	@Inject(at = @At(
@@ -61,8 +59,7 @@ public abstract class EntityMixin {
 			Stream stream, Stream stream2, 
 			ReusableStream reusableStream, 
 			Vec3d vec3d) {
-		Entity entity = (Entity)(Object)this;
-		if(EntityConfigCommand.shouldDisableStepHeight(entity)) {
+		if(this.isStepHeightDisabled) {
 			ci.setReturnValue(vec3d);
 			ci.cancel();
 		}
@@ -73,7 +70,7 @@ public abstract class EntityMixin {
 	)
 	private void onMoveStart(MovementType type, Vec3d movement, CallbackInfo ci) {
 		if(type != MovementType.SELF && type != MovementType.PLAYER) {
-			if(LogMovementCommand.SUBSCRIBED_ENTITIES.contains((Entity)(Object) this) && !this.world.isClient) {
+			if(this.shouldLogMovement && !this.world.isClient) {
 				currentReport = Lists.newArrayList();
 				currentReport.add(new LiteralText("Tick: " + this.world.getTime()).formatted(Formatting.DARK_GREEN, Formatting.BOLD));
 				currentReport.add(new LiteralText("Entity: " + this.type + '(' + this.id + ')'));
@@ -107,10 +104,9 @@ public abstract class EntityMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	private void onPistonMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
-		Vec3d vec = this.adjustMovementForPiston(movement);
-		if(currentReport != null && !this.world.isClient) {
-			currentReport.add(new LiteralText("Restricted piston movement to " + vec));
-			lastMovement = vec;
+		if(currentReport != null && !this.world.isClient  && !movement.equals(lastMovement)) {
+			currentReport.add(new LiteralText("Restricted piston movement to " + movement));
+			lastMovement = movement;
 		}
 	}
 	
@@ -134,10 +130,9 @@ public abstract class EntityMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	private void onSneakingMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci) {
-		Vec3d vec = this.adjustMovementForSneaking(movement, type);
-		if(currentReport != null && !vec.equals(movement) && !this.world.isClient) {
-			currentReport.add(new LiteralText("Sneaking restricted the movement to " + vec));
-			lastMovement = vec;
+		if(currentReport != null && !movement.equals(lastMovement) && !this.world.isClient) {
+			currentReport.add(new LiteralText("Sneaking restricted the movement to " + movement));
+			lastMovement = movement;
 		}
 	}
 	
@@ -148,10 +143,9 @@ public abstract class EntityMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	private void onCollisionMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci, Vec3d vec3d) {
-		Vec3d vec = this.adjustMovementForCollisions(movement);
-		if(currentReport != null && !vec.equals(movement) && !this.world.isClient) {
-			currentReport.add(new LiteralText("Collision restricted the movement to " + vec));
-			lastMovement = vec;
+		if(currentReport != null && !vec3d.equals(lastMovement) && !this.world.isClient) {
+			currentReport.add(new LiteralText("Collision restricted the movement to " + movement));
+			lastMovement = vec3d;
 		}
 	}
 	
@@ -165,5 +159,32 @@ public abstract class EntityMixin {
 			currentReport = null;
 			lastMovement = null;
 		}
+	}
+	
+	@Override
+	public boolean isFrozen() {
+		return this.isFrozen;
+	}
+	
+	@Override
+	public boolean isStepHeightDisabled() {
+		return this.isStepHeightDisabled;
+	}
+	
+	@Override
+	public boolean shouldLogMovement() {
+		return this.shouldLogMovement;
+	}
+	@Override
+	public void setFrozen(boolean frozen) {
+		this.isFrozen = frozen;
+	}
+	@Override
+	public void setStepHeightDisabled(boolean disabled) {
+		this.isStepHeightDisabled = disabled;
+	}
+	@Override
+	public void setMovementSubscribed(boolean subscribed) {
+		this.shouldLogMovement = subscribed;
 	}
 }
