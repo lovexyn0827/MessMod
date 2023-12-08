@@ -232,7 +232,7 @@ public abstract class Literal<T> {
 						}
 					} else {
 						throw InvalidLiteralException.createWithArgs(FailureCause.NO_FIELD, this, null, 
-								clazz.getTypeName(), fieldName);
+								clazz == null ? "???" : clazz.getTypeName(), fieldName);
 					}
 				} else {
 					throw InvalidLiteralException.createWithArgs(FailureCause.UNCERTAIN_CLASS, this, null, 

@@ -124,6 +124,10 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			nodeStr = sr.readStringUntil(')');
 			sr.skip();
 			return new ClassCastNode(nodeStr);
+		case '*':
+			sr.skip();
+			nodeStr = sr.readStringUntil('.');
+			return new LiteralNode(nodeStr);
 		default:
 			nodeStr = readUntil(sr, '.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
@@ -241,6 +245,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
             		.suggest("<")
             		.suggest("[")
             		.suggest("(")
+            		.suggest("*")
             		.suggest("x")
             		.suggest("y")
             		.suggest("z")
