@@ -73,7 +73,7 @@ public abstract class EntityHud {
 			}
 			
 			int dataX = chm.looserLines ? 
-					(int) (MinecraftClient.getInstance().getWindow().getWidth() / size) - tr.getWidth(data) : x + tr.getWidth(header);
+					this.xEnd - tr.getWidth(data) : x + tr.getWidth(header);
 			tr.drawWithShadow(ms, header, x, y0, chm.headerSpeciallyColored ? 0xFF4040 : 0x31F38B);
 			tr.drawWithShadow(ms, data, dataX, mutableY.getAndAdd(10), 0x31F38B);
 			
