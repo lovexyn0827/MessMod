@@ -1,18 +1,33 @@
 package lovexyn0827.mess.mixins;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntitySelectorInterface;
 import lovexyn0827.mess.fakes.EntitySelectorReaderInterface;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
+import lovexyn0827.mess.util.i18n.I18N;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.EntitySelector;
@@ -21,18 +36,40 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.predicate.NumberRange.IntRange;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.Vec3d;
 
 @Mixin(EntitySelectorReader.class)
-public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface {
+public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderInterface {
 	@Shadow
 	private Predicate<Entity> predicate;
+	@Shadow
+	private int limit;
+	@Shadow
+    private boolean includesNonPlayers;
+	@Shadow
+	private BiConsumer<Vec3d, List<? extends Entity>> sorter;
+	@Shadow
+	private BiFunction<SuggestionsBuilder, Consumer<SuggestionsBuilder>, CompletableFuture<Suggestions>> suggestionProvider;
+	@Shadow @Final
+	private StringReader reader;
 	private IntRange idRange;
 	private NetworkSide side;
 	private Pattern typeRegex;
 	private Pattern nameRegex;
 	private Pattern classRegex;
 	private Class<?> clazz;
+	private boolean targetOnly;
+	
+	@Shadow
+	protected abstract CompletableFuture<Suggestions> suggestOpen(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer);
 
+	@Shadow
+	protected abstract void readArguments();
+	
+	@Shadow
+	protected abstract CompletableFuture<Suggestions> suggestOptionOrEnd(SuggestionsBuilder builder, Consumer<SuggestionsBuilder> consumer);
+	
 	@Override
 	public void setIdRange(IntRange range) {
 		this.idRange = range;
@@ -101,6 +138,7 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 			((EntitySelectorInterface) selector).setSide(this.side == null ? NetworkSide.SERVERBOUND : this.side);
 		}
 		
+		((EntitySelectorInterface) selector).setTargetOnly(this.targetOnly);
 		return selector;
 	}
 
@@ -151,6 +189,38 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 			this.predicate = p0;
 		}
 	}
+	
+	@Inject(method = "readAtVariable", 
+			at = @At(
+					value = "INVOKE", 
+					target = "com/mojang/brigadier/StringReader.setCursor(I)V", 
+					remap = false
+			), 
+			locals = LocalCapture.CAPTURE_FAILHARD, 
+			cancellable = true
+	)
+	private void addAtTSelector(CallbackInfo ci, int i, char c) {
+		if(c == 't') {
+			this.limit = 1;
+			this.includesNonPlayers = true;
+			this.sorter = EntitySelectorReader.ARBITRARY;
+			this.predicate = (e) -> true;
+			this.targetOnly = true;
+			this.suggestionProvider = this::suggestOpen;
+	        if (this.reader.canRead() && this.reader.peek() == '[') {
+	            this.reader.skip();
+	            this.suggestionProvider = this::suggestOptionOrEnd;
+	            this.readArguments();
+	        }
+	        
+	        ci.cancel();
+		}
+	}
+	
+	@Inject(method = "suggestSelector", at = @At("RETURN"))
+	private static void suggestAtTSelector(SuggestionsBuilder builder, CallbackInfo ci) {
+		builder.suggest("@t", new LiteralText(I18N.translate("misc.selector.att")));
+	}
 
 	@Override
 	public void setInstanceofClass(Class<?> cl) {
@@ -160,5 +230,10 @@ public class EntitySelectorReaderMixin implements EntitySelectorReaderInterface 
 	@Override
 	public Class<?> getInstanceofClass() {
 		return this.clazz;
+	}
+
+	@Override
+	public boolean targetOnly() {
+		return this.targetOnly;
 	}
 }

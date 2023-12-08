@@ -28,6 +28,22 @@ public class I18N {
 		return String.format(translate(translationKey), args);
 	}
 	
+	public static boolean canUseLanguage(String name, boolean forceLoad) {
+		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {
+			return true;
+		}
+		
+		if(SUPPORTED_LANGUAGES.contains(name)) {
+			try {
+				return forceLoad || new Language(name).vaildate();
+			} catch (Exception e) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
 	@SuppressWarnings("resource")
 	public static boolean setLanguage(String name, boolean forceLoad) {
 		if(name == null || "-FOLLOW_SYSTEM_SETTINGS-".equals(name)) {

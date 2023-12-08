@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.command.VariableCommand;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.Reflection;
 import net.minecraft.util.math.BlockPos;
@@ -77,19 +78,30 @@ public abstract class Literal<T> {
 			if(strRep.charAt(1) == '+') {
 				return new EnumL(strRep);
 			}
+			
+			break;
 		case 'S' : 
 			if(strRep.charAt(1) == '+') {
 				return new StaticFieldL(strRep);
 			}
+			
+			break;
 		case 'C' : 
 			if(strRep.charAt(1) == '+') {
 				return new ClassL(strRep);
 			}
+			
+			break;
 		case '[' : 
 			return new BlockPosL(strRep);
 		case '(' : 
 			return new Vec3dL(strRep);
-		case '<' : 
+		case 'V' : 
+			if(strRep.charAt(1) == '+') {
+				return new VarL(strRep);
+			}
+			
+			break;
 		default : 
 			Matcher matcher = NUMBER_PATTERN.matcher(strRep);
 			if("null".equals(strRep)) {
@@ -130,6 +142,8 @@ public abstract class Literal<T> {
 				};
 			}
 		}
+		
+		throw new TranslatableException("exp.invliteral", strRep);
 	}
 
 	/**
@@ -438,5 +452,21 @@ public abstract class Literal<T> {
 			return this.vec3d;
 		}
 
+	}
+	
+	public static class VarL extends Literal<Object> {
+		private final String slot;
+
+		protected VarL(String strRep) throws CommandSyntaxException {
+			super(strRep);
+			this.slot = strRep.substring(2);
+			this.compiled = false;
+		}
+
+		@Override
+		public @Nullable Object get(@Nullable Type type) throws InvalidLiteralException {
+			return VariableCommand.getVariable(this.slot);
+		}
+		
 	}
 }

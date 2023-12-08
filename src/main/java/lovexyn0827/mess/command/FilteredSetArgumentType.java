@@ -56,7 +56,7 @@ public class FilteredSetArgumentType<T> extends ElementSetArgumentType<T, Filter
 		return builder.buildFuture();
 	}
 	
-	static {
+	public static void registerArgumentType() {
 		// ???
 		@SuppressWarnings("unchecked")
 		Class<FilteredSetArgumentType<Object>> cl = 

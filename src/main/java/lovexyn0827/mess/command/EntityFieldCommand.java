@@ -6,6 +6,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -31,19 +32,37 @@ import net.minecraft.text.LiteralText;
 public class EntityFieldCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		SuggestionProvider<ServerCommandSource> suggests = (ct,builder)->{
-			for(String fieldName : Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass())) {
+			for(String fieldName : Reflection.getAvailableFieldNames(EntityArgumentType.getEntity(ct.getLastChild(), "target").getClass())) {
 				builder = builder.suggest(fieldName);
 			}
 			
 			builder.suggest("-THIS-");
 			return builder.buildFuture();
 		};
-		
+		Supplier<AccessingPathArgumentType> pathArgSupplier = () -> {
+			return AccessingPathArgumentType.accessingPathArg((ct) -> {
+				Entity entity;
+				try {
+					entity = EntityArgumentType.getEntity(ct, "target");
+				} catch (CommandSyntaxException e) {
+					entity = null;
+				}
+				
+				Class<?> eClass = entity == null ? Entity.class : entity.getClass();
+				String fName = StringArgumentType.getString(ct, "fieldName");
+				if("-THIS-".equals(fName)) {
+					return eClass;
+				}
+				
+				Field field = Reflection.getFieldFromNamed(eClass, fName);
+				return field == null ? Object.class : field.getGenericType();
+			});
+		};
 		LiteralArgumentBuilder<ServerCommandSource> get = literal("get")
 				.then(argument("fieldName",StringArgumentType.string())
 						.suggests(suggests)
 						.executes((ct) -> getField(ct, AccessingPath.DUMMY))
-						.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+						.then(argument("path", pathArgSupplier.get())
 								.executes((ct) -> {
 									try {
 										AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
@@ -53,7 +72,7 @@ public class EntityFieldCommand {
 										return 0;
 									}
 								})));
-		
+
 		ArgumentBuilder<ServerCommandSource, ?> modify = literal("modify")
 				.requires((source) -> source.hasPermissionLevel(1))
 				.then(argument("fieldName",StringArgumentType.string()).suggests(suggests)
@@ -75,7 +94,7 @@ public class EntityFieldCommand {
 										return -1;
 									}
 								})
-								.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+								.then(argument("path", pathArgSupplier.get())
 										.executes((ct)->{
 											try {
 												if(modifyField(EntityArgumentType.getEntity(ct, "target"),
@@ -101,7 +120,7 @@ public class EntityFieldCommand {
 				.executes((ct) -> {
 					Set<String> fieldSet;
 					try {
-						fieldSet = Reflection.getAvailableFields(EntityArgumentType.getEntity(ct, "target").getClass());
+						fieldSet = Reflection.getAvailableFieldNames(EntityArgumentType.getEntity(ct, "target").getClass());
 						String list = String.join("  ", fieldSet);
 						CommandUtil.feedback(ct, list);
 					} catch (Exception e) {
