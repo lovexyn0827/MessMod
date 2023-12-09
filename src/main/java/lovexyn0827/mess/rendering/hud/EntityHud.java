@@ -78,7 +78,7 @@ public abstract class EntityHud {
 			tr.drawWithShadow(ms, data, dataX, mutableY.getAndAdd(10), 0x31F38B);
 			
 		});
-		this.hudManager.hudHeight += (mutableY.getValue() - this.yStart);
+		this.hudManager.hudHeight += mutableY.getValue() - this.yStart;
 	}
 	
 	public void toggleRender() {
@@ -90,6 +90,17 @@ public abstract class EntityHud {
 		MessMod.INSTANCE.getClientNetworkHandler().send(packet);
 	}
 	
+	private int calculateHeight() {
+		int[] height = new int[1];
+		this.getData().forEach((n, o) -> {
+			if(!(BuiltinHudInfo.NAME.getName().equals(n) || BuiltinHudInfo.ID.getName().equals(n))) {
+				height[0] += 10;
+			}
+		});
+		
+		return height[0] + 10;
+	}
+	
 	private void updateAlign() {
 		AlignMode mode = OptionManager.hudAlignMode;
 		this.lastLineWidth = this.getMaxLineLength();
@@ -99,7 +110,8 @@ public abstract class EntityHud {
 		this.xStart = left ? 0 : (int) (windowWidth / size - this.lastLineWidth + 1);
 		this.xEnd = left ? this.lastLineWidth - 1 : windowWidth;
 		int offset = this.hudManager.hudHeight;
-		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight() - this.getData().size() * 10 - offset;
+		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight() 
+				- this.calculateHeight() - offset;
 	}
 	
 	@SuppressWarnings("resource")
