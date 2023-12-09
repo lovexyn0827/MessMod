@@ -53,10 +53,10 @@ public abstract class EntityHud {
 		RenderSystem.matrixMode(5888);
 		RenderSystem.loadIdentity();
 		RenderSystem.translatef(0.0F, 0.0F, -2000.0F);
-		this.updateAlign();
+		TextRenderer tr = this.client.textRenderer;
+		this.updateAlign(tr.getWidth(description));
 		float size = OptionManager.hudTextSize;
 		RenderSystem.scalef(size, size, size);
-		TextRenderer tr = client.textRenderer;
 		ClientHudManager chm = MessMod.INSTANCE.getClientHudManager();
 		tr.drawWithShadow(ms, description, x, y, -1);
 		y += 10;
@@ -101,22 +101,22 @@ public abstract class EntityHud {
 		return height[0] + 10;
 	}
 	
-	private void updateAlign() {
+	private void updateAlign(int headerLineWidth) {
 		AlignMode mode = OptionManager.hudAlignMode;
-		this.lastLineWidth = this.getMaxLineLength();
+		this.lastLineWidth = this.getMaxLineLength(headerLineWidth);
 		float size = OptionManager.hudTextSize;
 		boolean left = mode.name().contains("LEFT");
 		int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
 		this.xStart = left ? 0 : (int) (windowWidth / size - this.lastLineWidth + 1);
-		this.xEnd = left ? this.lastLineWidth - 1 : windowWidth;
+		this.xEnd = left ? this.lastLineWidth - 1 : (int) (windowWidth / size);
 		int offset = this.hudManager.hudHeight;
-		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight() 
-				- this.calculateHeight() - offset;
+		int windowHeight = (int) (MinecraftClient.getInstance().getWindow().getHeight() / size);
+		this.yStart = mode.name().contains("TOP") ? offset : windowHeight - this.calculateHeight() - offset;
 	}
 	
 	@SuppressWarnings("resource")
-	protected synchronized int getMaxLineLength() {
-		MutableInt lineLength = new MutableInt(0);
+	protected synchronized int getMaxLineLength(int headerLineWidth) {
+		MutableInt lineLength = new MutableInt(headerLineWidth);
 		this.getData().forEach((n, v) -> {
 			TextRenderer tr = MinecraftClient.getInstance().textRenderer;
 			lineLength.setValue(Math.max(lineLength.getValue(), tr.getWidth(n + ':' + v)));;
