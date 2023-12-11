@@ -553,6 +553,14 @@ Remove the block entity at `<pos>`.In the current version of the mod, if a block
 
 The following options could be set with the command `/messcfg <option> <value>`. For example, to enable the entity boundary box renderer, enter `/messcfg serverSyncedBox true`.
 
+##### `accessingPathDynamicAutoCompletion`
+
+Support suggestions for fields and methods when auto completing Accessing paths.
+
+Available values: `true` / `false`
+
+Default value: `true`
+
 ##### `accessingPathInitStrategy`
 
 There are there initializing strategies available: 
@@ -622,7 +630,7 @@ Specify how the causes of events like chunk loading are recorded.
 - `DISABLED`: Disable cause recording completely
 - `SIMPLE_TRACE`: Record the stack trace from where the events happened, without applying any deobfuscation.
 - `DEOBFUSCATED_TRACE`: Record deobfuscated stack trace, which is the most decent but leads to larger logs and higher performance costs.
-- `ANALYZED`: Compute a couple of tags from the stack trace. This can make logs significantly smaller than ones with stack traces, however, the performance cost may be even higher.
+- `ANALYZED`: Compute a couple of tags from the stack trace. This can make logs significantly smaller than ones with stacktraces, however, the performance cost may be even higher.
 
 Available values: 
 
@@ -693,11 +701,11 @@ Default value: `true`
 
 ##### `commandExecutionRequirment`
 
-Whether or not the execution of commands defined by this mod requires OP permission.
+Whether or not the execution of commands defined by this mod require OP permission.
 
 Available values: `true` / `false`
 
-Default value: `false`
+Default value: `true`
 
 ##### `craftingTableBUD`
 
@@ -713,7 +721,7 @@ Set the vertical speed flying speed in the creative mode. The actual terminal sp
 
 Available values: Any positive real number
 
-Default value: `0.05`
+Default value: `NaN`
 
 ##### `debugStickSkipsInvaildState`
 
@@ -730,6 +738,34 @@ Enable commands for dedicated servers in single-player games.
 Available values: `true` / `false`
 
 Default value: `false`
+
+##### `defaultSaveComponents`
+
+Save components that are included in export saves by default.
+
+Available values: `[]` (empty list) or some of the following elements, separated by ',': 
+
+- `REGION`
+- `POI`
+- `GAMERULES`
+- `RAID`
+- `MAP_LOCAL`
+- `MAP_OTHER`
+- `ICON`
+- `ADVANCEMENTS_SELF`
+- `ADVANCEMENT_OTHER`
+- `PLAYER_SELF`
+- `PLAYER_OTHER`
+- `STAT_SELF`
+- `STAT_OTHER`
+- `SCOREBOARD`
+- `FORCE_CHUNKS_LOCAL`
+- `FORCE_CHUNKS_OTHER`
+- `DATA_COMMAND_STORAGE`
+- `CARPET`
+- `MESSMOD`
+
+Default value: `REGION,POI`
 
 ##### `disableChunkLoadingCheckInCommands`
 
@@ -756,6 +792,14 @@ Available values: `true` / `false`
 
 Default value: `false`
 
+##### `disableItemUsageCooldown`
+
+Disable item usages cooldown for ender pearls and chorus fruits, etc.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `disableProjectileRandomness`
 
 Remove the random speed of projectiles. It could be used to test pearl cannons, but don't forget to disable it if not needed.
@@ -764,13 +808,53 @@ Available values: `true` / `false`
 
 Default value: `false`
 
+##### `dumpTargetEntityDataOnClient`
+
+Output the information of the client-side entity instead of the one of server-side one.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `dumpTargetEntityDataWithCtrlC`
+
+Output the data of currently target entity with Ctrl + C.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `dumpTargetEntityDataWithPaper`
+
+Output the data of currently target entity by right clicking while holding a paper.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `dumpTargetEntityNbt`
+
+Output the NBT data of targeted entity. If the item on the main hand of the player has a custom name, the name will be interpreted as a NBT path to be applied to the NBT data of the entity when the item has no enchantment, or be served as an Accessing Path to be applied to the Entity instance of the entity.
+
+Available values: `true` / `false`
+
+Default value: `true`
+
+##### `dumpTargetEntitySummonCommand`
+
+Generate a command to summon the target entity. If the held item is enchanted, the full NBT data with UUID(s) stripped off are included in the generated command, otherwise, only the entity type, dimension, position, motion and rotation are present in the command.
+
+Available values: `true` / `false`
+
+Default value: `true`
+
 ##### `enabledTools`
 
 Item tools, which make bone and bricks useful. Requires carpet-fabric.
 
-- Bone: `/tick step <countOfBones>` 
-- Brick: `/tick freeze` 
-- Netherite Ingot: `/kill @e[type!=player]`
+ - Bone: `/tick step <countOfBones>` 
+ - Brick: `/tick freeze` 
+ - Netherite Ingot: `/kill @e[type!=player]`
 
 Available values: `true` / `false`
 
@@ -817,6 +901,14 @@ Available values: `true` / `false`
 
 Default value: `true`
 
+##### `expandedStructureBlockRenderingRange`
+
+Expand the maximum visible distance of structure blocks.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `fillHistory`
 
 Record block changes caused by `/fill` so that they can be undone or redone later.
@@ -855,15 +947,15 @@ Default value: `false`
 
 ##### `getEntityRangeExpansion`
 
-[TODO] In the vanilla `getEntities()` method, only entities that are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually, it doesn't matter, but when the height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Changing it to a higher value may fix some bugs about the interaction between entities and something else.
+In the vanilla `getEntities()` method, only entities that are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually, it doesn't matter, but when the height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Changing it to a higher value may fix some bugs about the interaction between entities and something else.
 
-Available values: Any positive real number
+Available values: Any real number
 
 Default value: `2.0`
 
 ##### `hideSurvivalSaves`
 
-Hide worlds that are likely to be survival saves to prevent them from being opened accidentally. Can only be set globally.
+Hide worlds that are likely to be survival saves to prevent it from being opened accidentally. Can only be set globally.
 
 Available values: `true` / `false`
 
@@ -894,9 +986,9 @@ Default value: `TOP_RIGHT`
 
 The style of the HUDs, containing zero or more flags below: 
 
-- B: Render a gray background
-- L: Align the headers on the left and the data on the right
-- R: Change the color of headers to red
+ - B: Render a gray background
+ - L: Align the headers on the left and the data on the right
+ - R: Change the color of headers to red
 
 Available values: Any string
 
@@ -906,9 +998,17 @@ Default value: `(BL)^2/(mR)`
 
 Set the size of the text in the HUDs.
 
-Available values: Any positive real number
+Available values: Any real number
 
 Default value: `1.0`
+
+##### `independentEntityPickerForInfomation`
+
+Pick crosshair-targeted entities for information providers (currently only the UUID suggestor) independently.
+
+Available values: `true` / `false`
+
+Default value: `false`
 
 ##### `interactableB36`
 
@@ -923,8 +1023,8 @@ Default value: `false`
 The main language of the Mod.
 
 Available values: 
- `-FOLLOW_SYSTEM_SETTINGS-`
 
+- `-FOLLOW_SYSTEM_SETTINGS-`
 - `zh_cn`
 - `zh_cn_FORCELOAD`
 - `en_us`
@@ -944,7 +1044,7 @@ Default value: `10`
 
 Set the maximum range of teleportation with `endEyeTeleport`.
 
-Available values: Any positive real number
+Available values: Any real number
 
 Default value: `180`
 
@@ -974,7 +1074,7 @@ Default value: `false`
 
 ##### `projectileChunkLoading`
 
-Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at an extremely high speed when the option is set to true, the server may be lagged greatly.
+Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.
 
 Available values: `true` / `false`
 
@@ -1007,6 +1107,14 @@ Default value: `1.0`
 ##### `quickMobMounting`
 
 Placing mobs into vehicles.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `quickStackedEntityKilling`
+
+Kill the entity being knocked by a brick, along with all entities being at the same position as it.
 
 Available values: `true` / `false`
 
@@ -1077,6 +1185,18 @@ Available values: Any real number
 
 Default value: `-1`
 
+##### `serverSyncedBoxUpdateModeInFrozenTicks`
+
+What the server-side hitbox renderer should do in ticks frozen by the Carpet.
+
+Available values: 
+
+- `NORMALLY`
+- `PAUSE`
+- `NO_REMOVAL`
+
+Default value: `NORMALLY`
+
 ##### `skipUnloadedChunkInRaycasting`
 
 Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long-distance raycasts.
@@ -1107,7 +1227,7 @@ Default value: `[]`
 
 ##### `stableHudLocation`
 
-Make the location of HUDs more stable when the lengths of lines change frequently.
+Make the location of HUDs more stable when the length of lines change frequently.
 
 Available values: `true` / `false`
 
@@ -1115,7 +1235,7 @@ Default value: `true`
 
 ##### `strictAccessingPathParsing`
 
-Parse accessing paths more strictly, to make them more reliable. Currently, the strictly checking system is not completed, so it is not recommended to enable it.
+Parse accessing paths more strictly, to make them more reliable. Currently the strictly checking system is not completed, so it is not recommended to enable it.
 
 Available values: `true` / `false`
 

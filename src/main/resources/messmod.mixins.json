@@ -58,7 +58,8 @@
     "WorldMixin_GetEntityExpansion", 
     "WorldChunkMixin_GetEntityExpansion", 
     "ItemCooldownManagerMixin", 
-    "ArgumentTypesMixin"
+    "ArgumentTypesMixin", 
+    "ChunkTaskPrioritySystemMixin"
   ],
   "client": [
     "MinecraftClientMixin",

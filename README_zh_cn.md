@@ -538,13 +538,21 @@
 
 以下选项均通过`/messcfg`命令设置，格式均为`/messcfg <选项名> <值>`，如启用实体碰撞箱显示可使用`/messcfg serverSyncedBox true`
 
+##### `accessingPathDynamicAutoCompletion`
+
+支持自动补全Accessing Path中的字段名和方法名。
+
+可能取值：`true`或`false`
+
+默认值：`true`
+
 ##### `accessingPathInitStrategy`
 
 共有3种初始化策略： 
 
-- 旧版本模式：每个Accessing Path只在第一次被使用时进行初始化，然后这一结果用于访问后续的所有输入对象 
-- 标准模式：Accessing Path会对每个不同对象进行初始化，然后结果会被缓存直到相应对象被清理。
-- 严格模式：Accessing Path每次被使用时都会重新进行初始化。
+ - 旧版本模式：每个Accessing Path只在第一次被使用时进行初始化，然后这一结果用于访问后续的所有输入对象 
+ - 标准模式：Accessing Path会对每个不同对象进行初始化，然后结果会被缓存直到相应对象被清理。
+ - 严格模式：Accessing Path每次被使用时都会重新进行初始化。
 
 可能取值：
 
@@ -682,7 +690,7 @@ TNT可以被玩家的攻击杀死。
 
 可能取值：`true`或`false`
 
-默认值：`false`
+默认值：`true`
 
 ##### `craftingTableBUD`
 
@@ -698,7 +706,7 @@ TNT可以被玩家的攻击杀死。
 
 可能取值：任意正实数
 
-默认值：`0.05`
+默认值：`NaN`
 
 ##### `debugStickSkipsInvaildState`
 
@@ -715,6 +723,34 @@ TNT可以被玩家的攻击杀死。
 可能取值：`true`或`false`
 
 默认值：`false`
+
+##### `defaultSaveComponents`
+
+默认包含在导出的存档中的存档组件。
+
+可能取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一些下方的一些项目：
+
+- `REGION`
+- `POI`
+- `GAMERULES`
+- `RAID`
+- `MAP_LOCAL`
+- `MAP_OTHER`
+- `ICON`
+- `ADVANCEMENTS_SELF`
+- `ADVANCEMENT_OTHER`
+- `PLAYER_SELF`
+- `PLAYER_OTHER`
+- `STAT_SELF`
+- `STAT_OTHER`
+- `SCOREBOARD`
+- `FORCE_CHUNKS_LOCAL`
+- `FORCE_CHUNKS_OTHER`
+- `DATA_COMMAND_STORAGE`
+- `CARPET`
+- `MESSMOD`
+
+默认值：`REGION,POI`
 
 ##### `disableChunkLoadingCheckInCommands`
 
@@ -741,6 +777,14 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`false`
 
+##### `disableItemUsageCooldown`
+
+禁用末影珍珠和紫颂果等物品的的使用冷却时长。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `disableProjectileRandomness`
 
 取消弹射物的随机速度，用于部分测试，不过不要忘记关闭。
@@ -749,13 +793,53 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`false`
 
+##### `dumpTargetEntityDataOnClient`
+
+输出客户端实体信息而不是服务端实体信息。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `dumpTargetEntityDataWithCtrlC`
+
+使用Ctrl + C时输出目标实体信息。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `dumpTargetEntityDataWithPaper`
+
+主手持有纸的玩家右键实体时输出目标实体信息。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `dumpTargetEntityNbt`
+
+输出目标实体的NBT数据。如果玩家手持的物品有自定义名称，那么当物品没有附魔时该名称会被解析为一个作用于实体NBT的NBT路径，否则，这一名称会被作为应用于实体的Entity实例的一个Accessing Path。
+
+可能取值：`true`或`false`
+
+默认值：`true`
+
+##### `dumpTargetEntitySummonCommand`
+
+生成用于生成目标实体的一条指令。如果手持的物品被附魔，实体的完整NBT数据（不含UUID）会被添加到 指令中，否则，只有实体类型，维度、坐标、动量与朝向信息会出现在指令中。
+
+可能取值：`true`或`false`
+
+默认值：`true`
+
 ##### `enabledTools`
 
 启用或禁用工具物品。
 
-- 骨头：`/tick step <骨头数目>` 
-- 红砖：`/tick freeze` 
-- 下界合金锭：`/kill @e[type!=player]`
+ - 骨头：`/tick step <骨头数目>` 
+ - 红砖：`/tick freeze` 
+ - 下界合金锭：`/kill @e[type!=player]`
 
 可能取值：`true`或`false`
 
@@ -802,6 +886,14 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`true`
 
+##### `expandedStructureBlockRenderingRange`
+
+增加结构方块的渲染距离。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `fillHistory`
 
 记录`/fill`产生的方块变更以便在将来撤销或重做。
@@ -842,7 +934,7 @@ TNT可以被玩家的攻击杀死。
 
 在原版的`getEntity()`方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。
 
-可能取值：任意正实数
+可能取值：任意实数
 
 默认值：`2.0`
 
@@ -879,9 +971,9 @@ TNT可以被玩家的攻击杀死。
 
 HUD的渲染样式, 包括了下面的零个至多个标志: 
 
-- B：渲染背景
-- L：左对齐行标题并右对齐数据
-- R：将行标题改为红色
+ - B：渲染背景
+ - L：左对齐行标题并右对齐数据
+ - R：将行标题改为红色
 
 可能取值：任意字符串
 
@@ -891,9 +983,17 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 调节HUD字体大小。
 
-可能取值：任意正实数
+可能取值：任意实数
 
 默认值：`1.0`
+
+##### `independentEntityPickerForInfomation`
+
+独立地为信息提供者（目前只包含指令UUID建议）选取目标实体。
+
+可能取值：`true`或`false`
+
+默认值：`false`
 
 ##### `interactableB36`
 
@@ -905,7 +1005,7 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 ##### `language`
 
-该Mod的主要语言
+该Mod的主要语言。
 
 可能取值：
 
@@ -929,7 +1029,7 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 设置endEyeTeleport功能的最远传送距离。
 
-可能取值：任意正实数
+可能取值：任意实数
 
 默认值：`180`
 
@@ -992,6 +1092,14 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 ##### `quickMobMounting`
 
 潜行时用刷怪蛋向载具中放置生物。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `quickStackedEntityKilling`
+
+杀死被砖块敲击的实体以及所有位置与其相同的实体。
 
 可能取值：`true`或`false`
 
@@ -1061,6 +1169,18 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 可能取值：任意实数
 
 默认值：`-1`
+
+##### `serverSyncedBoxUpdateModeInFrozenTicks`
+
+游戏运算被地毯端中/tick指令暂停时服务端碰撞箱渲染器的行为。
+
+可能取值：
+
+- `NORMALLY`
+- `PAUSE`
+- `NO_REMOVAL`
+
+默认值：`NORMALLY`
 
 ##### `skipUnloadedChunkInRaycasting`
 

@@ -18,12 +18,14 @@ import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.ChunkTaskPrioritySystemInterface;
 import lovexyn0827.mess.fakes.ChunkTicketManagerInterface;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.util.blame.StackTrace;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ChunkHolder;
+import net.minecraft.server.world.ChunkTaskPrioritySystem;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.structure.StructureManager;
@@ -43,6 +45,9 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	
 	@Shadow @Final
 	private ThreadedAnvilChunkStorage.TicketManager ticketManager;
+	
+	@Shadow @Final
+	private ChunkTaskPrioritySystem chunkTaskPrioritySystem;
 	
 	@Inject(method = "loadChunk", 
 			at = @At(value = "HEAD")
@@ -221,5 +226,26 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			WorldGenerationProgressListener worldGenerationProgressListener, Supplier<PersistentStateManager> supplier, 
 			int i, boolean bl, CallbackInfo ci) {
 		((ChunkTicketManagerInterface) this.ticketManager).initWorld(serverWorld);
+	}
+	
+	@Inject(
+			method = "<init>", 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/server/world/ThreadedAnvilChunkStorage."
+							+ "chunkTaskPrioritySystem:Lnet/minecraft/server/world/ChunkTaskPrioritySystem;", 
+					opcode = Opcodes.PUTFIELD, 
+					shift = At.Shift.AFTER
+			)
+	)
+	private void onCreatedChunkTaskPrioritySystem(ServerWorld serverWorld, LevelStorage.Session session, DataFixer dataFixer, 
+			StructureManager structureManager, Executor workerExecutor, ThreadExecutor<Runnable> mainThreadExecutor, 
+			ChunkProvider chunkProvider, ChunkGenerator chunkGenerator, 
+			WorldGenerationProgressListener worldGenerationProgressListener, Supplier<PersistentStateManager> supplier, 
+			int i, boolean bl, CallbackInfo ci) {
+		// This is necessary since we couldn't ensure that advanced CTPSMixin is applied.
+		if(this.chunkTaskPrioritySystem instanceof ChunkTaskPrioritySystemInterface) {
+			((ChunkTaskPrioritySystemInterface) this.chunkTaskPrioritySystem).initWorld(serverWorld);
+		}
 	}
 }

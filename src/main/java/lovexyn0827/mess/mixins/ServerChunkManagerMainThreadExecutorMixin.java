@@ -26,7 +26,7 @@ public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadEx
 	private @Final ServerChunkManager field_18810;
 	
 	private static final AtomicLong NEXT_ID = new AtomicLong(0);
-	private static final Map<Object, Long> TASK_TO_ID = new ConcurrentHashMap<>();
+	private static final Map<Object, Long> TASK_TO_ID = new ConcurrentHashMap<>();	// FIXME: Memory leak
 	
 	protected ServerChunkManagerMainThreadExecutorMixin(String name) {
 		super(name);
