@@ -26,6 +26,7 @@ In other languages:
 - Exporting given areas as a new save.
 - Undo / Redoing changes to blocks with `Ctrl + Z` and `Ctrl + Y`.
 - Chunk grid generation.
+- Fake lazy loaded chunks.
 - And more...
 
 ## Requirements
@@ -43,17 +44,17 @@ Names of arguments are wrapped by pointy semicolons, and optional components are
 
 ##### `/accessingpath compile <name> <inputType>`
 
-Compile the custom node with the given `<name>` into bytecode to increase the performance. The expected input type of nodes may be specified with the argument `<inputType>`, in the format `pkg1/Class1,pkg2/Class2`. 
+Compile the custom node with the given `<name>` into bytecode to increase the performance. The expected input type of nodes may be specified with the argument `<inputType>`, in the format `pkg1/Class1,pkg2/Class2`, and the input type of the first node must be a reference type. 
 
 Currently, this feature may be buggy.
 
 ##### `/accessingpath defineNode <name> <temproary> <backend>`
 
-Define the accessing path specified by the argument `backend` as a custom accessing path node. If `<temproary>` is `false`, the node will be saved in the level folder.
+Define the accessing path specified by the argument <backend> as a custom accessing path node. If <temproary> is false, the node will be saved in the world folder.
 
 ##### `/accessingpath list`
 
-Get the list of custom nodes.
+List all custom nodes.
 
 ##### `/accessingpath undefineNode <name>`
 
@@ -67,7 +68,7 @@ Get the number of entities selected by `<selector>`， or the total entity count
 
 ##### `/countentities <selector> <stackedWith>`
 
-Get the number of entities selected by `<selector>`  and with the same coordination as the one of `<stackedWith>`.
+Get the number of entities selected by `<selector>`  and at the same position as the entity selected by `<stackedWith>`.
 
 ##### `/countentities <selector> <stackedWith> <maxDistanceVec>`
 
@@ -185,9 +186,10 @@ Supported ticking phases (sorted by time):
 - `BLOCK_EVENT`: When block events are going to be updated.
 - `ENTITY`: When entities are going to be processed.
 - `TILE_ENTITY`: When block entities are going to be processed.
-- `TICKED_ALL_WORLDS`: When all worlds got ticked and the asynchronized tasks like inputs of players haven't got processed.
+- `DIM_REST`: When all block entities are processed.
+- `TICKED_ALL_WORLDS`: When all worlds are ticked and the asynchronized tasks like inputs of players haven't got processed.
 - `SERVER_TASKS`: When asynchronized tasks like player inputs are going to be processed.
-- `REST`: When all asynchronized tasks got processed.
+- `REST`: When all asynchronized tasks are processed.
 
 ##### `/entitysidebar remove <name>`
 
@@ -208,6 +210,8 @@ Add a save component to be exported. Available components:
 - `REGION`: Region files, contain blocks, entities (1.16-) and block entities.
 
 - `POI`: POI data.
+
+- `GAMERULE`: Game rules.
 
 - `ENTITY`Entity Data (1.17+).
 
@@ -245,9 +249,9 @@ Add a save component to be exported. Available components:
 
 Using DOS file name wildcards to select multiple items is allowed.
 
-##### `/exportsave addRegion <name> <corner1> <corner2> <dimension>`
+##### `/exportsave addRegion <name> <corner1> <corner2> [<dimension>]`
 
-Add a selection, where `<corner1>` and `<corener2>` is two block position of two opposite vertex of a rectangle area. Any chunk intersecting the area will be selected.
+Add a selection, where `<corner1>` and `<corener2>` is two block position of two opposite vertex of a rectangle area. Any chunk intersecting the area will be selected. If the `<dimension>` is absent, the dimension where the sender is in will be used.
 
 ##### ` /exportsave deleteRegion <name>`
 
@@ -311,9 +315,13 @@ Set the player used in getting the data in the server-side player information HU
 
 ### Produce Lags
 
-##### `/lag nanoseconds [<thread>]`
+##### `/lag once <nanoseconds> [<thread>]`
 
 Freeze a thread of the game for a while. If the thread is not specified explicitly, the server thread will sleep.
+
+##### `/lag while <nanoseconds> <ticks> <phase>`
+
+Freeze the current server or client at the beginning of a given `<phase>` for a given number of ticks, which may be used to adjust MSPT in a more flexibly.
 
 ### Lazy Loaded Chunk Simulation
 
@@ -376,6 +384,16 @@ Subscribe to a chunk event. Supported chunk events:
 - `SCHEDULER_UPGARDE`: Scheduling to start updating a chunk generation stage.
 - `TICKET_ADDITION`: Adding a chunk ticket.
 - `TICKET_REMOVAL`: Removing a chunk ticket (expiration is not included here).
+- `PLAYER_TICKER_UPDATE`: Attemption to update player tickets.
+- `ASYNC_TASKS`: Executing asynchronous tasks in  `ServerChunkManager.Main`.
+- `ASYNC_TASK_SINGLE`: Executing a single asynchronous task.
+- `ASYNC_TASK_ADDITION`: Adding an asynchronous task.
+- `SCM_TICK`: `ServerChunkManager.tick()`.
+- `CTM_TICK`: `ChunkTicketManager.tick()`.
+- `SCM_INIT_CACHE`: Invalidating chunk cache in `ServerChunkManager`.
+- `CTPS_LEVEL`: `ChunkTaskPrioritySystem.updateLevel()`.
+- `CTPS_CHUNK`: `ChunkTaskPrioritySystem.enqueueChunk()`.
+- `CTPS_REMOVE`: `ChunkTaskPrioritySystem.removeChunk()`.
 
 Using DOS file name wildcards to select multiple items is allowed.
 
@@ -422,6 +440,24 @@ Read options from `mcwmem.prop`.
 ##### `/messcfg setGlobal <option> <value>`
 
 Set the global value (used as the default value of options for new saves) and the save-specific value of `<option>` to `<value>`.
+
+##### `/messcfg list [<label>]`
+
+List all options with a given label. If no label is given, all option will be listed.
+
+Available labels: 
+
+- `MESSMOD`: Options related to features of MessMod itself.
+- `ENTITY`: Options related to entities.
+- `RENDERER`: Options related to renderers.
+- `INTERACTION_TWEAKS`: Options to simplify or enhance interactions.
+- `EXPLOSION`: Options related to explosions.
+- `RESEARCH`: Options that may be useful when researching the game mechanisms.
+- `REDSTONE`: Options to debug redstone contraptions.
+- `CHUNK`: Options related to chunks.
+- `BUGFIX`: Bug fixes.
+- `BREAKING_OPTIMIZATION`: Aggressive optimizations which may break some vanilla mechanisms.
+- `MISC`: Miscellaneous.
 
 ### Modifying Entity Properties
 
@@ -548,6 +584,52 @@ Set the block entity at `<pos>` to `<type>`. Optionally, you can specify a `<tag
 ##### `/tileentity remove <pos>`
 
 Remove the block entity at `<pos>`.In the current version of the mod, if a block needs a block entity, the block entity will be recreated after its removal that is a bug). 
+
+### Variable Management
+
+##### `/variable set <slot> new <constructor> [<args>]`
+
+Create a new object with a given `<constructor>` and put into a given `<slot>`. Constructors may be specified using a syntax similar to method nodes, that is:
+
+- `packagename/ClassName`
+- `packagename/ClassName<ArgumentNumber>`
+- `packagename/ClassName<Descriptor>`
+
+Literals separated by commas may be served arguments when necessary. 
+
+##### `/variable set <slot> literal <value>`
+
+Put the value of the literal specified by argument `<value>` into `<slot>`.
+
+##### `/variable set <slot> <objSrc>`
+
+Put the object supplied by `<objSrc>` into `<slot>`. Available suppliers:
+
+- `server`: Current `MinecraftServer` instance.
+- `sender`: The `ServerCommandSource` instance of the sender；
+- `world`: The `ServerWorld` where the sender is in.
+- `senderEntity`: The `Entity` instance of the sender.
+- `client`：`MinecraftClient` instance.
+- `clientWorld`: Current `ClientWorld` instance.
+- `clientPlayer`: Client side player entity.
+
+##### `/variable map <slotSrc> <slotDst> <path>`
+
+Process the value in `<slotSrc>` with a given Accessing Path and put the result into `<slotDst>`.
+
+##### `/variable print <slot> array | toString | dumpFields`
+
+Get the value in `<slot>`.
+
+- `array`: Format the value with`Arrays.toString()`, thus only arrays are permitted.
+- `toString`: Format the value using its `toString()` method.
+- `dumpFields`: Print all non-static fields of the value.
+
+##### `/variable list`
+
+List all variables.
+
+## 配置项
 
 ## Options
 
@@ -1302,15 +1384,17 @@ Default value: `[]`
 
 ## Key Binds
 
-**F3 + E**: Toggle the HUD containing the information of the entity that the player is looking at. 
+**`F3 + E`**: Toggle the HUD containing the information of the entity that the player is looking at. 
 
-**F3 + M**: Toggle the HUD containing the information of the local player. 
+**`F3 + M`**: Toggle the HUD containing the information of the local player. 
 
-**F3 + S**: Toggle the HUD containing the information of the server-side player. 
+**`F3 + S`**: Toggle the HUD containing the information of the server-side player. 
 
-**Ctrl + Z**: Undo block placement or breaking. (Requires `blockPlacementHistory`)
+**`Ctrl + Z`**: Undo block placement or breaking. (Requires `blockPlacementHistory`)
 
-**Ctrl+ Y**: Redo block placement or breaking. (Requires `blockPlacementHistory`)
+**`Ctrl+ Y`**: Redo block placement or breaking. (Requires `blockPlacementHistory`)
+
+**`Ctrl + C`**: Output the NBT data of the targeted entity or the command to summon such an entity. (requires `dumpTargetEntityDataWithCtrlC`)
 
 ## Renderers
 
@@ -1486,9 +1570,14 @@ Specify a regular expression matching the class (package name is optional) of se
 4. Otherwise, if the TIS Carpet Addition is loaded, try to load its bundled mapping.
 5. Otherwise, the mapping won't be loaded.
 
+## Advanced Mixins
+
+Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are enabled. If you want to disable some advanced mixins, you can press F8 in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
+
+Disabling advanced mixins may make related features no longer available.
+
 ## Other Features
 
-- Structure blocks can be seen when the player is very far from them, if the version of fabric-carpet is lower than 1.4.25.
 - Stacktrace will be printed when the Carpet Mod is not loaded. If the Carpet Mod is loaded, enabling the `superSecretSetting` has the same effect.
 - A warning screen is popped when trying to open a survival with MessMod installed for the first time.
 

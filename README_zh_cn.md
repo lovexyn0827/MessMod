@@ -19,9 +19,10 @@
 - 从代码层面控制游戏运作；
 - 功能多样的Accessing Path；
 - 六种直观易用的渲染器（详见下文）；
-- 导出指定区域为存档（尚在完善中）；
+- 导出指定区域为存档；
 - 使用Ctrl + Z / Ctrl + U撤销/重做方块放置与破坏；
 - 区块网格生成；
+- 伪弱加载区块；
 - 以及更多。
 
 ## 需求
@@ -310,7 +311,7 @@
 
 ##### `/lag while <nanoseconds> <ticks> <phase>`
 
-在此后`<ticks>`游戏刻内么哥游戏刻的`<phase>`阶段开始时卡顿`<nanoseconds>`纳秒，用于更灵活地调整MSPT。
+在此后`<ticks>`游戏刻内每个游戏刻的`<phase>`阶段开始时卡顿`<nanoseconds>`纳秒，用于更灵活地调整MSPT。
 
 ### 模拟弱加载区块
 
@@ -322,17 +323,13 @@
 
 移除方块坐标`<corner1>`所在的区块的弱加载标记。
 
-##### `/lazyload add <corner1> [<corner2>]`
+##### `/lazyload add <corner1> <corner2>`
 
 将以方块坐标`<corner1>`所在的区块和方块坐标`<corner2>`所在的区块为两个相对顶点的矩形区域中区块标记为弱加载。
 
-如果省略了`<corner2>`，则只有`<corner1>`会被标记为弱加载区块。
-
-##### `/lazyload remove <corner1> [<corner2>]`
+##### `/lazyload remove <corner1> <corner2>`
 
 移除以方块坐标`<corner1>`所在的区块和方块坐标`<corner2>`所在的区块为两个相对顶点的矩形区域中区块的弱加载标记。
-
-如果省略了`<corner2>`，则只有`<corner1>`的弱加载标记会被移除。
 
 ### 记录区块行为
 
@@ -596,7 +593,7 @@
 - `sender`：指令执行者对应的`ServerCommandSource`实例；
 - `world`：执行者所在维度的`ServerWorld`实例；
 - `senderEntity`：执行者的`Entity`实例；
-- `client`：`MinecraftClient`实例
+- `client`：`MinecraftClient`实例；
 - `clientWorld`：当前的`ClientWorld`实例；
 - `clientPlayer`：客户端玩家实例。
 
