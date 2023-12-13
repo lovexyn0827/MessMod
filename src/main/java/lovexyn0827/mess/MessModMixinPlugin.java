@@ -6,11 +6,13 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -141,43 +143,65 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 
 	private static ImmutableSet<String> getActiviatedAdvancedMixins(ImmutableSet<MixinInfo> advancedMixins) {
 		try {
-			Properties config = new Properties();
+			Properties config = loadConfig(advancedMixins);
 			if("true".equals(System.clearProperty("messmod.chooseMixin"))) {
-				ADVANCED_MIXINS_CONFIGURATION.createNewFile();
-				try {
-					MixinChoosingFrame frame = new MixinChoosingFrame();
-					frame.setVisible(true);
-					while(frame.choosing && frame.isVisible());
-					frame.writeChoices(config);
-				} catch (Throwable e) {
-					LOGGER.error("Failed to display mixin choosing window!");
-					e.printStackTrace();
-				}
+				tryOpenMixinChoosingFrame(config);
 			}
 			
-			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-			try(FileReader fr = new FileReader(ADVANCED_MIXINS_CONFIGURATION)) {
-				config.load(fr);
-				ADVANCED_MIXINS.forEach((info) -> {
-					if(Boolean.parseBoolean((String) config.computeIfAbsent(info.name, (k) -> "true"))) {
-						builder.add(info.name);
-						config.put(info.name, "true");
-					}
-				});
-			}
-			
-			advancedMixins.forEach((entry) -> {
-				config.computeIfAbsent(entry.name, (k) -> "true");
-			});
 			try(FileWriter fw = new FileWriter(ADVANCED_MIXINS_CONFIGURATION)) {
 				config.store(fw, "Advanced Mixins of MessMod");
 			}
 			
+			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+			config.forEach((name, value) -> {
+				if("true".equals(value)) {
+					builder.add((String) name);
+				}
+			});
 			return builder.build();
 		} catch (Exception e) {
 			LOGGER.fatal("Failed to load activation config of advanced mixins!");
 			e.printStackTrace();
 			return ImmutableSet.of();
+		}
+	}
+	
+	private static Properties loadConfig(ImmutableSet<MixinInfo> advancedMixins) throws IOException {
+		Properties config = new Properties();
+		if(!ADVANCED_MIXINS_CONFIGURATION.exists()) {
+			ADVANCED_MIXINS_CONFIGURATION.createNewFile();
+		}
+		
+		try(FileReader fr = new FileReader(ADVANCED_MIXINS_CONFIGURATION)) {
+			config.load(fr);
+			ADVANCED_MIXINS.forEach((info) -> {
+				if(Boolean.parseBoolean((String) config.computeIfAbsent(info.name, (k) -> "true"))) {
+					config.put(info.name, "true");
+				}
+			});
+		}
+		
+		advancedMixins.forEach((entry) -> {
+			config.computeIfAbsent(entry.name, (k) -> "true");
+		});
+		return config;
+	}
+	
+	public static void tryOpenMixinChoosingFrame(Properties initial) {
+		try {
+			if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("mac")) {
+				return;
+			}
+			
+			System.setProperty("java.awt.headless", "false");
+			initial = initial == null ? loadConfig(ADVANCED_MIXINS) : initial;
+			MixinChoosingFrame frame = new MixinChoosingFrame(initial);
+			frame.setVisible(true);
+			while(frame.choosing && frame.isVisible());
+			frame.writeChoices(initial);
+		} catch (Throwable e) {
+			LOGGER.error("Failed to display mixin choosing window!");
+			e.printStackTrace();
 		}
 	}
 	
@@ -198,6 +222,10 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 				addUsages("getEntityRangeExpansion").costly()
 				.add("WorldChunkMixin_GetEntityExpansion")
 				.addUsages("getEntityRangeExpansion").costly()
+				.add("ChunkTicketManagerNearbyChunkTicketUpdaterMixin")
+				.addUsages("PLAYER_TICKER_UPDATE").risky().costly()
+				.add("ChunkTaskPrioritySystem")
+				.addUsages("CTPS_LEVEL", "CTPS_REMOVE", "CTPS_CHUNK").risky().costly()
 				.build();
 		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);
 		ADVANCED_MIXINS.forEach((info) -> {
@@ -216,13 +244,17 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		private final Map<String, JCheckBox> mixins = new HashMap<>();
 		protected volatile boolean choosing = true;
 		
-		protected MixinChoosingFrame() {
+		protected MixinChoosingFrame(Properties initial) {
 			this.setLayout(new GridLayout(0, 3, 3, 3));
 			this.add(new JLabel("Name of Mixin"));
 			this.add(new JLabel("Usage"));
 			this.add(new JLabel("Impacts"));
 			ADVANCED_MIXINS.forEach((s) -> {
 				JCheckBox check = new JCheckBox(s.name);
+				if("true".equals(initial.get(s.name))) {
+					check.setSelected(true);
+				}
+				
 				this.mixins.put(s.name, check);
 				this.add(check);
 				this.add(new JLabel(String.join(", ", s.usages)));
@@ -246,6 +278,12 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 
 		public void writeChoices(Properties config) {
 			this.mixins.forEach((name, check) -> config.put(name, Boolean.toString(check.isSelected())));
+			try(FileWriter fw = new FileWriter(ADVANCED_MIXINS_CONFIGURATION)) {
+				config.store(fw, "Advanced Mixins of MessMod");
+			} catch (IOException e) {
+				LOGGER.error("Unable to write advanced mixin configuration!");
+				e.printStackTrace();
+			}
 		}
 	}
 	
