@@ -48,7 +48,6 @@ public abstract class EntityHud {
 		int y = this.yStart;
 		int x = this.xStart;
 		// i don't know how it works, but it runs correctly...
-		//
 		Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, this.client.getWindow().getFramebufferWidth(), 
 				this.client.getWindow().getFramebufferHeight(), 0.0f, 1000.0f, 3000.0f);
         RenderSystem.setProjectionMatrix(matrix4f);
@@ -58,10 +57,10 @@ public abstract class EntityHud {
 		matrixStack.translate(0.0, 0.0, -2000.0);
 		RenderSystem.applyModelViewMatrix();
 		RenderSystem.lineWidth(1.0f);
-		this.updateAlign();
+		TextRenderer tr = this.client.textRenderer;
+		this.updateAlign(tr.getWidth(description));
 		float size = OptionManager.hudTextSize;
 		ms.scale(size, size, size);
-		TextRenderer tr = client.textRenderer;
 		ClientHudManager chm = MessMod.INSTANCE.getClientHudManager();
 		tr.drawWithShadow(ms, description, x, y, -1);
 		y += 10;
@@ -78,7 +77,7 @@ public abstract class EntityHud {
 			}
 			
 			int dataX = chm.looserLines ? 
-					(int) (MinecraftClient.getInstance().getWindow().getWidth() / size) - tr.getWidth(data) : x + tr.getWidth(header);
+					this.xEnd - tr.getWidth(data) : x + tr.getWidth(header);
 			tr.drawWithShadow(ms, header, x, y0, chm.headerSpeciallyColored ? 0xFF4040 : 0x31F38B);
 			tr.drawWithShadow(ms, data, dataX, mutableY.getAndAdd(10), 0x31F38B);
 			
@@ -97,21 +96,33 @@ public abstract class EntityHud {
 		MessMod.INSTANCE.getClientNetworkHandler().send(packet);
 	}
 	
-	private void updateAlign() {
+	private int calculateHeight() {
+		int[] height = new int[1];
+		this.getData().forEach((n, o) -> {
+			if(!(BuiltinHudInfo.NAME.getName().equals(n) || BuiltinHudInfo.ID.getName().equals(n))) {
+				height[0] += 10;
+			}
+		});
+		
+		return height[0] + 10;
+	}
+	
+	private void updateAlign(int headerLineWidth) {
 		AlignMode mode = OptionManager.hudAlignMode;
-		this.lastLineWidth = this.getMaxLineLength();
+		this.lastLineWidth = this.getMaxLineLength(headerLineWidth);
 		float size = OptionManager.hudTextSize;
 		boolean left = mode.name().contains("LEFT");
 		int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
 		this.xStart = left ? 0 : (int) (windowWidth / size - this.lastLineWidth + 1);
-		this.xEnd = left ? this.lastLineWidth - 1 : windowWidth;
+		this.xEnd = left ? this.lastLineWidth - 1 : (int) (windowWidth / size);
 		int offset = this.hudManager.hudHeight;
-		this.yStart = mode.name().contains("TOP") ? offset : MinecraftClient.getInstance().getWindow().getHeight() - this.getData().size() * 10 - offset;
+		int windowHeight = (int) (MinecraftClient.getInstance().getWindow().getHeight() / size);
+		this.yStart = mode.name().contains("TOP") ? offset : windowHeight - this.calculateHeight() - offset;
 	}
 	
 	@SuppressWarnings("resource")
-	protected synchronized int getMaxLineLength() {
-		MutableInt lineLength = new MutableInt(0);
+	protected synchronized int getMaxLineLength(int headerLineWidth) {
+		MutableInt lineLength = new MutableInt(headerLineWidth);
 		this.getData().forEach((n, v) -> {
 			TextRenderer tr = MinecraftClient.getInstance().textRenderer;
 			lineLength.setValue(Math.max(lineLength.getValue(), tr.getWidth(n + ':' + v)));;

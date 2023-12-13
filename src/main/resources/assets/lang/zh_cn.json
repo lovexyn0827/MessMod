@@ -49,7 +49,7 @@
 		"cmd.entitylog.usage" : "TODO", 
 		"cmd.entitylog.listen" : "开始监听字段%s", 
 		"cmd.entitylog.unlisten" : "停止监听字段%s", 
-		"cmd.entitilog.reqidle" : "该行为只在记录器空闲时可用", 
+		"cmd.entitylog.reqidle" : "该行为只在记录器空闲时可用", 
 		
 		//***** exportsave *****
 		"cmd.exportsave.failexp" : "导出存档失败", 
