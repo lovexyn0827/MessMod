@@ -1,7 +1,8 @@
 package lovexyn0827.mess.mixins;
 
+import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
 
@@ -26,7 +27,7 @@ public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadEx
 	private @Final ServerChunkManager field_18810;
 	
 	private static final AtomicLong NEXT_ID = new AtomicLong(0);
-	private static final Map<Object, Long> TASK_TO_ID = new ConcurrentHashMap<>();
+	private static final Map<Object, Long> TASK_TO_ID = Collections.synchronizedMap(new WeakHashMap<>());
 	
 	protected ServerChunkManagerMainThreadExecutorMixin(String name) {
 		super(name);

@@ -26,6 +26,7 @@ In other languages:
 - Exporting given areas as a new save.
 - Undo / Redoing changes to blocks with `Ctrl + Z` and `Ctrl + Y`.
 - Chunk grid generation.
+- Fake lazy loaded chunks.
 - And more...
 
 ## Requirements
@@ -43,17 +44,17 @@ Names of arguments are wrapped by pointy semicolons, and optional components are
 
 ##### `/accessingpath compile <name> <inputType>`
 
-Compile the custom node with the given `<name>` into bytecode to increase the performance. The expected input type of nodes may be specified with the argument `<inputType>`, in the format `pkg1/Class1,pkg2/Class2`. 
+Compile the custom node with the given `<name>` into bytecode to increase the performance. The expected input type of nodes may be specified with the argument `<inputType>`, in the format `pkg1/Class1,pkg2/Class2`, and the input type of the first node must be a reference type. 
 
 Currently, this feature may be buggy.
 
 ##### `/accessingpath defineNode <name> <temproary> <backend>`
 
-Define the accessing path specified by the argument `backend` as a custom accessing path node. If `<temproary>` is `false`, the node will be saved in the level folder.
+Define the accessing path specified by the argument <backend> as a custom accessing path node. If <temproary> is false, the node will be saved in the world folder.
 
 ##### `/accessingpath list`
 
-Get the list of custom nodes.
+List all custom nodes.
 
 ##### `/accessingpath undefineNode <name>`
 
@@ -67,7 +68,7 @@ Get the number of entities selected by `<selector>`， or the total entity count
 
 ##### `/countentities <selector> <stackedWith>`
 
-Get the number of entities selected by `<selector>`  and with the same coordination as the one of `<stackedWith>`.
+Get the number of entities selected by `<selector>`  and at the same position as the entity selected by `<stackedWith>`.
 
 ##### `/countentities <selector> <stackedWith> <maxDistanceVec>`
 
@@ -185,9 +186,10 @@ Supported ticking phases (sorted by time):
 - `BLOCK_EVENT`: When block events are going to be updated.
 - `ENTITY`: When entities are going to be processed.
 - `TILE_ENTITY`: When block entities are going to be processed.
-- `TICKED_ALL_WORLDS`: When all worlds got ticked and the asynchronized tasks like inputs of players haven't got processed.
+- `DIM_REST`: When all block entities are processed.
+- `TICKED_ALL_WORLDS`: When all worlds are ticked and the asynchronized tasks like inputs of players haven't got processed.
 - `SERVER_TASKS`: When asynchronized tasks like player inputs are going to be processed.
-- `REST`: When all asynchronized tasks got processed.
+- `REST`: When all asynchronized tasks are processed.
 
 ##### `/entitysidebar remove <name>`
 
@@ -208,6 +210,8 @@ Add a save component to be exported. Available components:
 - `REGION`: Region files, contain blocks, entities (1.16-) and block entities.
 
 - `POI`: POI data.
+
+- `GAMERULE`: Game rules.
 
 - `ENTITY`Entity Data (1.17+).
 
@@ -245,9 +249,9 @@ Add a save component to be exported. Available components:
 
 Using DOS file name wildcards to select multiple items is allowed.
 
-##### `/exportsave addRegion <name> <corner1> <corner2> <dimension>`
+##### `/exportsave addRegion <name> <corner1> <corner2> [<dimension>]`
 
-Add a selection, where `<corner1>` and `<corener2>` is two block position of two opposite vertex of a rectangle area. Any chunk intersecting the area will be selected.
+Add a selection, where `<corner1>` and `<corener2>` is two block position of two opposite vertex of a rectangle area. Any chunk intersecting the area will be selected. If the `<dimension>` is absent, the dimension where the sender is in will be used.
 
 ##### ` /exportsave deleteRegion <name>`
 
@@ -311,9 +315,13 @@ Set the player used in getting the data in the server-side player information HU
 
 ### Produce Lags
 
-##### `/lag nanoseconds [<thread>]`
+##### `/lag once <nanoseconds> [<thread>]`
 
 Freeze a thread of the game for a while. If the thread is not specified explicitly, the server thread will sleep.
+
+##### `/lag while <nanoseconds> <ticks> <phase>`
+
+Freeze the current server or client at the beginning of a given `<phase>` for a given number of ticks, which may be used to adjust MSPT in a more flexibly.
 
 ### Lazy Loaded Chunk Simulation
 
@@ -376,6 +384,16 @@ Subscribe to a chunk event. Supported chunk events:
 - `SCHEDULER_UPGARDE`: Scheduling to start updating a chunk generation stage.
 - `TICKET_ADDITION`: Adding a chunk ticket.
 - `TICKET_REMOVAL`: Removing a chunk ticket (expiration is not included here).
+- `PLAYER_TICKER_UPDATE`: Attemption to update player tickets.
+- `ASYNC_TASKS`: Executing asynchronous tasks in  `ServerChunkManager.Main`.
+- `ASYNC_TASK_SINGLE`: Executing a single asynchronous task.
+- `ASYNC_TASK_ADDITION`: Adding an asynchronous task.
+- `SCM_TICK`: `ServerChunkManager.tick()`.
+- `CTM_TICK`: `ChunkTicketManager.tick()`.
+- `SCM_INIT_CACHE`: Invalidating chunk cache in `ServerChunkManager`.
+- `CTPS_LEVEL`: `ChunkTaskPrioritySystem.updateLevel()`.
+- `CTPS_CHUNK`: `ChunkTaskPrioritySystem.enqueueChunk()`.
+- `CTPS_REMOVE`: `ChunkTaskPrioritySystem.removeChunk()`.
 
 Using DOS file name wildcards to select multiple items is allowed.
 
@@ -422,6 +440,24 @@ Read options from `mcwmem.prop`.
 ##### `/messcfg setGlobal <option> <value>`
 
 Set the global value (used as the default value of options for new saves) and the save-specific value of `<option>` to `<value>`.
+
+##### `/messcfg list [<label>]`
+
+List all options with a given label. If no label is given, all option will be listed.
+
+Available labels: 
+
+- `MESSMOD`: Options related to features of MessMod itself.
+- `ENTITY`: Options related to entities.
+- `RENDERER`: Options related to renderers.
+- `INTERACTION_TWEAKS`: Options to simplify or enhance interactions.
+- `EXPLOSION`: Options related to explosions.
+- `RESEARCH`: Options that may be useful when researching the game mechanisms.
+- `REDSTONE`: Options to debug redstone contraptions.
+- `CHUNK`: Options related to chunks.
+- `BUGFIX`: Bug fixes.
+- `BREAKING_OPTIMIZATION`: Aggressive optimizations which may break some vanilla mechanisms.
+- `MISC`: Miscellaneous.
 
 ### Modifying Entity Properties
 
@@ -549,9 +585,63 @@ Set the block entity at `<pos>` to `<type>`. Optionally, you can specify a `<tag
 
 Remove the block entity at `<pos>`.In the current version of the mod, if a block needs a block entity, the block entity will be recreated after its removal that is a bug). 
 
+### Variable Management
+
+##### `/variable set <slot> new <constructor> [<args>]`
+
+Create a new object with a given `<constructor>` and put into a given `<slot>`. Constructors may be specified using a syntax similar to method nodes, that is:
+
+- `packagename/ClassName`
+- `packagename/ClassName<ArgumentNumber>`
+- `packagename/ClassName<Descriptor>`
+
+Literals separated by commas may be served arguments when necessary. 
+
+##### `/variable set <slot> literal <value>`
+
+Put the value of the literal specified by argument `<value>` into `<slot>`.
+
+##### `/variable set <slot> <objSrc>`
+
+Put the object supplied by `<objSrc>` into `<slot>`. Available suppliers:
+
+- `server`: Current `MinecraftServer` instance.
+- `sender`: The `ServerCommandSource` instance of the sender；
+- `world`: The `ServerWorld` where the sender is in.
+- `senderEntity`: The `Entity` instance of the sender.
+- `client`：`MinecraftClient` instance.
+- `clientWorld`: Current `ClientWorld` instance.
+- `clientPlayer`: Client side player entity.
+
+##### `/variable map <slotSrc> <slotDst> <path>`
+
+Process the value in `<slotSrc>` with a given Accessing Path and put the result into `<slotDst>`.
+
+##### `/variable print <slot> array | toString | dumpFields`
+
+Get the value in `<slot>`.
+
+- `array`: Format the value with`Arrays.toString()`, thus only arrays are permitted.
+- `toString`: Format the value using its `toString()` method.
+- `dumpFields`: Print all non-static fields of the value.
+
+##### `/variable list`
+
+List all variables.
+
+## 配置项
+
 ## Options
 
 The following options could be set with the command `/messcfg <option> <value>`. For example, to enable the entity boundary box renderer, enter `/messcfg serverSyncedBox true`.
+
+##### `accessingPathDynamicAutoCompletion`
+
+Support suggestions for fields and methods when auto completing Accessing paths.
+
+Available values: `true` / `false`
+
+Default value: `true`
 
 ##### `accessingPathInitStrategy`
 
@@ -622,7 +712,7 @@ Specify how the causes of events like chunk loading are recorded.
 - `DISABLED`: Disable cause recording completely
 - `SIMPLE_TRACE`: Record the stack trace from where the events happened, without applying any deobfuscation.
 - `DEOBFUSCATED_TRACE`: Record deobfuscated stack trace, which is the most decent but leads to larger logs and higher performance costs.
-- `ANALYZED`: Compute a couple of tags from the stack trace. This can make logs significantly smaller than ones with stack traces, however, the performance cost may be even higher.
+- `ANALYZED`: Compute a couple of tags from the stack trace. This can make logs significantly smaller than ones with stacktraces, however, the performance cost may be even higher.
 
 Available values: 
 
@@ -693,11 +783,11 @@ Default value: `true`
 
 ##### `commandExecutionRequirment`
 
-Whether or not the execution of commands defined by this mod requires OP permission.
+Whether or not the execution of commands defined by this mod require OP permission.
 
 Available values: `true` / `false`
 
-Default value: `false`
+Default value: `true`
 
 ##### `craftingTableBUD`
 
@@ -713,7 +803,7 @@ Set the vertical speed flying speed in the creative mode. The actual terminal sp
 
 Available values: Any positive real number
 
-Default value: `0.05`
+Default value: `NaN`
 
 ##### `debugStickSkipsInvaildState`
 
@@ -730,6 +820,34 @@ Enable commands for dedicated servers in single-player games.
 Available values: `true` / `false`
 
 Default value: `false`
+
+##### `defaultSaveComponents`
+
+Save components that are included in export saves by default.
+
+Available values: `[]` (empty list) or some of the following elements, separated by ',': 
+
+- `REGION`
+- `POI`
+- `GAMERULES`
+- `RAID`
+- `MAP_LOCAL`
+- `MAP_OTHER`
+- `ICON`
+- `ADVANCEMENTS_SELF`
+- `ADVANCEMENT_OTHER`
+- `PLAYER_SELF`
+- `PLAYER_OTHER`
+- `STAT_SELF`
+- `STAT_OTHER`
+- `SCOREBOARD`
+- `FORCE_CHUNKS_LOCAL`
+- `FORCE_CHUNKS_OTHER`
+- `DATA_COMMAND_STORAGE`
+- `CARPET`
+- `MESSMOD`
+
+Default value: `REGION,POI`
 
 ##### `disableChunkLoadingCheckInCommands`
 
@@ -756,6 +874,14 @@ Available values: `true` / `false`
 
 Default value: `false`
 
+##### `disableItemUsageCooldown`
+
+Disable item usages cooldown for ender pearls and chorus fruits, etc.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `disableProjectileRandomness`
 
 Remove the random speed of projectiles. It could be used to test pearl cannons, but don't forget to disable it if not needed.
@@ -764,13 +890,53 @@ Available values: `true` / `false`
 
 Default value: `false`
 
+##### `dumpTargetEntityDataOnClient`
+
+Output the information of the client-side entity instead of the one of server-side one.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `dumpTargetEntityDataWithCtrlC`
+
+Output the data of currently target entity with Ctrl + C.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `dumpTargetEntityDataWithPaper`
+
+Output the data of currently target entity by right clicking while holding a paper.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `dumpTargetEntityNbt`
+
+Output the NBT data of targeted entity. If the item on the main hand of the player has a custom name, the name will be interpreted as a NBT path to be applied to the NBT data of the entity when the item has no enchantment, or be served as an Accessing Path to be applied to the Entity instance of the entity.
+
+Available values: `true` / `false`
+
+Default value: `true`
+
+##### `dumpTargetEntitySummonCommand`
+
+Generate a command to summon the target entity. If the held item is enchanted, the full NBT data with UUID(s) stripped off are included in the generated command, otherwise, only the entity type, dimension, position, motion and rotation are present in the command.
+
+Available values: `true` / `false`
+
+Default value: `true`
+
 ##### `enabledTools`
 
 Item tools, which make bone and bricks useful. Requires carpet-fabric.
 
-- Bone: `/tick step <countOfBones>` 
-- Brick: `/tick freeze` 
-- Netherite Ingot: `/kill @e[type!=player]`
+ - Bone: `/tick step <countOfBones>` 
+ - Brick: `/tick freeze` 
+ - Netherite Ingot: `/kill @e[type!=player]`
 
 Available values: `true` / `false`
 
@@ -817,6 +983,14 @@ Available values: `true` / `false`
 
 Default value: `true`
 
+##### `expandedStructureBlockRenderingRange`
+
+Expand the maximum visible distance of structure blocks.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `fillHistory`
 
 Record block changes caused by `/fill` so that they can be undone or redone later.
@@ -855,15 +1029,15 @@ Default value: `false`
 
 ##### `getEntityRangeExpansion`
 
-[TODO] In the vanilla `getEntities()` method, only entities that are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually, it doesn't matter, but when the height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Changing it to a higher value may fix some bugs about the interaction between entities and something else.
+In the vanilla `getEntities()` method, only entities that are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually, it doesn't matter, but when the height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Changing it to a higher value may fix some bugs about the interaction between entities and something else.
 
-Available values: Any positive real number
+Available values: Any real number
 
 Default value: `2.0`
 
 ##### `hideSurvivalSaves`
 
-Hide worlds that are likely to be survival saves to prevent them from being opened accidentally. Can only be set globally.
+Hide worlds that are likely to be survival saves to prevent it from being opened accidentally. Can only be set globally.
 
 Available values: `true` / `false`
 
@@ -894,9 +1068,9 @@ Default value: `TOP_RIGHT`
 
 The style of the HUDs, containing zero or more flags below: 
 
-- B: Render a gray background
-- L: Align the headers on the left and the data on the right
-- R: Change the color of headers to red
+ - B: Render a gray background
+ - L: Align the headers on the left and the data on the right
+ - R: Change the color of headers to red
 
 Available values: Any string
 
@@ -906,9 +1080,17 @@ Default value: `(BL)^2/(mR)`
 
 Set the size of the text in the HUDs.
 
-Available values: Any positive real number
+Available values: Any real number
 
 Default value: `1.0`
+
+##### `independentEntityPickerForInfomation`
+
+Pick crosshair-targeted entities for information providers (currently only the UUID suggestor) independently.
+
+Available values: `true` / `false`
+
+Default value: `false`
 
 ##### `interactableB36`
 
@@ -923,8 +1105,8 @@ Default value: `false`
 The main language of the Mod.
 
 Available values: 
- `-FOLLOW_SYSTEM_SETTINGS-`
 
+- `-FOLLOW_SYSTEM_SETTINGS-`
 - `zh_cn`
 - `zh_cn_FORCELOAD`
 - `en_us`
@@ -944,7 +1126,7 @@ Default value: `10`
 
 Set the maximum range of teleportation with `endEyeTeleport`.
 
-Available values: Any positive real number
+Available values: Any real number
 
 Default value: `180`
 
@@ -974,7 +1156,7 @@ Default value: `false`
 
 ##### `projectileChunkLoading`
 
-Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at an extremely high speed when the option is set to true, the server may be lagged greatly.
+Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.
 
 Available values: `true` / `false`
 
@@ -1007,6 +1189,14 @@ Default value: `1.0`
 ##### `quickMobMounting`
 
 Placing mobs into vehicles.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `quickStackedEntityKilling`
+
+Kill the entity being knocked by a brick, along with all entities being at the same position as it.
 
 Available values: `true` / `false`
 
@@ -1077,6 +1267,18 @@ Available values: Any real number
 
 Default value: `-1`
 
+##### `serverSyncedBoxUpdateModeInFrozenTicks`
+
+What the server-side hitbox renderer should do in ticks frozen by the Carpet.
+
+Available values: 
+
+- `NORMALLY`
+- `PAUSE`
+- `NO_REMOVAL`
+
+Default value: `NORMALLY`
+
 ##### `skipUnloadedChunkInRaycasting`
 
 Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long-distance raycasts.
@@ -1107,7 +1309,7 @@ Default value: `[]`
 
 ##### `stableHudLocation`
 
-Make the location of HUDs more stable when the lengths of lines change frequently.
+Make the location of HUDs more stable when the length of lines change frequently.
 
 Available values: `true` / `false`
 
@@ -1115,7 +1317,7 @@ Default value: `true`
 
 ##### `strictAccessingPathParsing`
 
-Parse accessing paths more strictly, to make them more reliable. Currently, the strictly checking system is not completed, so it is not recommended to enable it.
+Parse accessing paths more strictly, to make them more reliable. Currently the strictly checking system is not completed, so it is not recommended to enable it.
 
 Available values: `true` / `false`
 
@@ -1182,15 +1384,17 @@ Default value: `[]`
 
 ## Key Binds
 
-**F3 + E**: Toggle the HUD containing the information of the entity that the player is looking at. 
+**`F3 + E`**: Toggle the HUD containing the information of the entity that the player is looking at. 
 
-**F3 + M**: Toggle the HUD containing the information of the local player. 
+**`F3 + M`**: Toggle the HUD containing the information of the local player. 
 
-**F3 + S**: Toggle the HUD containing the information of the server-side player. 
+**`F3 + S`**: Toggle the HUD containing the information of the server-side player. 
 
-**Ctrl + Z**: Undo block placement or breaking. (Requires `blockPlacementHistory`)
+**`Ctrl + Z`**: Undo block placement or breaking. (Requires `blockPlacementHistory`)
 
-**Ctrl+ Y**: Redo block placement or breaking. (Requires `blockPlacementHistory`)
+**`Ctrl+ Y`**: Redo block placement or breaking. (Requires `blockPlacementHistory`)
+
+**`Ctrl + C`**: Output the NBT data of the targeted entity or the command to summon such an entity. (requires `dumpTargetEntityDataWithCtrlC`)
 
 ## Renderers
 
@@ -1366,9 +1570,14 @@ Specify a regular expression matching the class (package name is optional) of se
 4. Otherwise, if the TIS Carpet Addition is loaded, try to load its bundled mapping.
 5. Otherwise, the mapping won't be loaded.
 
+## Advanced Mixins
+
+Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are enabled. If you want to disable some advanced mixins, you can press F8 (not available on MacOS) in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
+
+Disabling advanced mixins may make related features no longer available.
+
 ## Other Features
 
-- Structure blocks can be seen when the player is very far from them, if the version of fabric-carpet is lower than 1.4.25.
 - Stacktrace will be printed when the Carpet Mod is not loaded. If the Carpet Mod is loaded, enabling the `superSecretSetting` has the same effect.
 - A warning screen is popped when trying to open a survival with MessMod installed for the first time.
 

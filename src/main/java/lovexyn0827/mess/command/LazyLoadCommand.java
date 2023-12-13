@@ -3,6 +3,7 @@ package lovexyn0827.mess.command;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+import java.util.HashMap;
 import java.util.function.LongConsumer;
 
 import com.mojang.brigadier.Command;
@@ -16,9 +17,11 @@ import net.minecraft.command.argument.ColumnPosArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ColumnPos;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 
 public class LazyLoadCommand {
-	public static final LongSet LAZY_CHUNKS = new LongOpenHashSet();
+	public static final HashMap<RegistryKey<World>, LongSet> LAZY_CHUNKS = new HashMap<>();
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("lazyload").requires(CommandUtil.COMMAND_REQUMENT)
@@ -26,13 +29,16 @@ public class LazyLoadCommand {
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
 								.executes((ct) -> {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
-									LAZY_CHUNKS.add(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
+									LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), (k) -> new LongOpenHashSet())
+											.add(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
 								.then(argument("corner2", ColumnPosArgumentType.columnPos())
 										.executes((ct) -> {
-											forEachSelected(ct, LAZY_CHUNKS::add);
+											LongSet posSet = LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), 
+													(k) -> new LongOpenHashSet());
+											forEachSelected(ct, posSet::add);
 											CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 											return Command.SINGLE_SUCCESS;
 										}))))
@@ -40,13 +46,17 @@ public class LazyLoadCommand {
 						.then(argument("corner1", ColumnPosArgumentType.columnPos())
 								.executes((ct) -> {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
-									LAZY_CHUNKS.remove(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
+									LongSet posSet = LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), 
+											(k) -> new LongOpenHashSet());
+									posSet.remove(ChunkPos.toLong(pos.x >> 4, pos.z >> 4));
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
 								.then(argument("corner2", ColumnPosArgumentType.columnPos())
 										.executes((ct) -> {
-											forEachSelected(ct, LAZY_CHUNKS::remove);
+											LongSet posSet = LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), 
+													(k) -> new LongOpenHashSet());
+											forEachSelected(ct, posSet::remove);
 											CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 											return Command.SINGLE_SUCCESS;
 										}))));
