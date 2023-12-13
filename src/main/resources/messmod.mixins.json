@@ -61,7 +61,8 @@
     "ServerWorldAccessor", 
     "SectionedEntityCacheMixin", 
     "ItemCooldownManagerMixin", 
-    "ArgumentTypesMixin"
+    "ArgumentTypesMixin", 
+    "ChunkTaskPrioritySystemMixin"
   ],
   "client": [
     "MinecraftClientMixin",

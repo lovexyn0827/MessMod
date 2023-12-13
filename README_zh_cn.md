@@ -19,9 +19,10 @@
 - 从代码层面控制游戏运作；
 - 功能多样的Accessing Path；
 - 六种直观易用的渲染器（详见下文）；
-- 导出指定区域为存档（尚在完善中）；
+- 导出指定区域为存档；
 - 使用Ctrl + Z / Ctrl + U撤销/重做方块放置与破坏；
 - 区块网格生成；
+- 伪弱加载区块；
 - 以及更多。
 
 ## 需求
@@ -182,6 +183,7 @@
 - `BLOCK_EVENT`：方块事件运算开始时；
 - `ENTITY`：实体运算开始时；
 - `TILE_ENTITY`：方块实体运算开始时；
+- `DIM_REST`：方块实体运算结束时；
 - `TICKED_ALL_WORLDS`：所有维度运算完成且玩家输入等异步处理未开始时；
 - `SERVER_TASKS`：玩家输入等异步处理开始时；
 - `REST`：异步处理结束时。
@@ -210,6 +212,7 @@
 - `REGION`：区域文件，包括方块、方块实体与实体（1.16-）等；
 
 +	`POI`：POI数据；
++	`GAMERULE`：Gamerule（游戏规则）数据；
 +	`ENTITY`：实体数据（1.17+）；
 +	`RAID`：袭击数据；
 +	`MAP_LOCAL`：与选区相交的地图数据；
@@ -232,9 +235,9 @@
 
 也可以使用类似于DOS文件名通配符的格式选取多个项目。
 
-##### `/exportsave addRegion <name> <corner1> <corner2> <dimension>`
+##### `/exportsave addRegion <name> <corner1> <corner2> [<dimension>]`
 
-添加一个选区，选取的区域会被按区块对齐以便保存。
+添加一个选区，选取的区域会被按区块对齐以便保存。如果没有指定`<dimension>`参数，则选区对应的维度以命令执行者所在的维度为准。
 
 ##### ` /exportsave deleteRegion <name>`
 
@@ -246,11 +249,11 @@
 
 可以使用`<worldGen>` 选项给出一个世界生成配置：
 
-- COPY：与原存档相同；
-- VOID：虚空；
-- BEDROCK：一层基岩；
-- GLASS：一层白色玻璃；
-- PLAIN：一层草方块。
+- `COPY`：与原存档相同；
+- `VOID`：虚空；
+- `BEDROCK`：一层基岩；
+- `GLASS`：一层白色玻璃；
+- `PLAIN`：一层草方块。
 
 ##### `/exportsave listComponents`
 
@@ -302,9 +305,13 @@
 
 ### 制造卡顿
 
-##### `/lag nanoseconds [<thread>]`
+##### `/lag once <nanoseconds> [<thread>]`
 
 让游戏的某一线程`<thread>`卡死`<nonoseconds>`纳秒，可用于某些测试。如未指定线程则卡死服务端线程。
+
+##### `/lag while <nanoseconds> <ticks> <phase>`
+
+在此后`<ticks>`游戏刻内每个游戏刻的`<phase>`阶段开始时卡顿`<nanoseconds>`纳秒，用于更灵活地调整MSPT。
 
 ### 模拟弱加载区块
 
@@ -366,7 +373,17 @@
 - `SCHEDULER_GENERATION`：计划生成一个区块；
 - `SCHEDULER_UPGRADE`：计划开始一个区块生成阶段；
 - `TICKET_ADDITION`：添加区块加载票；
-- `TICKET_REMOVAL`：移除区块加载票（不含过期）。
+- `TICKET_REMOVAL`：移除区块加载票（不含过期）；
+- `PLAYER_TICKER_UPDATE`：尝试更新玩家区块加载票；
+- `ASYNC_TASKS`：执行`ServerChunkManager.Main`中的异步任务；
+- `ASYNC_TASK_SINGLE`：执行单个异步任务；
+- `ASYNC_TASK_ADDITION`：添加异步任务；
+- `SCM_TICK`：`ServerChunkManager.tick()`方法；
+- `CTM_TICK`：`ChunkTicketManager.tick()`方法；
+- `SCM_INIT_CACHE`：清空`ServerChunkManager`的区块缓存；
+- `CTPS_LEVEL`：调用`ChunkTaskPrioritySystem.updateLevel()`方法；
+- `CTPS_CHUNK`：调用`ChunkTaskPrioritySystem.enqueueChunk()`方法；
+- `CTPS_REMOVE`：调用`ChunkTaskPrioritySystem.removeChunk()`方法。
 
 也可以使用类似于DOS文件名通配符的格式选取多个项目。
 
@@ -413,6 +430,24 @@
 ##### `/messcfg <option> <value>`
 
 在当前存档范围内将选项`<option>`的值设为`<value>`，详见文档的下一节。
+
+##### `/messcfg list [<label>]`
+
+列出带有某一标签的选项，如果不指定标签，则所有选项均会被列出。
+
+可用的标签如下：
+
+- `MESSMOD`：用于配置MessMod自身功能的选项；
+- `ENTITY`：与实体相关的选项；
+- `RENDERER`：与渲染器相关的选项；
+- `INTERACTION_TWEAKS`：用于为交互提供便利的选项；
+- `EXPLOSION`：与爆炸相关的选项；
+- `RESEARCH`：主要面向机制研究的选项；
+- `REDSTONE`：与调试红石电路有关的选项；
+- `CHUNK`：与区块有关的选项；
+- `BUGFIX`：与Bug修复有关的选项；
+- `BREAKING_OPTIMIZATION`：会破坏部分原版机制的高强度优化功能；
+- `MISC`：杂项。
 
 ### 修改实体属性
 
@@ -534,17 +569,69 @@
 
 移除`<pos>`处的方块实体。在目前版本中，如果该处存在一个需要方块实体的方块，在移除后该处方块实体会被该方块重新设置（一个Bug）。  
 
+### 变量管理
+
+##### `/variable set <slot> new <constructor> [<args>]`
+
+使用`<constructor>`指定的构造器构建一个新对象放入变量`<slot>`当中。可以使用类似于方法节点的方式指定构造器，可用的格式如下：
+
+- `packagename/ClassName`
+- `packagename/ClassName<构造器参数数量>`
+- `packagename/ClassName<构造器Descriptor>`
+
+如果需要的话，可以使用一串用英文逗号分开的字面值作为参数。
+
+##### `/variable set <slot> literal <value>`
+
+将字面值`<value>`的值放入变量`<slot>`当中。
+
+##### `/variable set <slot> <objSrc>`
+
+将`<objSrc>`提供的对象放入变量`<slot>`当中。可用的对象提供者有：
+
+- `server`：当前的`MinecraftServer`实例；
+- `sender`：指令执行者对应的`ServerCommandSource`实例；
+- `world`：执行者所在维度的`ServerWorld`实例；
+- `senderEntity`：执行者的`Entity`实例；
+- `client`：`MinecraftClient`实例；
+- `clientWorld`：当前的`ClientWorld`实例；
+- `clientPlayer`：客户端玩家实例。
+
+##### `/variable map <slotSrc> <slotDst> <path>`
+
+将变量`<slotSrc>`中的值经Accessing Path处理后的结果存储到变量`<slotDst>`中。
+
+##### `/variable print <slot> array | toString | dumpFields`
+
+输出变量`<slot>`的值，最后一个参数决定输出的格式：
+
+- `array`：使用`Arrays.toString()`进行格式化，只适用于数组；
+- `toString`：使用变量的`toString()`方法进行格式化；
+- `dumpFields`：输出变量的所有非静态字段及内容。
+
+##### `/variable list`
+
+列出目前定义的变量列表。
+
 ## 配置项
 
 以下选项均通过`/messcfg`命令设置，格式均为`/messcfg <选项名> <值>`，如启用实体碰撞箱显示可使用`/messcfg serverSyncedBox true`
+
+##### `accessingPathDynamicAutoCompletion`
+
+支持自动补全Accessing Path中的字段名和方法名。
+
+可能取值：`true`或`false`
+
+默认值：`true`
 
 ##### `accessingPathInitStrategy`
 
 共有3种初始化策略： 
 
-- 旧版本模式：每个Accessing Path只在第一次被使用时进行初始化，然后这一结果用于访问后续的所有输入对象 
-- 标准模式：Accessing Path会对每个不同对象进行初始化，然后结果会被缓存直到相应对象被清理。
-- 严格模式：Accessing Path每次被使用时都会重新进行初始化。
+ - 旧版本模式：每个Accessing Path只在第一次被使用时进行初始化，然后这一结果用于访问后续的所有输入对象 
+ - 标准模式：Accessing Path会对每个不同对象进行初始化，然后结果会被缓存直到相应对象被清理。
+ - 严格模式：Accessing Path每次被使用时都会重新进行初始化。
 
 可能取值：
 
@@ -682,7 +769,7 @@ TNT可以被玩家的攻击杀死。
 
 可能取值：`true`或`false`
 
-默认值：`false`
+默认值：`true`
 
 ##### `craftingTableBUD`
 
@@ -698,7 +785,7 @@ TNT可以被玩家的攻击杀死。
 
 可能取值：任意正实数
 
-默认值：`0.05`
+默认值：`NaN`
 
 ##### `debugStickSkipsInvaildState`
 
@@ -715,6 +802,34 @@ TNT可以被玩家的攻击杀死。
 可能取值：`true`或`false`
 
 默认值：`false`
+
+##### `defaultSaveComponents`
+
+默认包含在导出的存档中的存档组件。
+
+可能取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一些下方的一些项目：
+
+- `REGION`
+- `POI`
+- `GAMERULES`
+- `RAID`
+- `MAP_LOCAL`
+- `MAP_OTHER`
+- `ICON`
+- `ADVANCEMENTS_SELF`
+- `ADVANCEMENT_OTHER`
+- `PLAYER_SELF`
+- `PLAYER_OTHER`
+- `STAT_SELF`
+- `STAT_OTHER`
+- `SCOREBOARD`
+- `FORCE_CHUNKS_LOCAL`
+- `FORCE_CHUNKS_OTHER`
+- `DATA_COMMAND_STORAGE`
+- `CARPET`
+- `MESSMOD`
+
+默认值：`REGION,POI`
 
 ##### `disableChunkLoadingCheckInCommands`
 
@@ -741,6 +856,14 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`false`
 
+##### `disableItemUsageCooldown`
+
+禁用末影珍珠和紫颂果等物品的的使用冷却时长。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `disableProjectileRandomness`
 
 取消弹射物的随机速度，用于部分测试，不过不要忘记关闭。
@@ -749,13 +872,53 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`false`
 
+##### `dumpTargetEntityDataOnClient`
+
+输出客户端实体信息而不是服务端实体信息。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `dumpTargetEntityDataWithCtrlC`
+
+使用Ctrl + C时输出目标实体信息。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `dumpTargetEntityDataWithPaper`
+
+主手持有纸的玩家右键实体时输出目标实体信息。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `dumpTargetEntityNbt`
+
+输出目标实体的NBT数据。如果玩家手持的物品有自定义名称，那么当物品没有附魔时该名称会被解析为一个作用于实体NBT的NBT路径，否则，这一名称会被作为应用于实体的Entity实例的一个Accessing Path。
+
+可能取值：`true`或`false`
+
+默认值：`true`
+
+##### `dumpTargetEntitySummonCommand`
+
+生成用于生成目标实体的一条指令。如果手持的物品被附魔，实体的完整NBT数据（不含UUID）会被添加到 指令中，否则，只有实体类型，维度、坐标、动量与朝向信息会出现在指令中。
+
+可能取值：`true`或`false`
+
+默认值：`true`
+
 ##### `enabledTools`
 
 启用或禁用工具物品。
 
-- 骨头：`/tick step <骨头数目>` 
-- 红砖：`/tick freeze` 
-- 下界合金锭：`/kill @e[type!=player]`
+ - 骨头：`/tick step <骨头数目>` 
+ - 红砖：`/tick freeze` 
+ - 下界合金锭：`/kill @e[type!=player]`
 
 可能取值：`true`或`false`
 
@@ -802,6 +965,14 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`true`
 
+##### `expandedStructureBlockRenderingRange`
+
+增加结构方块的渲染距离。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `fillHistory`
 
 记录`/fill`产生的方块变更以便在将来撤销或重做。
@@ -842,7 +1013,7 @@ TNT可以被玩家的攻击杀死。
 
 在原版的`getEntity()`方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。
 
-可能取值：任意正实数
+可能取值：任意实数
 
 默认值：`2.0`
 
@@ -879,9 +1050,9 @@ TNT可以被玩家的攻击杀死。
 
 HUD的渲染样式, 包括了下面的零个至多个标志: 
 
-- B：渲染背景
-- L：左对齐行标题并右对齐数据
-- R：将行标题改为红色
+ - B：渲染背景
+ - L：左对齐行标题并右对齐数据
+ - R：将行标题改为红色
 
 可能取值：任意字符串
 
@@ -891,9 +1062,17 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 调节HUD字体大小。
 
-可能取值：任意正实数
+可能取值：任意实数
 
 默认值：`1.0`
+
+##### `independentEntityPickerForInfomation`
+
+独立地为信息提供者（目前只包含指令UUID建议）选取目标实体。
+
+可能取值：`true`或`false`
+
+默认值：`false`
 
 ##### `interactableB36`
 
@@ -905,7 +1084,7 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 ##### `language`
 
-该Mod的主要语言
+该Mod的主要语言。
 
 可能取值：
 
@@ -929,7 +1108,7 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 设置endEyeTeleport功能的最远传送距离。
 
-可能取值：任意正实数
+可能取值：任意实数
 
 默认值：`180`
 
@@ -992,6 +1171,14 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 ##### `quickMobMounting`
 
 潜行时用刷怪蛋向载具中放置生物。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `quickStackedEntityKilling`
+
+杀死被砖块敲击的实体以及所有位置与其相同的实体。
 
 可能取值：`true`或`false`
 
@@ -1061,6 +1248,18 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 可能取值：任意实数
 
 默认值：`-1`
+
+##### `serverSyncedBoxUpdateModeInFrozenTicks`
+
+游戏运算被地毯端中/tick指令暂停时服务端碰撞箱渲染器的行为。
+
+可能取值：
+
+- `NORMALLY`
+- `PAUSE`
+- `NO_REMOVAL`
+
+默认值：`NORMALLY`
 
 ##### `skipUnloadedChunkInRaycasting`
 
@@ -1175,7 +1374,9 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 **`Ctrl + Z`**：撤销方块放置/破坏及`/fill`操作（需要`blockPlacementHistory`和`fillHistory`）
 
-**`Ctrl+ Y`**：重做方块放置/破坏及`/fill`操作（需要`blockPlacementHistory`和`fillHistory`）
+**`Ctrl + Y`**：重做方块放置/破坏及`/fill`操作（需要`blockPlacementHistory`和`fillHistory`）
+
+**`Ctrl + C`**：在聊天栏输出玩家注视的实体的NBT或生成相应实体所用的指令。（需要`dumpTargetEntityDataWithCtrlC`）
 
 ## 渲染器
 
@@ -1352,11 +1553,16 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 4. 否则，若安装有TIS Carpet Addition，则使用TIS Carpet Addition内置的Mapping。
 5. 若全部失败，Mapping不会被加载。
 
+## 高级Mixin
+
+该模组当中的一些Mixin可能会对MC的运行性能造成较为明显的影响或对涉及多线程的原版行为产生意外的影响，所以，那些Mixin会被定义为可选的。默认情况下，这些Mixin处于启用状态，如果需要禁用相关的Mixin，可以在标题界面下按下F8（不适用于MacOS）或者修改游戏目录下的`advanced_mixins.prop`。在修改完毕后需要重启客户端或服务端才能使设置生效。
+
+禁用高级Mixin可能会使相关的功能不再可用。
+
 ## 其他特性
 
-1. 如果未安装Carpet或Carpet版本地狱1.4.25时结构方块的渲染距离被拓宽，可以在很远处被看到。
-2. 在未安装Carpet时执行命令遇到未知错误时会输出Stacktrace，在安装Carpet后也可以通过启用`superSecretSetting`规则做到这一点。
-3. 在第一次在安装有MessMod时打开某一个生存存档时会弹出一条警告。
+1. 在未安装Carpet时执行命令遇到未知错误时会输出Stacktrace，在安装Carpet后也可以通过启用`superSecretSetting`规则做到这一点。
+2. 在第一次在安装有MessMod时打开某一个生存存档时会弹出一条警告。
 
 ## 注意事项
 

@@ -92,7 +92,6 @@ public class EntitySidebarCommand {
 				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
-				CommandUtil.feedback(ct, "cmd.general.success");
 				return 0;
 			}
 		} catch (TranslatableException e1) {
@@ -113,7 +112,6 @@ public class EntitySidebarCommand {
 				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
-				CommandUtil.feedback(ct, "cmd.general.success");
 				return 0;
 			}
 		} catch (TranslatableException e1) {
@@ -135,7 +133,6 @@ public class EntitySidebarCommand {
 				return Command.SINGLE_SUCCESS;
 			} else {
 				CommandUtil.error(ct, "exp.dupname");
-				CommandUtil.feedback(ct, "cmd.general.success");
 				return 0;
 			}
 		} catch (TranslatableException e1) {

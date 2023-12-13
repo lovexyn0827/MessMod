@@ -1,14 +1,20 @@
 package lovexyn0827.mess.mixins;
 
+import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntityInterface;
+import lovexyn0827.mess.fakes.ServerEntityManagerInterface;
 import lovexyn0827.mess.fakes.ServerWorldInterface;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.PulseRecorder;
@@ -16,20 +22,32 @@ import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WorldGenerationProgressListener;
+import net.minecraft.server.world.ServerEntityManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.Spawner;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.level.ServerWorldProperties;
+import net.minecraft.world.level.storage.LevelStorage;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin implements BlockView, ServerWorldInterface {
 	private final PulseRecorder pulseRecorder = new PulseRecorder();
+	
+	@Shadow
+	private @Final ServerEntityManager<?> entityManager;
 	
 	@Override
 	public BlockHitResult raycast(RaycastContext context2) {
@@ -138,5 +156,21 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 		if(((EntityInterface) entity).isFrozen()) {
 			ci.cancel();
 		}
+	}
+	
+	@Inject(
+			method = "<init>", 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/server/world/ServerWorld.entityManager:Lnet/minecraft/server/world/ServerEntityManager;", 
+					opcode = Opcodes.PUTFIELD, 
+					shift = At.Shift.AFTER
+			)
+	)
+	private void onCreatedEntityManager(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, 
+			ServerWorldProperties properties, RegistryKey<World> worldKey, DimensionType dimensionType, 
+			WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, 
+			boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime, CallbackInfo ci) {
+		((ServerEntityManagerInterface) this.entityManager).initWorld((ServerWorld)(Object) this);
 	}
 }

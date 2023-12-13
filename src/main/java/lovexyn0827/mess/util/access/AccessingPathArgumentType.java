@@ -92,38 +92,44 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 			return null;
 		}
 		
-		if(sr.peek() == '!') {
+		String nodeStr;
+		switch(sr.peek()) {
+		case '!':
 			sr.skip();
 			// This is fine since dots are invalid in field names.
-			String nodeStr = sr.readStringUntil('.');
+			nodeStr = sr.readStringUntil('.');
 			return new FieldNode(nodeStr);
-		} else if(sr.peek() == '[') {
+		case '[':
 			//Element
 			sr.skip();
 			// This is fine as only numbers are allowed here.
-			String nodeStr = sr.readStringUntil(']');
+			nodeStr = sr.readStringUntil(']');
 			sr.skip();
 			try {
 				return new ElementNode(Integer.parseInt(nodeStr));
 			} catch (NumberFormatException e) {
 				throw new TranslatableException("exp.reqint", nodeStr);
 			}
-		} else if(sr.peek() == '<') {
+		case '<':
 			//Map
-			String nodeStr = readWrapped(sr, '<', '>');
+			nodeStr = readWrapped(sr, '<', '>');
 			sr.skip();
 			return new ValueOfMapNode(Literal.parse(nodeStr));
-		} else if(sr.peek() == '>') {
+		case '>':
 			sr.skip();
-			String nodeStr = readUntil(sr, '.');
+			nodeStr = readUntil(sr, '.');
 			return new MapperNode(nodeStr);
-		} else if(sr.peek() == '(') {
+		case '(':
 			sr.skip();
-			String nodeStr = sr.readStringUntil(')');
+			nodeStr = sr.readStringUntil(')');
 			sr.skip();
 			return new ClassCastNode(nodeStr);
-		} else {
-			String nodeStr = readUntil(sr, '.');
+		case '*':
+			sr.skip();
+			nodeStr = sr.readStringUntil('.');
+			return new LiteralNode(nodeStr);
+		default:
+			nodeStr = readUntil(sr, '.');
 			Matcher matcher = MethodNode.METHOD_PATTERN.matcher(nodeStr);
 			if(matcher.matches()) {
 				return new MethodNode(matcher.group("name"), matcher.group("types"), matcher.group("args"));
@@ -239,6 +245,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
             		.suggest("<")
             		.suggest("[")
             		.suggest("(")
+            		.suggest("*")
             		.suggest("x")
             		.suggest("y")
             		.suggest("z")
@@ -259,8 +266,9 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
         				.suggest(lastNodeStr + "::")
         				.buildFuture();
         	default:
-        		if(this.inputTypeGetter != null && OptionManager.accessingPathDynamicAutoCompletion) {
-        			if(ct.getSource() instanceof ServerCommandSource) {
+        		if(OptionManager.accessingPathDynamicAutoCompletion) {
+        			if(ct.getSource() instanceof ServerCommandSource 
+        					&& this.inputTypeGetter != null) {
         				// Server side
         				@SuppressWarnings("unchecked")
     					Type inType = this.inputTypeGetter.apply((CommandContext<ServerCommandSource>) ct);
@@ -294,12 +302,12 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
             				MutableBoolean anyExactlyMatching = new MutableBoolean(false);
             				Reflection.getAllMethods(Reflection.getRawType(completed.getOutputType()))
         							.stream()
-        							.filter((m) -> m.getName().contains(prefix))
         							.map((m) -> {
         								return MessMod.INSTANCE
         										.getMapping()
         										.namedMethod(m.getName(), org.objectweb.asm.Type.getMethodDescriptor(m));
         							})
+        							.filter((mn) -> mn.contains(prefix))
         							.distinct()
         							.forEach((mn) -> {
         								builder.suggest(mn);
