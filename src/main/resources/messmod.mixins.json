@@ -60,7 +60,8 @@
     "ChunkTicketManagerNearbyChunkTicketUpdaterMixin", 
     "ItemCooldownManagerMixin", 
     "SectionedEntityCacheMixin", 
-    "ServerPlayNetworkHandler_1Mixin"
+    "ServerPlayNetworkHandler_1Mixin", 
+    "ChunkTaskPrioritySystemMixin"
   ],
   "client": [
     "MinecraftClientMixin",
