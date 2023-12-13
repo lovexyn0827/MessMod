@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -187,6 +188,11 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	
 	public static void tryOpenMixinChoosingFrame(Properties initial) {
 		try {
+			if(System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("mac")) {
+				return;
+			}
+			
+			System.setProperty("java.awt.headless", "false");
 			initial = initial == null ? loadConfig(ADVANCED_MIXINS) : initial;
 			MixinChoosingFrame frame = new MixinChoosingFrame(initial);
 			frame.setVisible(true);

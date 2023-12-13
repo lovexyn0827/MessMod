@@ -1572,7 +1572,7 @@ Specify a regular expression matching the class (package name is optional) of se
 
 ## Advanced Mixins
 
-Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are enabled. If you want to disable some advanced mixins, you can press F8 in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
+Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are enabled. If you want to disable some advanced mixins, you can press F8 (not available on MacOS) in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
 
 Disabling advanced mixins may make related features no longer available.
 
