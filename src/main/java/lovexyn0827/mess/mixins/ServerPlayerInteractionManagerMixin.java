@@ -22,7 +22,6 @@ import net.minecraft.util.math.BlockPos;
 public class ServerPlayerInteractionManagerMixin {
 	@Shadow
 	public ServerPlayerEntity player;
-	
 	@Inject(
 			method = "tryBreakBlock", 
 			at = @At(

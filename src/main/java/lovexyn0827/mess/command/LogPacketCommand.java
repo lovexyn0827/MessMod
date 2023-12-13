@@ -13,6 +13,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.mixins.NetworkStateAccessor;
+import lovexyn0827.mess.mixins.NetworkStatePacketHandlerAccessor;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.NetworkState;
@@ -66,9 +67,11 @@ public class LogPacketCommand {
 						((NetworkStateAccessor)(Object) state).getHandlerMap();
 				handlerMap.values().forEach((handler) -> {
 					try {
-						handler.forEachPacketType((clazz) -> {
-							PACKET_TYPES.put(mapping.simpleNamedClass(clazz.getName()), clazz);
-						});
+						((NetworkStatePacketHandlerAccessor) handler).getPacketTypeMapForMess()
+								.values()
+								.forEach((clazz) -> {
+									PACKET_TYPES.put(mapping.simpleNamedClass(clazz.getName()), clazz);
+								});
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

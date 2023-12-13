@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.network.MessModPayload;
 import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.util.phase.TickingPhase;
 import net.minecraft.entity.Entity;
@@ -17,7 +18,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
@@ -56,7 +57,7 @@ public class RemoteHudDataSender implements HudDataSender {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		buffer.writeEnumConstant(type);
 		buffer.writeNbt(data);
-		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.HUD, buffer);
+		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(new MessModPayload(Channels.HUD, buffer));
 		this.server.getPlayerManager().getPlayerList().stream()
 				.filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(this.type))
 				.forEach((p) -> p.networkHandler.sendPacket(packet));
@@ -137,7 +138,7 @@ public class RemoteHudDataSender implements HudDataSender {
 			PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 			buffer.writeEnumConstant(HudType.SIDEBAR);
 			buffer.writeNbt(data);
-			CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.HUD, buffer);
+			CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(new MessModPayload(Channels.HUD, buffer));
 			this.server.getPlayerManager().getPlayerList().stream()
 					//TODO .filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(HudType.SIDEBAR))
 					.forEach((p) -> p.networkHandler.sendPacket(packet));

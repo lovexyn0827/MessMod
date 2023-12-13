@@ -16,8 +16,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
 
 public class MessClientNetworkHandler {
@@ -30,7 +30,7 @@ public class MessClientNetworkHandler {
 
 	public boolean handlePacket(CustomPayloadS2CPacket packet) {
 		try {
-			Identifier id = packet.getChannel();
+			Identifier id = packet.payload().id();
 			PacketHandler handler = PACKET_HANDLERS.get(id);
 			if(handler != null) {
 				handler.onPacket(packet, this.client);
@@ -55,7 +55,7 @@ public class MessClientNetworkHandler {
 		buf.writeInt(Channels.CHANNEL_VERSION);
 		buf.writeString(FabricLoader.getInstance().getModContainer("messmod").get().getMetadata()
 				.getVersion().getFriendlyString());
-		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(Channels.VERSION, buf);
+		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(new MessModPayload(Channels.VERSION, buf));
 		this.send(packet);
 	}
 
@@ -63,9 +63,13 @@ public class MessClientNetworkHandler {
 		PACKET_HANDLERS.put(id, handler);
 	}
 	
+	public boolean isValidPackedId(Identifier id) {
+		return PACKET_HANDLERS.containsKey(id);
+	}
+	
 	static {
 		register(Channels.HUD, (packet, client) -> {
-			PacketByteBuf buffer = packet.getData();
+			PacketByteBuf buffer = ((MessModPayload) packet.payload()).data();
 			HudType type = buffer.readEnumConstant(HudType.class);
 			NbtCompound tag = buffer.readNbt();
 			HudDataStorage cache = MessMod.INSTANCE.getClientHudManager().getData(type);
@@ -78,12 +82,12 @@ public class MessClientNetworkHandler {
 		});
 		register(Channels.OPTIONS, (packet, client) -> {
 			client.execute(() -> {
-				OptionManager.loadFromRemoteServer(packet.getData());
+				OptionManager.loadFromRemoteServer(((MessModPayload) packet.payload()).data());
 			});
 		});
 		register(Channels.OPTION_SINGLE, (packet, client) -> {
 			client.execute(() -> {
-				OptionManager.loadSingleFromRemoteServer(packet.getData());
+				OptionManager.loadSingleFromRemoteServer(((MessModPayload) packet.payload()).data());
 			});
 		});
 	}

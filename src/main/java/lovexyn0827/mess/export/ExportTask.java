@@ -214,7 +214,7 @@ public final class ExportTask {
 		boolean copyLocal = this.components.contains(SaveComponent.FORCE_CHUNKS_LOCAL);
 		boolean copyOther = this.components.contains(SaveComponent.FORCE_CHUNKS_OTHER);
 		ForcedChunkState fcs = ForcedChunkState.fromNbt(world.getPersistentStateManager()
-				.getOrCreate(ForcedChunkState::fromNbt, ForcedChunkState::new, "chunks")
+				.getOrCreate(ForcedChunkState.getPersistentStateType(), "chunks")
 				.writeNbt(new NbtCompound()));
 		fcs.markDirty();
 		fcs.getChunks().removeIf((LongPredicate) (pos) -> {
@@ -246,7 +246,7 @@ public final class ExportTask {
 		
 		if((copyLocal || copyOther) && world.getRegistryKey() == World.OVERWORLD) {
 			psm.set("idcounts", world.getPersistentStateManager()
-			        .getOrCreate(IdCountsState::fromNbt, IdCountsState::new, "idcounts"));
+			        .getOrCreate(IdCountsState.getPersistentStateType(), "idcounts"));
 		}
 	}
 
@@ -328,7 +328,7 @@ public final class ExportTask {
 	private void exportRaids(ServerWorld world, PersistentStateManager psm) throws IOException {
 	    String id = RaidManager.nameFor(world.getDimensionEntry());
 		RaidManager ps = world.getPersistentStateManager()
-				.get((nbt) -> RaidManager.fromNbt(world, nbt), id);
+				.get(RaidManager.getPersistentStateType(world), id);
 		RaidManager tempRm = RaidManager.fromNbt(world, ps.writeNbt(new NbtCompound()));
 		Iterator<Map.Entry<Integer, Raid>> itr = ((RaidManagerAccessor) tempRm).getRaids().entrySet().iterator();
 		while(itr.hasNext()) {

@@ -14,6 +14,7 @@ import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.MinecraftClientInterface;
 import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.network.MessModPayload;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.EntityDataDumpHelper;
 import lovexyn0827.mess.util.RaycastUtil;
@@ -26,7 +27,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
@@ -104,7 +105,8 @@ public abstract class MinecraftClientMixin implements MinecraftClientInterface {
 					EntityDataDumpHelper.tryDumpTarget(this.player);
 				} else {
 					MessMod.INSTANCE.getClientNetworkHandler().send(
-							new CustomPayloadC2SPacket(Channels.ENTITY_DUMP, new PacketByteBuf(Unpooled.buffer())));
+							new CustomPayloadC2SPacket(
+									new MessModPayload(Channels.ENTITY_DUMP, new PacketByteBuf(Unpooled.buffer()))));
 				}
 				
 				this.itemUseCooldown = 4;

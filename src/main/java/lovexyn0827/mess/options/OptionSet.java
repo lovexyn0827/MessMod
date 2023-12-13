@@ -19,10 +19,11 @@ import com.mojang.brigadier.context.CommandContext;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.network.MessModPayload;
 import lovexyn0827.mess.options.OptionManager.CustomOptionValidator;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.command.ServerCommandSource;
 
 public final class OptionSet {
@@ -229,7 +230,7 @@ public final class OptionSet {
 			buf.writeString(value);
 			MessMod.INSTANCE
 					.getServerNetworkHandler()
-					.sendToEveryone(new CustomPayloadS2CPacket(Channels.OPTION_SINGLE, buf));
+					.sendToEveryone(new CustomPayloadS2CPacket(new MessModPayload(Channels.OPTION_SINGLE, buf)));
 		}
 	}
 
@@ -303,7 +304,7 @@ public final class OptionSet {
 			StringWriter sw = new StringWriter();
 			this.backend.store(sw, "MessMod Options");
 			buf.writeString(sw.toString());
-			return new CustomPayloadS2CPacket(Channels.OPTIONS, buf);
+			return new CustomPayloadS2CPacket(new MessModPayload(Channels.OPTIONS, buf));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

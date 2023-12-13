@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.google.common.collect.Sets;
-import com.mojang.util.UUIDTypeAdapter;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -21,13 +20,13 @@ public class LocalShapeStorage extends ShapeCache implements ShapeSender {
 	private final UUID localPlayerUuid;
 	
 	LocalShapeStorage() {
-		this.localPlayerUuid = UUIDTypeAdapter.fromString(MinecraftClient.getInstance().getSession().getUuid());
+		this.localPlayerUuid = MinecraftClient.getInstance().getSession().getUuidOrNull();
 	}
 
 	@Override
 	public synchronized void addShape(Shape shape, RegistryKey<World> dim, ShapeSpace space, 
 			ServerPlayerEntity player) {
-		if(player == null || this.localPlayerUuid.equals(player.getUuid())) {
+		if(player == null || player.getUuid().equals(this.localPlayerUuid)) {
 			Set<Shape> set = this.getShapesInDimension(dim)
 					.computeIfAbsent(space, (ss) -> Sets.newHashSet());
 			set.add(shape);
@@ -36,7 +35,7 @@ public class LocalShapeStorage extends ShapeCache implements ShapeSender {
 
 	@Override
 	public synchronized void clearSpaceFromServer(ShapeSpace space, ServerPlayerEntity player) {
-		if(player == null || this.localPlayerUuid.equals(player.getUuid())) {
+		if(player == null || player.getUuid().equals(this.localPlayerUuid)) {
 			this.clearSpace(space);
 		}
 	}

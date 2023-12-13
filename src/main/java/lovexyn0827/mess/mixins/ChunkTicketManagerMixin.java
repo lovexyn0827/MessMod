@@ -76,7 +76,7 @@ public class ChunkTicketManagerMixin implements ChunkTicketManagerInterface {
 		}
 	}
 	
-	@Inject(method = "tick", at = @At("HEAD"))
+	@Inject(method = "update", at = @At("HEAD"))
 	protected void onTickNoArg(CallbackInfoReturnable<Boolean> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;

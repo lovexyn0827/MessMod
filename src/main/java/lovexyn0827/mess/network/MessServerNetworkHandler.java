@@ -7,14 +7,13 @@ import com.google.common.collect.Maps;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.HudDataSubscribeState;
 import lovexyn0827.mess.fakes.ServerPlayerEntityInterface;
-import lovexyn0827.mess.mixins.CustomPayloadC2SPacketAccessor;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.util.EntityDataDumpHelper;
 import lovexyn0827.mess.util.FormattedText;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -29,9 +28,8 @@ public class MessServerNetworkHandler {
 	
 	public boolean handlePacket(CustomPayloadC2SPacket packet, ServerPlayerEntity player) {
 		try {
-			CustomPayloadC2SPacketAccessor accessor = (CustomPayloadC2SPacketAccessor) packet;
-			Identifier channel = accessor.getMessChannel();
-			PacketByteBuf buf = accessor.getMessData();
+			Identifier channel = packet.payload().id();
+			PacketByteBuf buf = ((MessModPayload) packet.payload()).data();
 			PacketHandler handler = PACKET_HANDLERS.get(channel);
 			if(handler != null) {
 				handler.onPacket(player, channel, buf);
@@ -46,6 +44,10 @@ public class MessServerNetworkHandler {
 
 	private static void register(Identifier hud, PacketHandler handler) {
 		PACKET_HANDLERS.put(hud, handler);
+	}
+	
+	public boolean isValidPackedId(Identifier id) {
+		return PACKET_HANDLERS.containsKey(id);
 	}
 	
 	static {

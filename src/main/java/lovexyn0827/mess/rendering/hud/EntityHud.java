@@ -11,6 +11,7 @@ import com.mojang.blaze3d.systems.VertexSorter;
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.network.MessModPayload;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.data.BuiltinHudInfo;
 import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
@@ -20,7 +21,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 
 /**
  * It should be responsible for rendering, not getting data from entities.
@@ -99,7 +100,7 @@ public abstract class EntityHud {
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeEnumConstant(this.type);
 		buf.writeBoolean(this.shouldRender);
-		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(Channels.HUD, buf);
+		CustomPayloadC2SPacket packet = new CustomPayloadC2SPacket(new MessModPayload(Channels.HUD, buf));
 		MessMod.INSTANCE.getClientNetworkHandler().send(packet);
 	}
 	

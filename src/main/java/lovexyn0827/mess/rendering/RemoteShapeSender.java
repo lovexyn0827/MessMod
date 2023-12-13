@@ -2,9 +2,10 @@ package lovexyn0827.mess.rendering;
 
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.network.MessModPayload;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,7 +28,7 @@ public class RemoteShapeSender implements ShapeSender {
 		buffer.writeString(space.name);
 		NbtCompound tag = new NbtCompound();
 		buffer.writeNbt(shape.toTag(tag));
-		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.SHAPE, buffer);
+		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(new MessModPayload(Channels.SHAPE, buffer));
 		if(player == null) {
 			this.server.getPlayerManager().sendToDimension(packet, dim);
 		} else {
@@ -42,7 +43,7 @@ public class RemoteShapeSender implements ShapeSender {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		buffer.writeEnumConstant(UpdateMode.CLEAR_SPACE);
 		buffer.writeString(space.name);
-		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.SHAPE, buffer);
+		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(new MessModPayload(Channels.SHAPE, buffer));
 		this.server.getPlayerManager().sendToAll(packet);
 	}
 
@@ -51,7 +52,7 @@ public class RemoteShapeSender implements ShapeSender {
 		PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
 		buffer.writeEnumConstant(UpdateMode.TICK);
 		buffer.writeLong(gt);
-		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.SHAPE, buffer);
+		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(new MessModPayload(Channels.SHAPE, buffer));
 		this.server.getPlayerManager().sendToAll(packet);
 	}
 	

@@ -49,7 +49,7 @@ public class EntitySelectorMixin_Client implements EntitySelectorInterface {
 	@Shadow
 	private Predicate<Entity> basePredicate;
 	@Shadow
-	private NumberRange.FloatRange distance;
+	private NumberRange.DoubleRange distance;
 	@Shadow
 	private Function<Vec3d, Vec3d> positionOffset;
 	@Shadow

@@ -4,9 +4,10 @@ import java.util.HashMap;
 import com.google.common.collect.Sets;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.network.MessModPayload;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.thread.ThreadExecutor;
@@ -63,7 +64,8 @@ public class RemoteShapeCache extends ShapeCache {
 	public synchronized void handlePacket(CustomPayloadS2CPacket packet) {
 		this.shapeHandler.execute(() -> {
 			synchronized (this) {
-				PacketByteBuf buffer = packet.getData();
+				MessModPayload payload = (MessModPayload) packet.payload();
+				PacketByteBuf buffer = payload.data();
 				switch(buffer.readEnumConstant(RemoteShapeSender.UpdateMode.class)) {
 				case ADD_SHAPE : 
 					// Mode - Dimension - Space - Tag

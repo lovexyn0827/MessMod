@@ -23,7 +23,7 @@ public class ClientConnectionMixin {
 	private NetworkSide side;
 	
 	@Inject(method = "sendImmediately", at = @At("HEAD"))
-	private void onPacketBeingSended(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {
+	private void onPacketBeingSended(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
 		if(LogPacketCommand.isSubscribed(packet)) {
 			MessMod.LOGGER.info("{}: Sended Packet: {}", 
 					this.side == NetworkSide.CLIENTBOUND ? "CLIENT" : "SERVER", 

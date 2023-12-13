@@ -32,7 +32,7 @@ public class ServerChunkManagerMixin {
 				null);
 	}
 	
-	@Inject(method = "tick()Z", at = @At("JUMP"), locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "updateChunks()Z", at = @At("JUMP"), locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void onTickNoArg(CallbackInfoReturnable<Boolean> cir, boolean blCTM, boolean blTACS) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;

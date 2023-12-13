@@ -13,6 +13,7 @@ import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.MessModMixinPlugin;
 import lovexyn0827.mess.network.Channels;
+import lovexyn0827.mess.network.MessModPayload;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.LookingAtEntityHud;
 import lovexyn0827.mess.rendering.hud.PlayerHud;
@@ -23,7 +24,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.text.Text;
 
 @Mixin(Keyboard.class)
@@ -75,11 +76,11 @@ public abstract class KeyboardMixin {
 		MinecraftClient mc = MinecraftClient.getInstance();
 		if(key == 'Z' && Screen.hasControlDown() && isBeingPressed) {
 			if(mc.player != null) {
-				mc.player.networkHandler.sendPacket(new CustomPayloadC2SPacket(Channels.UNDO, new PacketByteBuf(Unpooled.buffer())));
+				mc.player.networkHandler.sendPacket(new CustomPayloadC2SPacket(new MessModPayload(Channels.UNDO, new PacketByteBuf(Unpooled.buffer()))));
 			}
 		} else if(key == 'Y' && Screen.hasControlDown() && isBeingPressed) {
 			if(mc.player != null) {
-				mc.player.networkHandler.sendPacket(new CustomPayloadC2SPacket(Channels.REDO, new PacketByteBuf(Unpooled.buffer())));
+				mc.player.networkHandler.sendPacket(new CustomPayloadC2SPacket(new MessModPayload(Channels.REDO, new PacketByteBuf(Unpooled.buffer()))));
 			}
 		} else if(key == 'C' && Screen.hasControlDown() && isBeingPressed) {
 			if(OptionManager.dumpTargetEntityDataWithCtrlC && mc.player != null) {
@@ -87,7 +88,7 @@ public abstract class KeyboardMixin {
 					EntityDataDumpHelper.tryDumpTarget(mc.player);
 				} else {
 					MessMod.INSTANCE.getClientNetworkHandler().send(
-							new CustomPayloadC2SPacket(Channels.ENTITY_DUMP, new PacketByteBuf(Unpooled.buffer())));
+							new CustomPayloadC2SPacket(new MessModPayload(Channels.ENTITY_DUMP, new PacketByteBuf(Unpooled.buffer()))));
 				}
 			}
 		} else if(key == GLFW.GLFW_KEY_F8 && isBeingPressed && this.client.currentScreen instanceof TitleScreen) {

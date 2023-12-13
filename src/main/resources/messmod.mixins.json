@@ -24,7 +24,6 @@
     "CraftingTableBlockMixin", 
     "ChunkTicketManagerMixin", 
     "ServerPlayNetworkHandlerMixin", 
-    "CustomPayloadC2SPacketAccessor", 
     "FormattingAccessor", 
     "ChunkStatusMixin", 
     "ServerPlayerInteractionManagerMixin", 
@@ -61,7 +60,11 @@
     "ItemCooldownManagerMixin", 
     "SectionedEntityCacheMixin", 
     "ServerPlayNetworkHandler_1Mixin", 
-    "ChunkTaskPrioritySystemMixin"
+    "ChunkTaskPrioritySystemMixin", 
+    "NetworkStatePacketHandlerAccessor", 
+    "CustomPayloadC2SPacketMixin", 
+    "CustomPayloadS2CPacketMixin", 
+    "ServerCommonNetworkHandlerMixin"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -81,7 +84,8 @@
     "GameRendererMixin", 
     "WorldListWidgetEntryMixin", 
     "EntitySelectorMixin_Client", 
-    "ClientCommandSourceMixin"
+    "ClientCommandSourceMixin", 
+    "ClientCommonNetworkHandlerMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"

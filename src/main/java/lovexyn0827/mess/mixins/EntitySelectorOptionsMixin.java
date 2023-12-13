@@ -61,8 +61,8 @@ public class EntitySelectorOptionsMixin {
 		putOption("id", (selectorReader) -> {
 			int i = selectorReader.getReader().getCursor();
 			NumberRange.IntRange intRange = NumberRange.IntRange.parse(selectorReader.getReader());
-			Integer min = intRange.getMin();
-			Integer max = intRange.getMax();
+			Integer min = intRange.min().orElse(-1);
+			Integer max = intRange.max().orElse(-1);
 			if ((min == null || min >= 0) && (max == null || max >= 0)) {
 				((EntitySelectorReaderInterface) selectorReader).setIdRange(intRange);
 				if(max != null && min != null && max.equals(min)) {
