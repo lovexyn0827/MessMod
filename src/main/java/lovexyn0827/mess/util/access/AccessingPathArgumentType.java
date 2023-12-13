@@ -302,12 +302,12 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
             				MutableBoolean anyExactlyMatching = new MutableBoolean(false);
             				Reflection.getAllMethods(Reflection.getRawType(completed.getOutputType()))
         							.stream()
-        							.filter((m) -> m.getName().contains(prefix))
         							.map((m) -> {
         								return MessMod.INSTANCE
         										.getMapping()
         										.namedMethod(m.getName(), org.objectweb.asm.Type.getMethodDescriptor(m));
         							})
+        							.filter((mn) -> mn.contains(prefix))
         							.distinct()
         							.forEach((mn) -> {
         								builder.suggest(mn);
