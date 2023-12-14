@@ -66,7 +66,8 @@ public class MappingProvider {
 				} else if(this.source == Source.YARN && FabricLoader.getInstance().isModLoaded("carpet-tis-addition")) {
 					return tryLoadMappingFromTisAddition().orElse(dummy);
 				}
-			} catch (IOException e1) {
+			} catch (Exception e1) {
+				LOGGER.warn("Failed to load mapping for MessMod!");
 				e1.printStackTrace();
 			}
 			

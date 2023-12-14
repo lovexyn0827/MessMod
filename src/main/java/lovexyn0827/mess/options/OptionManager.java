@@ -18,7 +18,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.datafixers.util.Either;
 
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.export.SaveComponent;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
@@ -548,23 +547,6 @@ public class OptionManager{
 	}
 	
 	static{
-		registerCustomHandlers("enabledTools", (newValue, ct) -> {
-			if(!FabricLoader.getInstance().isModLoaded("carpet")) {
-				throw new InvalidOptionException("opt.err.reqcarpet");
-			}
-		}, (newValue, ct) -> {
-			if(ct == null) {
-				// We cannot apply the change without a context.
-				return;
-			}
-			
-			// XXX Only influences the sender?
-			if((Boolean) newValue) {
-				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script load tool global");
-			}else {
-				CommandUtil.execute(CommandUtil.noreplySourceFor(ct.getSource()), "/script unload tool");
-			}
-		});
 		CustomOptionValidator checkLithium = (newVal, ct) -> {
 			if (FabricLoader.getInstance().isModLoaded("lithium") && (Boolean) newVal) {
 				throw new InvalidOptionException("opt.err.lithium");
