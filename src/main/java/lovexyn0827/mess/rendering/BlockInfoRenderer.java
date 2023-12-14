@@ -4,7 +4,6 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.mixins.AbstractRedstoneGateBlockMixin;
 import lovexyn0827.mess.options.EnumParser;
 import lovexyn0827.mess.options.OptionManager;
-import lovexyn0827.mess.util.CarpetUtil;
 import net.minecraft.block.AbstractRedstoneGateBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -35,7 +34,7 @@ public class BlockInfoRenderer {
 	public void tick() {
 		ShapeSender sr = MessMod.INSTANCE.shapeSender;
 		if(this.server != null && sr != null) {
-			boolean frozen = CarpetUtil.isTickFrozen();
+			boolean frozen = this.server.getTickManager().isFrozen();
 			if(frozen && OptionManager.blockInfoRendererUpdateInFrozenTicks == FrozenUpdateMode.PAUSE) {
 				return;
 			}

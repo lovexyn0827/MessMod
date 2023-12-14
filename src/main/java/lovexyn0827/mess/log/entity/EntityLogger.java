@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import lovexyn0827.mess.log.AbstractAchivingLogger;
-import lovexyn0827.mess.util.CarpetUtil;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
@@ -55,7 +54,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 			});
 		}
 		
-		if(CarpetUtil.isTickFrozen()) {
+		if(this.server.getTickManager().isFrozen()) {
 			return;
 		}
 		

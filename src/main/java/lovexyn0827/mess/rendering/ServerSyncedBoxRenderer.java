@@ -5,7 +5,6 @@ import java.util.List;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
-import lovexyn0827.mess.util.CarpetUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -50,7 +49,7 @@ public class ServerSyncedBoxRenderer {
 			return;
 		}
 		
-		boolean frozen = CarpetUtil.isTickFrozen();
+		boolean frozen = this.server.getTickManager().isFrozen();
 		FrozenUpdateMode mode = OptionManager.serverSyncedBoxUpdateModeInFrozenTicks;
 		if(frozen && mode == FrozenUpdateMode.PAUSE) {
 			return;
