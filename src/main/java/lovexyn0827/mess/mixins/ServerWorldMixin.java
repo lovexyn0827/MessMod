@@ -27,6 +27,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.tick.TickManager;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin implements BlockView, ServerWorldInterface {
@@ -144,7 +145,8 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 			cancellable = true, 
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	public void skipTickingEntityIfNeeded(Profiler profiler, Entity entity, CallbackInfo ci) {
+	public void skipTickingEntityIfNeeded(TickManager tickManager, Profiler profiler, 
+			Entity entity, CallbackInfo ci) {
 		if(((EntityInterface) entity).isFrozen()) {
 			ci.cancel();
 		}

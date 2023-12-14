@@ -23,20 +23,27 @@ public abstract class WorldListWidgetEntryMixin {
 	private @Final LevelSummary level;
 	@Shadow
 	private @Final SelectWorldScreen screen;
+	@Shadow(remap = false)
+	private @Final WorldListWidget field_19135;
 	
-	@Shadow
-	protected abstract void start();
-	
-	@Inject(method = "play", at = @At(value = "INVOKE", target = "net/minecraft/client/gui/screen/world/WorldListWidget$WorldEntry."
-			+ "start()V"), cancellable = true)
+	@Inject(method = "play", at = @At(
+					value = "INVOKE", 
+					target = "net/minecraft/client/MinecraftClient"
+							+ ".createIntegratedServerLoader()Lnet/minecraft/server/integrated/IntegratedServerLoader;"
+			), 
+			cancellable = true
+	)
 	private void requireComfirmIfNeeded(CallbackInfo ci) {
 		if(this.level.getGameMode().isSurvivalLike() 
 				&& !this.level.getIconPath().getParent().resolve("mcwmem.prop").toFile().exists()) {
 			BooleanConsumer bc = (bool) -> {
 				if(bool) {
-					this.start();
+					this.client.createIntegratedServerLoader().start(this.level.getName(), () -> {
+						((WorldListWidgetAccessor) this.field_19135).invokeLoadForMessMod();
+						this.client.setScreen(this.screen);
+					});
 				} else {
-					this.client.setScreen(screen);
+					this.client.setScreen(this.screen);
 				}
 			};
 			this.client.setScreen(new ConfirmScreen(bc, new FormattedText("misc.warnsur.title", "cl").asMutableText(), 

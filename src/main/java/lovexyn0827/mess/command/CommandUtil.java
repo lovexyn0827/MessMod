@@ -148,8 +148,8 @@ public class CommandUtil {
 		return noreplySource;
 	}
 
-	public static int execute(ServerCommandSource source, String command) {
-		return commandManager.executeWithPrefix(source, command);
+	public static void execute(ServerCommandSource source, String command) {
+		commandManager.executeWithPrefix(source, command);
 	}
 
 	public static ServerCommandSource noreplyPlayerSources() {

@@ -38,6 +38,7 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.registry.Registries;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.server.MinecraftServer;
@@ -295,7 +296,7 @@ public final class ExportTask {
 
 	private void createLevelDat(String name, WorldGenType wgType, Path temp) throws IOException {
 	    NbtCompound level = NbtIo.readCompressed(
-				this.server.getSavePath(WorldSavePathMixin.create("level.dat")).toFile());
+				this.server.getSavePath(WorldSavePathMixin.create("level.dat")), NbtSizeTracker.ofUnlimitedBytes());
 		level.getCompound("Data").putString("LevelName", name);
 		if(!this.components.contains(SaveComponent.GAMERULES)) {
 			level.getCompound("Data").put("GameRules", new GameRules().toNbt());
@@ -322,7 +323,7 @@ public final class ExportTask {
 			break;
 		}
 		
-		NbtIo.writeCompressed(level, temp.resolve("level.dat").toFile());
+		NbtIo.writeCompressed(level, temp.resolve("level.dat"));
 	}
 
 	private void exportRaids(ServerWorld world, PersistentStateManager psm) throws IOException {

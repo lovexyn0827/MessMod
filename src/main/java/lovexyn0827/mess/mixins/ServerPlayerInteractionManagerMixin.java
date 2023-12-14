@@ -30,8 +30,8 @@ public class ServerPlayerInteractionManagerMixin {
 			), 
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private void recordBreaking(BlockPos pos, CallbackInfoReturnable<Boolean> ci, BlockState blockState, 
-			BlockEntity blockEntity, Block block) {
+	private void recordBreaking(BlockPos pos, CallbackInfoReturnable<Boolean> ci, 
+			BlockEntity blockEntity, Block block, BlockState blockState) {
 		if(OptionManager.blockPlacementHistory) {
 			BlockPlacementHistory history = ((ServerPlayerEntityInterface) this.player).getBlockPlacementHistory();
 			if(history != null) {

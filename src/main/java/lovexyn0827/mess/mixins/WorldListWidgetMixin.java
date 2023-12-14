@@ -13,7 +13,7 @@ import net.minecraft.world.level.storage.LevelSummary;
 @Mixin(WorldListWidget.class)
 public abstract class WorldListWidgetMixin extends EntryListWidget {
 	public WorldListWidgetMixin(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
-		super(client, itemHeight, itemHeight, itemHeight, itemHeight, itemHeight);
+		super(client, itemHeight, itemHeight, itemHeight, itemHeight);
 	}
 	
 	@SuppressWarnings("unchecked")
