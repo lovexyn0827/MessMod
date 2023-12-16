@@ -80,7 +80,8 @@
     "GameRendererMixin", 
     "WorldListWidgetEntryMixin", 
     "EntitySelectorMixin_Client", 
-    "ClientCommandSourceMixin"
+    "ClientCommandSourceMixin", 
+    "DebugHudMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"
