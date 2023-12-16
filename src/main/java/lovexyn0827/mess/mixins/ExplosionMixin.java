@@ -1,5 +1,6 @@
 package lovexyn0827.mess.mixins;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,16 +30,6 @@ import net.minecraft.world.explosion.Explosion;
 
 @Mixin(Explosion.class)
 public abstract class ExplosionMixin {
-	@ModifyArg(method = "affectWorld",
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/World;setBlockState"
-							+ "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"),
-			index = 1)
-	private BlockState replaceToCustomBlockState(BlockState blockState) {
-		BlockState customBlockState = SetExplosionBlockCommand.getBlockState();
-		return customBlockState == null ? blockState : customBlockState;
-	}
-	
 	@ModifyArg(method = "affectWorld",
 			at = @At(value = "INVOKE",
 					target = "Lnet/minecraft/world/World;setBlockState"
@@ -86,7 +77,8 @@ public abstract class ExplosionMixin {
 			at = @At(value = "INVOKE",
 					target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"
 			),
-			locals = LocalCapture.CAPTURE_FAILHARD
+			locals = LocalCapture.CAPTURE_FAILSOFT, 
+			require = 0
 	)
 	private void onExplosionInfluencedEntity(CallbackInfo ci, Set set, int i, float j, int k, int l, int d, int q, 
 			int e, int r, List f, Vec3d vec3d, int g, Entity entity, double h, double s, double t, double u, 
@@ -97,6 +89,30 @@ public abstract class ExplosionMixin {
 					append("[").append(entity.getId()).append(",").append(entity.getPos()).append("]");
 			MessMod.INSTANCE.sendMessageToEveryone("Affected Entity: ", entityInfoBuilder.toString(), "\n", 
 					"Exposure: ", fluidState, "\n", 
+					"Infulence: ", v);
+			
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Inject(method = "collectBlocksAndDamageEntities", 
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"
+			),
+			locals = LocalCapture.CAPTURE_FAILSOFT, 
+			require = 0
+	)
+	private void onExplosionInfluencedEntity(CallbackInfo ci, Set set, int i, float q, 
+			int k, int l, int r, int s, int t, int u, List list, Vec3d vec3d, 
+			Iterator var12, Entity entity, double v, double w, double x, double y, 
+			double z, double aa, double ab, Vec3d injectorAllocatedLocal32, 
+			Entity injectorAllocatedLocal33) {
+		// FIXME: Not compatible with Lithium, may be fixed via disabling the Mixin of it.
+		if(OptionManager.entityExplosionInfluence && !entity.getWorld().isClient) {
+			StringBuilder entityInfoBuilder = new StringBuilder(entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "")).
+					append("[").append(entity.getId()).append(",").append(entity.getPos()).append("]");
+			MessMod.INSTANCE.sendMessageToEveryone("Affected Entity: ", entityInfoBuilder.toString(), "\n", 
+					"Exposure: ", aa, "\n", 
 					"Infulence: ", v);
 			
 		}

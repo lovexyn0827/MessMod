@@ -64,7 +64,8 @@
     "NetworkStatePacketHandlerAccessor", 
     "CustomPayloadC2SPacketMixin", 
     "CustomPayloadS2CPacketMixin", 
-    "ServerCommonNetworkHandlerMixin"
+    "ServerCommonNetworkHandlerMixin", 
+    "AbstractBlockMixin"
   ],
   "client": [
     "MinecraftClientMixin",
