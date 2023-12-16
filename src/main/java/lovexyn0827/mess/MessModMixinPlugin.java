@@ -214,8 +214,6 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 				.addUsages("ASYNC_TASKS", "ASYNC_TASK_SINGLE", "ASYNC_TASK_ADDITION").costly().risky()
 				.add("SectionedEntityCacheMixin")
 				.addUsages("getEntityRangeExpansion").costly()
-				.add("WorldChunkMixin_GetEntityExpansion")
-				.addUsages("getEntityRangeExpansion").costly()
 				.add("ChunkTicketManagerNearbyChunkTicketUpdaterMixin")
 				.addUsages("PLAYER_TICKER_UPDATE").risky().costly()
 				.add("ChunkTaskPrioritySystem")

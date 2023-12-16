@@ -246,6 +246,7 @@
 		"opt.tntChunkLoading.desc" : "允许TNT实体在其运算过程中自动加载区块。", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT在`tntChunkLoading`启用时永久加载区块。", 
 		"opt.tntChunkLoadingRange.desc" : "设置`tntChunkLoading`功能中创建的强加载范围的半径。", 
+		"opt.tpsGraphScale.desc" : "缩放TPS（MSPT）图表以使其可以在屏幕中完整显示。", 
 		"opt.vanillaDebugRenderers.desc" : "启用一些原版调试渲染器。",
 		
 		//***** Errors in options
