@@ -85,7 +85,8 @@
     "WorldListWidgetEntryMixin", 
     "EntitySelectorMixin_Client", 
     "ClientCommandSourceMixin", 
-    "ClientCommonNetworkHandlerMixin"
+    "ClientCommonNetworkHandlerMixin", 
+    "TickChartMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"

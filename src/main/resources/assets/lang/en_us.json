@@ -246,6 +246,7 @@
 		"opt.tntChunkLoading.desc" : "Allow TNT entities to load chunks for themselves in their ticking, which may be helpful in designing some kinds of TNT canons.", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT entities load the chunks permanently when `tntChunkLoading` is enabled.", 
 		"opt.tntChunkLoadingRange.desc" : "The radius of entity processing chunks loaded by `tntChunkLoading`.", 
+		"opt.tpsGraphScale.desc" : "Scale the TPS (MSPT) graph so that it can be held by the screen.", 
 		"opt.vanillaDebugRenderers.desc" : "Enable some vanilla debugging renderers, some of which won't actually work.",
 
 		//***** Errors in options
