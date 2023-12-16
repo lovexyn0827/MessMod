@@ -1,10 +1,6 @@
 package lovexyn0827.mess;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -87,17 +83,6 @@ public class MessMod implements ModInitializer {
 		return this.mapping;
 	}
 	
-	private void copyScript(String name) throws IOException {
-		Path scriptPath = Paths.get(this.scriptDir);
-		if(!Files.exists(scriptPath)) {
-			Files.createDirectories(scriptPath);
-		}
-		
-		Files.copy(MessMod.class.getResourceAsStream("/assets/scarpet/" + name + ".sc"), 
-				Paths.get(this.scriptDir, name + ".sc"), 
-				StandardCopyOption.REPLACE_EXISTING);
-	}
-	
 	//************ SERVER SIDE *****************
 	
 	public void onServerTicked(MinecraftServer server) {
@@ -168,19 +153,7 @@ public class MessMod implements ModInitializer {
 		}
 		
 		CommandUtil.tryUpdatePlayer(player);
-		try {
-			this.scriptDir = server.getSavePath(WorldSavePathMixin.create("scripts")).toAbsolutePath().toString();
-			copyScript("tool");
-			if(FabricLoader.getInstance().isModLoaded("carpet")) {
-				if(OptionManager.enabledTools) {
-					this.server.getCommandManager().executeWithPrefix(CommandUtil.noreplyPlayerSources(), 
-							"/script load tool global");
-				}
-			}
-		} catch (IOException e) {
-			LOGGER.error("Scarpet scripts couldn't be loaded.");
-			e.printStackTrace();
-		}
+		this.scriptDir = server.getSavePath(WorldSavePathMixin.create("scripts")).toAbsolutePath().toString();
 	}
 
 	//************ CLIENT SIDE *****************

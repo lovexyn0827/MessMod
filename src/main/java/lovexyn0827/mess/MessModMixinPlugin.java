@@ -218,8 +218,8 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		ADVANCED_MIXINS = AdvancedMixinInfoBuilder.create()
 				.add("ServerChunkManagerMainThreadExecutorMixin")
 				.addUsages("ASYNC_TASKS", "ASYNC_TASK_SINGLE", "ASYNC_TASK_ADDITION").costly().risky()
-				.add("WorldMixin_GetEntityExpansion").
-				addUsages("getEntityRangeExpansion").costly()
+				.add("WorldMixin_GetEntityExpansion")
+				.addUsages("getEntityRangeExpansion").costly()
 				.add("WorldChunkMixin_GetEntityExpansion")
 				.addUsages("getEntityRangeExpansion").costly()
 				.add("ChunkTicketManagerNearbyChunkTicketUpdaterMixin")
