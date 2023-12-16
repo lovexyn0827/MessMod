@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import lovexyn0827.mess.options.OptionManager;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.DebugHud;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.MetricsData;
 
 @Mixin(DebugHud.class)
@@ -16,7 +16,7 @@ public class DebugHudMixin {
 	private boolean renderingFpsChart;
 	
 	@Inject(method = "drawMetricsData", at = @At("HEAD"))
-	private void onGraphDrawingBegin(MatrixStack matrices, MetricsData metricsData, 
+	private void onGraphDrawingBegin(DrawContext context, MetricsData metricsData, 
 			int x, int width, boolean showFps, CallbackInfo ci) {
 		this.renderingFpsChart = showFps;
 	}
@@ -41,8 +41,8 @@ public class DebugHudMixin {
 			method = "drawMetricsData", 
 			at = @At(
 					value = "INVOKE", 
-					target = "net/minecraft/client/font/TextRenderer.draw"
-							+ "(Lnet/minecraft/client/util/math/MatrixStack;Ljava/lang/String;FFI)I"
+					target = "net/minecraft/client/gui/DrawContext.drawText"
+							+ "(Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;IIIZ)I"
 			),
 			index = 1
 	)
