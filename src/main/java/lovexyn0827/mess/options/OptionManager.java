@@ -457,6 +457,11 @@ public class OptionManager{
 			label = { Label.CHUNK, Label.ENTITY, Label.MESSMOD })
 	public static int tntChunkLoadingRange;
 	
+	@Option(defaultValue = "1.0", 
+			parserClass = FloatParser.Positive.class, 
+			label = Label.RENDERER)
+	public static float tpsGraphScale;
+	
 	@Option(defaultValue = "[]", 
 			parserClass = ListParser.DebugRender.class, 
 			label = Label.RENDERER)
