@@ -1355,6 +1355,14 @@ Available values: Any non-negative integer
 
 Default value: `3`
 
+##### `tpsGraphScale`
+
+Scale the TPS (MSPT) graph so that it can be held by the screen.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `vanillaDebugRenderers`
 
 Enable some vanilla debugging renderers, some of which won't actually work.
