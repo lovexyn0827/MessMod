@@ -1337,6 +1337,14 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 默认值：`3`
 
+##### `tpsGraphScale`
+
+缩放TPS（MSPT）图表以使其可以在屏幕中完整显示。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `vanillaDebugRenderers`
 
 启用一些原版调试渲染器。
