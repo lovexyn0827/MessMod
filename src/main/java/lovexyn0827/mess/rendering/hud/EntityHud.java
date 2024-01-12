@@ -69,7 +69,7 @@ public abstract class EntityHud {
 		this.getData().forEach((n, v) -> {
 			if(BuiltinHudInfo.NAME.getName().equals(n) || BuiltinHudInfo.ID.getName().equals(n)) return;
 			String header = n + ':';
-			String data = v.toString();
+			String data = v == null ? "null" : v.toString();
 			int y0 = mutableY.intValue();
 			if(chm.renderBackGround) {
 				DrawableHelper.fill(ms, x, y0, this.xEnd, y0 + 10, darkBg.booleanValue() ? 0x80000000 : 0x80808080);
