@@ -17,7 +17,7 @@ import net.minecraft.entity.vehicle.BoatEntity;
 public enum BuiltinHudInfo implements HudLine {
 	ID("ID", DataType.INTEGER, Entity::getId, null),
 	NAME("Name", DataType.STRING, (entity) -> {
-		return entity.hasCustomName() ? entity.getCustomName().getContent() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
+		return entity.hasCustomName() ? entity.getCustomName().getString() : entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "");
 	}),
 	POS_X("Pos X", DataType.DOUBLE, Entity::getX),
 	POS_Y("Pos Y", DataType.DOUBLE, Entity::getY),
