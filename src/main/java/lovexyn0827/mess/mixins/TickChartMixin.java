@@ -21,7 +21,7 @@ public class TickChartMixin {
 			return original;
 		}
 		
-		double scaled = 20 / scale;
+		double scaled = 20 * scale;
 		if(scaled == (int) scaled) {
 			return Integer.toString((int) scaled) + " TPS";
 		} else {
