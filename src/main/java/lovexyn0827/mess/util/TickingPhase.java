@@ -12,7 +12,6 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 
-// TODO Event system
 public enum TickingPhase {
 	WEATHER_CYCLE(false),
 	CHUNK(false),
