@@ -52,13 +52,6 @@ public enum DataType {
 				.put(EntityPose.CROUCHING, "crouching")
 				.put(EntityPose.SPIN_ATTACK, "spin_attack")
 				.put(EntityPose.LONG_JUMPING, "long_jumping")
-				.put(EntityPose.CROAKING, "croaking")
-				.put(EntityPose.USING_TONGUE, "using_tongue")
-				.put(EntityPose.SITTING, "sitting")
-				.put(EntityPose.ROARING, "roaring")
-				.put(EntityPose.SNIFFING, "sniffing")
-				.put(EntityPose.EMERGING, "emerging")
-				.put(EntityPose.DIGGING, "digging")
 				.put(EntityPose.DYING, "dying")
 				.build();
 		if(!POSE_NAMES.keySet().containsAll(Sets.newHashSet(EntityPose.values()))) {
