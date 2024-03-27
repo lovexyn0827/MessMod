@@ -185,6 +185,7 @@
 		"opt.chunkLogAutoArchiving.desc" : "自动存档一个会话内产生的区块行为记录（若有），存档文件可在`世界文件夹/chunklog/archives`找到。", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 
+		"opt.creativeNoVoidDamage.desc" : "为创造模式下玩家禁用虚空伤害。", 
 		"opt.creativeUpwardsSpeed.desc" : "调节创造模式下玩家向上飞行（加）速度大小。以m/s为单位，玩家真正的最终速度大约为该选项值的150倍。", 
 		"opt.debugStickSkipsInvaildState.desc" : "防止调试棒将方块调整到非法状态。目前这个选项在一些情况下不能正常工作，例如调整铁轨的shape属性时仍可以将其调整到非法状态使其掉落。", 
 		"opt.dedicatedServerCommands.desc" : "在单人游戏中启用专用于服务器的指令。", 

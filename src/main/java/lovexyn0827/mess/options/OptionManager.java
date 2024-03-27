@@ -140,6 +140,11 @@ public class OptionManager{
 			label = Label.REDSTONE)
 	public static boolean craftingTableBUD;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean creativeNoVoidDamage;
+	
 	@Option(defaultValue = "NaN", 
 			suggestions = {"0.05", "0.10", "NaN"}, 
 			parserClass = FloatParser.NaNablePositive.class, 

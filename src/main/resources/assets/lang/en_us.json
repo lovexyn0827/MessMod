@@ -185,6 +185,7 @@
 		"opt.chunkLogAutoArchiving.desc" : "Archive the chunk behavior log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/chunklog/archives`.", 
 		"opt.commandExecutionRequirment.desc" : "Whether or not the execution of commands defined by this mod require OP permission.",  
 		"opt.craftingTableBUD.desc" : "Detect the block updates received by crafting tables.", 
+		"opt.creativeNoVoidDamage.desc" : "Disable void damage for players in creative-like modes.", 
 		"opt.creativeUpwardsSpeed.desc" : "Set the vertical speed flying speed in the creative mode. The actual terminal speed (in m/s) of players is roughly 150 * `creativeUpwardsSpeed`.", 
 		"opt.debugStickSkipsInvaildState.desc" : "Prevent debug sticks from changing blocks to an invalid state. By now, the option doesn't work in many cases, for example, changing the `shape` property of a rail can still turn the rail into an illegal state and have the rail broken. ", 
 		"opt.dedicatedServerCommands.desc" : "Enable commands for dedicated servers in single-player games.", 
