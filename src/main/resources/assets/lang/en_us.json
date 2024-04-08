@@ -236,6 +236,7 @@
 		"opt.renderBlockShape.desc" : "Enhanced block outline renderer.", 
 		"opt.renderFluidShape.desc" : "Display the outlines, heights, and vectors describing the flowing directions of the target fluid blocks.", 
 		"opt.renderRedstoneGateInfo.desc" : "Display the output level of repeaters and comparators the player looks at.", 
+		"opt.resistanceReducesVoidDamage.desc" : "Entities with resistance effect are protected from void damages.", 
 		"opt.serverSyncedBox.desc" : "Enable or disable the server-side hitbox renderer.", 
 		"opt.serverSyncedBoxRenderRange.desc" : "The maximum Cheshev distance between the player and the entities with their bounding boxes rendered. All non-positive values are considered as positive infinite.", 
 		"opt.serverSyncedBoxUpdateModeInFrozenTicks.desc" : "What the server-side hitbox renderer should do in ticks frozen by the Carpet.", 

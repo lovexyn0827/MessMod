@@ -396,6 +396,11 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = Label.ENTITY)
+	public static boolean resistanceReducesVoidDamage;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = Label.RENDERER)
 	public static boolean renderFluidShape;
 	
