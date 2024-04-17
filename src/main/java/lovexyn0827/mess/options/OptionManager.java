@@ -177,6 +177,11 @@ public class OptionManager{
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
+	public static boolean disableCreativeForcePickup;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
 	public static boolean disableEnchantCommandRestriction;
 	
 	@Option(defaultValue = "false", 

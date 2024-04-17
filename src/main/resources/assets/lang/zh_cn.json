@@ -184,6 +184,7 @@
 		"opt.chunkLoadingInfoRenderRadius.desc" : "区块加载状态显示半径，以区块计。", 
 		"opt.chunkLogAutoArchiving.desc" : "自动存档一个会话内产生的区块行为记录（若有），存档文件可在`世界文件夹/chunklog/archives`找到。", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
+		"opt.disableCreativeForcePickup.desc" : "创造模式下的玩家在物品栏被填满时不再拾起箭矢和物品。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 
 		"opt.creativeNoVoidDamage.desc" : "为创造模式下的玩家禁用虚空伤害。", 
 		"opt.creativeUpwardsSpeed.desc" : "调节创造模式下玩家向上飞行（加）速度大小。以m/s为单位，玩家真正的最终速度大约为该选项值的150倍。", 
