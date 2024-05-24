@@ -20,6 +20,7 @@ import lovexyn0827.mess.network.MessServerNetworkHandler;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.HudType;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.TntEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
@@ -93,6 +94,10 @@ public abstract class ServerPlayNetworkHandlerMixin implements HudDataSubscribeS
 	)
 	private void tryKillStackedEntities(PlayerInteractEntityC2SPacket packet, CallbackInfo ci, 
 			Entity entity, Hand hand, ItemStack itemStack, Optional<?> optional) {
+		if (entity instanceof TntEntity && !OptionManager.attackableTnt) {
+			return;
+		}
+		
 		if(OptionManager.quickStackedEntityKilling && this.player.getMainHandStack().getItem() == Items.BRICK) {
 			int count = 0;
 			for(Entity e : entity.world.getOtherEntities(null, entity.getBoundingBox().expand(10E-3))) {
