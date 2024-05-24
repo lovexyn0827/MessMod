@@ -386,6 +386,11 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = { Label.INTERACTION_TWEAKS, Label.MESSMOD })
+	public static boolean quickStackedEntityKillingOneTypeOnly;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean railNoAutoConnection;
 	

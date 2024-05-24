@@ -101,6 +101,10 @@ public abstract class ServerPlayNetworkHandlerMixin implements HudDataSubscribeS
 		if(OptionManager.quickStackedEntityKilling && this.player.getMainHandStack().getItem() == Items.BRICK) {
 			int count = 0;
 			for(Entity e : entity.world.getOtherEntities(null, entity.getBoundingBox().expand(10E-3))) {
+				if (OptionManager.quickStackedEntityKillingOneTypeOnly && e.getType() != entity.getType()) {
+					continue;
+				}
+				
 				if(e.getPos().equals(entity.getPos())) {
 					if(OptionManager.mobFastKill) {
 						e.remove();
