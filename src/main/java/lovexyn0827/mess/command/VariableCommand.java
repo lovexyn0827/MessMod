@@ -221,6 +221,7 @@ public class VariableCommand {
 					ArgumentListTokenizer tokenizer = new ArgumentListTokenizer(argsStr);
 					try {
 						String[] argsStrArray = tokenizer.toArray();
+						Class<?>[] argTypes = c.getParameterTypes();
 						if(argsStrArray.length != c.getParameterCount()) {
 							CommandUtil.errorWithArgs(ct, "exp.badarg", argsStr, c);
 							return 0;
@@ -230,9 +231,12 @@ public class VariableCommand {
 						for(int i = 0; i < argsStrArray.length; i++) {
 							if (!argsStrArray[i].isEmpty()) {
 								try {
-									args[i] = Literal.parse(argsStrArray[i]);
+									args[i] = Literal.parse(argsStrArray[i]).get(argTypes[i]);
 								} catch (CommandSyntaxException e) {
 									throw e;
+								} catch (InvalidLiteralException e) {
+									CommandUtil.error(ct, e.getLocalizedMessage(), e);
+									e.printStackTrace();
 								}
 							} else {
 								throw new TranslatableException("exp.emptyarg");
