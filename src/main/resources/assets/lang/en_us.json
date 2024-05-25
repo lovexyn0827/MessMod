@@ -190,6 +190,7 @@
 		"opt.debugStickSkipsInvaildState.desc" : "Prevent debug sticks from changing blocks to an invalid state. By now, the option doesn't work in many cases, for example, changing the `shape` property of a rail can still turn the rail into an illegal state and have the rail broken. ", 
 		"opt.dedicatedServerCommands.desc" : "Enable commands for dedicated servers in single-player games.", 
 		"opt.defaultSaveComponents.desc" : "Save components that are included in export saves by default.", 
+		"opt.detailedChunkTaskLogging.desc" : "More details of chunk tasks are included in log files generated with `/logchunkbehavior`.", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "As the name says, you can fill some blocks in unloaded chunks.", 
 		"opt.disableCreativeForcePickup.desc" : "Creative players with full a inventory don't pick up items and arrows anymore.", 
 		"opt.disableItemUsageCooldown.desc" : "Disable item usages cooldown for ender pearls and chorus fruits, etc.", 

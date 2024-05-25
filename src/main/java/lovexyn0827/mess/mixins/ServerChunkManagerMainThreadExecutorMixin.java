@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
+import lovexyn0827.mess.log.chunk.ChunkTaskPrintUtil;
 import lovexyn0827.mess.util.blame.StackTrace;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.util.math.ChunkPos;
@@ -26,7 +27,7 @@ public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadEx
 	@Shadow()
 	private @Final ServerChunkManager field_18810;
 	
-	private static final AtomicLong NEXT_ID = new AtomicLong(0);
+	private static final AtomicLong NEXT_ID = new AtomicLong(1);
 	private static final Map<Object, Long> TASK_TO_ID = Collections.synchronizedMap(new WeakHashMap<>());
 	
 	protected ServerChunkManagerMainThreadExecutorMixin(String name) {
@@ -41,7 +42,7 @@ public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadEx
 		
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.ASYNC_TASK_SINGLE, ChunkPos.MARKER, 
 				this.field_18810.getWorld().getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), 
-				TASK_TO_ID.remove(task));
+				ChunkTaskPrintUtil.printTask(TASK_TO_ID.remove(task), task));
 	}
 	
 	@Override
@@ -62,7 +63,7 @@ public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadEx
 			TASK_TO_ID.put(runnable, id);
 			MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.ASYNC_TASK_ADDITION, ChunkPos.MARKER, 
 					this.field_18810.getWorld().getRegistryKey().getValue(), Thread.currentThread(), 
-					StackTrace.blameCurrent(), id);
+					StackTrace.blameCurrent(), ChunkTaskPrintUtil.printTask(id, runnable));
 		}
 		
 		super.send(runnable);

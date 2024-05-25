@@ -191,6 +191,7 @@
 		"opt.debugStickSkipsInvaildState.desc" : "防止调试棒将方块调整到非法状态。目前这个选项在一些情况下不能正常工作，例如调整铁轨的shape属性时仍可以将其调整到非法状态使其掉落。", 
 		"opt.dedicatedServerCommands.desc" : "在单人游戏中启用专用于服务器的指令。", 
 		"opt.defaultSaveComponents.desc" : "默认包含在导出的存档中的存档组件。", 
+		"opt.detailedChunkTaskLogging.desc" : "在区块事件记录器（`/logchunkbehavior`）生成的文件中包含关于区块任务的更多细节.", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "禁用指令中对方块是否被加载的检查。", 
 		"opt.disableEnchantCommandRestriction.desc" : "移除`/enchant`中对附魔等级与附魔兼容性的检查。", 
 		"opt.disableExplosionExposureCalculation.desc" : "禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。\n在安装Lithium后可能不能正常工作。", 

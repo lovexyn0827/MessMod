@@ -18,6 +18,7 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.ChunkTaskPrioritySystemInterface;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
+import lovexyn0827.mess.log.chunk.ChunkTaskPrintUtil;
 import lovexyn0827.mess.util.blame.StackTrace;
 import net.minecraft.server.world.ChunkTaskPrioritySystem;
 import net.minecraft.server.world.ServerWorld;
@@ -63,7 +64,7 @@ public class ChunkTaskPrioritySystemMixin implements ChunkTaskPrioritySystemInte
 		long taskId = IDS_BY_TASK.computeIfAbsent(callback, (k) -> NEXT_ID.getAndIncrement());
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.CTPS_REMOVE, chunkPos, 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), 
-				 Long.toString(taskId) + ':' + clearTask + '@' + actor.getName());
+				ChunkTaskPrintUtil.printTask(taskId, callback) + ':' + clearTask + '@' + actor.getName());
 	}
 	
 	@Inject(method = "enqueueChunk", at = @At("HEAD"))
@@ -77,6 +78,6 @@ public class ChunkTaskPrioritySystemMixin implements ChunkTaskPrioritySystemInte
 		long taskId = IDS_BY_TASK.computeIfAbsent(task, (k) -> NEXT_ID.getAndIncrement());
 		MessMod.INSTANCE.getChunkLogger().onEvent(ChunkEvent.CTPS_CHUNK, chunkPos, 
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), 
-				Long.toString(taskId) + ':' + addBlocker + '@' + actor.getName());
+				ChunkTaskPrintUtil.printTask(taskId, task) + ':' + addBlocker + '@' + actor.getName());
 	}
 }
