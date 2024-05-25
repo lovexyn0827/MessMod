@@ -174,6 +174,11 @@ public class OptionManager{
 			label = { Label.CHUNK, Label.MESSMOD })
 	public static boolean detailedChunkTaskLogging;
 	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class, 
+			label = { Label.RESEARCH, Label.MESSMOD })
+	public static boolean directChunkAccessForMessMod;
+	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)

@@ -3,6 +3,7 @@ package lovexyn0827.mess.rendering;
 import java.util.List;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.fakes.ServerWorldInterface;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.CarpetUtil;
 import net.minecraft.entity.Entity;
@@ -31,7 +32,12 @@ public class ServerSyncedBoxRenderer {
 		List<? extends Entity> list;
 		if(r > 0) {
 			Vec3d pos = player.getPos();
-			list = world.getEntitiesByClass(Entity.class, new Box(pos, pos).expand(r), (e) -> true);
+			if (OptionManager.directChunkAccessForMessMod) {
+				list = ((ServerWorldInterface) world).toNoChunkLoadingWorld()
+						.getEntitiesByClass(Entity.class, new Box(pos, pos).expand(r), (e) -> true);
+			} else {
+				list = world.getEntitiesByClass(Entity.class, new Box(pos, pos).expand(r), (e) -> true);
+			}
 		} else {
 			list = world.getEntitiesByType(null, (e) -> true);
 		}
