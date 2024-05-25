@@ -25,6 +25,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.mixins.DataCommandStorageAccessor;
+import lovexyn0827.mess.mixins.IdCountsStateAccessor;
 import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RaidManagerAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -111,7 +112,7 @@ public final class ExportTask {
 		Path temp = Files.createTempDirectory(this.server.getSavePath(EXPORT_PATH), "export_");
 		this.regions.forEach((n, region) -> {
 			try {
-				region.export(temp, this.components);
+				region.exportMcas(temp, this.components);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -227,15 +228,21 @@ public final class ExportTask {
 	private void tryExportMaps(ServerWorld world, PersistentStateManager psm) {
 		boolean copyLocal = this.components.contains(SaveComponent.MAP_LOCAL);
 		boolean copyOther = this.components.contains(SaveComponent.MAP_OTHER);
-		int nextId = world.getNextMapId();
+		IdCountsState idCounts = this.server.getOverworld().getPersistentStateManager()
+				.get(IdCountsState::new, "idcounts");
+		if (idCounts == null) {
+			return;
+		}
+		
+		int nextId = ((IdCountsStateAccessor) idCounts).getIdCountsForMessMod().getOrDefault("map", 0) + 1;
 		for(int i = 0; i < nextId; i++) {
 			String name = FilledMapItem.getMapName(i);
-			MapState ms = new MapState(name);
 			MapState origin = world.getMapState(name);
 			if(origin == null) {
-				return;
+				continue;
 			}
-			
+
+			MapState ms = new MapState(name);
 			ms.fromTag(origin.toTag(new CompoundTag()));
 			ms.markDirty();
 			if(ms != null) {
@@ -247,7 +254,8 @@ public final class ExportTask {
 		}
 		
 		if((copyLocal || copyOther) && world.getRegistryKey() == World.OVERWORLD) {
-			psm.set(world.getPersistentStateManager().getOrCreate(IdCountsState::new, "idcounts"));
+			idCounts.markDirty();
+			psm.set(idCounts);
 		}
 	}
 

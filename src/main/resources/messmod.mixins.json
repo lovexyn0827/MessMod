@@ -60,7 +60,8 @@
     "ItemCooldownManagerMixin", 
     "ArgumentTypesMixin", 
     "ChunkTaskPrioritySystemMixin", 
-    "LivingEntityMixin"
+    "LivingEntityMixin", 
+    "IdCountsStateAccessor"
   ],
   "client": [
     "MinecraftClientMixin",
