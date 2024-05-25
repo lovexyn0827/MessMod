@@ -21,6 +21,7 @@ import lovexyn0827.mess.util.blame.StackTrace;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.thread.ThreadExecutor;
+import net.minecraft.world.World;
 
 @Mixin(ServerChunkManager.MainThreadExecutor.class)
 public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadExecutor<Runnable> {
@@ -32,6 +33,12 @@ public abstract class ServerChunkManagerMainThreadExecutorMixin extends ThreadEx
 	
 	protected ServerChunkManagerMainThreadExecutorMixin(String name) {
 		super(name);
+	}
+	
+	@Inject(method = "<init>", at = @At("RETURN"))
+	protected void onCreated(ServerChunkManager scm, World world, CallbackInfo ci) {
+		NEXT_ID.set(0);
+		TASK_TO_ID.clear();
 	}
 	
 	@Inject(method = "executeTask", at = @At("HEAD"))

@@ -39,6 +39,8 @@ public class ChunkTaskPrioritySystemMixin implements ChunkTaskPrioritySystemInte
 
 	@Override
 	public void initWorld(ServerWorld world) {
+		IDS_BY_TASK.clear();
+		NEXT_ID.set(0);
 		this.world = world;
 	}
 
