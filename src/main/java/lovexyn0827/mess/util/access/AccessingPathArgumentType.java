@@ -235,7 +235,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
     	
     	int offset = unoffsetedBuilder.getStart() + lastNotEscapedDot + 1;
     	SuggestionsBuilder builder = unoffsetedBuilder.createOffset(offset);
-        if(lastNotEscapedDot == len -1) {
+        if(lastNotEscapedDot == len - 1) {
         	// The last node is empty
         	CustomNode.listSuggestions(builder);
         	SimpleNode.appendSuggestions(builder);
@@ -267,8 +267,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
         				.buildFuture();
         	default:
         		if(OptionManager.accessingPathDynamicAutoCompletion) {
-        			if(ct.getSource() instanceof ServerCommandSource 
-        					&& this.inputTypeGetter != null) {
+        			if(this.inputTypeGetter != null) {
         				// Server side
         				@SuppressWarnings("unchecked")
     					Type inType = this.inputTypeGetter.apply((CommandContext<ServerCommandSource>) ct);
@@ -320,7 +319,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
                 						.suggest("(");
             				}
             			}
-        			} else {
+        			} else if (!(ct.getSource() instanceof ServerCommandSource)) {
         				// Client side
         				try {
         					@SuppressWarnings("unchecked")

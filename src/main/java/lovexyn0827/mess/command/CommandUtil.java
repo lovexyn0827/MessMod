@@ -9,7 +9,9 @@ import org.jetbrains.annotations.NotNull;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.tree.ArgumentCommandNode;
 
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
@@ -209,6 +211,12 @@ public class CommandUtil {
 			
 			Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), fName);
 			return f == null ? Object.class : f.getType();
+		});
+	}
+	
+	public static boolean hasArgument(CommandContext<ServerCommandSource> ct, String argName) {
+		return ct.getNodes().stream().map(ParsedCommandNode::getNode).anyMatch((n) -> {
+			return n instanceof ArgumentCommandNode && ((ArgumentCommandNode<?, ?>) n).getName().equals(argName);
 		});
 	}
 }

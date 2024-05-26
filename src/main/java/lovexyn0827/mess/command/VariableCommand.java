@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -91,11 +90,15 @@ public class VariableCommand {
 												.executes(VariableCommand::setLiteral)))
 								.then(literal("entity")
 										.then(argument("selector", EntityArgumentType.entity())
-												.executes(VariableCommand::setEntity)))
+												.executes(VariableCommand::setEntity)
+												.then(argument("path", AccessingPathArgumentType.accessingPathArg(Entity.class))
+														.executes(VariableCommand::setEntity))))
 								.then(argument("objSrc", StringArgumentType.word())
 										.suggests(CommandUtil.immutableSuggestions(
 												BUILTIN_OBJECT_PROVIDERS.keySet().toArray()))
-										.executes(VariableCommand::setBulitin))))
+										.executes(VariableCommand::setBulitin)
+										.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+												.executes(VariableCommand::setBulitin)))))
 				.then(literal("map")
 						.then(argument("slotSrc", StringArgumentType.word())
 								.suggests(slotSuggestion)
@@ -315,7 +318,18 @@ public class VariableCommand {
 	private static int setEntity(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
 		String slot = StringArgumentType.getString(ct, "slot");
 		Entity e = EntityArgumentType.getEntity(ct, "selector");
-		VARIABLES.put(slot, e);
+		if (CommandUtil.hasArgument(ct, "path")) {
+			AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
+			try {
+				VARIABLES.put(slot, path.access(e, e.getClass()));
+			} catch (AccessingFailureException ex) {
+				CommandUtil.errorRaw(ct, ex.getLocalizedMessage(), ex);
+				return 0;
+			}
+		} else {
+			VARIABLES.put(slot, e);
+		}
+		
 		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
@@ -325,10 +339,18 @@ public class VariableCommand {
 		String name = StringArgumentType.getString(ct, "objSrc");
 		Function<CommandContext<ServerCommandSource>, Object> getter = BUILTIN_OBJECT_PROVIDERS.get(name);
 		if(getter != null) {
-			VARIABLES.put(slot, getter.apply(ct));
-		} else {
-			CommandUtil.errorWithArgs(ct, "cmd.general.nodef", name);
-			return 0;
+			Object ob = getter.apply(ct);
+			if (CommandUtil.hasArgument(ct, "path")) {
+				AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
+				try {
+					VARIABLES.put(slot, path.access(ob, ob.getClass()));
+				} catch (AccessingFailureException e) {
+					CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
+					return 0;
+				}
+			} else {
+				VARIABLES.put(slot, ob);
+			}
 		}
 
 		CommandUtil.feedback(ct, "cmd.general.success");
