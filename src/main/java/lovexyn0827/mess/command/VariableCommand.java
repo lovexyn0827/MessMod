@@ -6,6 +6,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,9 +41,13 @@ import lovexyn0827.mess.util.access.InvalidLiteralException;
 import lovexyn0827.mess.util.access.Literal;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.dedicated.MinecraftDedicatedServer;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
@@ -63,6 +68,25 @@ public class VariableCommand {
 					b.put("client", (ct) -> MinecraftClient.getInstance());
 					b.put("clientWorld", (ct) -> MinecraftClient.getInstance().world);
 					b.put("clientPlayer", (ct) -> MinecraftClient.getInstance().player);
+				}
+				
+				return b.build();
+			});
+	private static final ImmutableMap<String, Function<CommandContext<ServerCommandSource>, Type>>
+			BUILTIN_OBJECT_TYPES = Util.make(() -> {
+				ImmutableMap.Builder<String, Function<CommandContext<ServerCommandSource>, Type>> b = 
+						ImmutableMap.builder();
+				b.put("sender", (ct) -> ServerCommandSource.class);
+				b.put("world", (ct) -> ServerCommandSource.class);
+				b.put("senderEntity", (ct) -> ct.getSource().getEntity() != null 
+						? ct.getSource().getEntity().getClass() : Entity.class);
+				if(!MessMod.isDedicatedServerEnv()) {
+					b.put("client", (ct) -> MinecraftClient.class);
+					b.put("clientWorld", (ct) -> ClientWorld.class);
+					b.put("clientPlayer", (ct) -> ClientPlayerEntity.class);
+					b.put("server", (ct) -> IntegratedServer.class);
+				} else {
+					b.put("server", (ct) -> MinecraftDedicatedServer.class);
 				}
 				
 				return b.build();
@@ -97,7 +121,10 @@ public class VariableCommand {
 										.suggests(CommandUtil.immutableSuggestions(
 												BUILTIN_OBJECT_PROVIDERS.keySet().toArray()))
 										.executes(VariableCommand::setBulitin)
-										.then(argument("path", AccessingPathArgumentType.accessingPathArg())
+										.then(argument("path", AccessingPathArgumentType.accessingPathArg((ct) -> {
+											return BUILTIN_OBJECT_TYPES.get(StringArgumentType.getString(ct, "objSrc"))
+													.apply(ct);
+										}))
 												.executes(VariableCommand::setBulitin)))))
 				.then(literal("map")
 						.then(argument("slotSrc", StringArgumentType.word())
