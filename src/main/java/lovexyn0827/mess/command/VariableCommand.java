@@ -20,6 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -130,9 +132,16 @@ public class VariableCommand {
 								.then(literal("dumpFields")
 										.executes((ct) -> {
 											String slot = StringArgumentType.getString(ct, "slot");
-											ct.getSource().sendFeedback(toText(VARIABLES.get(slot)), false);
+											ct.getSource().sendFeedback(toText(VARIABLES.get(slot), 1), false);
 											return Command.SINGLE_SUCCESS;
-										}))))
+										})
+										.then(argument("depth", IntegerArgumentType.integer(1))
+												.executes((ct) -> {
+													String slot = StringArgumentType.getString(ct, "slot");
+													int d = IntegerArgumentType.getInteger(ct, "depth");
+													ct.getSource().sendFeedback(toText(VARIABLES.get(slot), d), false);
+													return Command.SINGLE_SUCCESS;
+												})))))
 				.then(literal("list")
 						.executes((ct) -> {
 							VARIABLES.forEach((key, val) -> {
@@ -144,7 +153,11 @@ public class VariableCommand {
 		dispatcher.register(command);
 	}
 	
-	private static Text toText(Object ob) {
+	private static Text toText(Object ob, int depth) {
+		if (depth == 0) {
+			return new FormattedText(ob == null ? "null" : ob.toString(), "r7").asMutableText();
+		}
+		
 		Mapping map = MessMod.INSTANCE.getMapping();
 		MutableText text = new FormattedText(map.namedClass(ob.getClass().getName()), "").asMutableText();
 		text.append(new FormattedText("[", "rla").asMutableText());
@@ -156,7 +169,7 @@ public class VariableCommand {
 			text.append(new FormattedText(map.namedField("="), "r6").asMutableText());
 			try {
 				Object val = f.get(ob);
-				text.append(new FormattedText(val == null ? "null" : val.toString(), "r7").asMutableText());
+				text.append(f.getType().isPrimitive() ? toText(val, 0) : toText(val, depth - 1));
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();
 				text.append(new FormattedText(f.getName(), "r7k").asMutableText());
