@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
 import lovexyn0827.mess.fakes.ThreadedAnvilChunkStorageInterface;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
@@ -52,17 +55,22 @@ public final class NoChunkLoadingWorld implements EntityView, BlockView {
 
 	@Override
 	public BlockEntity getBlockEntity(BlockPos pos) {
-		return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4).getBlockEntity(pos);
+		WorldChunk chunk = this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+		return chunk != null ? chunk.getBlockEntity(pos) : null;
 	}
 
 	@Override
+	@NotNull
 	public BlockState getBlockState(BlockPos pos) {
-		return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4).getBlockState(pos);
+		WorldChunk chunk = this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+		return chunk != null ? chunk.getBlockState(pos) : Blocks.VOID_AIR.getDefaultState();
 	}
 
 	@Override
+	@NotNull
 	public FluidState getFluidState(BlockPos pos) {
-		return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4).getFluidState(pos);
+		WorldChunk chunk = this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+		return chunk != null ? chunk.getFluidState(pos) : Fluids.EMPTY.getDefaultState();
 	}
 	
 	/**
