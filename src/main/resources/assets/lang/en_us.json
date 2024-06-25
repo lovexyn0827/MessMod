@@ -205,6 +205,7 @@
 		"opt.dumpTargetEntitySummonCommand.desc" : "Generate a command to summon the target entity. If the held item is enchanted, the full NBT data with UUID(s) stripped off are included in the generated command, otherwise, only the entity type, dimension, position, motion and rotation are present in the command.", 
 		"opt.enabledTools.desc" : "Item tools, which make bone and bricks useful. Requires carpet-fabric.\n - Bone: `/tick step <countOfBones>` \n - Brick: `/tick freeze` \n - Netherite Ingot: `/kill @e[type!=player]`", 
 		"opt.endEyeTeleport.desc" : "When the player uses ender eyes, teleport it to where it looks at.", 
+		"opt.entityExplosionImpulseScale.desc" : "Scale the acceleration caused by explosions.", 
 		"opt.entityExplosionInfluence.desc" : "Tell you how entities are affected by explosions. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.\nIncompatible with Lithium.", 
 		"opt.entityExplosionRaysVisiblity.desc" : "Explosion ray (used in the calculation of the exposure of entities) renderer. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.", 
 		"opt.entityExplosionRaysLifetime.desc" : "The number of ticks the rendered rays remains. ", 

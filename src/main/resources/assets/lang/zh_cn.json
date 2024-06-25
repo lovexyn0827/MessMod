@@ -205,6 +205,7 @@
 		"opt.dumpTargetEntitySummonCommand.desc" : "生成用于生成目标实体的一条指令。如果手持的物品被附魔，实体的完整NBT数据（不含UUID）会被添加到 指令中，否则，只有实体类型，维度、坐标、动量与朝向信息会出现在指令中。", 
 		"opt.enabledTools.desc" : "启用或禁用工具物品。\n - 骨头：`/tick step <骨头数目>` \n - 红砖：`/tick freeze` \n - 下界合金锭：`/kill @e[type!=player]`", 
 		"opt.endEyeTeleport.desc" : "在使用末影之眼时将玩家传送到玩家注视的地方。", 
+		"opt.entityExplosionImpulseScale.desc" : "调整爆炸对实体造成的变速大小。", 
 		"opt.entityExplosionInfluence.desc" : "爆炸影响到实体时在聊天栏输出实体被影响的情况。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。\n与Lithium不兼容。", 
 		"opt.entityExplosionRaysVisiblity.desc" : "启用或禁用实体爆炸射线渲染。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。", 
 		"opt.entityExplosionRaysLifetime.desc" : "设置实体爆炸射线的显示时长，单位为刻。", 

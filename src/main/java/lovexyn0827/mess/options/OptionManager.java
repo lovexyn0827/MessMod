@@ -244,15 +244,22 @@ public class OptionManager{
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean endEyeTeleport;
 	
+	@Option(defaultValue = "1.0", 
+			experimental = true, 
+			parserClass = FloatParser.NonNegative.class, 
+			suggestions = { "0.0", "1.0" }, 
+			label = { Label.EXPLOSION, Label.RESEARCH, Label.ENTITY })
+	public static float entityExplosionImpulseScale;
+	
 	@Option(defaultValue = "false", 
 			experimental = true, 
 			parserClass = BooleanParser.class, 
-			label = { Label.EXPLOSION, Label.RESEARCH })
+			label = { Label.EXPLOSION, Label.RESEARCH, Label.ENTITY })
 	public static boolean entityExplosionInfluence;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.EXPLOSION, Label.RENDERER, Label.MESSMOD })
+			label = { Label.EXPLOSION, Label.RENDERER, Label.ENTITY, Label.MESSMOD })
 	public static boolean entityExplosionRaysVisiblity;
 	
 	@Option(defaultValue = "300", 
