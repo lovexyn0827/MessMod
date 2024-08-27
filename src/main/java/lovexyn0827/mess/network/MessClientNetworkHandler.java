@@ -1,6 +1,7 @@
 package lovexyn0827.mess.network;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
 
@@ -22,6 +23,7 @@ import net.minecraft.util.Identifier;
 
 public class MessClientNetworkHandler {
 	private static final Map<Identifier, PacketHandler> PACKET_HANDLERS = Maps.newHashMap();
+	public static final Set<Identifier> PACKET_TYPES;
 	private MinecraftClient client;
 
 	public MessClientNetworkHandler(MinecraftClient mc) {
@@ -30,11 +32,13 @@ public class MessClientNetworkHandler {
 
 	public boolean handlePacket(CustomPayloadS2CPacket packet) {
 		try {
-			Identifier id = packet.payload().id();
+			Identifier id = ((MessModPayload) packet.payload()).channel();
 			PacketHandler handler = PACKET_HANDLERS.get(id);
 			if(handler != null) {
 				handler.onPacket(packet, this.client);
 				return true;
+			} else {
+				MessMod.LOGGER.warn("Unrecognized channel: {}", id);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -90,6 +94,7 @@ public class MessClientNetworkHandler {
 				OptionManager.loadSingleFromRemoteServer(((MessModPayload) packet.payload()).data());
 			});
 		});
+		PACKET_TYPES = PACKET_HANDLERS.keySet();
 	}
 	
 	public interface PacketHandler {

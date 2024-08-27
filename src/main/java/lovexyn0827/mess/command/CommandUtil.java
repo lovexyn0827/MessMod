@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
+import com.google.common.collect.Maps;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -16,6 +17,7 @@ import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import lovexyn0827.mess.util.i18n.I18N;
 import lovexyn0827.mess.util.phase.TickingPhaseArgumentType;
+import net.minecraft.command.argument.serialize.ArgumentSerializer;
 import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -202,21 +204,26 @@ public class CommandUtil {
 		};
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void registerArgumentTypes(Registry<?> reg) {
-		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_enum_set", 
+	public static void registerArgumentTypes(Registry<ArgumentSerializer<?, ?>> reg) {
+//		ArgumentTypesAccessor.registerForMessMod(reg, "mess_enum_set", 
+//				EnumSetArgumentType.class, 
+//				new EnumSetArgumentType.Serializer());
+//		ArgumentTypesAccessor.registerForMessMod(reg, "mess_filtered_set", 
+//				FilteredSetArgumentType.class, 
+//				new FilteredSetArgumentType.Serializer());
+		ArgumentTypesAccessor.registerForMessMod(reg, "mess_enum_set", 
 				EnumSetArgumentType.class, 
-				new EnumSetArgumentType.Serializer());
-		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_filtered_set", 
+				ConstantArgumentSerializer.of(() -> EnumSetArgumentType.of(EnumSetArgumentType.Empty.class)));
+		ArgumentTypesAccessor.registerForMessMod(reg, "mess_filtered_set", 
 				FilteredSetArgumentType.class, 
-				new FilteredSetArgumentType.Serializer());
-		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_float", 
+				ConstantArgumentSerializer.of(() -> FilteredSetArgumentType.of(Maps.newHashMap())));
+		ArgumentTypesAccessor.registerForMessMod(reg, "mess_float", 
 				ExtendedFloatArgumentType.class, 
 				ConstantArgumentSerializer.of(ExtendedFloatArgumentType::floatArg));
-		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_accessing_path", 
+		ArgumentTypesAccessor.registerForMessMod(reg, "mess_accessing_path", 
 				AccessingPathArgumentType.class, 
 				ConstantArgumentSerializer.of(() -> AccessingPathArgumentType.accessingPathArg()));
-		ArgumentTypesAccessor.registerForMessMod(Registries.COMMAND_ARGUMENT_TYPE, "mess_phase", 
+		ArgumentTypesAccessor.registerForMessMod(reg, "mess_phase", 
 				TickingPhaseArgumentType.class, 
 				ConstantArgumentSerializer.of(TickingPhaseArgumentType::phaseArg));
 	}

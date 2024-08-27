@@ -6,6 +6,7 @@ import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
 import net.minecraft.command.argument.NbtPathArgumentType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -43,7 +44,7 @@ public class EntityDataDumpHelper {
 		
 		if(OptionManager.dumpTargetEntityNbt) {
 			Text data;
-			if(holding.hasCustomName()) {
+			if(holding.get(DataComponentTypes.CUSTOM_NAME) != null) {	// XXX
 				String pathStr = holding.getName().getString();
 				if(holding.hasEnchantments()) {
 					try {

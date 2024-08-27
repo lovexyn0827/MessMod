@@ -3,38 +3,30 @@ package lovexyn0827.mess.mixins;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Function;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.mojang.datafixers.util.Either;
-
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.options.RangeParser;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ServerLightingProvider;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkGenerationContext;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.FullChunkConverter;
 import net.minecraft.world.chunk.ProtoChunk;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 @Mixin(ChunkStatus.class)
 public class ChunkStatusMixin {
 	@Inject(method = "runGenerationTask", at = @At(value = "HEAD"), cancellable = true)
-	private void runGenerationTask(Executor executor, ServerWorld world, ChunkGenerator generator, 
-			StructureTemplateManager structureTemplateManager, ServerLightingProvider lightingProvider, 
-			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> fullChunkConverter, 
-			List<Chunk> chunks, CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void runGenerationTask(ChunkGenerationContext ctx, Executor executor, FullChunkConverter fullChunkConverter, 
+			List<Chunk> chunks, CallbackInfoReturnable<CompletableFuture<Chunk>> cir) {
 		if(OptionManager.skippedGenerationStages.isEmpty()) {
 			return;
 		}
@@ -46,17 +38,16 @@ public class ChunkStatusMixin {
 				((ProtoChunk)chunk).setStatus(s);
 			}
 			
-			cir.setReturnValue(CompletableFuture.completedFuture(Either.left(chunk)));
+			cir.setReturnValue(CompletableFuture.completedFuture(chunk));
 			cir.cancel();
 		}
 	}
 	
 	@Inject(method = "runGenerationTask", at = @At(value = "RETURN"), cancellable = true)
-	private void generateChunkGrid(Executor executor, ServerWorld world, ChunkGenerator generator, 
-			StructureTemplateManager structureTemplateManager, ServerLightingProvider lightingProvider, 
-			Function<Chunk, CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> fullChunkConverter, 
-			List<Chunk> chunks, CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void generateChunkGrid(ChunkGenerationContext ctx, Executor executor, FullChunkConverter fullChunkConverter, 
+			List<Chunk> chunks, CallbackInfoReturnable<CompletableFuture<Chunk>> cir) {
 		ChunkStatus s = (ChunkStatus)(Object) this;
+		ServerWorld world = ctx.world();
 		if(OptionManager.generateChunkGrid && (s == ChunkStatus.SURFACE && !world.getDimension().hasCeiling()
 				|| s == ChunkStatus.FEATURES && world.getDimension().hasCeiling())) {
 			Chunk chunk = chunks.get(chunks.size() / 2);

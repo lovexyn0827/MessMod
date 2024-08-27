@@ -34,7 +34,6 @@
     "PistonExtensionBlockMixin", 
     "PlayerInventoryMixin_Server", 
     "ClientConnectionMixin", 
-    "NetworkStateAccessor", 
     "MinecartItemMixin", 
     "SpawnEggItemMixin", 
     "MinecraftServerAccessor", 
@@ -61,11 +60,11 @@
     "SectionedEntityCacheMixin", 
     "ServerPlayNetworkHandler_1Mixin", 
     "ChunkTaskPrioritySystemMixin", 
-    "NetworkStatePacketHandlerAccessor", 
-    "CustomPayloadC2SPacketMixin", 
-    "CustomPayloadS2CPacketMixin", 
     "ServerCommonNetworkHandlerMixin", 
-    "AbstractBlockMixin"
+    "AbstractBlockMixin", 
+    "CustomPayloadMixin", 
+    "NetworkStateBuilderMixin", 
+    "ServerCommonNetworkHandlerMixin"
   ],
   "client": [
     "MinecraftClientMixin",

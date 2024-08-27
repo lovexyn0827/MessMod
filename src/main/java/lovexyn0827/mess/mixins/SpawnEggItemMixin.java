@@ -14,7 +14,6 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
@@ -25,7 +24,7 @@ import net.minecraft.world.World;
 @Mixin(value = SpawnEggItem.class, priority = 1001)
 public abstract class SpawnEggItemMixin {
 	@Shadow
-	protected abstract EntityType<?> getEntityType(NbtCompound tag);
+	protected abstract EntityType<?> getEntityType(ItemStack stack);
 	
 	@Inject(method = "use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;"
 					+ "Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;", 
@@ -40,7 +39,7 @@ public abstract class SpawnEggItemMixin {
 			Entity vehicle = RaycastUtil.getTargetEntity(splayer);
 			if(vehicle != null) {
 				BlockPos pos = vehicle.getBlockPos();
-				Entity entity = this.getEntityType(stack.getNbt())
+				Entity entity = this.getEntityType(stack)
 						.spawnFromItemStack((ServerWorld)world, stack, user, pos, SpawnReason.SPAWN_EGG, false, false);
 				entity.startRiding(vehicle, true);
 				if (!splayer.getAbilities().creativeMode) {

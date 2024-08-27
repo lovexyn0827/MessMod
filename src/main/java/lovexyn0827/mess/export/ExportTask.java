@@ -33,12 +33,13 @@ import lovexyn0827.mess.rendering.RenderedBox;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.FilledMapItem;
+import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtSizeTracker;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.server.MinecraftServer;
@@ -127,7 +128,8 @@ public final class ExportTask {
 			}
 			
 			PersistentStateManager psm = 
-					new PersistentStateManager(dir.resolve("data").toFile(), this.server.getDataFixer());
+					new PersistentStateManager(dir.resolve("data").toFile(), this.server.getDataFixer(), 
+							this.server.getRegistryManager());
 			if(this.components.contains(SaveComponent.RAID)) {
 				exportRaids(world, psm);
 			}
@@ -216,7 +218,7 @@ public final class ExportTask {
 		boolean copyOther = this.components.contains(SaveComponent.FORCE_CHUNKS_OTHER);
 		ForcedChunkState fcs = ForcedChunkState.fromNbt(world.getPersistentStateManager()
 				.getOrCreate(ForcedChunkState.getPersistentStateType(), "chunks")
-				.writeNbt(new NbtCompound()));
+				.writeNbt(new NbtCompound(), world.getRegistryManager()), world.getRegistryManager());
 		fcs.markDirty();
 		fcs.getChunks().removeIf((LongPredicate) (pos) -> {
 			boolean local = this.regions.values().stream().anyMatch((r) -> r.contains(world, pos));
@@ -227,20 +229,21 @@ public final class ExportTask {
 	private void tryExportMaps(ServerWorld world, PersistentStateManager psm) {
 		boolean copyLocal = this.components.contains(SaveComponent.MAP_LOCAL);
 		boolean copyOther = this.components.contains(SaveComponent.MAP_OTHER);
-		int nextId = world.getNextMapId();
+		int nextId = world.getNextMapId().id();
+		DynamicRegistryManager reg = world.getRegistryManager();
 		for(int i = 0; i < nextId; i++) {
-			String name = FilledMapItem.getMapName(i);
-            MapState origin = world.getMapState(name);
+			MapIdComponent id = new MapIdComponent(i);
+            MapState origin = world.getMapState(id);
 			if(origin == null) {
 				return;
 			}
 			
-            MapState ms = MapState.fromNbt(origin.writeNbt(new NbtCompound()));
+            MapState ms = MapState.fromNbt(origin.writeNbt(new NbtCompound(), reg), reg);
 			ms.markDirty();
 			if(ms != null) {
 				boolean local = this.regions.values().stream().anyMatch((r) -> r.contains(ms));
 				if(local && copyLocal || !local && copyOther) {
-					psm.set(name, ms);
+					psm.set(id.asString(), ms);
 				}
 			}
 		}
@@ -330,11 +333,12 @@ public final class ExportTask {
 	    String id = RaidManager.nameFor(world.getDimensionEntry());
 		RaidManager ps = world.getPersistentStateManager()
 				.get(RaidManager.getPersistentStateType(world), id);
-		RaidManager tempRm = RaidManager.fromNbt(world, ps.writeNbt(new NbtCompound()));
+		DynamicRegistryManager reg = world.getRegistryManager();
+		RaidManager tempRm = RaidManager.fromNbt(world, ps.writeNbt(new NbtCompound(), reg));
 		Iterator<Map.Entry<Integer, Raid>> itr = ((RaidManagerAccessor) tempRm).getRaids().entrySet().iterator();
 		while(itr.hasNext()) {
 			Map.Entry<Integer, Raid> entry = itr.next();
-			if(!this.regions.values().stream().anyMatch((reg) -> reg.contains(world, entry.getValue().getCenter()))) {
+			if(!this.regions.values().stream().anyMatch((r) -> r.contains(world, entry.getValue().getCenter()))) {
 				itr.remove();
 			}
 		}

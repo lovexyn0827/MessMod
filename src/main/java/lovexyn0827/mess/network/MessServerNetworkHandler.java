@@ -1,6 +1,7 @@
 package lovexyn0827.mess.network;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
 
@@ -20,6 +21,7 @@ import net.minecraft.util.Identifier;
 
 public class MessServerNetworkHandler {
 	private static final Map<Identifier, PacketHandler> PACKET_HANDLERS = Maps.newHashMap();
+	public static final Set<Identifier> PACKET_TYPES;
 	private final MinecraftServer server;
 
 	public MessServerNetworkHandler(MinecraftServer server) {
@@ -28,12 +30,14 @@ public class MessServerNetworkHandler {
 	
 	public boolean handlePacket(CustomPayloadC2SPacket packet, ServerPlayerEntity player) {
 		try {
-			Identifier channel = packet.payload().id();
+			Identifier channel = ((MessModPayload) packet.payload()).channel();
 			PacketByteBuf buf = ((MessModPayload) packet.payload()).data();
 			PacketHandler handler = PACKET_HANDLERS.get(channel);
 			if(handler != null) {
 				handler.onPacket(player, channel, buf);
 				return true;
+			} else {
+				MessMod.LOGGER.warn("Unrecognized channel: {}", channel);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -42,8 +46,8 @@ public class MessServerNetworkHandler {
 		return false;
 	}
 
-	private static void register(Identifier hud, PacketHandler handler) {
-		PACKET_HANDLERS.put(hud, handler);
+	private static void register(Identifier id, PacketHandler handler) {
+		PACKET_HANDLERS.put(id, handler);
 	}
 	
 	public boolean isValidPackedId(Identifier id) {
@@ -89,6 +93,7 @@ public class MessServerNetworkHandler {
 				EntityDataDumpHelper.tryDumpTarget(player);
 			});
 		});
+		PACKET_TYPES = PACKET_HANDLERS.keySet();
 	}
 	
 	public interface PacketHandler {

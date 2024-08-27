@@ -12,6 +12,7 @@ import com.google.common.base.Objects;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -31,7 +32,8 @@ public class BlockPlacementHistory {
 			BlockState newState, @Nullable BlockEntity prevBlockEntity) {
 		this.history.push(new Operation(
 				Collections.singletonList(new BlockChange(this.player.getServerWorld(), pos, prevState, 
-				prevBlockEntity == null ? null : prevBlockEntity.createNbtWithIdentifyingData(), 
+				prevBlockEntity == null ? null : 
+					prevBlockEntity.createNbtWithIdentifyingData(prevBlockEntity.getWorld().getRegistryManager()), 
 				newState, null))));
 		this.redoQueue.clear();
 	}
@@ -58,7 +60,7 @@ public class BlockPlacementHistory {
 	
 	public void preparePrevBlockEntityForTheNext(BlockEntity be) {
 		if(be != null) {
-			NEXT_BE.set(be.createNbtWithId());
+			NEXT_BE.set(be.createNbtWithId(be.getWorld().getRegistryManager()));
 		}
 	}
 	
@@ -137,7 +139,8 @@ public class BlockPlacementHistory {
 			if(this.newBlockEntity != null) {
 				BlockEntity be = this.world.getBlockEntity(this.pos);
 				if(be != null) {
-					be.readNbt(appendLocationalData(this.newBlockEntity, this.pos));
+					DynamicRegistryManager reg = be.getWorld().getRegistryManager();
+					be.read(appendLocationalData(this.newBlockEntity, this.pos), reg);
 				}
 			}
 		}
@@ -147,7 +150,8 @@ public class BlockPlacementHistory {
 			if (this.prevBlockEntity != null) {
 				BlockEntity be = this.world.getBlockEntity(this.pos);
 				if(be != null) {
-					be.readNbt(appendLocationalData(this.prevBlockEntity, this.pos));
+					DynamicRegistryManager reg = be.getWorld().getRegistryManager();
+					be.read(appendLocationalData(this.prevBlockEntity, this.pos), reg);
 				}
 			}
 		}
