@@ -26,6 +26,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.predicate.NumberRange;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.TypeFilter;
@@ -76,12 +77,17 @@ public class EntitySelectorMixin_Client implements EntitySelectorInterface {
 	}
 
 	@Shadow
-	private Predicate<Entity> getPositionPredicate(Vec3d vec3d) {
+	private Predicate<Entity> getPositionPredicate(Vec3d pos, @Nullable Box box, @Nullable FeatureSet enabledFeatures) {
 		throw new AssertionError();
 	}
 
 	@Shadow
 	private <T extends Entity> List<T> getEntities(Vec3d vec3d, List<Entity> list) {
+		throw new AssertionError();
+	}
+	
+	@Shadow
+	private Box getOffsetBox(Vec3d offset) {
 		throw new AssertionError();
 	}
 	
@@ -136,7 +142,7 @@ public class EntitySelectorMixin_Client implements EntitySelectorInterface {
 				cir.cancel();
 			} else {
 				Vec3d vec3d = (Vec3d)this.positionOffset.apply(serverCommandSource.getPosition());
-				Predicate<Entity> predicate = this.getPositionPredicate(vec3d);
+				Box box = this.getOffsetBox(vec3d);
 				if (this.senderOnly) {
 					// @s
 					Entity senderServer = serverCommandSource.getEntity();
@@ -150,6 +156,7 @@ public class EntitySelectorMixin_Client implements EntitySelectorInterface {
 					cir.setReturnValue(result);
 					cir.cancel();
 				} else {
+					Predicate<Entity> predicate = this.getPositionPredicate(vec3d, box, serverCommandSource.getEnabledFeatures());
 					if (this.isLocalWorldOnly()) {
 						if(serverCommandSource.getWorld().getRegistryKey() == mc.world.getRegistryKey()) {
 							this.appendEntitiesFromClientWorld(result, mc.world, vec3d, predicate);
