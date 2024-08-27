@@ -8,6 +8,7 @@ import java.util.List;
 import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RegionBasedStorageAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
@@ -17,11 +18,14 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.ChunkSerializer;
+import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestStorage.OccupationStatus;
 import net.minecraft.world.storage.ChunkDataList;
+import net.minecraft.world.storage.ChunkPosKeyedStorage;
 import net.minecraft.world.storage.EntityChunkDataAccess;
 import net.minecraft.world.storage.RegionBasedStorage;
+import net.minecraft.world.storage.StorageKey;
 
 public final class Region {
 	private final ChunkPos max;
@@ -54,14 +58,22 @@ public final class Region {
 		Path dir = this.dimension.getServer().getSavePath(WorldSavePathMixin.create(""))
 				.relativize(((MinecraftServerAccessor) this.dimension.getServer()).getSession()
 						.getWorldDirectory(this.dimension.getRegistryKey()));
+		LevelStorage.Session session = ((MinecraftServerAccessor)this.dimension.getServer()).getSession();
+		StorageKey chunkStorageKey = new StorageKey(session.getDirectoryName(), 
+				this.dimension.getRegistryKey(), "chunk");
 		RegionBasedStorage storage = RegionBasedStorageAccessor
-				.create(temp.resolve(dir).resolve("region"), true);
+				.create(chunkStorageKey, temp.resolve(dir).resolve("region"), true);
 		PointOfInterestStorage poiStorage = this.dimension.getPointOfInterestStorage();
-		PointOfInterestStorage poiDst = new PointOfInterestStorage(temp.resolve(dir).resolve("poi"), 
+		StorageKey poiStorageKey = new StorageKey(session.getDirectoryName(), this.dimension.getRegistryKey(), "poi");
+		PointOfInterestStorage poiDst = new PointOfInterestStorage(poiStorageKey, temp.resolve(dir).resolve("poi"), 
 				this.dimension.getServer().getDataFixer(), false, this.dimension.getRegistryManager(), this.dimension);
-		EntityChunkDataAccess entityDst = new EntityChunkDataAccess(this.dimension, 
-				temp.resolve(dir).resolve("entities"), this.dimension.getServer().getDataFixer(), false, 
-				this.dimension.getServer());
+		StorageKey entityStorageKey = new StorageKey(session.getDirectoryName(), 
+				this.dimension.getRegistryKey(), "entities");
+		EntityChunkDataAccess entityDst = new EntityChunkDataAccess(new ChunkPosKeyedStorage(
+				entityStorageKey, 
+				session.getWorldDirectory(this.dimension.getRegistryKey()).resolve("entities"), 
+				this.dimension.getServer().getDataFixer(), false, 
+				DataFixTypes.ENTITY_CHUNK), this.dimension, this.dimension.getServer());
 		for(int x = this.min.x; x <= this.max.x; x++) {
 			for(int z = this.min.z; z <= this.max.z; z++) {
 				ChunkPos pos = new ChunkPos(x, z);

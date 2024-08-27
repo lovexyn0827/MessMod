@@ -23,7 +23,7 @@ public class TileEntityCommand {
 									}
 									
 									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.type", Registries.BLOCK_ENTITY_TYPE.getId(be.getType()).getPath());
-									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.createNbtWithId());
+									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.createNbtWithId(be.getWorld().getRegistryManager()));
 									return 1;
 								}))).
 				then(literal("remove").

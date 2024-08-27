@@ -3,6 +3,7 @@ package lovexyn0827.mess.rendering.hud;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -19,7 +20,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 
@@ -57,9 +57,9 @@ public abstract class EntityHud {
 		Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, this.client.getWindow().getFramebufferWidth(), 
 				this.client.getWindow().getFramebufferHeight(), 0.0f, 1000.0f, 3000.0f);
 		RenderSystem.setProjectionMatrix(matrix4f, VertexSorter.BY_Z);
-		MatrixStack matrixStack = RenderSystem.getModelViewStack();
-		matrixStack.push();
-		matrixStack.loadIdentity();
+		Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+		matrixStack.pushMatrix();
+		matrixStack.identity();
 		matrixStack.translate(0.0f, 0.0f, -2000.0f);
 		RenderSystem.applyModelViewMatrix();
 		RenderSystem.lineWidth(1.0f);
@@ -91,7 +91,7 @@ public abstract class EntityHud {
 			
 		});
 		this.hudManager.hudHeight += (mutableY.getValue() - this.yStart);
-		matrixStack.pop();
+		matrixStack.popMatrix();
 		RenderSystem.applyModelViewMatrix();
 	}
 

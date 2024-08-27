@@ -1,6 +1,5 @@
 package lovexyn0827.mess.mixins;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -16,8 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.util.Either;
-
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.ChunkTaskPrioritySystemInterface;
 import lovexyn0827.mess.fakes.ChunkTicketManagerInterface;
@@ -28,6 +25,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ChunkTaskPrioritySystem;
+import net.minecraft.server.world.OptionalChunk;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.structure.StructureTemplateManager;
@@ -56,7 +54,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			at = @At(value = "HEAD")
 	)
 	private void onSchedulingChunkLoad(ChunkPos pos, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+			CallbackInfoReturnable<CompletableFuture<Chunk>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -80,8 +78,8 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	@Inject(method = "convertToFullChunk", 
 			at = @At(value = "HEAD")
 	)
-	private void onSchedulingChunkGeneration(ChunkHolder chunkHolder, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void onSchedulingChunkGeneration(ChunkHolder chunkHolder, Chunk chunk, 
+			CallbackInfoReturnable<CompletableFuture<CompletableFuture<Chunk>>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -94,7 +92,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			at = @At(value = "HEAD")
 	)
 	private void onSchedulingChunkUdgrade(ChunkHolder holder, ChunkStatus requiredStatus, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+			CallbackInfoReturnable<CompletableFuture<CompletableFuture<Chunk>>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -109,7 +107,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			remap = false
 	)
 	private void onChunkLoad(ChunkPos pos, Optional<?> nbt, 
-			CallbackInfoReturnable<Either<Chunk, ChunkHolder.Unloaded>> cir) {
+			CallbackInfoReturnable<CompletableFuture<Chunk>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -130,12 +128,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
-	@Inject(method = "method_20460", 
+	@Inject(method = "method_17227", 
 			at = @At(value = "HEAD"), 
 			remap = false
 	)
-	private void onChunkGeneration(ChunkHolder holder, Either<?, ?> either, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void onChunkGeneration(ChunkHolder holder, Chunk chunk, 
+			CallbackInfoReturnable<CompletableFuture<CompletableFuture<Chunk>>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -144,12 +142,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
-	@Inject(method = "method_17225", 
+	@Inject(method = "method_17224", 
 			at = @At(value = "HEAD"), 
 			remap = false
 	)
 	private void onChunkUpgrade(ChunkPos pos, ChunkHolder holder, ChunkStatus status, Executor e, 
-			List<?> list, CallbackInfoReturnable<Boolean> cir) {
+			OptionalChunk<?> mayChunk, CallbackInfoReturnable<Boolean> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -164,7 +162,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			remap = false
 	)
 	private void onChunkLoadFinish(ChunkPos pos, Optional<?> nbt, 
-			CallbackInfoReturnable<Either<Chunk, ChunkHolder.Unloaded>> cir) {
+			CallbackInfoReturnable<CompletableFuture<Chunk>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -185,12 +183,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
-	@Inject(method = "method_20460", 
+	@Inject(method = "method_17227", 
 			at = @At(value = "RETURN"), 
 			remap = false
 	)
-	private void onChunkGenerationFinish(ChunkHolder holder, Either<?, ?> either, 
-			CallbackInfoReturnable<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> cir) {
+	private void onChunkGenerationFinish(ChunkHolder holder, Chunk chunk, 
+			CallbackInfoReturnable<CompletableFuture<CompletableFuture<Chunk>>> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}
@@ -199,12 +197,12 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
-	@Inject(method = "method_17225", 
+	@Inject(method = "method_17224", 
 			at = @At(value = "RETURN"), 
 			remap = false
 	)
 	private void onChunkUpgradeFinish(ChunkPos pos, ChunkHolder holder, ChunkStatus status, Executor exec, 
-			List<?> list, CallbackInfoReturnable<Boolean> cir) {
+			OptionalChunk<?> mayChunk, CallbackInfoReturnable<Boolean> cir) {
 		if(ChunkBehaviorLogger.shouldSkip()) {
 			return;
 		}

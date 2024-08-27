@@ -39,6 +39,9 @@ import net.minecraft.world.World;
 import java.util.Map;
 import java.util.Set;
 
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+
 /**
  * A modified version of carpet.script.util.ShapesRenderer
  * Original Author : gnembon
@@ -61,7 +64,7 @@ public class ShapeRenderer {
 		return this.shapes;
 	}
 
-    public void render(MatrixStack matrices, Camera camera, float partialTick) {
+    public void render(Matrix4f viewMat, Camera camera, float partialTick) {
         //Camera camera = this.client.gameRenderer.getCamera();
         ClientWorld iWorld = this.client.world;
         if(iWorld == null) {
@@ -74,6 +77,7 @@ public class ShapeRenderer {
         	return;
         }
         
+        MatrixStack matrices = new MatrixStack();
         RenderSystem.enableDepthTest();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.depthFunc(515);
@@ -104,13 +108,13 @@ public class ShapeRenderer {
             	set.forEach((s) -> {
             		if(s.shouldRender(dimensionType)) {
             			if(!(s instanceof RenderedText)) {
-            				MatrixStack matrixStack = RenderSystem.getModelViewStack();
-            				matrixStack.push();
-                            matrixStack.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
+            				Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+            				matrixStack.pushMatrix();
+                            matrixStack.mul(matrices.peek().getPositionMatrix());
                             RenderSystem.applyModelViewMatrix();
                             s.renderFaces(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
                 			s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
-                			matrixStack.pop();
+                			matrixStack.popMatrix();
                             RenderSystem.applyModelViewMatrix();
             			}
             		}

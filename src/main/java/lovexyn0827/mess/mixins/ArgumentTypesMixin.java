@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import lovexyn0827.mess.command.CommandUtil;
 import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.command.argument.serialize.ArgumentSerializer;
 import net.minecraft.registry.Registry;
 
 @Mixin(ArgumentTypes.class)
@@ -16,7 +17,7 @@ public class ArgumentTypesMixin {
 					+ "Lnet/minecraft/command/argument/serialize/ArgumentSerializer;", 
 			at = @At("HEAD")
 	)
-	private static void onRegisterArgmentTypes(Registry<?> reg, CallbackInfoReturnable<?> cir) {
+	private static void onRegisterArgmentTypes(Registry<ArgumentSerializer<?, ?>> reg, CallbackInfoReturnable<?> cir) {
 		CommandUtil.registerArgumentTypes(reg);
 	}
 }
