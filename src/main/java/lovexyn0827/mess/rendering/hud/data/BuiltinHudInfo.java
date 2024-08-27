@@ -41,9 +41,7 @@ public enum BuiltinHudInfo implements HudLine {
 	MOVEMENT_SPEED("OnLand Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).getMovementSpeed(), LivingEntity.class),
 	//XXX FLYING_SPEED("Fly Speed", DataType.FLOAT, (e) -> ((LivingEntity) e).airStrafingSpeed, LivingEntity.class),
 	FUSE("Fuse", DataType.INTEGER, (e) -> ((TntEntity) e).getFuse(), TntEntity.class),
-	POWER_X("Power X", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerX, ExplosiveProjectileEntity.class),
-	POWER_Y("Power Y", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerY, ExplosiveProjectileEntity.class),
-	POWER_Z("Power Z", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).powerZ, ExplosiveProjectileEntity.class),
+	POWER_X("Power", DataType.DOUBLE, (e) -> ((ExplosiveProjectileEntity) e).accelerationPower, ExplosiveProjectileEntity.class),
 	VELOCITY_DECAY("Decay", DataType.FLOAT, (e) -> ((BoatEntityAccessor) e).getVelocityDeacyMCWMEM(), BoatEntity.class),
 	POSE("Pose", DataType.POSE, Entity::getPose);
 	

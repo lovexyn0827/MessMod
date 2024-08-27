@@ -1,5 +1,6 @@
 package lovexyn0827.mess.mixins;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -8,7 +9,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,7 +42,7 @@ import net.minecraft.util.math.Vec3d;
 @Mixin(EntitySelectorReader.class)
 public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderInterface {
 	@Shadow
-	private Predicate<Entity> predicate;
+	private List<Predicate<Entity>> predicates;
 	@Shadow
 	private int limit;
 	@Shadow
@@ -97,23 +97,23 @@ public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderI
 	)
 	public EntitySelector addCustomOptions(EntitySelectorReader reader){
 		if(this.idRange != null) {
-			this.predicate = this.predicate.and((e) -> this.idRange.test(e.getId()));
+			this.predicates.add((e) -> this.idRange.test(e.getId()));
 		}
 		
 		if(this.typeRegex != null) {
-			this.predicate = this.predicate.and((e) -> {
+			this.predicates.add((e) -> {
 				return this.typeRegex.matcher(EntityType.getId(e.getType()).toString()).matches();
 			});
 		}
 		
 		if(this.nameRegex != null) {
-			this.predicate = this.predicate.and((e) -> {
+			this.predicates.add((e) -> {
 				return this.nameRegex.matcher(e.getName().getString()).matches();
 			});
 		}
 		
 		if(this.classRegex != null) {
-			this.predicate = this.predicate.and((e) -> {
+			this.predicates.add((e) -> {
 				Class<?> clazz = e.getClass();
 				Mapping mapping = MessMod.INSTANCE.getMapping();
 				for(; clazz != Object.class; clazz = clazz.getSuperclass()) {
@@ -130,7 +130,7 @@ public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderI
 		}
 		
 		if(this.clazz != null) {
-			this.predicate = this.predicate.and(this.clazz::isInstance);
+			this.predicates.add(this.clazz::isInstance);
 		}
 
 		EntitySelector selector = this.build();
@@ -176,17 +176,18 @@ public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderI
 	public Pattern getClassRegex() {
 		return classRegex;
 	}
-	
+
 	@Redirect(method = "readAtVariable", 
 			at = @At(
-					value = "FIELD", 
-					target = "net/minecraft/command/EntitySelectorReader.predicate:Ljava/util/function/Predicate;", 
-					opcode = Opcodes.PUTFIELD
+					value = "INVOKE", 
+					target = "Ljava/util/List;add(Ljava/lang/Object;)Z"
 			)
 	)
-	private void replaceIsAlive(EntitySelectorReader reader, Predicate<Entity> p0) {
+	private boolean replaceIsAlive(List<Object> predicates, Object p0) {
 		if(!OptionManager.allowSelectingDeadEntities) {
-			this.predicate = p0;
+			return predicates.add(p0);
+		} else {
+			return true;
 		}
 	}
 	
@@ -204,7 +205,8 @@ public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderI
 			this.limit = 1;
 			this.includesNonPlayers = true;
 			this.sorter = EntitySelectorReader.NEAREST;
-			this.predicate = (e) -> true;
+			this.predicates = new ArrayList<>();
+			this.predicates.add((e) -> true);
 			this.targetOnly = true;
 			this.suggestionProvider = this::suggestOpen;
 	        if (this.reader.canRead() && this.reader.peek() == '[') {

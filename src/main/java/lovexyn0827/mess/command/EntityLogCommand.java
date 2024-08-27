@@ -46,7 +46,7 @@ public class EntityLogCommand {
 										.executes((ct) -> {
 											EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 											EntityType<?> type = Registries.ENTITY_TYPE
-													.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+													.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 											String field = StringArgumentType.getString(ct, "field");
 											try {
 												l.listenToField(field, type, null, null, ServerTickingPhase.TICKED_ALL_WORLDS);
@@ -61,7 +61,7 @@ public class EntityLogCommand {
 												.executes((ct) -> {
 													EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 													EntityType<?> type = Registries.ENTITY_TYPE
-															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+															.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 													String field = StringArgumentType.getString(ct, "field");
 													String name = StringArgumentType.getString(ct, "name");
 													try {
@@ -77,7 +77,7 @@ public class EntityLogCommand {
 														.executes((ct) -> {
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 															EntityType<?> type = Registries.ENTITY_TYPE
-																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+																	.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 															String field = StringArgumentType.getString(ct, "field");
 															String name = StringArgumentType.getString(ct, "name");
 															AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
@@ -94,7 +94,7 @@ public class EntityLogCommand {
 														.executes((ct) -> {
 															EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 															EntityType<?> type = Registries.ENTITY_TYPE
-																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+																	.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 															String field = StringArgumentType.getString(ct, "field");
 															String name = StringArgumentType.getString(ct, "name");
 															TickingPhase phase = TickingPhaseArgumentType.getPhase(ct, "whereToUpdate");
@@ -111,7 +111,7 @@ public class EntityLogCommand {
 																.executes((ct) -> {
 																	EntityLogger l = MessMod.INSTANCE.getEntityLogger();
 																	EntityType<?> type = Registries.ENTITY_TYPE
-																			.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+																			.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 																	String field = StringArgumentType.getString(ct, "field");
 																	String name = StringArgumentType.getString(ct, "name");
 																	AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
@@ -154,7 +154,7 @@ public class EntityLogCommand {
 						.then(argument("entityType", StringArgumentType.word())
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.executes((ct) -> {
-									Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+									Identifier id = Identifier.of(StringArgumentType.getString(ct, "entityType"));
 									EntityType<?> type = Registries.ENTITY_TYPE.get(id);
 									MessMod.INSTANCE.getEntityLogger().addAutoSubEntityType(type);
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.autosub", id);
@@ -164,7 +164,7 @@ public class EntityLogCommand {
 						.then(argument("entityType", StringArgumentType.word())
 								.suggests(CommandUtil.ENTITY_TYPES)
 								.executes((ct) -> {
-									Identifier id = new Identifier(StringArgumentType.getString(ct, "entityType"));
+									Identifier id = Identifier.of(StringArgumentType.getString(ct, "entityType"));
 									EntityType<?> type = Registries.ENTITY_TYPE.get(id);
 									MessMod.INSTANCE.getEntityLogger().removeAutoSubEntityType(type);
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.stopautosub", id);

@@ -42,7 +42,7 @@ public class CommandUtil {
 		return b.buildFuture();
 	};
 	public static final SuggestionProvider<ServerCommandSource> ENTITY_FIELDS_SUGGESTION = (ct, builder) -> {
-		Identifier id = new Identifier(StringArgumentType.getString(ct.getLastChild(), "entityType"));
+		Identifier id = Identifier.of(StringArgumentType.getString(ct.getLastChild(), "entityType"));
 		EntityType<?> type = Registries.ENTITY_TYPE.get(id);
 		Class<?> clazz = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 		Reflection.getAvailableFieldNames(clazz).forEach(builder::suggest);
@@ -204,7 +204,6 @@ public class CommandUtil {
 		};
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void registerArgumentTypes(Registry<ArgumentSerializer<?, ?>> reg) {
 //		ArgumentTypesAccessor.registerForMessMod(reg, "mess_enum_set", 
 //				EnumSetArgumentType.class, 
@@ -232,7 +231,7 @@ public class CommandUtil {
 	public static AccessingPathArgumentType getPathArgForFieldListening(String entityTypeArg, String fieldArg) {
 		return AccessingPathArgumentType.accessingPathArg((ct) -> {
 			EntityType<?> type = Registries.ENTITY_TYPE
-					.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+					.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 			String fName = StringArgumentType.getString(ct, "field");
 			if("-THIS-".equals(fName)) {
 				return Reflection.ENTITY_TYPE_TO_CLASS.get(type);

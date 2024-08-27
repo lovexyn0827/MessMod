@@ -98,6 +98,7 @@ public class MappingProvider {
 			String mcVer = SharedConstants.getGameVersion().getName();
 			LOGGER.info("Trying to download the lastest yarn mapping from Maven...");
 			long start = Util.getMeasuringTimeMs();
+			@SuppressWarnings("deprecation")
 			URL listUrl = new URL("https://maven.fabricmc.net/net/fabricmc/yarn/maven-metadata.xml");
 			NavigableSet<String> foundMappings = new TreeSet<>();
 			try (InputStream is = listUrl.openStream()) {
@@ -120,6 +121,7 @@ public class MappingProvider {
 				return false;
 			} else {
 				String latest = foundMappings.last();
+				@SuppressWarnings("deprecation")
 				URL url = new URL("https://maven.fabricmc.net/net/fabricmc/yarn/" + latest + "/yarn-" + latest + "-v2.jar");
 				//URL url = new URL("file:///M:/SOURCE%20CODE/yarn-1.16.4+build.9-v2.jar");
 				Path temp = Files.createTempFile("yarn-" + mcVer, ".jar");

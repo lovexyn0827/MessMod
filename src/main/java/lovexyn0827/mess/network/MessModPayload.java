@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 
 // Actually we cannot take advantage of the new custom payload system as we should port from 1.16.x
 public record MessModPayload(Identifier channel, PacketByteBuf data) implements CustomPayload {
-	public static final Id<MessModPayload> ID = new Id<>(new Identifier("messmod", "payload_id"));
+	public static final Id<MessModPayload> ID = new Id<>(Identifier.of("messmod", "payload_id"));
 	
 	public static final PacketCodec<PacketByteBuf, MessModPayload> CODEC = PacketCodec.ofStatic(
 			(a, b) -> {

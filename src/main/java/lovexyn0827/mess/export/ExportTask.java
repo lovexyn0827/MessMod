@@ -229,7 +229,7 @@ public final class ExportTask {
 	private void tryExportMaps(ServerWorld world, PersistentStateManager psm) {
 		boolean copyLocal = this.components.contains(SaveComponent.MAP_LOCAL);
 		boolean copyOther = this.components.contains(SaveComponent.MAP_OTHER);
-		int nextId = world.getNextMapId().id();
+		int nextId = world.increaseAndGetMapId().id();
 		DynamicRegistryManager reg = world.getRegistryManager();
 		for(int i = 0; i < nextId; i++) {
 			MapIdComponent id = new MapIdComponent(i);

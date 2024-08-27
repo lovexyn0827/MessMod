@@ -26,6 +26,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
@@ -93,7 +94,6 @@ public class ShapeRenderer {
         //RenderSystem.enablePolygonOffset();
         //Entity entity = this.client.gameRenderer.getCamera().getFocusedEntity();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
         // render
         double cameraX = camera.getPos().x;
         double cameraY = camera.getPos().y;
@@ -112,8 +112,8 @@ public class ShapeRenderer {
             				matrixStack.pushMatrix();
                             matrixStack.mul(matrices.peek().getPositionMatrix());
                             RenderSystem.applyModelViewMatrix();
-                            s.renderFaces(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
-                			s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+                            s.renderFaces(matrices, tessellator, cameraX, cameraY, cameraZ, partialTick);
+                			s.renderLines(matrices, tessellator, cameraX, cameraY, cameraZ, partialTick);
                 			matrixStack.popMatrix();
                             RenderSystem.applyModelViewMatrix();
             			}
@@ -124,7 +124,7 @@ public class ShapeRenderer {
             	set.forEach((s) -> {
             		if(s.shouldRender(dimensionType)) {
             			if(s instanceof RenderedText) {
-                			s.renderLines(matrices, tessellator, bufferBuilder, cameraX, cameraY, cameraZ, partialTick);
+                			s.renderLines(matrices, tessellator, cameraX, cameraY, cameraZ, partialTick);
             			}
             		}
             	});
@@ -140,114 +140,115 @@ public class ShapeRenderer {
     
     // some raw shit
 
-    public static void drawLine(Tessellator tessellator, BufferBuilder builder, float x1, float y1, float z1, float x2, float y2, float z2, float red1, float grn1, float blu1, float alpha) {
-        builder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR); // 3
-        builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
-        builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
-        tessellator.draw();
+    public static void drawLine(Tessellator tessellator, float x1, float y1, float z1, float x2, float y2, float z2, float red1, float grn1, float blu1, float alpha) {
+    	BufferBuilder builder = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha);
+        builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha);
+        BufferRenderer.drawWithGlobalProgram(builder.end());
         
     }
 
     public static void drawBoxWireGLLines(
-            Tessellator tessellator, BufferBuilder builder,
+            Tessellator tessellator, 
             float x1, float y1, float z1,
             float x2, float y2, float z2,
             boolean xthick, boolean ythick, boolean zthick,
             float red1, float grn1, float blu1, float alpha, float red2, float grn2, float blu2) {
-        builder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR); // 3
+    	BufferBuilder builder = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         if (xthick) {
-            builder.vertex(x1, y1, z1).color(red1, grn2, blu2, alpha).next();
-            builder.vertex(x2, y1, z1).color(red1, grn2, blu2, alpha).next();
+            builder.vertex(x1, y1, z1).color(red1, grn2, blu2, alpha);
+            builder.vertex(x2, y1, z1).color(red1, grn2, blu2, alpha);
 
-            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha);
 
-            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha);
 
-            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha);
         }
         
         if (ythick) {
-            builder.vertex(x1, y1, z1).color(red2, grn1, blu2, alpha).next();
-            builder.vertex(x1, y2, z1).color(red2, grn1, blu2, alpha).next();
+            builder.vertex(x1, y1, z1).color(red2, grn1, blu2, alpha);
+            builder.vertex(x1, y2, z1).color(red2, grn1, blu2, alpha);
 
-            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha);
 
-            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha);
 
-            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha);
         }
         
         if (zthick) {
-            builder.vertex(x1, y1, z1).color(red2, grn2, blu1, alpha).next();
-            builder.vertex(x1, y1, z2).color(red2, grn2, blu1, alpha).next();
+            builder.vertex(x1, y1, z1).color(red2, grn2, blu1, alpha);
+            builder.vertex(x1, y1, z2).color(red2, grn2, blu1, alpha);
 
-            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha);
 
-            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha);
 
-            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha);
         }
         
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(builder.end());
     }
 
     public static void drawBoxFaces(
-            Tessellator tessellator, BufferBuilder builder,
+            Tessellator tessellator, 
             float x1, float y1, float z1,
             float x2, float y2, float z2,
             boolean xthick, boolean ythick, boolean zthick,
             float red1, float grn1, float blu1, float alpha) {
-        builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+    	BufferBuilder builder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         if (xthick && ythick) {
-            builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha);
             if (zthick) {
-                builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
+                builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha);
+                builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha);
+                builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha);
+                builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha);
             }
         }
 
         if (zthick && ythick) {
-            builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha);
             if (xthick) {
-                builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
+                builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha);
+                builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha);
+                builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha);
+                builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha);
             }
         }
 
         // now at least drawing one
         if (zthick && xthick) {
-            builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha).next();
-            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha).next();
+            builder.vertex(x1, y1, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y1, z1).color(red1, grn1, blu1, alpha);
+            builder.vertex(x2, y1, z2).color(red1, grn1, blu1, alpha);
+            builder.vertex(x1, y1, z2).color(red1, grn1, blu1, alpha);
 
 
             if (ythick) {
-                builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha).next();
-                builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha).next();
+                builder.vertex(x1, y2, z1).color(red1, grn1, blu1, alpha);
+                builder.vertex(x2, y2, z1).color(red1, grn1, blu1, alpha);
+                builder.vertex(x2, y2, z2).color(red1, grn1, blu1, alpha);
+                builder.vertex(x1, y2, z2).color(red1, grn1, blu1, alpha);
             }
         }
-        tessellator.draw();
+
+        BufferRenderer.drawWithGlobalProgram(builder.end());
     }
 }

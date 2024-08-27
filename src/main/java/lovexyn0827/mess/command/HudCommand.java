@@ -38,7 +38,7 @@ public class HudCommand {
 												.suggests(CommandUtil.ENTITY_FIELDS_SUGGESTION)
 												.executes((ct) -> {
 													EntityType<?> type = Registries.ENTITY_TYPE
-															.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+															.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 													Class<?> cl = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 													String field = StringArgumentType.getString(ct, "field");
 													MessMod.INSTANCE.getServerHudManager().lookingHud
@@ -49,7 +49,7 @@ public class HudCommand {
 												.then(argument("name", StringArgumentType.word())
 														.executes((ct) -> {
 															EntityType<?> type = Registries.ENTITY_TYPE
-																	.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+																	.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 															Class<?> cl = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 															String field = StringArgumentType.getString(ct, "field");
 															String name = StringArgumentType.getString(ct, "name");
@@ -66,7 +66,7 @@ public class HudCommand {
 														.then(argument("path", CommandUtil.getPathArgForFieldListening("entityType", "field"))
 																.executes((ct) -> {
 																	EntityType<?> type = Registries.ENTITY_TYPE
-																			.get(new Identifier(StringArgumentType.getString(ct, "entityType")));
+																			.get(Identifier.of(StringArgumentType.getString(ct, "entityType")));
 																	Class<?> cl = Reflection.ENTITY_TYPE_TO_CLASS.get(type);
 																	String field = StringArgumentType.getString(ct, "field");
 																	String name = StringArgumentType.getString(ct, "name");

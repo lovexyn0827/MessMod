@@ -6,10 +6,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtString;
@@ -32,13 +33,13 @@ public class RenderedText extends Shape {
 	}
 
 	@Override
-	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX, double cameraY,
+	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, double cameraX, double cameraY,
 			double cameraZ, float partialTick) {
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX, double cameraY,
+	protected void renderLines(MatrixStack matrices, Tessellator tessellator, double cameraX, double cameraY,
 			double cameraZ, float partialTick) {
 		if (this.a == 0.0) return;
 		MinecraftClient client = MinecraftClient.getInstance();
@@ -58,8 +59,8 @@ public class RenderedText extends Shape {
         matrices.translate((float)(pos.x - d), (float)(pos.y - e), (float)(pos.z - f));
         matrices.multiply(camera1.getRotation());
         matrices.scale(0.01f, -0.01f, 0.01f);
-        matrices.scale(-1.0F, 1.0F, 1.0F);
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+        matrices.scale(1.0F, 1.0F, -1.0F);
+        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(RenderLayer.DEFAULT_BUFFER_SIZE));
         //textRenderer.draw(this.value, 0, 0.0F, this.color, false, matrices.peek().getModel(), immediate, false, 0x0000002f, 15728880);
         textRenderer.draw(this.value, 0, 0, this.color, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0x0000002f, 15728880);
         immediate.draw();

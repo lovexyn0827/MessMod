@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
@@ -32,11 +31,11 @@ public class RenderedBox extends Shape {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, double cx, double cy,
 			double cz, float partialTick) {
 		if ((this.a) == 0) return;
         RenderSystem.lineWidth(1.0F);
-        ShapeRenderer.drawBoxFaces(tessellator, bufferBuilder,
+        ShapeRenderer.drawBoxFaces(tessellator, 
                 (float)(box.minX - cx - renderEpsilon), (float)(box.minY - cy - renderEpsilon), (float)(box.minZ - cz - renderEpsilon),
                 (float)(box.maxX - cx + renderEpsilon), (float)(box.maxY - cy + renderEpsilon), (float)(box.maxZ - cz + renderEpsilon),
                 box.minX != box.maxX, box.minY != box.maxY, box.minZ != box.maxZ,
@@ -46,11 +45,11 @@ public class RenderedBox extends Shape {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderLines(MatrixStack matrices, Tessellator tessellator, double cx, double cy,
 			double cz, float partialTick) {
 		if (this.a == 0.0) return;
         RenderSystem.lineWidth(2.0F);
-        ShapeRenderer.drawBoxWireGLLines(tessellator, bufferBuilder,
+        ShapeRenderer.drawBoxWireGLLines(tessellator, 
                 (float)(box.minX - cx - renderEpsilon), (float)(box.minY - cy - renderEpsilon), (float)(box.minZ - cz - renderEpsilon),
                 (float)(box.maxX - cx + renderEpsilon), (float)(box.maxY - cy + renderEpsilon), (float)(box.maxZ - cz + renderEpsilon),
                 box.minX != box.maxX, box.minY != box.maxY, box.minZ != box.maxZ,

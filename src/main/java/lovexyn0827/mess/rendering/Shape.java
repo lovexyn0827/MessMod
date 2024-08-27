@@ -5,7 +5,6 @@ import com.google.common.collect.HashBiMap;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
@@ -45,11 +44,11 @@ public abstract class Shape {
 	}
 
 	@Environment(EnvType.CLIENT)
-	protected abstract void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX,
+	protected abstract void renderFaces(MatrixStack matrices, Tessellator tessellator, double cameraX,
 			double cameraY, double cameraZ, float partialTick);
 
 	@Environment(EnvType.CLIENT)
-	protected abstract void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cameraX,
+	protected abstract void renderLines(MatrixStack matrices, Tessellator tessellator, double cameraX,
 			double cameraY, double cameraZ, float partialTick);
 
 	protected abstract boolean shouldRender(RegistryKey<World> dimensionType);

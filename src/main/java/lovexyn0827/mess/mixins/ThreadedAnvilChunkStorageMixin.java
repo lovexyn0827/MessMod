@@ -26,8 +26,8 @@ import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.server.world.ChunkTaskPrioritySystem;
 import net.minecraft.server.world.OptionalChunk;
+import net.minecraft.server.world.ServerChunkLoadingManager;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.thread.ThreadExecutor;
@@ -39,13 +39,13 @@ import net.minecraft.world.chunk.ChunkStatusChangeListener;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.storage.LevelStorage;
 
-@Mixin(ThreadedAnvilChunkStorage.class)
+@Mixin(ServerChunkLoadingManager.class)
 public abstract class ThreadedAnvilChunkStorageMixin {	
 	@Shadow @Final
 	private ServerWorld world;
 	
 	@Shadow @Final
-	private ThreadedAnvilChunkStorage.TicketManager ticketManager;
+	private ServerChunkLoadingManager.TicketManager ticketManager;
 	
 	@Shadow @Final
 	private ChunkTaskPrioritySystem chunkTaskPrioritySystem;
@@ -88,7 +88,7 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 				this.world.getRegistryKey().getValue(), Thread.currentThread(), StackTrace.blameCurrent(), null);
 	}
 	
-	@Inject(method = "upgradeChunk", 
+	@Inject(method = "generate", 
 			at = @At(value = "HEAD")
 	)
 	private void onSchedulingChunkUdgrade(ChunkHolder holder, ChunkStatus requiredStatus, 

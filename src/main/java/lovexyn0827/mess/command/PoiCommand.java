@@ -77,7 +77,7 @@ public class PoiCommand {
 										then(argument("type",StringArgumentType.word()).suggests(sp).
 												executes((ct) -> {
 													boolean foundAny = false;
-													PointOfInterestType expectedType = Registries.POINT_OF_INTEREST_TYPE.get(new Identifier(StringArgumentType.getString(ct, "type")));
+													PointOfInterestType expectedType = Registries.POINT_OF_INTEREST_TYPE.get(Identifier.of(StringArgumentType.getString(ct, "type")));
 													Iterable<BlockPos> iterator = BlockPos.iterate(BlockPosArgumentType.getLoadedBlockPos(ct, "corner1"), 
 															BlockPosArgumentType.getLoadedBlockPos(ct, "corner2"));
 													for(BlockPos pos : iterator) {
@@ -120,7 +120,7 @@ public class PoiCommand {
 		String typeS = StringArgumentType.getString(ct, "type");
 		Registry<PointOfInterestType> reg = Registries.POINT_OF_INTEREST_TYPE;
 		RegistryEntry<PointOfInterestType> expected = 
-				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, new Identifier(typeS)));
+				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, Identifier.of(typeS)));
 		List<PointOfInterest> poiList = ct.getSource()
 				.getWorld()
 				.getPointOfInterestStorage()
@@ -143,7 +143,7 @@ public class PoiCommand {
 		poiStorage.remove(blockPos);
 		Registry<PointOfInterestType> reg = Registries.POINT_OF_INTEREST_TYPE;
 		poiStorage.add(blockPos, 
-				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, new Identifier(type))));
+				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, Identifier.of(type))));
 		return true;
 	}
 	

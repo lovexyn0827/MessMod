@@ -124,28 +124,11 @@ public class ModifyCommand {
 													(entity) -> entity instanceof LivingEntity);
 											return 0;
 										}))).
-						then(literal("powerX").
+						then(literal("power").
 								then(argument("val",DoubleArgumentType.doubleArg()).
 										executes((ct) -> {
 											forEachEntity(ct,
-													(entity,val) -> ((ExplosiveProjectileEntity)entity).powerX = val,
-													(entity) -> entity instanceof ExplosiveProjectileEntity);
-											return 0;
-										}))).
-						then(literal("powerY").
-								then(argument("val",DoubleArgumentType.doubleArg()).
-										executes((ct) -> {
-											forEachEntity(ct,(entity,val) -> {
-												((ExplosiveProjectileEntity)entity).powerY = val;
-											},
-											(entity) -> entity instanceof ExplosiveProjectileEntity);
-											return 0;
-										}))).
-						then(literal("powerZ").
-								then(argument("val",DoubleArgumentType.doubleArg()).
-										executes((ct)->{
-											forEachEntity(ct,
-													(entity,val) -> ((ExplosiveProjectileEntity)entity).powerZ = val,
+													(entity,val) -> ((ExplosiveProjectileEntity)entity).accelerationPower = val,
 													(entity) -> entity instanceof ExplosiveProjectileEntity);
 											return 0;
 										}))).

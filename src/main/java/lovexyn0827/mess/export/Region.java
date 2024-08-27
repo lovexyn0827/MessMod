@@ -12,6 +12,7 @@ import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.map.MapState;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ChunkErrorHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockBox;
@@ -66,7 +67,8 @@ public final class Region {
 		PointOfInterestStorage poiStorage = this.dimension.getPointOfInterestStorage();
 		StorageKey poiStorageKey = new StorageKey(session.getDirectoryName(), this.dimension.getRegistryKey(), "poi");
 		PointOfInterestStorage poiDst = new PointOfInterestStorage(poiStorageKey, temp.resolve(dir).resolve("poi"), 
-				this.dimension.getServer().getDataFixer(), false, this.dimension.getRegistryManager(), this.dimension);
+				this.dimension.getServer().getDataFixer(), false, this.dimension.getRegistryManager(), 
+				new DummyChunkErrorHandler(), this.dimension);
 		StorageKey entityStorageKey = new StorageKey(session.getDirectoryName(), 
 				this.dimension.getRegistryKey(), "entities");
 		EntityChunkDataAccess entityDst = new EntityChunkDataAccess(new ChunkPosKeyedStorage(
@@ -134,5 +136,15 @@ public final class Region {
 		return new StringBuilder(this.name)
 				.append('{').append(this.min).append('-').append(this.max).append('}')
 				.append('@').append(this.dimension.getRegistryKey().getValue()).toString();
+	}
+	
+	private static final class DummyChunkErrorHandler implements ChunkErrorHandler {
+		@Override
+		public void onChunkLoadFailure(Throwable exception, StorageKey key, ChunkPos chunkPos) {
+		}
+
+		@Override
+		public void onChunkSaveFailure(Throwable exception, StorageKey key, ChunkPos chunkPos) {
+		}
 	}
 }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
@@ -28,16 +27,16 @@ public class RenderedLine extends Shape {
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderFaces(MatrixStack matrices, Tessellator tessellator, double cx, double cy,
 			double cz, float partialTick) {
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	protected void renderLines(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferBuilder, double cx, double cy,
+	protected void renderLines(MatrixStack matrices, Tessellator tessellator, double cx, double cy,
 			double cz, float partialTick) {
         RenderSystem.lineWidth(2);
-        ShapeRenderer.drawLine(tessellator, bufferBuilder,
+        ShapeRenderer.drawLine(tessellator, 
                 (float)(from.x-cx-renderEpsilon), (float)(from.y-cy-renderEpsilon), (float)(from.z-cz-renderEpsilon),
                 (float)(to.x-cx+renderEpsilon), (float)(to.y-cy+renderEpsilon), (float)(to.z-cz+renderEpsilon),
                 this.r, this.g, this.b, this.a

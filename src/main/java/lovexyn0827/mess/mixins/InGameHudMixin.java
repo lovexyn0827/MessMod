@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
 	@Shadow
-	private static final Identifier HOTBAR_TEXTURE = new Identifier("hud/hotbar");
+	private static final Identifier HOTBAR_TEXTURE = Identifier.of("hud/hotbar");
     
 	@ModifyConstant(method = "renderHotbar", constant = @Constant(intValue = 9))
 	private int modifyHotbarLength(int lengthO) {
