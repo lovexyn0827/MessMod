@@ -46,7 +46,6 @@ public enum DataType {
 	static {
 		POSE_NAMES = new ImmutableMap.Builder<EntityPose, String>()
 				.put(EntityPose.STANDING, "standing")
-				.put(EntityPose.FALL_FLYING, "fall_flying")
 				.put(EntityPose.SLEEPING, "sleeping")
 				.put(EntityPose.SWIMMING, "swiming")
 				.put(EntityPose.CROUCHING, "crouching")
@@ -63,6 +62,7 @@ public enum DataType {
 				.put(EntityPose.SHOOTING, "shooting")
 				.put(EntityPose.INHALING, "inhaling")
 				.put(EntityPose.DYING, "dying")
+				.put(EntityPose.GLIDING, "gliding")
 				.build();
 		if(!POSE_NAMES.keySet().containsAll(Sets.newHashSet(EntityPose.values()))) {
 			throw new IllegalStateException("Incomplete EntityPose map!");

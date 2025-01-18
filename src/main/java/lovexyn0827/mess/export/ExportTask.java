@@ -41,6 +41,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
+import net.minecraft.resource.DataConfiguration;
 import net.minecraft.scoreboard.ScoreboardState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandOutput;
@@ -128,7 +129,7 @@ public final class ExportTask {
 			}
 			
 			PersistentStateManager psm = 
-					new PersistentStateManager(dir.resolve("data").toFile(), this.server.getDataFixer(), 
+					new PersistentStateManager(dir.resolve("data"), this.server.getDataFixer(), 
 							this.server.getRegistryManager());
 			if(this.components.contains(SaveComponent.RAID)) {
 				exportRaids(world, psm);
@@ -302,7 +303,8 @@ public final class ExportTask {
 				this.server.getSavePath(WorldSavePathMixin.create("level.dat")), NbtSizeTracker.ofUnlimitedBytes());
 		level.getCompound("Data").putString("LevelName", name);
 		if(!this.components.contains(SaveComponent.GAMERULES)) {
-			level.getCompound("Data").put("GameRules", new GameRules().toNbt());
+			GameRules rules = new GameRules(DataConfiguration.SAFE_MODE.enabledFeatures());
+			level.getCompound("Data").put("GameRules", rules.toNbt());
 		}
 		
 		NbtCompound wgConfig = level.getCompound("Data")

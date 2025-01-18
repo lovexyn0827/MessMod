@@ -6,8 +6,7 @@ import net.minecraft.entity.LivingEntity;
 public class EntityHudUtil {
 	public static String getLivingFlags(LivingEntity living) {
 		String result = "|";
-		if(living.hurtTime==living.maxHurtTime-1) result += "Hurt|";
-		if(living.isFallFlying()) result += "Fly|";
+		if(living.hurtTime == living.maxHurtTime-1) result += "Hurt|";
 		if(living.isSleeping()) result += "Slp|";
 		if(living.isDead()) result += "Dead|";
 		return result;

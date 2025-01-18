@@ -2,13 +2,6 @@ package lovexyn0827.mess.rendering.hud;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
-
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.Channels;
@@ -19,7 +12,6 @@ import lovexyn0827.mess.rendering.hud.data.HudDataStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 
@@ -51,19 +43,6 @@ public abstract class EntityHud {
 	public synchronized void render(String description) {
 		int y = this.yStart;
 		int x = this.xStart;
-		// i don't know how it works, but it runs correctly...
-		RenderSystem.clear(GlConst.GL_DEPTH_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-		Matrix4f matrix4f = new Matrix4f().setOrtho(0.0f, this.client.getWindow().getFramebufferWidth(), 
-				this.client.getWindow().getFramebufferHeight(), 0.0f, 1000.0f, 3000.0f);
-		RenderSystem.setProjectionMatrix(matrix4f, VertexSorter.BY_Z);
-		Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
-		matrixStack.pushMatrix();
-		matrixStack.identity();
-		matrixStack.translate(0.0f, 0.0f, -2000.0f);
-		RenderSystem.applyModelViewMatrix();
-		RenderSystem.lineWidth(1.0f);
-		RenderSystem.disableBlend();
 		TextRenderer tr = client.textRenderer;
 		this.updateAlign(tr.getWidth(description));
 		DrawContext dc = new DrawContext(client, client.getBufferBuilders().getEntityVertexConsumers());
@@ -85,14 +64,13 @@ public abstract class EntityHud {
 			}
 			
 			int dataX = chm.looserLines ? 
-					(int) (MinecraftClient.getInstance().getWindow().getWidth() / size) - tr.getWidth(data) : x + tr.getWidth(header);
+					(int) (this.client.getWindow().getScaledWidth() / size) - tr.getWidth(data) 
+					: x + tr.getWidth(header);
 			dc.drawTextWithShadow(tr, header, x, y0, chm.headerSpeciallyColored ? 0xFF4040 : 0x31F38B);
 			dc.drawTextWithShadow(tr, data, dataX, mutableY.getAndAdd(10), 0x31F38B);
 			
 		});
 		this.hudManager.hudHeight += (mutableY.getValue() - this.yStart);
-		matrixStack.popMatrix();
-		RenderSystem.applyModelViewMatrix();
 	}
 
 	public void toggleRender() {
@@ -120,11 +98,11 @@ public abstract class EntityHud {
 		this.lastLineWidth = this.getMaxLineLength(headerLineWidth);
 		float size = OptionManager.hudTextSize;
 		boolean left = mode.name().contains("LEFT");
-		int windowWidth = MinecraftClient.getInstance().getWindow().getWidth();
+		int windowWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
 		this.xStart = left ? 0 : (int) (windowWidth / size - this.lastLineWidth + 1);
 		this.xEnd = left ? this.lastLineWidth - 1 : (int) (windowWidth / size);
 		int offset = this.hudManager.hudHeight;
-		int windowHeight = (int) (MinecraftClient.getInstance().getWindow().getHeight() / size);
+		int windowHeight = (int) (MinecraftClient.getInstance().getWindow().getScaledHeight() / size);
 		this.yStart = mode.name().contains("TOP") ? offset : windowHeight - this.calculateHeight() - offset;
 	}
 	

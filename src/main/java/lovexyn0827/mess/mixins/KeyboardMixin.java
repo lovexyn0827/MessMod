@@ -40,7 +40,7 @@ public abstract class KeyboardMixin {
 				lookingHud.toggleRender();
 				// This is not going to be changed, in memory of 2021...
 				this.client.player.sendMessage(
-						Text.literal(I18N.translate("hud.target") + (lookingHud.shouldRender ? "On" : "Off")));
+						Text.literal(I18N.translate("hud.target") + (lookingHud.shouldRender ? "On" : "Off")), true);
 			}
 			
 			break;
@@ -49,7 +49,7 @@ public abstract class KeyboardMixin {
 			if(playerHudC != null) {
 				playerHudC.toggleRender();
 				this.client.player.sendMessage(
-						Text.literal(I18N.translate("hud.client") + (playerHudC.shouldRender ? "On" : "Off")));
+						Text.literal(I18N.translate("hud.client") + (playerHudC.shouldRender ? "On" : "Off")), true);
 			}
 			
 			break;
@@ -58,7 +58,7 @@ public abstract class KeyboardMixin {
 			if(playerHudS != null) {
 				playerHudS.toggleRender();
 				this.client.player.sendMessage(
-						Text.literal(I18N.translate("hud.server") + (playerHudS.shouldRender ? "On" : "Off")));
+						Text.literal(I18N.translate("hud.server") + (playerHudS.shouldRender ? "On" : "Off")), true);
 			}
 			
 			break;

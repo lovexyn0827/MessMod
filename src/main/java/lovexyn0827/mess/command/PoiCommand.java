@@ -120,7 +120,7 @@ public class PoiCommand {
 		String typeS = StringArgumentType.getString(ct, "type");
 		Registry<PointOfInterestType> reg = Registries.POINT_OF_INTEREST_TYPE;
 		RegistryEntry<PointOfInterestType> expected = 
-				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, Identifier.of(typeS)));
+				reg.getOrThrow(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, Identifier.of(typeS)));
 		List<PointOfInterest> poiList = ct.getSource()
 				.getWorld()
 				.getPointOfInterestStorage()
@@ -143,7 +143,7 @@ public class PoiCommand {
 		poiStorage.remove(blockPos);
 		Registry<PointOfInterestType> reg = Registries.POINT_OF_INTEREST_TYPE;
 		poiStorage.add(blockPos, 
-				reg.entryOf(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, Identifier.of(type))));
+				reg.getOrThrow(RegistryKey.of(RegistryKeys.POINT_OF_INTEREST_TYPE, Identifier.of(type))));
 		return true;
 	}
 	

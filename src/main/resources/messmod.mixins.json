@@ -57,7 +57,6 @@
     "ItemCooldownManagerMixin", 
     "SectionedEntityCacheMixin", 
     "ServerPlayNetworkHandler_1Mixin", 
-    "ChunkTaskPrioritySystemMixin", 
     "ServerCommonNetworkHandlerMixin", 
     "AbstractBlockMixin", 
     "CustomPayloadMixin", 

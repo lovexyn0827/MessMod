@@ -1,8 +1,6 @@
 package lovexyn0827.mess.mixins;
 
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,14 +9,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.LazyLoadCommand;
-import lovexyn0827.mess.fakes.ChunkTaskPrioritySystemInterface;
 import lovexyn0827.mess.fakes.ChunkTicketManagerInterface;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.blame.BlamingMode;
 import lovexyn0827.mess.util.blame.StackTrace;
-import net.minecraft.server.world.ChunkTaskPrioritySystem;
 import net.minecraft.server.world.ChunkTicket;
 import net.minecraft.server.world.ChunkTicketManager;
 import net.minecraft.server.world.ServerWorld;
@@ -29,9 +25,6 @@ import net.minecraft.util.math.ChunkPos;
 public class ChunkTicketManagerMixin implements ChunkTicketManagerInterface {
 	@Unique
 	private ServerWorld world;
-	
-	@Shadow @Final
-	private ChunkTaskPrioritySystem levelUpdateListener;
 	
 	@Inject(method = "addTicket(JLnet/minecraft/server/world/ChunkTicket;)V", 
 			at = @At(value = "HEAD"),
@@ -95,9 +88,5 @@ public class ChunkTicketManagerMixin implements ChunkTicketManagerInterface {
 	@Override
 	public void initWorld(ServerWorld world) {
 		this.world = world;
-		// This is necessary since we couldn't ensure that advanced CTPSMixin is applied.
-		if(this.levelUpdateListener instanceof ChunkTaskPrioritySystemInterface) {
-			((ChunkTaskPrioritySystemInterface) this.levelUpdateListener).initWorld(world);
-		}
 	}
 }

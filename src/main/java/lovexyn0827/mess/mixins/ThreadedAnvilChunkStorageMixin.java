@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.mojang.datafixers.DataFixer;
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.fakes.ChunkTaskPrioritySystemInterface;
 import lovexyn0827.mess.fakes.ChunkTicketManagerInterface;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
@@ -24,7 +23,6 @@ import lovexyn0827.mess.util.blame.StackTrace;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.world.ChunkHolder;
-import net.minecraft.server.world.ChunkTaskPrioritySystem;
 import net.minecraft.server.world.OptionalChunk;
 import net.minecraft.server.world.ServerChunkLoadingManager;
 import net.minecraft.server.world.ServerWorld;
@@ -46,9 +44,6 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	
 	@Shadow @Final
 	private ServerChunkLoadingManager.TicketManager ticketManager;
-	
-	@Shadow @Final
-	private ChunkTaskPrioritySystem chunkTaskPrioritySystem;
 	
 	@Inject(method = "loadChunk", 
 			at = @At(value = "HEAD")
@@ -230,28 +225,5 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 			Supplier<PersistentStateManager> persistentStateManagerFactory, int viewDistance, boolean dsync, 
 			CallbackInfo ci) {
 		((ChunkTicketManagerInterface) this.ticketManager).initWorld(world);
-	}
-	
-	@Inject(
-			method = "<init>", 
-			at = @At(
-					value = "FIELD", 
-					target = "net/minecraft/server/world/ThreadedAnvilChunkStorage."
-							+ "chunkTaskPrioritySystem:Lnet/minecraft/server/world/ChunkTaskPrioritySystem;", 
-					opcode = Opcodes.PUTFIELD, 
-					shift = At.Shift.AFTER
-			)
-	)
-	private void onCreatedChunkTaskPrioritySystem(ServerWorld world, LevelStorage.Session session, DataFixer dataFixer, 
-			StructureTemplateManager structureTemplateManager, Executor executor, 
-			ThreadExecutor<Runnable> mainThreadExecutor, ChunkProvider chunkProvider, ChunkGenerator chunkGenerator, 
-			WorldGenerationProgressListener worldGenerationProgressListener, 
-			ChunkStatusChangeListener chunkStatusChangeListener, 
-			Supplier<PersistentStateManager> persistentStateManagerFactory, int viewDistance, boolean dsync, 
-			CallbackInfo ci) {
-		// This is necessary since we couldn't ensure that advanced CTPSMixin is applied.
-		if(this.chunkTaskPrioritySystem instanceof ChunkTaskPrioritySystemInterface) {
-			((ChunkTaskPrioritySystemInterface) this.chunkTaskPrioritySystem).initWorld(world);
-		}
 	}
 }

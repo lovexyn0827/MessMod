@@ -160,7 +160,6 @@ public class MessMod implements ModInitializer {
 	
 	@Environment(EnvType.CLIENT)
 	public void onRender(ClientPlayerEntity player, IntegratedServer server) {
-		if(this.getClientHudManager() != null) this.getClientHudManager().render(player,server);
 	}
 	
 	@Environment(EnvType.CLIENT)
@@ -247,7 +246,7 @@ public class MessMod implements ModInitializer {
 			return true;
 		} else {
 			MinecraftClient mc = MinecraftClient.getInstance();
-			return mc.getServer() == null && (mc.getCurrentServerEntry() == null ? 
+			return mc != null && mc.getServer() == null && (mc.getCurrentServerEntry() == null ? 
 					false : !mc.getCurrentServerEntry().isLocal());
 		}
 	}

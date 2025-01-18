@@ -20,6 +20,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
 
 @Mixin(Entity.class)
@@ -129,9 +130,10 @@ public abstract class EntityMixin implements EntityInterface {
 			), 
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private void onCollisionMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci, Vec3d vec3d) {
+	private void onCollisionMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci, 
+			Profiler profiler,  Vec3d vec3d) {
 		if(currentReport != null && !vec3d.equals(lastMovement) && !this.world.isClient) {
-			currentReport.add(Text.literal("Collision restricted the movement to " + movement));
+			currentReport.add(Text.literal("Collision restricted the movement to " + vec3d));
 			lastMovement = vec3d;
 		}
 	}

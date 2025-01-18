@@ -25,10 +25,10 @@ package lovexyn0827.mess.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.world.ClientWorld;
@@ -80,7 +80,7 @@ public class ShapeRenderer {
         
         MatrixStack matrices = new MatrixStack();
         RenderSystem.enableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.depthFunc(515);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -111,11 +111,10 @@ public class ShapeRenderer {
             				Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
             				matrixStack.pushMatrix();
                             matrixStack.mul(matrices.peek().getPositionMatrix());
-                            RenderSystem.applyModelViewMatrix();
                             s.renderFaces(matrices, tessellator, cameraX, cameraY, cameraZ, partialTick);
                 			s.renderLines(matrices, tessellator, cameraX, cameraY, cameraZ, partialTick);
                 			matrixStack.popMatrix();
-                            RenderSystem.applyModelViewMatrix();
+                            //matrixStack.mul(RenderSystem.getModelViewMatrix());
             			}
             		}
             	});
@@ -133,7 +132,6 @@ public class ShapeRenderer {
         
         RenderSystem.enableCull();
         RenderSystem.depthMask(true);
-        RenderSystem.lineWidth(1.0F);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
     }

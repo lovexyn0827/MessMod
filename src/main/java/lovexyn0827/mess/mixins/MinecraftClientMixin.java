@@ -45,7 +45,7 @@ public abstract class MinecraftClientMixin implements MinecraftClientInterface {
 	
 	@Inject(method = "render", at = @At(value = "CONSTANT", args = "stringValue=blit"))
 	private void onRender(boolean tick,CallbackInfo ci) {
-		MessMod.INSTANCE.onRender(this.player, this.server);
+		//MessMod.INSTANCE.onRender(this.player, this.server);
 	}
 	
 	@Inject(method = "tick", at = @At(value = "HEAD"))

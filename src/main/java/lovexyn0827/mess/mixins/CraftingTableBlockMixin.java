@@ -4,31 +4,43 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.FormattedText;
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
 
 @Mixin(CraftingTableBlock.class)
-public abstract class CraftingTableBlockMixin extends AbstractBlock {
+public abstract class CraftingTableBlockMixin extends Block {
 	protected CraftingTableBlockMixin(Settings settings) {
 		super(settings);
 	}
 	
 	@Override
-	public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
-		if(OptionManager.craftingTableBUD && !world.isClient) {
+	public BlockState getStateForNeighborUpdate(BlockState state,
+			WorldView world,
+			ScheduledTickView tickView,
+			BlockPos pos,
+			Direction direction,
+			BlockPos neighborPos,
+			BlockState neighborState,
+			Random random) {
+		if(OptionManager.craftingTableBUD && !world.isClient()) {
 			if(world instanceof ServerWorld) {
 				ServerWorld sw = (ServerWorld) world;
 				sw.getServer().getPlayerManager().broadcast(
-						new FormattedText("NC: Tick %d @ (%d, %d, %d)", "cl", false, world.getTime(), 
+						new FormattedText("NC: Tick %d @ (%d, %d, %d)", "cl", false, sw.getTime(), 
 								pos.getX(), pos.getY(), pos.getZ()).asMutableText(), false);
 			}
 		}
+		
+		return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, 
+				neighborPos, neighborState, random);
 	}
 	
 	@Override

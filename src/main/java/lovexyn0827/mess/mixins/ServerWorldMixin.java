@@ -83,7 +83,7 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 	
 	@Inject(method = "tick", 
 			at = @At(value = "INVOKE_STRING", 
-					target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", 
+					target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", 
 					args = "ldc=tickPending")
 			)
 	private void startScheduledTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {

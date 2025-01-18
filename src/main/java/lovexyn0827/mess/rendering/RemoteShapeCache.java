@@ -19,7 +19,7 @@ public class RemoteShapeCache extends ShapeCache {
 		private boolean running = true;
 		
 		@Override
-		protected RemoteShapeTask createTask(Runnable runnable) {
+		public RemoteShapeTask createTask(Runnable runnable) {
 			return new RemoteShapeTask(runnable);
 		}
 

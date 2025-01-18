@@ -26,9 +26,9 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.explosion.ExplosionImpl;
 
-@Mixin(Explosion.class)
+@Mixin(ExplosionImpl.class)
 public abstract class ExplosionMixin {
 	@ModifyArg(method = "affectWorld",
 			at = @At(value = "INVOKE",

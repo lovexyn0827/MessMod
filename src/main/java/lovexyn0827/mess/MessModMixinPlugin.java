@@ -224,8 +224,6 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 				.addUsages("getEntityRangeExpansion").costly()
 				.add("ChunkTicketManagerNearbyChunkTicketUpdaterMixin")
 				.addUsages("PLAYER_TICKER_UPDATE").risky().costly()
-				.add("ChunkTaskPrioritySystem")
-				.addUsages("CTPS_LEVEL", "CTPS_REMOVE", "CTPS_CHUNK").risky().costly()
 				.build();
 		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);
 		ADVANCED_MIXINS.forEach((info) -> {

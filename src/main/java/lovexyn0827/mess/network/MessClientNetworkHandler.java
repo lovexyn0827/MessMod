@@ -31,6 +31,10 @@ public class MessClientNetworkHandler {
 	}
 
 	public boolean handlePacket(CustomPayloadS2CPacket packet) {
+		if (!(packet.payload() instanceof MessModPayload)) {
+			return false;
+		}
+		
 		try {
 			Identifier id = ((MessModPayload) packet.payload()).channel();
 			PacketHandler handler = PACKET_HANDLERS.get(id);

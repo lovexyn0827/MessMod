@@ -230,9 +230,11 @@ public class VariableCommand {
 						for(int i = 0; i < argsStrArray.length; i++) {
 							if (!argsStrArray[i].isEmpty()) {
 								try {
-									args[i] = Literal.parse(argsStrArray[i]);
+									args[i] = Literal.parse(argsStrArray[i]).get(c.getGenericParameterTypes()[i]);
 								} catch (CommandSyntaxException e) {
 									throw e;
+								} catch (InvalidLiteralException e) {
+									e.printStackTrace();
 								}
 							} else {
 								throw new TranslatableException("exp.emptyarg");

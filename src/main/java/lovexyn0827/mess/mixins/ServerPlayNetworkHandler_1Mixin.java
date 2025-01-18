@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 
 @Mixin(targets = "net/minecraft/server/network/ServerPlayNetworkHandler$1")
@@ -40,7 +41,7 @@ public class ServerPlayNetworkHandler_1Mixin {
 					if(OptionManager.mobFastKill) {
 						e.remove(RemovalReason.KILLED);
 					} else {
-						e.kill();
+						e.kill((ServerWorld) e.getWorld());
 					}
 					
 					count++;

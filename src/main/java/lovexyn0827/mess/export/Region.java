@@ -18,7 +18,7 @@ import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.ChunkSerializer;
+import net.minecraft.world.chunk.SerializedChunk;
 import net.minecraft.world.level.storage.LevelStorage;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestStorage.OccupationStatus;
@@ -80,7 +80,7 @@ public final class Region {
 			for(int z = this.min.z; z <= this.max.z; z++) {
 				ChunkPos pos = new ChunkPos(x, z);
 				if(components.contains(SaveComponent.REGION)) {
-					NbtCompound tag = ChunkSerializer.serialize(this.dimension, this.dimension.getChunk(x, z));
+					NbtCompound tag = SerializedChunk.fromChunk(dimension, this.dimension.getChunk(x, z)).serialize();
 					((RegionBasedStorageAccessor)(Object) storage).writeChunk(pos, tag);
 				}
 				

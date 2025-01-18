@@ -9,18 +9,19 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.Entity.RemovalReason;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.KillCommand;
+import net.minecraft.server.world.ServerWorld;
 
 @Mixin(KillCommand.class)
 public abstract class KillCommandMixin {
 	@Redirect(method = "execute", 
 			at = @At(value = "INVOKE", 
-			target = "Lnet/minecraft/entity/Entity;kill()V")
+			target = "Lnet/minecraft/entity/Entity;kill(Lnet/minecraft/server/world/ServerWorld;)V")
 	)
-	private static void removeEntity(Entity entity) {
+	private static void removeEntity(Entity entity, ServerWorld sw) {
 		if(OptionManager.mobFastKill && entity instanceof MobEntity) {
 			entity.remove(RemovalReason.KILLED);
 		} else {
-			entity.kill();
+			entity.kill(sw);
 		}
 	}
 }

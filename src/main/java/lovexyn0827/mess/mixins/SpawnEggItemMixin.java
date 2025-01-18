@@ -16,8 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -32,7 +32,7 @@ public abstract class SpawnEggItemMixin {
 			cancellable = true
 	)
 	public void mountIfNeeded(World world, PlayerEntity user, Hand hand, 
-			CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
+			CallbackInfoReturnable<ActionResult> cir) {
 		if(OptionManager.quickMobMounting && user instanceof ServerPlayerEntity && user.isSneaking()) {
 			ServerPlayerEntity splayer = (ServerPlayerEntity) user;
 			ItemStack stack = user.getStackInHand(hand);
@@ -40,13 +40,14 @@ public abstract class SpawnEggItemMixin {
 			if(vehicle != null) {
 				BlockPos pos = vehicle.getBlockPos();
 				Entity entity = this.getEntityType(stack)
-						.spawnFromItemStack((ServerWorld)world, stack, user, pos, SpawnReason.SPAWN_EGG, false, false);
+						.spawnFromItemStack((ServerWorld)world, stack, user, pos, 
+								SpawnReason.SPAWN_ITEM_USE, false, false);
 				entity.startRiding(vehicle, true);
 				if (!splayer.getAbilities().creativeMode) {
 					stack.decrement(1);
 				}
 				
-				cir.setReturnValue(TypedActionResult.consume(stack));
+				cir.setReturnValue(ActionResult.SUCCESS);
 				cir.cancel();
 			}
 		}

@@ -32,7 +32,7 @@ public class PartlyKillCommand {
 											if(OptionManager.mobFastKill && e instanceof MobEntity) {
 												e.remove(RemovalReason.KILLED);
 											} else {
-												e.kill();
+												e.kill(ct.getSource().getWorld());
 											}
 										}
 									});

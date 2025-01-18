@@ -27,6 +27,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Pair;
+import net.minecraft.util.TypeFilter;
 
 // TODO Support for EnderDragonPart, whose EntityType is not specified
 public final class EntityLogger extends AbstractAchivingLogger {
@@ -47,7 +48,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 	public synchronized void serverTick() {
 		if(!this.autoSubTypes.isEmpty()) {
 			this.server.getWorlds().forEach((world) -> {
-				this.subscribe(world.getEntitiesByType(null, (e) -> {
+				this.subscribe(world.getEntitiesByType(TypeFilter.instanceOf(Entity.class), (e) -> {
 					return this.autoSubTypes.contains(e.getType()) || 
 							this.autoSubNames.contains(e.getName().getString());
 				}), this.defaultStoragePolicy);
