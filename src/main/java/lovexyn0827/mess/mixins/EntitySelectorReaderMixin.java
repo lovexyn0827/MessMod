@@ -205,8 +205,7 @@ public abstract class EntitySelectorReaderMixin implements EntitySelectorReaderI
 			this.limit = 1;
 			this.includesNonPlayers = true;
 			this.sorter = EntitySelectorReader.NEAREST;
-			this.predicates = new ArrayList<>();
-			this.predicates.add((e) -> true);
+			this.predicates.clear();
 			this.targetOnly = true;
 			this.suggestionProvider = this::suggestOpen;
 	        if (this.reader.canRead() && this.reader.peek() == '[') {

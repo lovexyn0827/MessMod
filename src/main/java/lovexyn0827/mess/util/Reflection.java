@@ -114,6 +114,7 @@ import net.minecraft.entity.EntityType;
  */
 public class Reflection {
 	public static final Map<EntityType<?>, Class<?>> ENTITY_TYPE_TO_CLASS;
+	public static final ImmutableMap<Class<?>, EntityType<?>> CLASS_TO_ENTITY_TYPE;
 	private static final ImmutableMap<String, Class<?>> PRIMITIVE_CLASSES;
 	public static final ImmutableBiMap<BlockEntityType<?>, Class<?>> BLOCK_ENTITY_TYPE_TO_CLASS;
 	/**
@@ -474,7 +475,9 @@ public class Reflection {
 	}
 
 	static {
-		ImmutableBiMap.Builder<EntityType<?>, Class<?>> entityTypeMapBuilder = ImmutableBiMap.builder();
+		ImmutableMap.Builder<EntityType<?>, Class<?>> entityTypeMapBuilder = ImmutableMap.builder();
+		ImmutableMap.Builder<Class<?>, EntityType<?>> entityClassMapBuilder = ImmutableMap.builder();
+		Set<Object> addedObjects = Sets.newHashSet();
 		Stream.of(EntityType.class.getFields())
 				.filter((f) -> {
 					return Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers())
@@ -486,7 +489,15 @@ public class Reflection {
 							ParameterizedType genericType = (ParameterizedType) fType;
 							Type[] typeArgs = genericType.getActualTypeArguments();
 							if(typeArgs.length == 1) {
-								entityTypeMapBuilder.put((EntityType<?>) f.get(null), getRawType(typeArgs[0]));
+								Class<?> rawType = getRawType(typeArgs[0]);
+								EntityType<?> entityType = (EntityType<?>) f.get(null);
+								if (addedObjects.add(entityType)) {
+									entityTypeMapBuilder.put(entityType, rawType);
+								}
+								
+								if (addedObjects.add(rawType)) {
+									entityClassMapBuilder.put(rawType, entityType);
+								}
 							}
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
@@ -494,6 +505,7 @@ public class Reflection {
 					}
 				});
 		ENTITY_TYPE_TO_CLASS = entityTypeMapBuilder.build();
+		CLASS_TO_ENTITY_TYPE = entityClassMapBuilder.build();
 		ImmutableBiMap.Builder<BlockEntityType<?>, Class<?>> beTypeMapBuilder = ImmutableBiMap.builder();
 		Stream.of(BlockEntityType.class.getFields())
 				.filter((f) -> {
