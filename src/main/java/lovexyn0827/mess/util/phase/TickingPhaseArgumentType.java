@@ -45,12 +45,16 @@ public class TickingPhaseArgumentType implements ArgumentType<TickingPhase> {
 	@Override
 	public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
 		for(ServerTickingPhase phase : ServerTickingPhase.values()) {
-			builder.suggest(phase.name());
+			if (phase.name().contains(builder.getRemaining())) {
+				builder.suggest(phase.name());
+			}
 		}
 		
 		if(!MessMod.isDedicatedEnv()) {
 			for(ClientTickingPhase phase : ClientTickingPhase.values()) {
-				builder.suggest(phase.name());
+				if (phase.name().contains(builder.getRemaining())) {
+					builder.suggest(phase.name());
+				}
 			}
 		}
 		
