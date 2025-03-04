@@ -24,6 +24,7 @@ import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.command.LazyLoadCommand;
+import lovexyn0827.mess.command.LoadJavaAgentCommand;
 import lovexyn0827.mess.command.LogChunkBehaviorCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.LogPacketCommand;
@@ -81,6 +82,7 @@ public abstract class CommandMixin {
         LazyLoadCommand.register(this.dispatcher);
         CountEntitiesCommand.register(this.dispatcher);
         VariableCommand.register(this.dispatcher);
+        LoadJavaAgentCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 

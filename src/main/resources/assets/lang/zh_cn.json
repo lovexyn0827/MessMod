@@ -69,6 +69,11 @@
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "需要1个目标，但是找到了%d个", 
 		
+		//***** loadjavaagent *****
+		"cmd.loadjavaagent.loadsuc": "成功加载了Java agent: %s", 
+		"cmd.loadjavaagent.fail": "Java Agent加载失败！", 
+		"cmd.loadjavaagent.malurl": "URL格式有误！", 
+		
 		//***** lag *****
 		"cmd.lag.unsupported" : "专用服务器环境下无法访问线程%s", 
 		"cmd.lag.done" : "卡顿完成", 

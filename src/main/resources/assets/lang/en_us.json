@@ -69,6 +69,11 @@
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "Epected 1 targets, but %d targets were found.", 
 		
+		//***** loadjavaagent *****
+		"cmd.loadjavaagent.loadsuc": "Loaded Java agent: %s", 
+		"cmd.loadjavaagent.fail": "Failed to load agent!", 
+		"cmd.loadjavaagent.malurl": "Malformed URL!", 
+		
 		//***** lag *****
 		"cmd.lag.unsupported" : "Unable to access thread %s in the dedicated server environment.", 
 		"cmd.lag.done" : "Lagging completed", 
