@@ -11,9 +11,12 @@ import lovexyn0827.mess.util.phase.TickingPhase;
 
 import java.util.TreeMap;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorage {
 	private TreeMap<HudLine, Object> data = new TreeMap<>();
 	private List<HudLine> lines = new ArrayList<>();

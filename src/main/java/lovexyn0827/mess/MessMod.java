@@ -181,9 +181,6 @@ public class MessMod implements ModInitializer {
         this.shapeCache = sr.getShapeCache();
 		this.hudManagerC = new ClientHudManager();
 		this.hudManagerC.playerHudS = new PlayerHud(this.hudManagerC, player, true);
-		if (!isDedicatedEnv()) {
-			this.hudManagerS.playerHudC.updatePlayer();
-		}
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -200,7 +197,9 @@ public class MessMod implements ModInitializer {
 		}
 		
 		if(shm != null && shm.playerHudC != null) {
-			shm.playerHudC.updateData();
+			@SuppressWarnings("resource")
+			ClientPlayerEntity player = MinecraftClient.getInstance().player;
+			shm.playerHudC.updateData(player);
 		}
 	}
 
@@ -213,7 +212,6 @@ public class MessMod implements ModInitializer {
 	//Client
 	@Environment(EnvType.CLIENT)
 	public void onPlayerRespawned(PlayerRespawnS2CPacket packet) {
-		this.getServerHudManager().playerHudC.updatePlayer();
 	}
 
 	public void sendMessageToEveryone(Object... message) {

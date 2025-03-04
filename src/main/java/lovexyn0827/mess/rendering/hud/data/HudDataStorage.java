@@ -26,6 +26,7 @@ public interface HudDataStorage {
 		}
 	}
 	
+	// FIXME: Client crashes when connecting to a server without MessMod
 	static HudDataStorage create(HudType type) {
 		if(MessMod.isDedicatedEnv()) {
 			return new RemoteHudDataStorage();
