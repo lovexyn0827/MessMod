@@ -34,7 +34,7 @@ import net.minecraft.util.registry.Registry;
 
 public class CommandUtil {
 	public static final Predicate<ServerCommandSource> COMMAND_REQUMENT = (s) -> 
-			!OptionManager.commandExecutionRequirment || s.hasPermissionLevel(1);
+			!OptionManager.commandExecutionRequirment || s.hasPermissionLevel(2);
 	public static final SuggestionProvider<ServerCommandSource> ENTITY_TYPES = (ct, b) -> {
 		Registry.ENTITY_TYPE.getIds().stream().map(Identifier::getPath).forEach(b::suggest);
 		return b.buildFuture();
