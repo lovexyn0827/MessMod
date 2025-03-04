@@ -16,6 +16,7 @@ import lovexyn0827.mess.network.MessServerNetworkHandler;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.BlockInfoRenderer;
 import lovexyn0827.mess.rendering.ChunkLoadingInfoRenderer;
+import lovexyn0827.mess.rendering.FlowerFieldRenderer;
 import lovexyn0827.mess.rendering.ServerSyncedBoxRenderer;
 import lovexyn0827.mess.rendering.ShapeCache;
 import lovexyn0827.mess.rendering.ShapeRenderer;
@@ -67,6 +68,7 @@ public class MessMod implements ModInitializer {
 	private MessServerNetworkHandler serverNetworkHandler;
 	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
 	private ChunkBehaviorLogger chunkLogger;
+	private FlowerFieldRenderer flowerFieldRenderer;
 	private long gameTime;
 
 	private MessMod() {
@@ -94,6 +96,7 @@ public class MessMod implements ModInitializer {
 		
 		this.boxRenderer.tick();
 		this.blockInfoRederer.tick();
+		this.flowerFieldRenderer.tick();
 		this.shapeSender.updateClientTime(server.getOverworld().getTime());
 		this.entityLogger.serverTick();
 		LagCommand.tick();
@@ -107,6 +110,7 @@ public class MessMod implements ModInitializer {
 		this.serverNetworkHandler = new MessServerNetworkHandler(server);
 		this.boxRenderer = new ServerSyncedBoxRenderer(server);
 		this.blockInfoRederer.initializate(server);
+		this.flowerFieldRenderer = new FlowerFieldRenderer(server);
 		this.hudManagerS = new ServerHudManager(server);
 		CustomNode.reload(server);
 		this.chunkLoadingInfoRenderer = new ChunkLoadingInfoRenderer();
@@ -124,6 +128,7 @@ public class MessMod implements ModInitializer {
 		this.serverNetworkHandler = null;
 		this.chunkLoadingInfoRenderer.close();
 		this.chunkLoadingInfoRenderer = null;
+		this.flowerFieldRenderer = null;
 		ServerTickingPhase.initialize();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {

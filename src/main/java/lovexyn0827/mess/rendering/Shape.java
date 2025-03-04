@@ -28,7 +28,7 @@ public abstract class Shape {
 	double renderEpsilon = 0;
 	private int fill;
 	
-	protected Shape(int color, int fill, int life, long gt) {
+	protected Shape(int color,													 int fill, int life, long gt) {
 		this.color = color;
 		this.fill = fill;
 		this.life = life;
@@ -65,6 +65,9 @@ public abstract class Shape {
 		tag.putLong("GT", this.createdTime);
 		return tag;
 	}
+	
+	protected void close() {
+	}
 
 	public static Shape fromTag(CompoundTag tag) {
 		switch(tag.get("ID").asString()) {
@@ -77,6 +80,11 @@ public abstract class Shape {
 					new Vec3d(tag.getDouble("X1"), tag.getDouble("Y1"), tag.getDouble("Z1")), 
 					tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
 		case "text" : 
+			return new RenderedText(tag.getString("Value"), 
+					new Vec3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z")), 
+							tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
+		case "bitmap" : 
+			// TODO GZIP
 			return new RenderedText(tag.getString("Value"), 
 					new Vec3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z")), 
 							tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));

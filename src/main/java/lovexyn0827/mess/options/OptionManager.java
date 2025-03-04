@@ -47,6 +47,9 @@ import net.minecraft.server.world.ChunkTicketType;
  * @author lovexyn0827
  * Date: April 2, 2022
  */
+
+// TODO flowerFieldRenderer & 
+
 public class OptionManager{
 	public static final SortedMap<String, OptionWrapper> OPTIONS = Stream.of(OptionManager.class.getFields())
 			.filter((f) -> f.isAnnotationPresent(Option.class))
@@ -291,6 +294,21 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			label = Label.REDSTONE)
 	public static boolean fletchingTablePulseDetector;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = { Label.RENDERER, Label.MISC })
+	public static boolean flowerFieldRenderer;
+	
+	@Option(defaultValue = "16", 
+			parserClass = IntegerParser.Positive.class, 
+			label = { Label.RENDERER, Label.MISC })
+	public static int flowerFieldRendererRadius;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = { Label.RENDERER, Label.MISC })
+	public static boolean flowerFieldRendererSingleLayer;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 

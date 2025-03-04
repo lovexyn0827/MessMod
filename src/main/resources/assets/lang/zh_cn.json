@@ -214,6 +214,8 @@
 		"opt.fillHistory.desc" : "记录`/fill`产生的方块变更以便在将来撤销或重做。", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "指定被记录的脉冲类型。", 
 		"opt.fletchingTablePulseDetector.desc" : "记录制箭台接收到的红石脉冲的长度。", 
+		"opt.flowerFieldRenderer.desc" : "显示当前区域可能在使用骨粉时生成的花朵种类。在具有繁花森林以外群系的新区块中渲染时会因CME异常导致崩溃。", 
+		"opt.flowerFieldRendererRadius.desc" : "`flowerFieldRenderer`的最大渲染距离。", 
 		"opt.generateChunkGrid.desc" : "在地表生层一层玻璃来标记区块。", 
 		"opt.getEntityRangeExpansion.desc" : "在原版的`getEntity()`方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。", 
 		"opt.hideSurvivalSaves.desc" : "隐藏可能的生存存档以防止其被意外地打开。只能在全局范围内设置。", 
