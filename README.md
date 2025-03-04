@@ -353,7 +353,7 @@ Start to record chunk events. Recorded events will be written to a CSV file in `
 
 The file has 7 columns: 
 
-- Event`: The name of the event.
+- `Event`: The name of the event.
 - `Pos`: The chunk coordinate of the chunk where the event happened in (or rather, for).
 - `Dimension`: The ID of the dimension where the event happened.
 - `GameTime`: The game time when the event happened (ingame tick).
@@ -628,8 +628,6 @@ Get the value in `<slot>`.
 ##### `/variable list`
 
 List all variables.
-
-## 配置项
 
 ## Options
 
@@ -1408,7 +1406,7 @@ Default value: `[]`
 
 #### Entity information HUD
 
-Information about the entity that the player is looking at is obtained at the end of server ticks, and the information about the local player is obtained at the end of client ticks. More information about that is available below.
+Information about the entity that the player is looking at is obtained at the end of server ticks, and the information about the local player is obtained at the end of client ticks. Further discussion on them are available in the next section.
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/HUD-demo.png)
 
@@ -1573,7 +1571,7 @@ Specify a regular expression matching the class (package name is optional) of se
 ## Mapping Loading
 
 1. If Minecraft is deobfuscated, the mapping won't be loaded.
-2. Check the `mapping` folder for corresponding mapping (i.e.`<mcversion>.ting`, like `1.16.4.tiny`).
+2. Check the `mapping` folder for corresponding mapping (i.e.`<mcversion>.tiny`, like `1.16.4.tiny`).
 3. Otherwise, try to download the latest compatible mapping from Fabric's official maven repository.
 4. Otherwise, if the TIS Carpet Addition is loaded, try to load its bundled mapping.
 5. Otherwise, the mapping won't be loaded.
@@ -1588,16 +1586,18 @@ Disabling advanced mixins may make related features no longer available.
 
 - Stacktrace will be printed when the Carpet Mod is not loaded. If the Carpet Mod is loaded, enabling the `superSecretSetting` has the same effect.
 - A warning screen is popped when trying to open a survival with MessMod installed for the first time.
+- Players can select entities targeted by the crosshair with entity selector `@t`.
 
 ## Notice
 
 - The mod is still in development, some feature is not available or buggy, please tell me if you find something working not properly. 
 - Dedicated servers are not supported well currently and there are many unsolved bugs related to the connection between the server and the client, so only use the mod in single-player mode or the host client of a LAN server. 
 - Some commands like /explode ~ ~ ~ 2147483647 true can freeze the server, be careful.
-- The mod is not intended to be used in survival saves, as it may break vanilla mechanisms or enable the players to cheat accidentally, especially when some options are modified. To ensure this, the option `hideSurvivalSaves` could be enabled.
+- The Mod is not intended to be used in survival saves, as it may break vanilla mechanisms or enable the players to cheat accidentally, especially when some options are modified. To ensure this, the option `hideSurvivalSaves` could be enabled.
+- To minimumize potential impact on the game and make the usage of this mod as convenient as possible, almost no measures are taken to check if any operation can cause server crashes or any other serious impacts,  so using the Mod only on singleplayer mode or servers played by trusted players.
 
 ## About
 
-Initially, I started this mod in Feb 2021 to do some research on the motion of entities, thus the HUDs, bounding box renderer, tool items and command `/entityfield` were the earliest features of this mod. Later, more features were introduced gradually if they were needed.
+Initially, I started this mod in Feb 2021 to do some research on the motion of entities, thus the HUDs, bounding box renderer, tool items and command `/entityfield` were the earliest features of this mod. Later, more features were introduced gradually when needed.
 
 After April 2022, I speeded up the development of the mod, more features were added while many previously added ones were completely refactored. By 2023/08/20, 28 commands, 70 options (or rules) and 9 renderers had been available.
