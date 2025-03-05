@@ -83,6 +83,13 @@
 		"cmd.logchunkbehavior.alreadystarted" : "The logger has already been started.", 
 		"cmd.logchunkbehavior.alreadystopped" : "The logger has alerady been stopped.", 
 		
+		//***** logdeath *****
+		"cmd.logdeath.fmterr" : "Incorrect format for death info specifier. Try something like pillager+arrow(projectile)->villager.", 
+		"cmd.logdeath.nonnull" : "null is not allowed here!", 
+		"cmd.logdeath.noentype" : "Entity type %s is not defined!", 
+		"cmd.logdeath.dmginf" : "\n ======= Damage =======", 
+		"cmd.logdeath.vctinf" : "\n ======= Victim =======", 
+		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "Current Options", 
 		"cmd.messcfg.modified" : " (Modified)", 

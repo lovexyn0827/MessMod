@@ -61,7 +61,8 @@
     "ArgumentTypesMixin", 
     "ChunkTaskPrioritySystemMixin", 
     "LivingEntityMixin", 
-    "IdCountsStateAccessor"
+    "IdCountsStateAccessor", 
+    "DieableEntityMixin"
   ],
   "client": [
     "MinecraftClientMixin",

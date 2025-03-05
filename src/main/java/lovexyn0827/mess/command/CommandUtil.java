@@ -64,6 +64,7 @@ public class CommandUtil {
 			LogPacketCommand.reset();
 			LazyLoadCommand.reset();
 			VariableCommand.reset();
+			LogDeathCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}
@@ -105,6 +106,10 @@ public class CommandUtil {
 	
 	public static void feedbackRaw(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendFeedback(new LiteralText(ob == null ? "[null]" : ob.toString()), false);
+	}
+	
+	public static void feedbackRawWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
+		ct.getSource().sendFeedback(new LiteralText(String.format(fmt, args)), false);
 	}
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {

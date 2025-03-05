@@ -83,6 +83,13 @@
 		"cmd.logchunkbehavior.alreadystarted" : "记录器已被启用", 
 		"cmd.logchunkbehavior.alreadystopped" : "记录器已经停止工作", 
 		
+		//***** logdeath *****
+		"cmd.logdeath.fmterr" : "死亡原因格式错误，应形如pillager+arrow(projectile)->villager", 
+		"cmd.logdeath.nonnull" : "在此处不可使用null", 
+		"cmd.logdeath.noentype" : "实体类型%s未被定义",
+		"cmd.logdeath.dmginf" : "\n ======= 伤害源 =======", 
+		"cmd.logdeath.vctinf" : "\n ======= 受伤者 =======",  
+		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "当前配置", 
 		"cmd.messcfg.modified" : "（已修改）", 
