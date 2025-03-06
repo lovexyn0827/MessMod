@@ -6,6 +6,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +31,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lovexyn0827.mess.util.FloatPredicate;
 import lovexyn0827.mess.util.FormattedText;
 import lovexyn0827.mess.util.NameFilter;
@@ -44,11 +48,13 @@ import net.minecraft.network.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 public class LogDeathCommand {
 	public static final Map<String, DeathInfoLoggingItem> SUBSCRIPTED_DEATH_PREDICATES = Maps.newHashMap();
+	public static final Object2IntMap<AutoDeathStatKey> DEATH_AUTO_STATS = new Object2IntOpenHashMap<>();
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		SuggestionProvider<ServerCommandSource> predNameSuggestion = (ct, b) -> {
@@ -139,9 +145,10 @@ public class LogDeathCommand {
 													v.setVisible(visible);
 												}
 											});
+											CommandUtil.feedback(ct, "cmd.general.success");
 											return Command.SINGLE_SUCCESS;
 										}))))
-				.then(literal("getStats")
+				.then(literal("stats")
 						.executes((ct) -> {
 							SUBSCRIPTED_DEATH_PREDICATES.forEach((k, v) -> {
 								CommandUtil.feedbackRawWithArgs(ct, "%s: %d", k, v.getTriggerCount());
@@ -159,12 +166,47 @@ public class LogDeathCommand {
 										}
 									});
 									return Command.SINGLE_SUCCESS;
+								})
+								.then(literal("reset")
+										.executes((ct) -> {
+											String in = StringArgumentType.getString(ct, "target").replace(" ", "");
+											NameFilter filter = NameFilter.compile(in);
+											SUBSCRIPTED_DEATH_PREDICATES.forEach((k, v) -> {
+												if (filter.test(k)) {
+													v.resetTriggerCount();
+												}
+											});
+											CommandUtil.feedback(ct, "cmd.general.success");
+											return Command.SINGLE_SUCCESS;
+										}))))
+				.then(literal("autoStats")
+						.executes((ct) -> {
+							DEATH_AUTO_STATS.forEach((k, v) -> {
+								CommandUtil.feedbackRawWithArgs(ct, "%s + %s(%s) -> %s: %d", 
+										entityTypeToString(k.killerType),
+										entityTypeToString(k.directKillerType),
+										k.cause,
+										entityTypeToString(k.victimType),
+										v);
+							});
+							return Command.SINGLE_SUCCESS;
+						})
+						.then(literal("reset")
+								.executes((ct) -> {
+									DEATH_AUTO_STATS.clear();
+									CommandUtil.feedback(ct, "cmd.general.success");
+									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
 	}
 	
+	static String entityTypeToString(EntityType<?> type) {
+		return type == null ? "null" : new TranslatableText(type.getTranslationKey()).getString();
+	}
+	
 	static void reset() {
 		SUBSCRIPTED_DEATH_PREDICATES.clear();
+		DEATH_AUTO_STATS.clear();
 	}
 	
 	private static int subField(CommandContext<ServerCommandSource> ct, 
@@ -197,29 +239,46 @@ public class LogDeathCommand {
 	}
 	
 	public static void onEntityDies(DamageSource damage, @NotNull Entity victim, float amount) {
-		// TODO: Select multiple at once
-		Optional<LogDeathCommand.DeathInfoLoggingItem> mayTrigger = LogDeathCommand.SUBSCRIPTED_DEATH_PREDICATES
+		List<DeathInfoLoggingItem> triggered = LogDeathCommand.SUBSCRIPTED_DEATH_PREDICATES
 				.values()
 				.stream()
 				.filter((p) -> p.test(damage, victim, amount))
-				.findFirst();
-		if (!mayTrigger.isPresent()) {
+				.collect(Collectors.toList());
+		if (triggered.isEmpty()) {
 			return;
 		}
 		
-		DeathInfoLoggingItem item = mayTrigger.get();
-		item.increaseTriggerCount();
-		if (!item.isVisible()) {
+		Entity killer = damage.getAttacker();
+		Entity directKiller = damage.getSource();
+		AutoDeathStatKey key = new AutoDeathStatKey(killer == null ? null : killer.getType(), 
+				directKiller == null ? null : directKiller.getType(), 
+				damage.name, 
+				victim == null ? null : victim.getType());
+		DEATH_AUTO_STATS.computeInt(key, (k, v) -> v == null ? 1 :v + 1);
+		Map<String, WrappedPath> damageDetails = Maps.newTreeMap();
+		Map<String, WrappedPath> victimDetails = Maps.newTreeMap();
+		boolean[] isVisible = new boolean[] { false };
+		for (DeathInfoLoggingItem item : triggered) {
+			item.increaseTriggerCount();
+			if (item.isVisible()) {
+				isVisible[0] = true;
+				damageDetails.putAll(item.damageDetails);
+				victimDetails.putAll(item.victimDetails);
+			}
+		}
+		
+		if (!isVisible[0]) {
 			return;
 		}
 		
-		Text deathReport = getDeathReport(damage, victim, amount, item);
+		Text deathReport = getDeathReport(damage, victim, amount, damageDetails, victimDetails);
 		victim.getServer()
 				.getPlayerManager()
 				.broadcastChatMessage(deathReport, MessageType.CHAT, Util.NIL_UUID);
 	}
-	
-	private static Text getDeathReport(DamageSource damage, Entity victim, float amount, DeathInfoLoggingItem item) {
+
+	private static Text getDeathReport(DamageSource damage, @NotNull Entity victim, float amount,
+			Map<String, WrappedPath> damageDetails, Map<String, WrappedPath> victimDetails) {
 		MutableText t = new FormattedText("%s", "c", false, entityToString(damage.getAttacker())).asMutableText();
 		t.append(new FormattedText(" + ", "rl", false).asMutableText());
 		t.append(new FormattedText("%s", "r5", false, entityToString(damage.getSource())).asMutableText());
@@ -229,20 +288,20 @@ public class LogDeathCommand {
 		t.append(new FormattedText("%s", "r7", false, entityToString(victim)).asMutableText());
 		t.append(new FormattedText(" @ ", "rl", false).asMutableText());
 		t.append(new FormattedText("%.2f", "r4", false, amount).asMutableText());
-		if (!item.damageDetails.isEmpty()) {
+		if (!damageDetails.isEmpty()) {
 			t.append(new FormattedText("cmd.logdeath.dmginf", "r6l").asMutableText());
 		}
 		
-		for (WrappedPath l : item.damageDetails.values()) {
+		for (WrappedPath l : damageDetails.values()) {
 			t.append(new FormattedText("\n%s: ", "rcl", false, l.getName()).asMutableText());
 			t.append(new FormattedText("%s", "rfo", false, l.getFrom(damage)).asMutableText());
 		}
 
-		if (!item.victimDetails.isEmpty()) {
+		if (!victimDetails.isEmpty()) {
 			t.append(new FormattedText("cmd.logdeath.vctinf", "r6l").asMutableText());
 		}
 		
-		for (WrappedPath l : item.victimDetails.values()) {
+		for (WrappedPath l : victimDetails.values()) {
 			t.append(new FormattedText("\n%s: ", "rcl", false, l.getName()).asMutableText());
 			t.append(new FormattedText("%s", "rfo", false, l.getFrom(victim)).asMutableText());
 		}
@@ -256,6 +315,10 @@ public class LogDeathCommand {
 		} else {
 			return "null";
 		}
+	}
+	
+	static {
+		DEATH_AUTO_STATS.defaultReturnValue(0);
 	}
 	
 	private static final class DeathInfoLoggingItem {
@@ -301,6 +364,10 @@ public class LogDeathCommand {
 		
 		int getTriggerCount() {
 			return this.triggerCount;
+		}
+		
+		void resetTriggerCount() {
+			this.triggerCount = 0;
 		}
 
 		static DeathInfoLoggingItem parse(String in) {
@@ -418,7 +485,7 @@ public class LogDeathCommand {
 				return false;
 			}
 			
-			if (getClass() != obj.getClass()) {
+			if (this.getClass() != obj.getClass()) {
 				return false;
 			}
 			
@@ -483,6 +550,47 @@ public class LogDeathCommand {
 					sb.suggest(done + item);
 				}
 			}
+		}
+	}
+	
+	private static class AutoDeathStatKey {
+		final EntityType<?> killerType;
+		final EntityType<?> directKillerType;
+		final String cause;
+		final EntityType<?> victimType;
+		
+		AutoDeathStatKey(EntityType<?> killerType, EntityType<?> directKillerType, String cause,
+				EntityType<?> victimType) {
+			this.killerType = killerType;
+			this.directKillerType = directKillerType;
+			this.cause = cause;
+			this.victimType = victimType;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(cause, directKillerType, killerType, victimType);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			
+			if (obj == null) {
+				return false;
+			}
+			
+			if (this.getClass() != obj.getClass()) {
+				return false;
+			}
+			
+			AutoDeathStatKey other = (AutoDeathStatKey) obj;
+			return Objects.equals(this.cause, other.cause) 
+					&& Objects.equals(this.directKillerType, other.directKillerType)
+					&& Objects.equals(this.killerType, other.killerType) 
+					&& Objects.equals(this.victimType, other.victimType);
 		}
 	}
 }
