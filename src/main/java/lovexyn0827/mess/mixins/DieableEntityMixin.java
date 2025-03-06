@@ -28,22 +28,46 @@ public class DieableEntityMixin {
 			at = {
 					@At(
 							value = "INVOKE", 
-							target = "net/minecraft/entity/Entity.remove()V"
+							target = "net/minecraft/entity/ItemEntity.remove()V"
 					), 
+					@At(
+							value = "INVOKE", 
+							target = "net/minecraft/entity/ExperienceOrbEntity.remove()V"
+					), 
+					@At(
+							value = "INVOKE", 
+							target = "net/minecraft/entity/vehicle/BoatEntity.remove()V"
+					), 
+					@At(
+							value = "INVOKE", 
+							target = "net/minecraft/entity/vehicle/AbstractMinecartEntity.remove()V"
+					), 
+					@At(
+							value = "INVOKE", 
+							target = "net/minecraft/entity/decoration/AbstractDecorationEntity.remove()V"
+					),
+					@At(
+							value = "INVOKE", 
+							target = "net/minecraft/entity/decoration/EndCrystalEntity.remove()V"
+					),
+					@At(
+							value = "INVOKE", 
+							target = "net/minecraft/entity/projectile/ShulkerBulletEntity.remove()V"
+					),  
 					@At(
 							value = "INVOKE", 
 							target = "net/minecraft/entity/vehicle/AbstractMinecartEntity.dropItems(Lnet/minecraft/entity/damage/DamageSource;)V"
 					), 
 					@At(
 							value = "INVOKE", 
-							target = "net/minecraft/entity/vehicle/AbstractMinecartEntity.explode(D)V"
+							target = "net/minecraft/entity/vehicle/TntMinecartEntity.explode(D)V"
 					), 
 					@At(
 							value = "INVOKE", 
 							target = "net/minecraft/entity/LivingEntity.onDeath(Lnet/minecraft/entity/damage/DamageSource;)V"
 					)
 			}, 
-			require = 0
+			require = 1
 	)
 	private void onDeath(DamageSource damage, float amount, CallbackInfoReturnable<Boolean> cir) {
 		Entity self = (Entity)(Object) this;
