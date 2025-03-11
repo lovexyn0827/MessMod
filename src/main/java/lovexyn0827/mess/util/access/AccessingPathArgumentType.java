@@ -79,7 +79,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
 						nodes.getLast().getClass().getSimpleName(), nodes.getLast());
 			}
 			
-			n.ordinary = i;
+			n.ordinary = i++;
 			nodes.add(n);
 		}
 		
@@ -267,7 +267,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
         				.buildFuture();
         	default:
         		if(OptionManager.accessingPathDynamicAutoCompletion) {
-        			if(this.inputTypeGetter != null) {
+        			if(this.inputTypeGetter != null && ct.getSource() instanceof ServerCommandSource) {
         				// Server side
         				@SuppressWarnings("unchecked")
     					Type inType = this.inputTypeGetter.apply((CommandContext<ServerCommandSource>) ct);
