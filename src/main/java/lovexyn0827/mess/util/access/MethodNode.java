@@ -209,7 +209,7 @@ final class MethodNode extends Node implements Cloneable {
 
 	@Override
 	protected Type resolveOutputType(Type lastOutType){
-		return this.method.getGenericReturnType();
+		return Reflection.resolveMemberType(this.method.getGenericReturnType(), lastOutType);
 	}
 
 	public static Literal<?>[] parseArgs(String argsStr) throws CommandSyntaxException {
