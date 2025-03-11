@@ -16,7 +16,7 @@ public class AccessingFailureException extends Exception {
 	private AccessingFailureException(FailureCause failureCause, Node node, Throwable e, Object ... args) {
 		super(I18N.translate(failureCause.translationKey, args) 
 				+ '(' + "Node#" + (node == null ? '?' : node.ordinary) + ','
-				+ (node == null ? '?' : node.ordinary) + ')' , e);
+				+ (node == null ? '?' : node) + ')' , e);
 		this.shortenedMsg = failureCause.name() + '@' + (node == null ? '?' : node.ordinary);
 		this.failureCause = failureCause;
 		this.args = args;
