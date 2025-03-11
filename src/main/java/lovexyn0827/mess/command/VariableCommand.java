@@ -138,6 +138,11 @@ public class VariableCommand {
 										}))
 												.executes(VariableCommand::map)))))
 				.then(literal("print")
+						.executes((ct) -> {
+							String slot = StringArgumentType.getString(ct, "slot");
+							CommandUtil.feedbackRaw(ct, VARIABLES.get(slot));
+							return Command.SINGLE_SUCCESS;
+						})
 						.then(argument("slot", StringArgumentType.word())
 								.suggests(slotSuggestion)
 								.then(literal("array")
