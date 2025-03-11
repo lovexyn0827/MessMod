@@ -40,6 +40,7 @@ import lovexyn0827.mess.command.RepeatCommand;
 import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
+import lovexyn0827.mess.command.StackEntityCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
 import lovexyn0827.mess.command.VariableCommand;
 import lovexyn0827.mess.options.OptionManager;
@@ -85,6 +86,7 @@ public abstract class CommandMixin {
         VariableCommand.register(this.dispatcher);
         LoadJavaAgentCommand.register(this.dispatcher);
         LogDeathCommand.register(this.dispatcher);
+        StackEntityCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 
