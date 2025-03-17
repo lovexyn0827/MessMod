@@ -6,6 +6,7 @@
 		"cmd.general.unsub" : "Found %d entities, and unsubscribed %d entities among them", 
 		"cmd.general.subgen" : "Subscribed %s", 
 		"cmd.general.unsubgen" : "Unsubscribed %s", 
+		"cmd.general.subdup" : "%s has already been subscribed!", 
 		"cmd.general.submulti" : "Subscribed %d items: %s", 
 		"cmd.general.unsubmulti" : "Unsubscribed %d items: %s", 
 		"cmd.general.found" : "Found at (%d, %d, %d)", 

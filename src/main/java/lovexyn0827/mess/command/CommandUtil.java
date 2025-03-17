@@ -65,6 +65,7 @@ public class CommandUtil {
 			LazyLoadCommand.reset();
 			VariableCommand.reset();
 			LogDeathCommand.reset();
+			LogMovementCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}
