@@ -90,7 +90,7 @@ public class LogMovementCommand {
 					return AUTO_SUBSCRIBED_TYPES.contains(e.getType());
 				}).forEach((e) -> {
 					((EntityInterface) e).setMovementSubscribed(true);
-				})
+				});
 			});
 		}
 	}

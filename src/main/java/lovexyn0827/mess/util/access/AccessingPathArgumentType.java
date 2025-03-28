@@ -250,6 +250,7 @@ public final class AccessingPathArgumentType implements ArgumentType<AccessingPa
             		.suggest("y")
             		.suggest("z")
             		.suggest("size")
+            		.suggest("class")
             		.buildFuture();
         } else {
         	String lastNodeStr = in.substring(lastNotEscapedDot + 1);
