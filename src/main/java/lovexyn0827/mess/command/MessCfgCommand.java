@@ -85,21 +85,25 @@ public class MessCfgCommand {
 			command.then(literal(name).requires(CommandUtil.COMMAND_REQUMENT)
 					.executes((ct) -> {
 						MutableText text = new FormattedText(name, "a", false).asMutableText();
-						if(opt.isExperimental()) {
+						if (opt.isExperimental()) {
 							text.append(new FormattedText("cmd.messcfg.exp", "rcl").asMutableText());
+						}
+						
+						if (opt.isDeprecated()) {
+							text.append(new FormattedText("cmd.messcfg.deprecated", "rcl").asMutableText());
 						}
 						
 						text.append(new LiteralText("\n" + opt.getDescription() + "\n")
 								.formatted(Formatting.GRAY));
 						String value = OptionManager.getActiveOptionSet().getSerialized(name);
 						text.append(new FormattedText("cmd.messcfg.current", "f", true, value).asMutableText());
-						if(!opt.getDefaultValue().equals(value)) {
+						if (!opt.getDefaultValue().equals(value)) {
 							text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
 						}
 						
 						String globalValue = OptionManager.getGlobalOptionSet().getSerialized(name);
 						text.append(new FormattedText("cmd.messcfg.global", "f", true, globalValue).asMutableText());
-						if(!opt.getDefaultValue().equals(globalValue)) {
+						if (!opt.getDefaultValue().equals(globalValue)) {
 							text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
 						}
 						

@@ -21,4 +21,5 @@ import net.fabricmc.api.EnvType;
 	boolean globalOnly() default false;
 	EnvType[] environment() default {EnvType.CLIENT, EnvType.SERVER};
 	Label[] label();
+	boolean deprecated() default false;
 }
