@@ -130,8 +130,16 @@ public class RenderedBitmap extends Shape {
 		tag.putInt("Oriention", this.oriention.ordinal());
 		tag.putInt("Width", this.width);
 		tag.putInt("Height", this.height);
-		// TODO pixels
+		tag.putIntArray("Pixels", this.pixels);
 		return tag;
+	}
+	
+	public static RenderedBitmap fromTag(CompoundTag tag) {
+		return new RenderedBitmap(tag.getIntArray("Pixels"), tag.getDouble("PixelSize"), 
+				tag.getInt("Height"), tag.getInt("Width"), 
+				Direction.Axis.values()[tag.getInt("Oriention")], 
+				new Vec3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z")), 
+				tag.getInt("Life"), tag.getLong("GT"));
 	}
 	
 	@Override
