@@ -163,7 +163,25 @@ public class VariableCommand {
 											String slot = StringArgumentType.getString(ct, "slot");
 											CommandUtil.feedbackRaw(ct, VARIABLES.get(slot));
 											return Command.SINGLE_SUCCESS;
+										})
+										.then(argument("func", AccessingPathArgumentType.accessingPathArg((ct) -> {
+											String slot = StringArgumentType.getString(ct, "slot");
+											Object ob = VARIABLES.get(slot);
+											return ob == null ? Object.class : ob.getClass();
 										}))
+												.executes((ct) -> {
+													AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "func");
+													String slot = StringArgumentType.getString(ct, "slot");
+													Object obj = VARIABLES.get(slot);
+													try {
+														CommandUtil.feedbackRaw(ct, path.access(obj, obj.getClass()));
+													} catch (AccessingFailureException e) {
+														CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
+														return 0;
+													}
+													
+													return Command.SINGLE_SUCCESS;
+												}))
 								.then(literal("dumpFields")
 										.executes((ct) -> {
 											String slot = StringArgumentType.getString(ct, "slot");
@@ -184,7 +202,7 @@ public class VariableCommand {
 										key, val == null ? "null" : val.toString()));
 							});
 							return Command.SINGLE_SUCCESS;
-						}));
+						})));
 		dispatcher.register(command);
 	}
 	
