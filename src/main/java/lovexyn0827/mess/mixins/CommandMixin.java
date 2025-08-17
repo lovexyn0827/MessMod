@@ -19,6 +19,7 @@ import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
 import lovexyn0827.mess.command.ExportSaveCommand;
+import lovexyn0827.mess.command.FillInventoryCommand;
 import lovexyn0827.mess.command.FreezeEntityCommand;
 import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
@@ -87,6 +88,7 @@ public abstract class CommandMixin {
         LoadJavaAgentCommand.register(this.dispatcher);
         LogDeathCommand.register(this.dispatcher);
         StackEntityCommand.register(this.dispatcher);
+        FillInventoryCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 
