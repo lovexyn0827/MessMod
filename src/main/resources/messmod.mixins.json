@@ -62,7 +62,8 @@
     "ChunkTaskPrioritySystemMixin", 
     "LivingEntityMixin", 
     "IdCountsStateAccessor", 
-    "DieableEntityMixin"
+    "DieableEntityMixin", 
+    "LoomBlockMixin"
   ],
   "client": [
     "MinecraftClientMixin",

@@ -70,7 +70,7 @@ public class MessMod implements ModInitializer {
 	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
 	private ChunkBehaviorLogger chunkLogger;
 	private FlowerFieldRenderer flowerFieldRenderer;
-	private long gameTime;
+	private volatile long gameTime;
 
 	private MessMod() {
 		this.reloadMapping();

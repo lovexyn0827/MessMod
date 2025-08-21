@@ -15,6 +15,12 @@ import net.minecraft.server.MinecraftServer;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
+	@Inject(method = "tick", at = @At("HEAD"))
+	public void onTickStart(BooleanSupplier bs, CallbackInfo ci) {
+		// Actually here is before WTU and thus +1 is necessary for consistence
+		MessMod.INSTANCE.updateTime(((MinecraftServer)(Object) this).getOverworld().getTime() + 1);
+	}
+	
 	@Inject(method = "tick", at = @At(value = "RETURN"))
 	public void onTicked(BooleanSupplier bs, CallbackInfo ci) {
 		ServerTickingPhase.TICKED_ALL_WORLDS.begin(null);

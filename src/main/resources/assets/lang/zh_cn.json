@@ -136,6 +136,15 @@
 		"cmd.variable.reqarray" : "给定槽位中的对象应为数组", 
 		"cmd.variable.invconstructor" : "无法解析构造器\n应类似于java/lang/Integer<1>、java/lang/Integer<I>V或java/lang/Integer.", 
 		
+		//***** wavegen *****
+		"cmd.wavegen.reqloom" : "选中位置的方块必须为织布机", 
+		"cmd.wavegen.err.empty" : "波形定义中必须至少包含一个阶段", 
+		"cmd.wavegen.err.stgfmt" : "波形定义语法错误，示例：(!1ENTITY=>!2)L15", 
+		"cmd.wavegen.err.stgfmt.simp" : "波形定义语法错误，示例：SH17L18H3L16", 
+		"cmd.wavegen.err.reqorder" : "阶段间必须有序，而且不能重叠", 
+		"cmd.wavegen.err.tobeforefrom" : "阶段的开始时间不能在结束之间之后", 
+		"cmd.wavegen.err.largeoffset" : "时间偏移量（%d）必须小于波形长度（%d）", 
+		
 		//***** Exceptions *****
 		"exp.reqint" : "需要整数， 但是出现了%s", 
 		"exp.invaildInvocation" : "%s不是一个有效的方法调用", 

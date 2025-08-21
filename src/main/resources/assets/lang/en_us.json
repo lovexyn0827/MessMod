@@ -136,6 +136,15 @@
 		"cmd.variable.reqarray" : "The object in this slot should be an array", 
 		"cmd.variable.invconstructor" : "Failed to parse constructor.\nShould be something like java/lang/Integer<1>, java/lang/Integer<I>V, or java/lang/Integer.", 
 		
+		//***** wavegen *****
+		"cmd.wavegen.reqloom" : "The block at targeted position must be a loom!", 
+		"cmd.wavegen.err.empty" : "There should be one stage in the waveform definition at least.", 
+		"cmd.wavegen.err.stgfmt" : "There is syntax error in waveform definition. Examples: (!1ENTITY=>!2)L15", 
+		"cmd.wavegen.err.stgfmt.simp" : "There is syntax error in waveform definition. Examples: SH17L18H3L16", 
+		"cmd.wavegen.err.reqorder" : "Stages should be ordered and should not overlap", 
+		"cmd.wavegen.err.tobeforefrom" : "Start time of stages shouldn't appear after its end time!", 
+		"cmd.wavegen.err.largeoffset" : "Time offset (%d) should be less than the length of waveform (%d)", 
+		
 		//***** Exceptions *****
 		"exp.reqint" : "Requires an integer, but found %s", 
 		"exp.invaildInvocation" : "%s is not a valid method invocation", 

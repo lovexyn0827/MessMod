@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.ServerWorldInterface;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.NoChunkLoadingWorld;
@@ -81,10 +80,6 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 			)
 	private void startTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		ServerTickingPhase.WEATHER_CYCLE.begin((ServerWorld)(Object) this);
-		// Actually here is also the ending of WTU
-		if(((ServerWorld)(Object) this).getRegistryKey() == World.OVERWORLD) {
-			MessMod.INSTANCE.updateTime(((ServerWorld)(Object) this).getTime());
-		}
 	}
 	
 	@Inject(method = "tick", 
