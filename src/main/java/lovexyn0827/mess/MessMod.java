@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
+import lovexyn0827.mess.electronic.Oscilscope;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -70,6 +71,7 @@ public class MessMod implements ModInitializer {
 	private ChunkLoadingInfoRenderer chunkLoadingInfoRenderer;
 	private ChunkBehaviorLogger chunkLogger;
 	private FlowerFieldRenderer flowerFieldRenderer;
+	private Oscilscope oscilscope;
 	private volatile long gameTime;
 
 	private MessMod() {
@@ -119,6 +121,7 @@ public class MessMod implements ModInitializer {
 		this.entityLogger = new EntityLogger(server);
 		this.shapeSender = ShapeSender.create(server);
 		this.chunkLogger = new ChunkBehaviorLogger(server);
+		this.oscilscope = new Oscilscope();
 	}
 
 	public void onServerShutdown(MinecraftServer server) {
@@ -131,6 +134,7 @@ public class MessMod implements ModInitializer {
 		this.chunkLoadingInfoRenderer.close();
 		this.chunkLoadingInfoRenderer = null;
 		this.flowerFieldRenderer = null;
+		this.oscilscope = null;
 		ServerTickingPhase.initialize();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
@@ -163,6 +167,7 @@ public class MessMod implements ModInitializer {
 		
 		CommandUtil.tryUpdatePlayer(player);
 		this.scriptDir = server.getSavePath(WorldSavePathMixin.create("scripts")).toAbsolutePath().toString();
+		this.oscilscope.sendAllChannelsTo(player);
 	}
 
 	//************ CLIENT SIDE *****************
@@ -183,6 +188,10 @@ public class MessMod implements ModInitializer {
         this.shapeCache = sr.getShapeCache();
 		this.hudManagerC = new ClientHudManager();
 		this.hudManagerC.playerHudS = new PlayerHud(this.hudManagerC, player, true);
+		if (isDedicatedEnv()) {
+			// Prevent overwriting the server's Oscilscope instance in single player mode
+			this.oscilscope = new Oscilscope();
+		}
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -298,5 +307,9 @@ public class MessMod implements ModInitializer {
 
 	public void updateTime(long time) {
 		this.gameTime = time;
+	}
+
+	public Oscilscope getOscilscope() {
+		return this.oscilscope;
 	}
 }

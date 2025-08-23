@@ -324,6 +324,16 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = { Label.RESEARCH, Label.REDSTONE })
+	public static boolean hayOscilscope;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class, 
+			label = { Label.RESEARCH, Label.REDSTONE, Label.MESSMOD })
+	public static boolean hayOscilscopeChannelVisibilityBroadcast;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			deprecated = true, 
 			environment = EnvType.CLIENT, 
 			label = { Label.MISC, Label.MESSMOD })

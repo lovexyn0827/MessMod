@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 
 import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.electronic.Oscilscope;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.RemoteShapeCache;
 import lovexyn0827.mess.rendering.hud.HudType;
@@ -84,6 +85,28 @@ public class MessClientNetworkHandler {
 		register(Channels.OPTION_SINGLE, (packet, client) -> {
 			client.execute(() -> {
 				OptionManager.loadSingleFromRemoteServer(packet.getData());
+			});
+		});
+		register(Channels.OSCILSCOPE, (packet, client) -> {
+			client.execute(() -> {
+				Oscilscope osc = MessMod.INSTANCE.getOscilscope();
+				if (osc != null) {
+					osc.handleDataPacket(packet.getData());
+				}
+			});
+		});
+		register(Channels.OSCILSCOPE_CONF_BROADCAST, (packet, client) -> {
+			client.execute(() -> {
+				Oscilscope osc = MessMod.INSTANCE.getOscilscope();
+				if (osc != null) {
+					osc.handleConfigBroadcastPacket(packet.getData());
+				}
+			});
+		});
+
+		register(Channels.TIME, (packet, client) -> {
+			client.execute(() -> {
+				MessMod.INSTANCE.updateTime(packet.getData().readLong());
 			});
 		});
 	}
