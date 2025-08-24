@@ -53,7 +53,7 @@ abstract class OscilscopeDataStorage {
 		
 		Map<Oscilscope.Channel, ServerMicroTime> lowerBounds = new HashMap<>();
 		this.waveData.forEach((ch, wave) -> {
-			while (wave.size() > 0) {
+			while (wave.size() > this.storageDepth) {
 				wave.removeFirst();
 			}
 			
