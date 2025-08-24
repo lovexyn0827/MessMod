@@ -40,6 +40,7 @@ import lovexyn0827.mess.command.RaycastCommand;
 import lovexyn0827.mess.command.RepeatCommand;
 import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
+import lovexyn0827.mess.command.SetBlockRawCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
 import lovexyn0827.mess.command.StackEntityCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
@@ -93,6 +94,7 @@ public abstract class CommandMixin {
         FillInventoryCommand.register(this.dispatcher);
         WaveGenCommand.register(this.dispatcher);
         TouchCommand.register(this.dispatcher);
+        SetBlockRawCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 
