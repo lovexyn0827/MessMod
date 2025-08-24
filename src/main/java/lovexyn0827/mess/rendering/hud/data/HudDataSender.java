@@ -65,9 +65,16 @@ public interface HudDataSender {
 				.collect(Collectors.toList());
 	}
 	
+	/**
+	 * SIDEBAR is not allowed here!
+	 */
 	public static HudDataSender createHudDataSenderer(HudType type, MinecraftServer server) {
+		if (type == HudType.SIDEBAR) {
+			throw new IllegalArgumentException("Data senderer of sidebars cannot be created here!");
+		}
+		
 		if(MessMod.isDedicatedEnv()) {
-			return new RemoteHudDataSender(server, type);
+			return new RemoteHudDataSender(server, type, true);
 		} else {
 			switch(type) {
 			case TARGET :  

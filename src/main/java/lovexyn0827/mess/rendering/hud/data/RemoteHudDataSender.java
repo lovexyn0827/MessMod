@@ -28,11 +28,13 @@ public class RemoteHudDataSender implements HudDataSender {
 	protected final MinecraftServer server;
 	private final HudType type;
 
-	public RemoteHudDataSender(MinecraftServer server, HudType type) {
+	public RemoteHudDataSender(MinecraftServer server, HudType type, boolean addDefaultLines) {
 		this.server = server;
 		this.type = type;
-		for(HudLine l : BuiltinHudInfo.values()) {
-			this.lines.add(l);
+		if (addDefaultLines) {
+			for(HudLine l : BuiltinHudInfo.values()) {
+				this.lines.add(l);
+			}
 		}
 	}
 	
@@ -93,7 +95,7 @@ public class RemoteHudDataSender implements HudDataSender {
 	
 	public static class Sidebar extends RemoteHudDataSender implements SidebarDataSender {
 		public Sidebar(MinecraftServer server) {
-			super(server, HudType.SIDEBAR);
+			super(server, HudType.SIDEBAR, false);
 			this.registerTickingEvents();
 		}
 
