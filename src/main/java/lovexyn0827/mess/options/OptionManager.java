@@ -563,7 +563,7 @@ public class OptionManager{
 					.map((o) -> {
 						return o.name + ": " + set.getSerialized(o.name);
 					})
-					.forEach(MessMod.LOGGER::info);
+					.forEach(MessMod.LOGGER::debug);
 		}
 	}
 	
