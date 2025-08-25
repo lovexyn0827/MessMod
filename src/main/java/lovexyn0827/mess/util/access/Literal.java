@@ -60,11 +60,16 @@ public abstract class Literal<T> {
 		Literal<?> other = (Literal<?>) obj;
 		return this.compiled && stringRepresentation.equals(other.stringRepresentation);
 	}
+	
+	@Override
+	public String toString() {
+		return this.stringRepresentation;
+	}
 
 	/**
 	 * @param type The type which the literal is expected to be parsed as, or null if unknown.
 	 * @throws InvalidLiteralException 
-	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
+	 * @implNote For literals of primitive types, {@code type} shouldn't be used. No side-effects permitted.
 	 */
 	@Nullable
 	public abstract T get(@Nullable Type type) throws InvalidLiteralException;
@@ -419,8 +424,9 @@ public abstract class Literal<T> {
 			}
 			
 			String className = this.stringRepresentation.substring(2).replace('/', '.');
+			String srg = MessMod.INSTANCE.getMapping().srgClass(className);
 			try {
-				this.classVal = Reflection.getClassIncludingPrimitive(className);
+				this.classVal = Reflection.getClassIncludingPrimitive(srg);
 				this.compiled = true;
 				return this.classVal;
 			} catch (ClassNotFoundException e) {
