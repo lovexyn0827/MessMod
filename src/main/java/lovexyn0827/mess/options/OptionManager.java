@@ -526,7 +526,12 @@ public class OptionManager{
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
-	public static boolean survivalHudInCreativeMode;	// TODO
+	public static boolean survivalStatusBarInCreativeMode;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean survivalXpBarInCreativeMode;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 

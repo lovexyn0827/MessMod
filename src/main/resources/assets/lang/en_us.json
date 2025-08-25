@@ -279,6 +279,8 @@
 		"opt.stableHudLocation.desc" : "Make the location of HUDs more stable when the length of lines change frequently.", 
 		"opt.strictAccessingPathParsing.desc" : "Parse accessing paths more strictly, to make them more reliable. Currently the strictly checking system is not completed, so it is not recommended to enable it.", 
 		"opt.superSuperSecretSetting.desc" : "wlujkgfdhlqcmyfdhj...Never turn it on!", 
+		"opt.survivalStatusBarInCreativeMode.desc" : "Dispaly survival status bar (health & hungry) in creative mode.", 
+		"opt.survivalXpBarInCreativeMode.desc" : "Dispaly experience bar in creative mode.", 
 		"opt.tntChunkLoading.desc" : "Allow TNT entities to load chunks for themselves in their ticking, which may be helpful in designing some kinds of TNT canons.", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT entities load the chunks permanently when `tntChunkLoading` is enabled.", 
 		"opt.tntChunkLoadingRange.desc" : "The radius of entity processing chunks loaded by `tntChunkLoading`.", 

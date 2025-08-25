@@ -279,6 +279,8 @@
 		"opt.stableHudLocation.desc" : "使HUD的位置在数据长度频繁变化时更加稳定。", 
 		"opt.strictAccessingPathParsing.desc" : "解释阶段严格检查Accessing Path。目前这一严格检查系统尚未完善，不建议启用该选项。", 
 		"opt.superSuperSecretSetting.desc" : "wlujkgfdhlqcmyfdhj...千万不要打开！", 
+		"opt.survivalStatusBarInCreativeMode.desc" : "创造模式下显示生存模式状态栏（生命值与饥饿值）。", 
+		"opt.survivalXpBarInCreativeMode.desc" : "创造模式下显示经验栏。", 
 		"opt.tntChunkLoading.desc" : "允许TNT实体在其运算过程中自动加载区块。", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT在`tntChunkLoading`启用时永久加载区块。", 
 		"opt.tntChunkLoadingRange.desc" : "设置`tntChunkLoading`功能中创建的强加载范围的半径。", 
