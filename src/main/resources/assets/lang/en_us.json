@@ -274,6 +274,8 @@
 		"opt.serverSyncedBoxUpdateModeInFrozenTicks.desc" : "What the server-side hitbox renderer should do in ticks frozen by the Carpet.", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long-distance raycasts.", 
 		"opt.skippedGenerationStages.desc" : "Skip some stages in the world generation. Skipping stage `biome` and `full` is not supported, as the absence of them will make the server crash." , 
+		"opt.smartCursorMode.desc" : "Allow cursors to stop at word delimiters other than spaces (e.g. commas in entity selectors) when editing commands with Ctrl + Arrow or Ctrl + Backspace.", 
+		"opt.smartCursorCustomWordDelimiters.desc" : "A list of word delimiters, used when smartCursorMode = CUSTOM. Any characters apperas in this option will be recognized as a word delimiter.", 
 		"opt.stableHudLocation.desc" : "Make the location of HUDs more stable when the length of lines change frequently.", 
 		"opt.strictAccessingPathParsing.desc" : "Parse accessing paths more strictly, to make them more reliable. Currently the strictly checking system is not completed, so it is not recommended to enable it.", 
 		"opt.superSuperSecretSetting.desc" : "wlujkgfdhlqcmyfdhj...Never turn it on!", 

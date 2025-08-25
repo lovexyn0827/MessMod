@@ -85,7 +85,9 @@
     "WorldListWidgetEntryMixin", 
     "EntitySelectorMixin_Client", 
     "ClientCommandSourceMixin", 
-    "DebugHudMixin"
+    "DebugHudMixin", 
+    "ChatScreenMixin", 
+    "AbstractCommandBlockScreenMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"

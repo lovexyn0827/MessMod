@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.datafixers.util.Either;
 
+import it.unimi.dsi.fastutil.chars.CharSet;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.export.SaveComponent;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -24,6 +25,7 @@ import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.FrozenUpdateMode;
 import lovexyn0827.mess.rendering.hud.AlignMode;
+import lovexyn0827.mess.util.CommandTextFieldWidget;
 import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.blame.BlamingMode;
@@ -490,10 +492,17 @@ public class OptionManager{
 			label = { Label.CHUNK, Label.BREAKING_OPTIMIZATION })
 	public static boolean skipUnloadedChunkInRaycasting;
 	
-	@Option(defaultValue = "false", 
-			parserClass = BooleanParser.class, 
+	@Option(defaultValue = " ", 
+			parserClass = CommandTextFieldWidget.CharSetParser.class, 
+			label = { Label.INTERACTION_TWEAKS }, 
+			suggestions = { " ", " ,=:.([{}])" })
+	public static CharSet smartCursorCustomWordDelimiters;
+	
+	@Option(defaultValue = "VANILLA", 
+			parserClass = CommandTextFieldWidget.CursorMode.Parser.class, 
+			environment = EnvType.CLIENT, 
 			label = { Label.INTERACTION_TWEAKS })
-	public static boolean smartCursor;
+	public static CommandTextFieldWidget.CursorMode smartCursorMode;
 	
 	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class, 
