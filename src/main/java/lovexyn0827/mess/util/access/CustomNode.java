@@ -95,7 +95,7 @@ public class CustomNode extends Node {
 			}
 		}
 		
-		try(Reader reader = new FileReader(file)) {
+		try(Reader reader = new FileReader(file); Writer writer = new FileWriter(file)) {
 			Properties prop = new Properties();
 			try {
 				prop.load(reader);
@@ -105,7 +105,6 @@ public class CustomNode extends Node {
 			}
 			
 			operation.accept(prop);
-			Writer writer = new FileWriter(file);
 			prop.store(writer, "Saved Custom Nodes");
 		} catch (Exception e) {
 			TranslatableException e1 = new TranslatableException("cmd.accessingpath.filefail",
