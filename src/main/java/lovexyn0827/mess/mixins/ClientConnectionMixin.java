@@ -1,7 +1,5 @@
 package lovexyn0827.mess.mixins;
 
-import java.lang.reflect.Field;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
