@@ -24,6 +24,8 @@
 		"cmd.general.flush" : "已将新内容保存到磁盘", 
 		"cmd.general.count" : "共有%d个被监视实体", 
 		"cmd.general.reqmixin" : "%s需要高级Mixin %s", 
+		"cmd.general.alexist" : "%s已存在", 
+		"cmd.general.alstartlog" : "已有记录在进行中！", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "无法加载保存的自定义节点：%s", 

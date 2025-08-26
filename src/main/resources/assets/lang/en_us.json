@@ -24,6 +24,8 @@
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
 		"cmd.general.reqmixin" : "%s requires advanced mixin %s", 
+		"cmd.general.alexist" : "%s has already exists!", 
+		"cmd.general.alstart" : "The recorder / logger has already started!", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 
