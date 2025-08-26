@@ -358,6 +358,9 @@ public class VariableCommand {
 		} catch (InvalidLiteralException e) {
 			CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
 			return 0;
+		} catch (TranslatableException e) {
+			CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
+			return 0;
 		}
 		
 		VARIABLES.put(slot, val);
