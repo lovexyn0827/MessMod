@@ -139,27 +139,23 @@ public class LogPacketCommand {
 						.executes((ct) -> {
 							STATS.forEach((clz, count) -> {
 								if (count != 0) {
-									String className = MessMod.INSTANCE.getMapping()
-											.namedClass(clz.getCanonicalName())
-											.replace("net.minecraft.network.packet", "");
-									CommandUtil.feedbackRawWithArgs(ct, "%s: %d", 
-											className, 
-											count);
+									String className = MessMod.INSTANCE.getMapping().simpleNamedClass(clz);
+									CommandUtil.feedbackRawWithArgs(ct, "%s: %d", className, count);
 								}
 							});
-							CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 							return Command.SINGLE_SUCCESS;
 						})
 						.then(argument("types", FilteredSetArgumentType.of(PACKET_TYPES.keySet(), (o) -> o))
 								.executes((ct) -> {
 									FilteredSetArgumentType.<String>getFiltered(ct, "types").forEach((className) -> {
-										long count = STATS.getOrDefault(PACKET_TYPES.get(className), 0);
+										Class<?> pktClz = PACKET_TYPES.get(className);
+										long count = STATS.getOrDefault(pktClz, 0);
 										if (count != 0) {
-											className = className.replace("net.minecraft.network.packet", "");
-											CommandUtil.feedbackRawWithArgs(ct, "%s: %d", className, count);
+											String shortClzName = MessMod.INSTANCE.getMapping()
+													.simpleNamedClass(pktClz);
+											CommandUtil.feedbackRawWithArgs(ct, "%s: %d", shortClzName, count);
 										}
 									});
-									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
