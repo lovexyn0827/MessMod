@@ -1,5 +1,7 @@
 package lovexyn0827.mess.rendering;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -28,7 +30,7 @@ public abstract class Shape {
 	double renderEpsilon = 0;
 	private int fill;
 	
-	protected Shape(int color,													 int fill, int life, long gt) {
+	protected Shape(int color, int fill, int life, long gt) {
 		this.color = color;
 		this.fill = fill;
 		this.life = life;
@@ -57,6 +59,7 @@ public abstract class Shape {
 		return this.life + this.createdTime - gameTime < 0;
 	}
 
+	@Nullable
 	protected CompoundTag toTag(CompoundTag tag) {
 		tag.putString("ID", IDS.inverse().get(this.getClass()));
 		tag.putInt("Color", this.color);
@@ -69,6 +72,7 @@ public abstract class Shape {
 	protected void close() {
 	}
 
+	@Nullable
 	public static Shape fromTag(CompoundTag tag) {
 		switch(tag.get("ID").asString()) {
 		case "box" : 
@@ -84,10 +88,8 @@ public abstract class Shape {
 					new Vec3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z")), 
 							tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
 		case "bitmap" : 
-			// TODO GZIP
-			return new RenderedText(tag.getString("Value"), 
-					new Vec3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z")), 
-							tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
+			// XXX Will GZIP bring some performance improvement?
+			return RenderedBitmap.fromTag(tag);
 		}
 		
 		return null;
