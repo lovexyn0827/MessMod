@@ -241,7 +241,7 @@
 		"opt.fillHistory.desc" : "Record block changes caused by `/fill` so that they can be undone or redone later.", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "Specify which type of pulses are recorded.", 
 		"opt.fletchingTablePulseDetector.desc" : "Record the lengths of redstone signal pulses received by fletching tables.", 
-		"opt.flowerFieldRenderer.desc" : "Displays which type of flower can generate within a given area when using bone meals. Causes crashes when rendering in new chunks of biome other than flower forest due to CME.", 
+		"opt.flowerFieldRenderer.desc" : "Displays which type of flower can generate within a given area when using bone meals.", 
 		"opt.flowerFieldRendererRadius.desc" : "Maximum rendering distance of `flowerFieldRenderer`.", 
 		"opt.generateChunkGrid.desc" : "Generate a layer of glass on the ground to show the chunks.", 
 		"opt.getEntityRangeExpansion.desc" : "In the vanilla `getEntities()` method, only entities that are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually, it doesn't matter, but when the height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Changing it to a higher value may fix some bugs about the interaction between entities and something else.", 

@@ -64,7 +64,8 @@
     "IdCountsStateAccessor", 
     "DieableEntityMixin", 
     "LoomBlockMixin", 
-    "HayBlockMixin"
+    "HayBlockMixin", 
+    "WeightedListMixin"
   ],
   "client": [
     "MinecraftClientMixin",

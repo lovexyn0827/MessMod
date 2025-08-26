@@ -36,14 +36,14 @@ public class FlowerFieldRenderer {
 	}
 
 	public void tick() {
-		this.server.getPlayerManager().getPlayerList().forEach(this::handlePlayer);
-	}
-	
-	private void handlePlayer(ServerPlayerEntity player) {
 		if (!OptionManager.flowerFieldRenderer) {
 			return;
 		}
 		
+		this.server.getPlayerManager().getPlayerList().forEach(this::handlePlayer);
+	}
+	
+	private void handlePlayer(ServerPlayerEntity player) {
 		ServerWorld sw = player.getServerWorld();
 		Item holding = player.getActiveItem().getItem();
 		boolean restricted = holding instanceof BlockItem 
@@ -97,7 +97,7 @@ public class FlowerFieldRenderer {
 		ConfiguredFeature fGenConf = flowerGenerators.get(0);
 		@SuppressWarnings("rawtypes")
 		FlowerFeature fGen = (FlowerFeature) fGenConf.feature;
-		synchronized (fGenConf.config) {
+		synchronized (fGen) {
 			return (FlowerBlock) fGen
 					.getFlowerState(RANDOM, cur, fGenConf.config)
 					.getBlock();
