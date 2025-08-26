@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL21;
 
@@ -177,7 +178,8 @@ public final class OscilscopeScreen extends Screen {
 	private void onNewChannel(Oscilscope.Channel channel) {
 		this.channelList.newChannel(channel);
 	}
-	
+
+	@NotNull
 	private Element getHoveringElement(double mouseX, double mouseY) {
 		for (Element e : this.children) {
 			if (e.isMouseOver(mouseX, mouseY)) {

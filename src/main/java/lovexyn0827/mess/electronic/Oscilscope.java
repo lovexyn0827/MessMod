@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.mojang.datafixers.util.Pair;
 
 import io.netty.buffer.Unpooled;
@@ -117,6 +119,7 @@ public final class Oscilscope {
 		return newCh;
 	}
 
+	@Nullable
 	Channel getChannel(int id) {
 		return this.channelsById.get(id);
 	}
