@@ -187,6 +187,8 @@
 		"exp.unknownescape" : "Unsupported escape: %s", 
 		"exp.incompquote" : "Incomplete quote", 
 		"exp.noconstructor" : "Specified constructor was not found in %s",
+		"exp.atleast1dim" : "At least one dimension size is required in array definition.", 
+		"exp.invarray" : "%s is not a valid representation of an array!", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 

@@ -187,6 +187,8 @@
 		"exp.unknownescape" : "不支持的转义字符：%s", 
 		"exp.incompquote" : "不完整的字符引文", 
 		"exp.noconstructor" : "指定的构造器在%s中不存在", 
+		"exp.atleast1dim" : "必须为数组指定至少一个维度", 
+		"exp.invarray" : "%s不是数组的合法表示", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 
