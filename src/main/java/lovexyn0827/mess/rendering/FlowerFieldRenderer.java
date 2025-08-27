@@ -54,13 +54,15 @@ public class FlowerFieldRenderer {
 		int width = 2 * radius;
 		int maxY = 0;
 		Int2ObjectMap<int[]> bitmapsByLayer = new Int2ObjectOpenHashMap<>();
+		boolean singleLayer = OptionManager.flowerFieldRendererSingleLayer;
 		for (int dx = -radius; dx < radius; dx++) {
 			for (int dz = -radius; dz < radius; dz++) {
 				cur.set(center, dx, 0, dz);
 				BlockPos top = sw.getTopPosition(Heightmap.Type.MOTION_BLOCKING   , cur);
-				int y = OptionManager.flowerFieldRendererSingleLayer ? DEFAULT_Y : top.getY();
+				int y = top.getY();
 				maxY = y > maxY ? y : maxY;
-				int[] bitmap = bitmapsByLayer.computeIfAbsent(top.getY(), (i) -> new int[width * width]);
+				int[] bitmap = bitmapsByLayer.computeIfAbsent(singleLayer ? DEFAULT_Y : top.getY(), 
+						(i) -> new int[width * width]);
 				int offset = (dz + radius) * width + dx + radius;
 				FlowerBlock flower = getFlowerAt(sw, top);
 				if (flower != null && (!restricted || flower.asItem() == holding)) {
@@ -70,7 +72,7 @@ public class FlowerFieldRenderer {
 			}
 		}
 		
-		if (OptionManager.flowerFieldRendererSingleLayer) {
+		if (singleLayer) {
 			Vec3d origin = new Vec3d(center.getX() - radius, maxY + 0.01, center.getZ() - radius);
 			int[] bitmap = bitmapsByLayer.get(DEFAULT_Y);
 			MessMod.INSTANCE.shapeSender.addShape(new RenderedBitmap(bitmap, 1, width, width, 
@@ -84,7 +86,6 @@ public class FlowerFieldRenderer {
 		}
 	}
 	
-	// FIXME: Crashes due to CME.
 	@SuppressWarnings("unchecked")
 	private static FlowerBlock getFlowerAt(ServerWorld sw, BlockPos cur) {
 		List<ConfiguredFeature<?, ?>> flowerGenerators = sw.getBiome(cur)

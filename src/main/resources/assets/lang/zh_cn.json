@@ -243,6 +243,7 @@
 		"opt.fletchingTablePulseDetector.desc" : "记录制箭台接收到的红石脉冲的长度。", 
 		"opt.flowerFieldRenderer.desc" : "显示当前区域可能在使用骨粉时生成的花朵种类。", 
 		"opt.flowerFieldRendererRadius.desc" : "`flowerFieldRenderer`的最大渲染距离。", 
+		"opt.flowerFieldRendererSingleLayer.desc" : "将`flowerFieldRenderer`生成的图像渲染在同一层（范围内最高方块顶部的水平面）。", 
 		"opt.generateChunkGrid.desc" : "在地表生层一层玻璃来标记区块。", 
 		"opt.getEntityRangeExpansion.desc" : "在原版的`getEntity()`方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。", 
 		"opt.hayOscilscope.desc" : "将干草块作为一个示波器 / 信号分析仪。", 

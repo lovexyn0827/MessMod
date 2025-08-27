@@ -50,8 +50,6 @@ import net.minecraft.server.world.ChunkTicketType;
  * Date: April 2, 2022
  */
 
-// TODO flowerFieldRenderer & 
-// TODO Deprecating options with both @Deprecated (or a field of @Option) and in-game warnings
 public class OptionManager{
 	public static final SortedMap<String, OptionWrapper> OPTIONS = Stream.of(OptionManager.class.getFields())
 			.filter((f) -> f.isAnnotationPresent(Option.class))
@@ -306,7 +304,6 @@ public class OptionManager{
 			label = { Label.RENDERER, Label.MISC })
 	public static int flowerFieldRendererRadius;
 	
-	// TODO Description
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			label = { Label.RENDERER, Label.MISC })
