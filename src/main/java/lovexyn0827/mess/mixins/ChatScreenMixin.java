@@ -31,7 +31,8 @@ public abstract class ChatScreenMixin extends Screen {
 	@Redirect(
 			method = "init", at = @At(
 					value = "FIELD", 
-					target = "chatField:Lnet/minecraft/client/gui/widget/TextFieldWidget;", 
+					target = "Lnet/minecraft/client/gui/screen/ChatScreen;"
+							+ "chatField:Lnet/minecraft/client/gui/widget/TextFieldWidget;", 
 					opcode = Opcodes.PUTFIELD
 			)
 	)

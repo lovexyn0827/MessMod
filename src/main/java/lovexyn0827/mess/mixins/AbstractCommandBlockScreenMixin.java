@@ -32,7 +32,8 @@ public class AbstractCommandBlockScreenMixin extends Screen {
 	@Redirect(
 			method = "init", at = @At(
 					value = "FIELD", 
-					target = "consoleCommandTextField:Lnet/minecraft/client/gui/widget/TextFieldWidget;", 
+					target = "Lnet/minecraft/client/gui/screen/ingame/AbstractCommandBlockScreen;"
+							+ "consoleCommandTextField:Lnet/minecraft/client/gui/widget/TextFieldWidget;", 
 					opcode = Opcodes.PUTFIELD
 			)
 	)
