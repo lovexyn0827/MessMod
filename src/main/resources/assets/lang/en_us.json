@@ -220,6 +220,7 @@
 		"opt.detailedChunkTaskLogging.desc" : "More details of chunk tasks are included in log files generated with `/logchunkbehavior`.", 
 		"opt.directChunkAccessForMessMod.desc" : "Some continuously working parts in MessMod like renderers can access chunks from `ThreadedAnvilChunkStorage` directly, without using `ServerChunkManager`, to avoid potential impact on the behaviors of the chunk managerment system.", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "As the name says, you can fill some blocks in unloaded chunks.", 
+		"opt.disableClientChunkUnloading.desc" : "Ignore chunk unloading requests from the server.", 
 		"opt.disableCreativeForcePickup.desc" : "Creative players with full a inventory don't pick up items and arrows anymore.", 
 		"opt.disableItemUsageCooldown.desc" : "Disable item usages cooldown for ender pearls and chorus fruits, etc.", 
 		"opt.disableEnchantCommandRestriction.desc" : "Remove the restriction on enchantment level and compatibility from `/enchant`.", 

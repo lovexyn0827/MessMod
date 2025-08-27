@@ -7,11 +7,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.MessClientNetworkHandler;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class ClientPlayNetworkHandlerMixin {
@@ -37,6 +39,13 @@ public abstract class ClientPlayNetworkHandlerMixin {
 			if (MessMod.INSTANCE.getClientNetworkHandler().handlePacket(packet)) {
 				ci.cancel();
 			}
+		}
+	}
+	
+	@Inject(method = "onUnloadChunk", at = @At("HEAD"), cancellable = true)
+	private void onUnloadChunk(UnloadChunkS2CPacket packet, CallbackInfo ci) {
+		if (OptionManager.disableClientChunkUnloading) {
+			ci.cancel();
 		}
 	}
 }

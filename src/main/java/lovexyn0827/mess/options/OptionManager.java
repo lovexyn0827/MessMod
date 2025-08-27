@@ -189,6 +189,11 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = { Label.INTERACTION_TWEAKS, Label.CHUNK })
+	public static boolean disableClientChunkUnloading;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean disableCreativeForcePickup;
 	

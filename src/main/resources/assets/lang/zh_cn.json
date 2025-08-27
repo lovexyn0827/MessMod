@@ -221,6 +221,7 @@
 		"opt.detailedChunkTaskLogging.desc" : "在区块事件记录器（`/logchunkbehavior`）生成的文件中包含关于区块任务的更多细节.", 
 		"opt.directChunkAccessForMessMod.desc" : "MessMod中一些持续工作的功能（如渲染器）可以直接从`ThreadedAnvilChunkStorage`中获取区块而不使用`ServerChunkManager`，以避免其对区块管理系统造成潜在影响。", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "禁用指令中对方块是否被加载的检查。", 
+		"opt.disableClientChunkUnloading.desc" : "忽略来自服务端的区块卸载请求。", 
 		"opt.disableEnchantCommandRestriction.desc" : "移除`/enchant`中对附魔等级与附魔兼容性的检查。", 
 		"opt.disableExplosionExposureCalculation.desc" : "禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。\n在安装Lithium后可能不能正常工作。", 
 		"opt.disableItemUsageCooldown.desc" : "禁用末影珍珠和紫颂果等物品的的使用冷却时长。", 
