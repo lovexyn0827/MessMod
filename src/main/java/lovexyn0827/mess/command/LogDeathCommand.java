@@ -188,7 +188,11 @@ public class LogDeathCommand {
 
 				.then(literal("reset")
 						.executes((ct) -> {
-							reset();
+							SUBSCRIPTED_DEATH_PREDICATES.forEach((k, v) -> {
+								v.resetTriggerCount();
+							});
+							DEATH_AUTO_STATS.clear();
+							CommandUtil.feedback(ct, "cmd.general.success");
 							return Command.SINGLE_SUCCESS;
 						})
 						.then(argument("target", StringArgumentType.string())
