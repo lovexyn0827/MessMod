@@ -166,19 +166,7 @@ public class LogDeathCommand {
 										}
 									});
 									return Command.SINGLE_SUCCESS;
-								})
-								.then(literal("reset")
-										.executes((ct) -> {
-											String in = StringArgumentType.getString(ct, "target").replace(" ", "");
-											NameFilter filter = NameFilter.compile(in);
-											SUBSCRIPTED_DEATH_PREDICATES.forEach((k, v) -> {
-												if (filter.test(k)) {
-													v.resetTriggerCount();
-												}
-											});
-											CommandUtil.feedback(ct, "cmd.general.success");
-											return Command.SINGLE_SUCCESS;
-										}))))
+								})))
 				.then(literal("autoStats")
 						.executes((ct) -> {
 							DEATH_AUTO_STATS.forEach((k, v) -> {
@@ -196,7 +184,27 @@ public class LogDeathCommand {
 									DEATH_AUTO_STATS.clear();
 									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
-								})));
+								})))
+
+				.then(literal("reset")
+						.executes((ct) -> {
+							reset();
+							return Command.SINGLE_SUCCESS;
+						})
+						.then(argument("target", StringArgumentType.string())
+								.suggests(predNameSuggestion)
+								.executes((ct) -> {
+									String in = StringArgumentType.getString(ct, "target").replace(" ", "");
+									NameFilter filter = NameFilter.compile(in);
+									// FIXME logdeath reset
+									SUBSCRIPTED_DEATH_PREDICATES.forEach((k, v) -> {
+										if (filter.test(k)) {
+											v.resetTriggerCount();
+										}
+									});
+									CommandUtil.feedback(ct, "cmd.general.success");
+									return Command.SINGLE_SUCCESS;
+								})));		
 		dispatcher.register(command);
 	}
 	
