@@ -36,7 +36,7 @@ public abstract class ChatScreenMixin extends Screen {
 					opcode = Opcodes.PUTFIELD
 			)
 	)
-	private void redirectTextFieldCreation(ChatScreenMixin screen, TextFieldWidget orig) {
+	private void redirectTextFieldCreation(ChatScreen screen, TextFieldWidget orig) {
 		if (OptionManager.smartCursorMode == CommandTextFieldWidget.CursorMode.VANILLA) {
 			// vanilla path
 			this.chatField = orig;

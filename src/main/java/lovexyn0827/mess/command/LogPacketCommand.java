@@ -41,7 +41,6 @@ public class LogPacketCommand {
 	private static final Object2LongMap<Class<?>> STATS = Object2LongMaps.synchronize(new Object2LongOpenHashMap<>());
 	
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-		@SuppressWarnings("resource")
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("logpacket").requires(CommandUtil.COMMAND_REQUMENT)
 				.then(literal("sub")
 						.then(argument("type", FilteredSetArgumentType.of(PACKET_TYPES.keySet(), (o) -> o))
@@ -80,7 +79,7 @@ public class LogPacketCommand {
 								.then(argument("saveTo", StringArgumentType.greedyString())
 										.executes((ct) -> {
 											if (packetRecorder != null) {
-												CommandUtil.errorWithArgs(ct, "cmd.general.alexist");
+												CommandUtil.errorWithArgs(ct, "cmd.general.alstartlog");
 												return 0;
 											}
 											
