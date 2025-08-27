@@ -31,7 +31,7 @@ public abstract class HayBlockMixin extends AbstractBlock {
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, 
 			Hand hand, BlockHitResult hit) {
-		if (OptionManager.hayOscilscope && world.isClient) {
+		if (OptionManager.hayOscilloscope && world.isClient) {
 			MinecraftClient.getInstance().openScreen(new OscilscopeScreen());
 		}
 		
@@ -40,7 +40,7 @@ public abstract class HayBlockMixin extends AbstractBlock {
 	
 	@Override
 	public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
-		if(OptionManager.hayOscilscope && world instanceof ServerWorld) {
+		if(OptionManager.hayOscilloscope && world instanceof ServerWorld) {
 			onUpdate((ServerWorld) world, pos);
 		}
 	}
@@ -48,7 +48,7 @@ public abstract class HayBlockMixin extends AbstractBlock {
 
 	@Override
 	public void prepare(BlockState state, WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth) {
-		if(OptionManager.hayOscilscope && world instanceof ServerWorld) {
+		if(OptionManager.hayOscilloscope && world instanceof ServerWorld) {
 			onUpdate((ServerWorld) world, pos);
 		}
 	}

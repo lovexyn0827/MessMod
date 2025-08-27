@@ -329,12 +329,12 @@ public class OptionManager{
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			label = { Label.RESEARCH, Label.REDSTONE })
-	public static boolean hayOscilscope;
+	public static boolean hayOscilloscope;
 	
 	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class, 
 			label = { Label.RESEARCH, Label.REDSTONE, Label.MESSMOD })
-	public static boolean hayOscilscopeChannelVisibilityBroadcast;
+	public static boolean hayOscilloscopeChannelVisibilityBroadcast;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 

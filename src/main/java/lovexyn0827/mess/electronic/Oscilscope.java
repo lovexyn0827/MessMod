@@ -300,7 +300,7 @@ public final class Oscilscope {
 		@Environment(EnvType.CLIENT)
 		public void setVisible(boolean visible) {
 			this.visible = visible;
-			if (OptionManager.hayOscilscopeChannelVisibilityBroadcast) {
+			if (OptionManager.hayOscilloscopeChannelVisibilityBroadcast) {
 				Oscilscope.this.uploadConfig(VISIBILITY, (buf) -> {
 					buf.writeInt(this.id);
 					buf.writeBoolean(visible);
