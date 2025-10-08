@@ -49,7 +49,7 @@ public final class Region {
 		return this.dimension;
 	}
 
-	public void export(Path temp, EnumSet<SaveComponent> components) throws IOException {
+	public void exportMcas(Path temp, EnumSet<SaveComponent> components) throws IOException {
 		Path dir = this.dimension.getServer().getSavePath(WorldSavePathMixin.create(""))
 				.relativize(((MinecraftServerAccessor) this.dimension.getServer()).getSession()
 						.getWorldDirectory(this.dimension.getRegistryKey())
@@ -95,8 +95,8 @@ public final class Region {
 	}
 
 	public boolean contains(ServerWorld world, BlockPos pos) {
-		return this.dimension == world && this.min.x << 4 <= pos.getX() && this.max.x << 4  + 15 >= pos.getX()
-				&& this.min.z << 4 <= pos.getZ() && this.max.z << 4  + 15 >= pos.getZ();
+		return this.dimension == world && this.min.x << 4 <= pos.getX() && (this.max.x << 4)  + 15 >= pos.getX()
+				&& this.min.z << 4 <= pos.getZ() && (this.max.z << 4) + 15 >= pos.getZ();
 	}
 
 	boolean contains(MapState ms) {
@@ -104,10 +104,10 @@ public final class Region {
 		int r = 63 * scale;
 		int x0 = this.min.x << 4;
 		int z0 = this.min.z << 4;
-		int x1 = this.max.x << 4 + 15;
-		int z1 = this.max.z << 4 + 15;
+		int x1 = (this.max.x << 4) + 15;
+		int z1 = (this.max.z << 4) + 15;
 		return this.dimension.getRegistryKey().equals(ms.dimension)
-				&& ms.centerX + r >= x0 && ms.centerX - r <= x1 && ms.centerZ + r > z0 && ms.centerZ < z1;
+				&& ms.centerX + r >= x0 && ms.centerX - r <= x1 && ms.centerZ + r >= z0 && ms.centerZ - r <= z1;
 	}
 
 	public boolean contains(ServerWorld world, long pos) {

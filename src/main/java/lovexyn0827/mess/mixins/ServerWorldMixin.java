@@ -12,11 +12,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntityInterface;
 import lovexyn0827.mess.fakes.ServerEntityManagerInterface;
 import lovexyn0827.mess.fakes.ServerWorldInterface;
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.NoChunkLoadingWorld;
 import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import net.minecraft.block.BlockState;
@@ -45,6 +45,15 @@ import net.minecraft.world.level.storage.LevelStorage;
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin implements BlockView, ServerWorldInterface {
 	private final PulseRecorder pulseRecorder = new PulseRecorder();
+	private @Final NoChunkLoadingWorld noChunkLoadingWorld;
+	
+	@Inject(method = "<init>", at = @At("RETURN"))
+	public void onCreated(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, 
+			ServerWorldProperties properties, RegistryKey<World> registryKey, DimensionType dimensionType, 
+			WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, 
+			boolean debugWorld, long l, List<Spawner> list, boolean bl, CallbackInfo ci) {
+		this.noChunkLoadingWorld = new NoChunkLoadingWorld((ServerWorld) (Object) this);
+	}
 	
 	@Shadow
 	private @Final ServerEntityManager<?> entityManager;
@@ -81,10 +90,6 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 			)
 	private void startTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		ServerTickingPhase.WEATHER_CYCLE.begin((ServerWorld)(Object) this);
-		// Actually here is also the ending of WTU
-		if(((ServerWorld)(Object) this).getRegistryKey() == World.OVERWORLD) {
-			MessMod.INSTANCE.updateTime(((ServerWorld)(Object) this).getTime());
-		}
 	}
 	
 	@Inject(method = "tick", 
@@ -172,5 +177,9 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 			WorldGenerationProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, 
 			boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime, CallbackInfo ci) {
 		((ServerEntityManagerInterface) this.entityManager).initWorld((ServerWorld)(Object) this);
+	}
+	
+	public NoChunkLoadingWorld toNoChunkLoadingWorld() {
+		return this.noChunkLoadingWorld;
 	}
 }

@@ -8,13 +8,11 @@ import java.util.stream.Collectors;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.HudType;
 import lovexyn0827.mess.util.ListenedField;
-import lovexyn0827.mess.util.RaycastUtil;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.WrappedPath;
 import lovexyn0827.mess.util.access.AccessingPath;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
  * @author lovexyn0827
@@ -24,15 +22,18 @@ public interface HudDataSender {
 	void updateData(Entity entity);
 	Collection<HudLine> getCustomLines();
 	
+	default boolean hasDuplication(HudLine line) {
+		return this.getCustomLines().stream().anyMatch((l0) -> {
+			return l0.getName().equals(line.getName()) || l0.equals(line);
+		});
+	}
+	
 	/**
 	 * @implNote Custom lines whose name is the same as the one of the names of in built-in lines and one of the other
 	 *  custom lines should be rejected.
 	 */
 	default boolean addCustomLine(HudLine line) {
-		boolean hasDuplication = this.getCustomLines().stream().anyMatch((l0) -> {
-			return l0.getName().equals(line.getName()) || l0.equals(line);
-		});
-		if(hasDuplication || BuiltinHudInfo.BY_TITLE.containsKey(line.getName())) {
+		if(this.hasDuplication(line)) {
 			return false;
 		} else {
 			this.getCustomLines().add(line);
@@ -64,25 +65,25 @@ public interface HudDataSender {
 				.collect(Collectors.toList());
 	}
 	
+	/**
+	 * SIDEBAR is not allowed here!
+	 */
 	public static HudDataSender createHudDataSenderer(HudType type, MinecraftServer server) {
+		if (type == HudType.SIDEBAR) {
+			throw new IllegalArgumentException("Data senderer of sidebars cannot be created here!");
+		}
+		
 		if(MessMod.isDedicatedEnv()) {
-			return type.isPlayer() ? new RemoteHudDataSender.Player(server, type) : new RemoteHudDataSender(server, type);
+			return new RemoteHudDataSender(server, type, true);
 		} else {
 			switch(type) {
 			case TARGET :  
-				return new LocalDataStorage();
 			case SERVER_PLAYER : 
-				return new LocalPlayerDataStorage(true);
 			case CLIENT_PLAYER : 
-				return new LocalPlayerDataStorage(false);
+				return new LocalDefaultHudDataStorage();
 			default:
 				throw new IllegalArgumentException();
 			}
 		}
 	}
-	
-	default void updateLookingAtEntityData(ServerPlayerEntity player) {
-		this.updateData(RaycastUtil.getTargetEntity(player));
-	}
-
 }

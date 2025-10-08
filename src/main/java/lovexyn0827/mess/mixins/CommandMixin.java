@@ -19,12 +19,15 @@ import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
 import lovexyn0827.mess.command.ExportSaveCommand;
+import lovexyn0827.mess.command.FillInventoryCommand;
 import lovexyn0827.mess.command.FreezeEntityCommand;
 import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.command.LazyLoadCommand;
+import lovexyn0827.mess.command.LoadJavaAgentCommand;
 import lovexyn0827.mess.command.LogChunkBehaviorCommand;
+import lovexyn0827.mess.command.LogDeathCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.LogPacketCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
@@ -37,9 +40,13 @@ import lovexyn0827.mess.command.RaycastCommand;
 import lovexyn0827.mess.command.RepeatCommand;
 import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
+import lovexyn0827.mess.command.SetBlockRawCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
+import lovexyn0827.mess.command.StackEntityCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
+import lovexyn0827.mess.command.TouchCommand;
 import lovexyn0827.mess.command.VariableCommand;
+import lovexyn0827.mess.command.WaveGenCommand;
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -81,6 +88,13 @@ public abstract class CommandMixin {
         LazyLoadCommand.register(this.dispatcher);
         CountEntitiesCommand.register(this.dispatcher);
         VariableCommand.register(this.dispatcher);
+        LoadJavaAgentCommand.register(this.dispatcher);
+        LogDeathCommand.register(this.dispatcher);
+        StackEntityCommand.register(this.dispatcher);
+        FillInventoryCommand.register(this.dispatcher);
+        WaveGenCommand.register(this.dispatcher);
+        TouchCommand.register(this.dispatcher);
+        SetBlockRawCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 

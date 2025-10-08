@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.datafixers.util.Either;
 
+import it.unimi.dsi.fastutil.chars.CharSet;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.export.SaveComponent;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -24,6 +25,7 @@ import lovexyn0827.mess.options.RangeParser.ChunkStatusRange.ChunkStatusSorter;
 import lovexyn0827.mess.rendering.BlockInfoRenderer.ShapeType;
 import lovexyn0827.mess.rendering.FrozenUpdateMode;
 import lovexyn0827.mess.rendering.hud.AlignMode;
+import lovexyn0827.mess.util.CommandTextFieldWidget;
 import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.blame.BlamingMode;
@@ -47,6 +49,7 @@ import net.minecraft.server.world.ChunkTicketType;
  * @author lovexyn0827
  * Date: April 2, 2022
  */
+
 public class OptionManager{
 	public static final SortedMap<String, OptionWrapper> OPTIONS = Stream.of(OptionManager.class.getFields())
 			.filter((f) -> f.isAnnotationPresent(Option.class))
@@ -77,6 +80,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			deprecated = true, 
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean allowTargetingSpecialEntities;
 	
@@ -118,7 +122,7 @@ public class OptionManager{
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
 			label = Label.RENDERER)
-	public static boolean chunkLoadingInfoRenderer;
+	public static boolean chunkLoadingInfoRenderer;	// TODO Mode
 	
 	@Option(defaultValue = "4", 
 			parserClass = IntegerParser.NonNegative.class, 
@@ -140,6 +144,11 @@ public class OptionManager{
 			label = Label.REDSTONE)
 	public static boolean craftingTableBUD;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean creativeNoVoidDamage;
+	
 	@Option(defaultValue = "NaN", 
 			suggestions = {"0.05", "0.10", "NaN"}, 
 			parserClass = FloatParser.NaNablePositive.class, 
@@ -153,7 +162,6 @@ public class OptionManager{
 	public static boolean debugStickSkipsInvaildState;
 	
 	@Option(defaultValue = "false", 
-			experimental = true, 
 			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean dedicatedServerCommands;
@@ -166,8 +174,28 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = { Label.CHUNK, Label.MESSMOD })
+	public static boolean detailedChunkTaskLogging;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class, 
+			label = { Label.RESEARCH, Label.MESSMOD })
+	public static boolean directChunkAccessForMessMod;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean disableChunkLoadingCheckInCommands;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = { Label.INTERACTION_TWEAKS, Label.CHUNK })
+	public static boolean disableClientChunkUnloading;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean disableCreativeForcePickup;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
@@ -224,15 +252,21 @@ public class OptionManager{
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean endEyeTeleport;
 	
+	@Option(defaultValue = "1.0", 
+			parserClass = FloatParser.NonNegative.class, 
+			suggestions = { "0.0", "1.0" }, 
+			label = { Label.EXPLOSION, Label.RESEARCH, Label.ENTITY })
+	public static float entityExplosionImpulseScale;
+	
 	@Option(defaultValue = "false", 
 			experimental = true, 
 			parserClass = BooleanParser.class, 
-			label = { Label.EXPLOSION, Label.RESEARCH })
+			label = { Label.EXPLOSION, Label.RESEARCH, Label.ENTITY })
 	public static boolean entityExplosionInfluence;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.EXPLOSION, Label.RENDERER, Label.MESSMOD })
+			label = { Label.EXPLOSION, Label.RENDERER, Label.ENTITY, Label.MESSMOD })
 	public static boolean entityExplosionRaysVisiblity;
 	
 	@Option(defaultValue = "300", 
@@ -267,6 +301,21 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = { Label.RENDERER, Label.MISC })
+	public static boolean flowerFieldRenderer;
+	
+	@Option(defaultValue = "16", 
+			parserClass = IntegerParser.Positive.class, 
+			label = { Label.RENDERER, Label.MISC })
+	public static int flowerFieldRendererRadius;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = { Label.RENDERER, Label.MISC })
+	public static boolean flowerFieldRendererSingleLayer;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = Label.CHUNK)
 	public static boolean generateChunkGrid;
 	
@@ -279,7 +328,17 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			globalOnly = true, 
+			label = { Label.RESEARCH, Label.REDSTONE })
+	public static boolean hayOscilloscope;
+	
+	@Option(defaultValue = "true", 
+			parserClass = BooleanParser.class, 
+			label = { Label.RESEARCH, Label.REDSTONE, Label.MESSMOD })
+	public static boolean hayOscilloscopeChannelVisibilityBroadcast;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			deprecated = true, 
 			environment = EnvType.CLIENT, 
 			label = { Label.MISC, Label.MESSMOD })
 	public static boolean hideSurvivalSaves;
@@ -291,6 +350,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "(BL)^2/(mR)", 
 			parserClass = StringParser.class, 
+			deprecated = true, 
 			label = { Label.MESSMOD, Label.RENDERER })
 	public static String hudStyles;
 	
@@ -376,6 +436,11 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = { Label.INTERACTION_TWEAKS, Label.MESSMOD })
+	public static boolean quickStackedEntityKillingOneTypeOnly;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = Label.INTERACTION_TWEAKS)
 	public static boolean railNoAutoConnection;
 	
@@ -388,6 +453,11 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			label = Label.RENDERER)
 	public static boolean renderBlockShape;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.ENTITY)
+	public static boolean resistanceReducesVoidDamage;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
@@ -424,8 +494,21 @@ public class OptionManager{
 			label = { Label.CHUNK, Label.BREAKING_OPTIMIZATION })
 	public static boolean skipUnloadedChunkInRaycasting;
 	
+	@Option(defaultValue = " ", 
+			parserClass = CommandTextFieldWidget.CharSetParser.class, 
+			label = { Label.INTERACTION_TWEAKS }, 
+			suggestions = { " ", " ,=:.([{}])" })
+	public static CharSet smartCursorCustomWordDelimiters;
+	
+	@Option(defaultValue = "VANILLA", 
+			parserClass = CommandTextFieldWidget.CursorMode.Parser.class, 
+			environment = EnvType.CLIENT, 
+			label = { Label.INTERACTION_TWEAKS })
+	public static CommandTextFieldWidget.CursorMode smartCursorMode;
+	
 	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class, 
+			deprecated = true, 
 			label = { Label.MESSMOD, Label.RENDERER })
 	public static boolean stableHudLocation;
 	
@@ -441,6 +524,16 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			label = Label.MISC)
 	public static boolean superSuperSecretSetting;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean survivalStatusBarInCreativeMode;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.INTERACTION_TWEAKS)
+	public static boolean survivalXpBarInCreativeMode;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
@@ -477,7 +570,7 @@ public class OptionManager{
 					.map((o) -> {
 						return o.name + ": " + set.getSerialized(o.name);
 					})
-					.forEach(MessMod.LOGGER::info);
+					.forEach(MessMod.LOGGER::debug);
 		}
 	}
 	

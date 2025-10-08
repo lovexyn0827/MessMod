@@ -1,6 +1,9 @@
 package lovexyn0827.mess.util.access;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -116,6 +119,16 @@ class PathCompiler {
 		// 9. Generate and load class
 		this.classFile.accept(wrappedCw);
 		byte[] clBytes = cw.toByteArray();
+		if (OptionManager.superSuperSecretSetting) {
+			// dump class files when debugging
+			try (BufferedOutputStream bos = new BufferedOutputStream(
+					new FileOutputStream(new File(this.className.replace('/', '.') + ".class")))) {
+				bos.write(clBytes);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 		try {
 			return PathClassLoader.INSTANCE.defineClass(this.className.replace('/', '.'), clBytes);
 		} catch (Throwable e) {
@@ -265,6 +278,7 @@ class PathCompiler {
 			try {
 				node.initialize(this.ctx.getLastOutputType());
 			} catch (AccessingFailureException e) {
+				e.printStackTrace();
 				throw new CompilationException(e.failureCause, e.args);
 			}
 			

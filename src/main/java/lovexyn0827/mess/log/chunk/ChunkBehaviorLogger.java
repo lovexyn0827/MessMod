@@ -3,6 +3,8 @@ package lovexyn0827.mess.log.chunk;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -13,6 +15,8 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+
+import com.mojang.datafixers.util.Pair;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.log.AbstractAchivingLogger;
@@ -29,6 +33,24 @@ import net.minecraft.util.registry.RegistryKey;
 
 public final class ChunkBehaviorLogger extends AbstractAchivingLogger {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+	private static final ParameterizedType CUSTOM_LINE_INPUT_TYPE = 
+			new ParameterizedType() {
+				@Override
+				public Type[] getActualTypeArguments() {
+					return new Class<?>[] { ServerWorld.class, Object.class };
+				}
+
+				@Override
+				public Type getRawType() {
+					return Pair.class;
+				}
+
+				@Override
+				public Type getOwnerType() {
+					return null;
+				}
+		
+			};
 	public static final Logger LOGGER = LogManager.getLogger();
 	@Nullable
 	private CsvWriter currentLog;
@@ -97,9 +119,10 @@ public final class ChunkBehaviorLogger extends AbstractAchivingLogger {
 				data[7] = addition;
 				ServerWorld world = this.server.getWorld(RegistryKey.of(Registry.WORLD_KEY, dim));
 				int dataPos = 8;
+				Pair<ServerWorld, Object> pair = new Pair<>(world, addition);
 				for(AccessingPath path : this.customColumns.values()) {
 					try {
-						data[dataPos] = path.access(world, ServerWorld.class);
+						data[dataPos] = path.access(pair, CUSTOM_LINE_INPUT_TYPE);
 					} catch (AccessingFailureException e) {
 						data[dataPos] = e.getShortenedMsg();
 					} finally {

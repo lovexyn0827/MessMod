@@ -62,7 +62,13 @@
     "SectionedEntityCacheMixin", 
     "ItemCooldownManagerMixin", 
     "ArgumentTypesMixin", 
-    "ChunkTaskPrioritySystemMixin"
+    "ChunkTaskPrioritySystemMixin", 
+    "LivingEntityMixin", 
+    "IdCountsStateAccessor", 
+    "DieableEntityMixin", 
+    "LoomBlockMixin", 
+    "HayBlockMixin", 
+    "WeightedListMixin"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -83,7 +89,9 @@
     "WorldListWidgetEntryMixin", 
     "EntitySelectorMixin_Client", 
     "ClientCommandSourceMixin", 
-    "DebugHudMixin"
+    "DebugHudMixin", 
+    "ChatScreenMixin", 
+    "AbstractCommandBlockScreenMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"

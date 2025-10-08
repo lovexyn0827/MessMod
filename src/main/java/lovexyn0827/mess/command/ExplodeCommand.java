@@ -4,7 +4,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
@@ -22,7 +24,9 @@ public class ExplodeCommand {
 								executes((ct) -> {
 										ServerWorld world = ct.getSource().getWorld();
 										Vec3d pos = Vec3ArgumentType.getVec3(ct, "pos");
-										createExplosion(world,pos,ExtendedFloatArgumentType.getFloat(ct, "power"), false);
+										createExplosion(world, pos, 
+												ExtendedFloatArgumentType.getFloat(ct, "power"), 
+												false, null);
 										CommandUtil.feedback(ct, "cmd.general.success");
 										return 1;
 								}).
@@ -32,15 +36,26 @@ public class ExplodeCommand {
 											Vec3d pos = Vec3ArgumentType.getVec3(ct, "pos");
 											createExplosion(world, pos, 
 													ExtendedFloatArgumentType.getFloat(ct, "power"),
-													BoolArgumentType.getBool(ct, "fire"));
+													BoolArgumentType.getBool(ct, "fire"), null);
 											CommandUtil.feedback(ct, "cmd.general.success");
 											return 1;
-										}))));
+										}).
+										then(argument("exploder", EntityArgumentType.entity()).
+												executes((ct) -> {
+													ServerWorld world = ct.getSource().getWorld();
+													Vec3d pos = Vec3ArgumentType.getVec3(ct, "pos");
+													createExplosion(world, pos, 
+															ExtendedFloatArgumentType.getFloat(ct, "power"),
+															BoolArgumentType.getBool(ct, "fire"), 
+															EntityArgumentType.getEntity(ct, "exploder"));
+													CommandUtil.feedback(ct, "cmd.general.success");
+													return 1;
+												})))));
 		dispatcher.register(command);
 	}
 	
-	private static void createExplosion(ServerWorld world, Vec3d pos, float power, boolean fire) {
-		world.createExplosion(null, pos.x, pos.y, pos.z, power, fire, DestructionType.DESTROY);
+	private static void createExplosion(ServerWorld world, Vec3d pos, float power, boolean fire, Entity exploder) {
+		world.createExplosion(exploder, pos.x, pos.y, pos.z, power, fire, DestructionType.DESTROY);
 	}
 
 }
