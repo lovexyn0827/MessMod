@@ -30,18 +30,35 @@ import net.minecraft.util.Formatting;
 public class MessCfgCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		Command<ServerCommandSource> listAllCmd = (ct) -> {
-			ModMetadata metadata = FabricLoader.getInstance().getModContainer("messmod").get().getMetadata();
-			ServerCommandSource s = ct.getSource();
-			s.sendFeedback(new LiteralText(metadata.getName() + " " + metadata.getVersion()).formatted(Formatting.BOLD), false);
-			CommandUtil.feedbackRaw(ct, metadata.getDescription());
-			s.sendFeedback(new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
+			ct.getSource().sendFeedback(new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
 			OptionManager.OPTIONS.forEach((name, opt) -> {
-				dumpOption(s, name, opt);
+				dumpOption(ct.getSource(), name, opt);
 			});
-			return 1;
+			return Command.SINGLE_SUCCESS;
 		};
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("messcfg").requires(CommandUtil.COMMAND_REQUMENT)
-				.executes(listAllCmd)
+				.executes((ct) -> {
+					ModMetadata metadata = FabricLoader.getInstance().getModContainer("messmod").get().getMetadata();
+					ServerCommandSource s = ct.getSource();
+					s.sendFeedback(new LiteralText(metadata.getName() + " " + metadata.getVersion()).formatted(Formatting.BOLD), false);
+					CommandUtil.feedbackRaw(ct, metadata.getDescription());
+					s.sendFeedback(new FormattedText("cmd.messcfg.labels", "l").asMutableText(), false);
+					MutableText labels = new LiteralText("").formatted(Formatting.GREEN, Formatting.BOLD);
+					for (Label label : Label.values()) {
+						MutableText labelText = new LiteralText(String.format("[%s]", label.getReadableName()));
+						labelText.styled((style) -> {
+							ClickEvent onClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, 
+									String.format("/messcfg list %s", label.name()));
+							HoverEvent onHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
+									new LiteralText(label.getDescription()));
+							return style.withClickEvent(onClick).withHoverEvent(onHover).withUnderline(true);
+						});
+						labels.append(new LiteralText(" ").append(labelText));
+					}
+					
+					s.sendFeedback(labels, false);
+					return Command.SINGLE_SUCCESS;
+				})
 				.then(literal("reloadConfig")
 						.executes((ct) -> {
 							OptionManager.reload();
@@ -68,7 +85,8 @@ public class MessCfgCommand {
 										return 0;
 									}
 									
-									CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.withtag", lName);
+									CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.withtag", 
+											lName, label.getReadableName());
 									ServerCommandSource s = ct.getSource();
 									OptionManager.OPTIONS.forEach((name, opt) -> {
 										for(Label l0 : opt.labels()) {

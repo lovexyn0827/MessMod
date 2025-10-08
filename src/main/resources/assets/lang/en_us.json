@@ -105,8 +105,9 @@
 		"cmd.messcfg.set" : "Option %s is now set to %s", 
 		"cmd.messcfg.setglobal" : "Option %s is now set to %s globally", 
 		"cmd.messcfg.globalonly" : "Option %s isn't supported in save-local storage, please click here to set it globally.", 
-		"cmd.messcfg.withtag" : "Options with tag %s:", 
+		"cmd.messcfg.withtag" : "Options with tag %s (%s):", 
 		"cmd.messcfg.deprecated" : "\nThis option is deprecated, and modification to its value is no longer recommended！", 
+		"cmd.messcfg.labels" : "Categories (click for details):", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -304,6 +305,33 @@
 		"opt.err.reqcarpet" : "This option require Carpet to function!", 
 		"opt.err.reqbool" : "Use true of false here!", 
 		"opt.err.conflict.carpet.1425" : "This option conflicts with Carpet 1.4.25 and above!", 
+		
+		//***** Labels of options *****
+		"opt.label.HIGHLIGHT.name" : "Highlights", 
+		"opt.label.RENDERER.name" : "Renderers", 
+		"opt.label.INTERACTION_TWEAKS.name" : "Tweakers", 
+		"opt.label.RESEARCH.name" : "Research", 
+		"opt.label.REDSTONE.name" : "Redstone", 
+		"opt.label.ENTITY.name" : "Entity", 
+		"opt.label.MESSMOD.name" : "MessMod", 
+		"opt.label.EXPLOSION.name" : "Explosion", 
+		"opt.label.CHUNK.name" : "Chunk", 
+		"opt.label.BUGFIX.name" : "BugFix", 
+		"opt.label.BREAKING_OPTIMIZATION.name" : "Optimization", 
+		"opt.label.MISC.name" : "Misc", 
+		
+		"opt.label.HIGHLIGHT.desc" : "The most frequently-used features.", 
+		"opt.label.RENDERER.desc" : "Options to enable and configure renders", 
+		"opt.label.INTERACTION_TWEAKS.desc" : "Interaction tweakers.", 
+		"opt.label.RESEARCH.desc" : "Helpful when dealing with details of game mechanics.", 
+		"opt.label.REDSTONE.desc" : "The redstone debugging toolkit.", 
+		"opt.label.ENTITY.desc" : "Stuff releated with entities.", 
+		"opt.label.MESSMOD.desc" : "Configurations of the Mod itself and its features.", 
+		"opt.label.EXPLOSION.desc" : "Observe or change the behaviors of explosions.", 
+		"opt.label.CHUNK.desc" : "Chunk loading & world generation.", 
+		"opt.label.BUGFIX.desc" : "Bug fixes.", 
+		"opt.label.BREAKING_OPTIMIZATION.desc" : "Aggressive optimizations, may change the behavior.", 
+		"opt.label.MISC.desc" : "Uncategorized stuff.", 
 		
 		//***** Oscilscope *****
 		"oscilscope.gui.title" : "Oscilscope", 

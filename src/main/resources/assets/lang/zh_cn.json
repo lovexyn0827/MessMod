@@ -105,8 +105,9 @@
 		"cmd.messcfg.set" : "选项%s的值现在已被设为%s", 
 		"cmd.messcfg.setglobal" : "全局作用域中选项%s的值现在已被设为%s", 
 		"cmd.messcfg.globalonly" : "存档局部设置中不支持选项%s，请点击这里以在全局作用域中设置该选项", 
-		"cmd.messcfg.withtag" : "带有标签%s的选项：", 
+		"cmd.messcfg.withtag" : "带有标签%s（%s）的选项：", 
 		"cmd.messcfg.deprecated" : "\n该选项已被废弃，不再推荐对其取值进行修改！", 
+		"cmd.messcfg.labels" : "类别（点击标签查看详情）：", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -304,6 +305,33 @@
 		"opt.err.reqcarpet" : "该选项需要安装Carpet", 
 		"opt.err.reqbool" : "只能使用true或false", 
 		"opt.err.conflict.carpet.1425" : "该选项与Carpet 1.4.25以上版本冲突", 
+		
+		//***** Labels of options *****
+		"opt.label.HIGHLIGHT.name" : "常用", 
+		"opt.label.RENDERER.name" : "渲染", 
+		"opt.label.INTERACTION_TWEAKS.name" : "辅助", 
+		"opt.label.RESEARCH.name" : "研究", 
+		"opt.label.REDSTONE.name" : "红石", 
+		"opt.label.ENTITY.name" : "实体", 
+		"opt.label.MESSMOD.name" : "设置", 
+		"opt.label.EXPLOSION.name" : "爆炸", 
+		"opt.label.CHUNK.name" : "区块", 
+		"opt.label.BUGFIX.name" : "修复", 
+		"opt.label.BREAKING_OPTIMIZATION.name" : "优化", 
+		"opt.label.MISC.name" : "杂项", 
+		
+		"opt.label.HIGHLIGHT.desc" : "最常用的若干功能", 
+		"opt.label.RENDERER.desc" : "用于启用或设置渲染器", 
+		"opt.label.INTERACTION_TWEAKS.desc" : "交互辅助", 
+		"opt.label.RESEARCH.desc" : "深度机制研究专用", 
+		"opt.label.REDSTONE.desc" : "红石调试工具包", 
+		"opt.label.ENTITY.desc" : "实体相关", 
+		"opt.label.MESSMOD.desc" : "模组本身及其功能的设置", 
+		"opt.label.EXPLOSION.desc" : "监视或更改爆炸行为", 
+		"opt.label.CHUNK.desc" : "区块加载与世界生成", 
+		"opt.label.BUGFIX.desc" : "Bug修复", 
+		"opt.label.BREAKING_OPTIMIZATION.desc" : "激进的优化，可能影响原版机制", 
+		"opt.label.MISC.desc" : "未分类的选项", 
 		
 		//***** Oscilscope *****
 		"oscilscope.gui.title" : "示波器", 

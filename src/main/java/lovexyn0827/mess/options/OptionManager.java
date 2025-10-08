@@ -75,7 +75,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean allowSelectingDeadEntities;
 	
 	@Option(defaultValue = "false", 
@@ -91,7 +91,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean attackableTnt;
 	
 	@Option(defaultValue = "POSSIBLE", 
@@ -111,7 +111,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean blockPlacementHistory;
 	
 	@Option(defaultValue = "COLLISION", 
@@ -121,7 +121,7 @@ public class OptionManager{
 
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.RENDERER)
+			label = { Label.HIGHLIGHT, Label.RENDERER })
 	public static boolean chunkLoadingInfoRenderer;	// TODO Mode
 	
 	@Option(defaultValue = "4", 
@@ -141,12 +141,12 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.REDSTONE)
+			label = { Label.HIGHLIGHT, Label.REDSTONE })
 	public static boolean craftingTableBUD;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean creativeNoVoidDamage;
 	
 	@Option(defaultValue = "NaN", 
@@ -163,7 +163,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean dedicatedServerCommands;
 	
 	@Option(defaultValue = "REGION,POI", 
@@ -184,7 +184,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean disableChunkLoadingCheckInCommands;
 	
 	@Option(defaultValue = "false", 
@@ -224,12 +224,12 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
+			label = { Label.HIGHLIGHT, Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntityDataWithPaper;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
+			label = { Label.HIGHLIGHT, Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntityDataWithCtrlC;
 	
 	@Option(defaultValue = "true", 
@@ -244,7 +244,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean enabledTools;
 	
 	@Option(defaultValue = "false", 
@@ -286,7 +286,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean fillHistory;
 	
 	@Option(defaultValue = "POSITIVE", 
@@ -296,12 +296,12 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.REDSTONE)
+			label = { Label.HIGHLIGHT, Label.REDSTONE })
 	public static boolean fletchingTablePulseDetector;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.RENDERER, Label.MISC })
+			label = { Label.HIGHLIGHT, Label.RENDERER, Label.MISC })
 	public static boolean flowerFieldRenderer;
 	
 	@Option(defaultValue = "16", 
@@ -316,7 +316,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.CHUNK)
+			label = { Label.HIGHLIGHT, Label.CHUNK })
 	public static boolean generateChunkGrid;
 	
 	@Option(defaultValue = "2.0", 
@@ -328,7 +328,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.RESEARCH, Label.REDSTONE })
+			label = { Label.HIGHLIGHT, Label.RESEARCH, Label.REDSTONE })
 	public static boolean hayOscilloscope;
 	
 	@Option(defaultValue = "true", 
@@ -361,12 +361,12 @@ public class OptionManager{
 	
 	@Option(defaultValue = "9", 
 			parserClass = IntegerParser.HotbarLength.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static int hotbarLength;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean independentEntityPickerForInfomation;
 	
 	@Option(defaultValue = "false", 
@@ -376,7 +376,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "-FOLLOW_SYSTEM_SETTINGS-", 
 			parserClass = Language.Parser.class, 
-			label = Label.MESSMOD)
+			label = { Label.HIGHLIGHT, Label.MESSMOD })
 	public static String language;
 	
 	@Option(defaultValue = "10", 
@@ -426,7 +426,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.INTERACTION_TWEAKS)
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static boolean quickMobMounting;
 	
 	@Option(defaultValue = "false", 
@@ -451,7 +451,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.RENDERER)
+			label = { Label.HIGHLIGHT, Label.RENDERER })
 	public static boolean renderBlockShape;
 	
 	@Option(defaultValue = "false", 
@@ -461,17 +461,17 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.RENDERER)
+			label = { Label.HIGHLIGHT, Label.RENDERER })
 	public static boolean renderFluidShape;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.RENDERER)
+			label = { Label.HIGHLIGHT, Label.RENDERER })
 	public static boolean renderRedstoneGateInfo;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = Label.RENDERER)
+			label = { Label.HIGHLIGHT, Label.RENDERER })
 	public static boolean serverSyncedBox;
 	
 	@Option(defaultValue = "-1", 
@@ -496,14 +496,14 @@ public class OptionManager{
 	
 	@Option(defaultValue = " ", 
 			parserClass = CommandTextFieldWidget.CharSetParser.class, 
-			label = { Label.INTERACTION_TWEAKS }, 
+			label = Label.INTERACTION_TWEAKS, 
 			suggestions = { " ", " ,=:.([{}])" })
 	public static CharSet smartCursorCustomWordDelimiters;
 	
 	@Option(defaultValue = "VANILLA", 
 			parserClass = CommandTextFieldWidget.CursorMode.Parser.class, 
 			environment = EnvType.CLIENT, 
-			label = { Label.INTERACTION_TWEAKS })
+			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
 	public static CommandTextFieldWidget.CursorMode smartCursorMode;
 	
 	@Option(defaultValue = "true", 
@@ -552,12 +552,12 @@ public class OptionManager{
 	
 	@Option(defaultValue = "1.0", 
 			parserClass = FloatParser.Positive.class, 
-			label = Label.RENDERER)
+			label = { Label.HIGHLIGHT, Label.RENDERER })
 	public static float tpsGraphScale;
 	
 	@Option(defaultValue = "[]", 
 			parserClass = ListParser.DebugRender.class, 
-			label = Label.RENDERER)
+			label = { Label.HIGHLIGHT, Label.RENDERER })
 	public static List<Either<Field, String>> vanillaDebugRenderers;
 	
 	private static void setOptionSet(OptionSet set) {
