@@ -22,7 +22,7 @@ public enum ServerTickingPhase implements TickingPhase {
 	REST(true);
 	
 	private static ServerTickingPhase current;
-	private final List<TickingPhase.Event> events = Lists.newArrayList();
+	private final List<TickingPhase.Event> events = Lists.newCopyOnWriteArrayList();
 	public final boolean notInAnyWorld;
 	
 	private ServerTickingPhase(boolean notInAnyWorld) {

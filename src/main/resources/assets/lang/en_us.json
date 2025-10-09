@@ -340,6 +340,7 @@
 		"oscil.gui.trigmode.BOTH" : "Both", 
 		"oscil.gui.trigmode.NONE" : "None", 
 		"oscil.gui.show" : "Show", 
+		"oscil.gui.active" : "Active Probing", 
 		"oscil.gui.triginf" : "Channel %d @ %d", 
 		"oscil.gui.mode" : "Mode", 
 		"oscil.gui.mode.analog" : "Analog Mode", 

@@ -866,21 +866,22 @@ public final class OscilscopeScreen extends Screen {
 			private final ButtonWidget trigMode;
 			private final TextFieldWidget trigLevel;
 			private final CheckboxWidget show; 
+			private final CheckboxWidget active; 
 
 			public Entry(Oscilscope.Channel backend) {
 				this.backend = backend;
 				this.trigMode = new ButtonWidget(ChannelList.this.left + 23, 1, 
-						(int) (ChannelList.this.width * 0.5) - 23, 20, 
-						I18N.translateAsText("oscil.gui.trigmode." + this.backend.getTrigMode()), 
+						20, 20, 
+						this.getTrigModeIndicator(), 
 						(btn) -> {
 							int prevTrigModeOrd = backend.getTrigMode().ordinal();
 							int newTrigModeOrd = (prevTrigModeOrd + 1) % Oscilscope.TrigMode.values().length;
 							Oscilscope.TrigMode newTrigMode = Oscilscope.TrigMode.values()[newTrigModeOrd];
 							this.backend.setTrigMode(newTrigMode);
-							btn.setMessage(I18N.translateAsText("oscil.gui.trigmode." + newTrigMode));
+							btn.setMessage(this.getTrigModeIndicator());
 						});
 				this.trigLevel = new TextFieldWidget(OscilscopeScreen.this.textRenderer, 
-						ChannelList.this.left + (int) (ChannelList.this.width * 0.5) + 4, 4, 
+						ChannelList.this.left + 47, 4, 
 						20, 14, 
 						Text.of(Integer.toString(this.backend.getTrigLevel())));
 				this.trigLevel.setTextPredicate((in) -> in.matches("^[+-]?[0-9]*$"));
@@ -890,15 +891,42 @@ public final class OscilscopeScreen extends Screen {
 					}
 				});
 				this.trigLevel.setText(Integer.toString(this.backend.getTrigLevel()));
-				this.show = new CheckboxWidget(ChannelList.this.left + (int) (ChannelList.this.width * 0.5) + 28, 1, 
-						(int) (ChannelList.this.width * 0.5) - 28, 20, 
-						I18N.translateAsText("oscil.gui.show"), true) {
+				this.show = new CheckboxWidget(ChannelList.this.left + 71, 1, 
+						20, 20, 
+						Text.of(I18N.translateAsText("oscil.gui.show").asTruncatedString(2)), true) {
 					@Override
 					public void onPress() {
 						super.onPress();
 						Entry.this.backend.setVisible(this.isChecked());
 					}
 				};
+				int lengthOfShow = ChannelList.this.client.textRenderer.getWidth(
+						I18N.translateAsText("oscil.gui.show").asTruncatedString(2));
+				this.active = new CheckboxWidget(ChannelList.this.left + 100 + lengthOfShow, 1, 
+						20, 20, 
+						Text.of(I18N.translateAsText("oscil.gui.active").asTruncatedString(2)), true) {
+					@Override
+					public void onPress() {
+						super.onPress();
+						Entry.this.backend.setActiveUpdate(this.isChecked());
+					}
+				};
+			}
+			
+			private Text getTrigModeIndicator() {
+				switch (this.backend.getTrigMode()) {
+				case BOTH:
+					return new FormattedText("\u2B06", "rcl").asMutableText()
+							.append(new FormattedText("\u2B07", "ral").asMutableText());
+				case FALLING:
+					return new FormattedText("\u2B07", "ral").asMutableText();
+				case NONE:
+					return new FormattedText("\u2715", "rcl").asMutableText();
+				case RISING:
+					return new FormattedText("\u2B06", "rcl").asMutableText();
+				default:
+					throw new IllegalStateException();
+				}
 			}
 			
 			@Override
@@ -919,9 +947,11 @@ public final class OscilscopeScreen extends Screen {
 				this.trigMode.y = y + 1;
 				this.trigLevel.y = y + 4;
 				this.show.y = y + 1;
+				this.active.y = y + 1;
 				this.trigMode.render(ms, mouseX, mouseY, var10);
 				this.trigLevel.render(ms, mouseX, mouseY, var10);
 				this.show.render(ms, mouseX, mouseY, var10);
+				this.active.render(ms, mouseX, mouseY, var10);
 				int deltaX = mouseX - x;
 				int deltaY = mouseY - y;
 				if (deltaX >= 2 && deltaX <= 19 && deltaY >= 2 && deltaY <= 19) {
@@ -934,13 +964,32 @@ public final class OscilscopeScreen extends Screen {
 							I18N.translateAsText("oscil.gui.chinf.z", ch.getPos().getZ())
 					);
 				}
+				
+				if (deltaX >= 23 && deltaX <= 43 && deltaY >= 2 && deltaY <= 19) {
+					ChannelList.this.tooltip = Lists.newArrayList(
+							I18N.translateAsText("oscil.gui.trigmode." + this.backend.getTrigMode().name())
+					);
+				}
+				
+				if (deltaX >= 71 && mouseX <= this.active.x && deltaY >= 2 && deltaY <= 19) {
+					ChannelList.this.tooltip = Lists.newArrayList(
+							I18N.translateAsText("oscil.gui.show")
+					);
+				}
+				
+				if (mouseX >= this.active.x && deltaY >= 2 && deltaY <= 19) {
+					ChannelList.this.tooltip = Lists.newArrayList(
+							I18N.translateAsText("oscil.gui.active")
+					);
+				}
 			}
 			
 			@Override
 			public boolean mouseClicked(double mouseX, double mouseY, int button) {
 				return this.trigMode.mouseClicked(mouseX, mouseY, button)
 						|| this.trigLevel.mouseClicked(mouseX, mouseY, button)
-						|| this.show.mouseClicked(mouseX, mouseY, button);
+						|| this.show.mouseClicked(mouseX, mouseY, button)
+						|| this.active.mouseClicked(mouseX, mouseY, button);
 			}
 			
 			@Override

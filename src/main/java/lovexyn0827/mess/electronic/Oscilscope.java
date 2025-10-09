@@ -16,6 +16,8 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.ServerMicroTime;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +26,7 @@ import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Lazy;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -178,12 +181,23 @@ public final class Oscilscope {
 		private int trigLevel = 1;
 		private int prevLevel = -1;
 		private boolean visible = true;
+		private final Lazy<TickingPhase.Event> updater;
 
 		private Channel(RegistryKey<World> dimension, BlockPos pos, int color) {
 			this.id = Oscilscope.this.nextChannelId++;
 			this.dimension = dimension;
 			this.pos = pos;
 			this.color = color;
+			this.updater = new Lazy<>(() -> {
+				return (phase, world) -> {
+					if (world != null) {
+						Oscilscope.this.update(world, pos, world.getReceivedRedstonePower(pos));
+					}
+				};
+			});
+			
+			// XXX: Channel auto creation
+			this.setActiveUpdate(true);
 		}
 		
 		/**
@@ -197,6 +211,7 @@ public final class Oscilscope {
 			this.color = color;
 			this.trigMode = trigMode;
 			this.trigLevel = trigLevel;
+			this.updater = new Lazy<>(() -> (p, w) -> {});
 		}
 
 		void update(int level) {
@@ -233,6 +248,14 @@ public final class Oscilscope {
 			int result = 1;
 			result = prime * result + Objects.hash(dimension, pos);
 			return result;
+		}
+		
+		void setActiveUpdate(boolean activeUpdate) {
+			if (activeUpdate) {
+				ServerTickingPhase.addEventToAll(this.updater.get());
+			} else {
+				ServerTickingPhase.removeEventFromAll(this.updater.get());
+			}
 		}
 
 		@Override

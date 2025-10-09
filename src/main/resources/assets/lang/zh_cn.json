@@ -340,6 +340,7 @@
 		"oscil.gui.trigmode.BOTH" : "上下边沿", 
 		"oscil.gui.trigmode.NONE" : "无触发", 
 		"oscil.gui.show" : "显示", 
+		"oscil.gui.active" : "主动探测", 
 		"oscil.gui.triginf" : "通道 %d @ %d", 
 		"oscil.gui.mode" : "模式", 
 		"oscil.gui.mode.analog" : "模拟模式", 
