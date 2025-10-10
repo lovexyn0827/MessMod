@@ -181,7 +181,7 @@ public class VariableCommand {
 													}
 													
 													return Command.SINGLE_SUCCESS;
-												}))
+												})))
 								.then(literal("dumpFields")
 										.executes((ct) -> {
 											String slot = StringArgumentType.getString(ct, "slot");
@@ -202,13 +202,17 @@ public class VariableCommand {
 										key, val == null ? "null" : val.toString()));
 							});
 							return Command.SINGLE_SUCCESS;
-						})));
+						}));
 		dispatcher.register(command);
 	}
 	
 	private static Text toText(Object ob, int depth) {
+		if (ob == null) {
+			return new FormattedText("null", "r7").asMutableText();
+		}
+		
 		if (depth == 0) {
-			return new FormattedText(ob == null ? "null" : ob.toString(), "r7").asMutableText();
+			return new FormattedText(ob.toString(), "r7").asMutableText();
 		}
 		
 		Mapping map = MessMod.INSTANCE.getMapping();
