@@ -265,8 +265,7 @@ public class MessMod implements ModInitializer {
 			return true;
 		} else {
 			MinecraftClient mc = MinecraftClient.getInstance();
-			return mc.getServer() == null && (mc.getCurrentServerEntry() == null ? 
-					false : !mc.getCurrentServerEntry().isLocal());
+			return mc.getServer() == null;
 		}
 	}
 
