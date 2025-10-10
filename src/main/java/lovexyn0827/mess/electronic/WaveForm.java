@@ -232,7 +232,7 @@ public final class WaveForm {
 			}
 
 			try {
-				return ServerTickingPhase.valueOf(name);
+				return ServerTickingPhase.byNameOrAbbreviation(name);
 			} catch (IllegalArgumentException e) {
 				throw new TranslatableException("cmd.general.nodef", name);
 			}
