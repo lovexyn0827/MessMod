@@ -10,7 +10,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import lovexyn0827.mess.MessMod;
-import lovexyn0827.mess.util.ServerMicroTime;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import lovexyn0827.mess.util.phase.TickingPhase.Event;
@@ -21,6 +20,7 @@ import net.minecraft.world.World;
 public final class WaveForm {
 	private final int length;
 	private final int startModLength;
+	private Stage currentStage = null;
 	
 	/**
 	 * Non-empty, ascending list of stages with output
@@ -45,35 +45,15 @@ public final class WaveForm {
 		this.stages.forEach(Stage::unregister);
 	}
 	
-	private WaveForm.Stage getStageAt(int tickMod, ServerTickingPhase phase) {
-		int left = 0;
-		int right = this.stages.size() - 1;
-		while (left <= right) {
-			int mid = (left + right) / 2;
-			WaveForm.Stage midStg = this.stages.get(mid);
-			if (midStg.contains(tickMod, phase)) {
-				return midStg;
-			} else if (midStg.after(tickMod, phase)) {
-				right = mid - 1;
-			} else {
-				left = mid + 1;
-			}
-		}
-		
-		return null;
-	}
-	
 	private int getTickMod(long tick) {
 		return (int) ((tick + this.startModLength + this.length) % this.length);
 	}
 	
 	public int getCurrentLevel() {
-		ServerMicroTime now = ServerMicroTime.current();
-		WaveForm.Stage curStg = this.getStageAt(this.getTickMod(now.gameTime), now.phase);
-		if (curStg == null) {
+		if (this.currentStage == null) {
 			return 0;
 		} else {
-			return curStg.level;
+			return this.currentStage.level;
 		}
 	}
 
@@ -100,14 +80,7 @@ public final class WaveForm {
 		}
 		
 		in.skipWhitespace();
-		List<WaveForm.Stage> stages = new ArrayList<>();
-		WaveForm.Stage prev = null;
-		while (in.canRead()) {
-			prev = Stage.parseStandardMode(prev, in);
-			stages.add(prev);
-			in.skipWhitespace();
-		}
-		
+		List<Stage> stages = parseStages(in, null, 1);
 		if (stages.isEmpty()) {
 			throw new TranslatableException("cmd.wavegen.err.empty");
 		}
@@ -124,6 +97,43 @@ public final class WaveForm {
 		return new WaveForm(len, offset >= 0 ? offset : len - offset, stages);
 	}
 	
+	private static List<Stage> parseStages(StringReader in, Stage prev, int repeat) throws CommandSyntaxException {
+		List<Stage> stages = new ArrayList<>();
+		int cursor = in.getCursor();
+		for (int i = 0; i < repeat; i++) {
+			in.setCursor(cursor);
+			while (in.canRead()) {
+				if (in.peek() == ']') {
+					break;
+				}
+				
+				// 3*((+0=>+0)L15 (+0=>+0)L0)
+				if (Character.isDigit(in.peek())) {
+					stages.addAll(parseStages(in, prev, readRepeatitionStart(in)));
+					if (!stages.isEmpty()) {
+						prev = stages.get(stages.size() - 1);
+					}
+				} else {
+					prev = Stage.parseStandardMode(prev, in);
+					stages.add(prev);
+				}
+				
+				in.skipWhitespace();
+			}
+		}
+		
+		return stages;
+	}
+	
+	private static int readRepeatitionStart(StringReader in) throws CommandSyntaxException {
+		int repeat = in.readInt();
+		if (!in.canRead() || in.read() != '*' || !in.canRead() || in.read() != '[') {
+			throw new TranslatableException("cmd.wavegen.err.stgfmt");
+		}
+		
+		return repeat;
+	}
+
 	private static WaveForm parseSimpleMode(StringReader in) throws CommandSyntaxException {
 		WaveForm.Stage prev = null;
 		List<WaveForm.Stage> stages = new ArrayList<>();
@@ -155,7 +165,8 @@ public final class WaveForm {
 	
 	private static void appendStandardModeSuggestions(StringReader in, SuggestionsBuilder sb) 
 			throws CommandSyntaxException {
-		in.setCursor(in.getString().lastIndexOf(' ') + 1);
+		String inStr = in.getString();
+		in.setCursor(Math.max(inStr.lastIndexOf(' '), inStr.lastIndexOf('[')) + 1);
 		Stage.appendStandardModeSuggestions(in, sb);
 	}
 
@@ -192,15 +203,14 @@ public final class WaveForm {
 			return tickMod << 4 | phase.ordinal();
 		}
 		
-		protected boolean contains(int tickMod, ServerTickingPhase phase) {
-			long tickModFlat = flatten(tickMod, phase);
-			return tickModFlat >= flatten(this.fromTick, this.fromPhase) 
-					&& tickModFlat < flatten(this.toTick, this.toPhase);
-		}
-		
 		protected boolean after(int tickMod, ServerTickingPhase phase) {
 			long tickModFlat = flatten(tickMod, phase);
 			return tickModFlat < flatten(this.fromTick, this.fromPhase);
+		}
+		
+		private boolean notBefore(int tickMod, ServerTickingPhase phase) {
+			long tickModFlat = flatten(tickMod, phase);
+			return tickModFlat <= flatten(this.fromTick, this.fromPhase);
 		}
 
 		protected void register(World targetWorld, BlockPos pos, WaveForm wave) {
@@ -211,6 +221,7 @@ public final class WaveForm {
 				
 				long curTimeMod = wave.getTickMod(MessMod.INSTANCE.getGameTime());
 				if (curTimeMod == this.fromTick) {
+					wave.currentStage = this;
 					world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
 				}
 			};
@@ -221,6 +232,7 @@ public final class WaveForm {
 				
 				long curTimeMod = wave.getTickMod(MessMod.INSTANCE.getGameTime());
 				if (curTimeMod == this.toTick) {
+					wave.currentStage = null;
 					world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
 				}
 			};
@@ -239,9 +251,9 @@ public final class WaveForm {
 		}
 
 		protected boolean canFollow(Stage prev) {
-			return prev == null || this.after(prev.fromTick, prev.fromPhase);
+			return prev == null || this.notBefore(prev.fromTick, prev.fromPhase);
 		}
-		
+
 		private static int readTick(int base, StringReader in) throws CommandSyntaxException {
 			switch (in.read()) {
 			case '+':
@@ -308,6 +320,10 @@ public final class WaveForm {
 			}
 		}
 		
+		private static boolean isDelim(char c) {
+			return c == ' ' || c == ']';
+		}
+		
 		static WaveForm.Stage parseStandardMode(WaveForm.Stage prev, StringReader in) throws CommandSyntaxException {
 			if (in.read() != '(') {
 				throw new TranslatableException("cmd.wavegen.err.stgfmt");
@@ -322,7 +338,7 @@ public final class WaveForm {
 			int to = readTick(from, in);
 			ServerTickingPhase toPhase = readTickingPhase(')', in);
 			int level;
-			if (!in.canRead() || in.peek() == ' ' || in.peek() == '(') {
+			if (!in.canRead() || isDelim(in.peek()) || in.peek() == '(') {
 				level = 15;
 			} else if (in.peek() == 'L') {
 				in.skip();
@@ -382,7 +398,7 @@ public final class WaveForm {
 			}
 			
 			CharSet updateFlags = new CharOpenHashSet();
-			while (in.canRead()) {
+			while (in.canRead() && !isDelim(in.peek())) {
 				char c = in.read();
 				if (c == 'S' || c == 'T') {
 					updateFlags.add(c);
