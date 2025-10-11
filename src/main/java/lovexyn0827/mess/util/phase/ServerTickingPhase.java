@@ -88,6 +88,10 @@ public enum ServerTickingPhase implements TickingPhase {
 			return valueOf(name);
 		}
 	}
+
+	public String abbreviation() {
+		return this.abbreviation;
+	}
 	
 	static {
 		ImmutableMap.Builder<String, ServerTickingPhase> builder = ImmutableMap.builder();

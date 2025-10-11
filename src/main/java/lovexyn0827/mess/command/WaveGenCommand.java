@@ -23,18 +23,22 @@ public class WaveGenCommand {
 				.then(literal("new")
 						.then(argument("pos", BlockPosArgumentType.blockPos())
 								.then(argument("wavedef", StringArgumentType.greedyString())
+										.suggests((ct, b) -> {
+											WaveForm.appendSuggestions(b);
+											return b.buildFuture();
+										})
 										.executes((ct) -> {
 											BlockPos pos = BlockPosArgumentType.getBlockPos(ct, "pos");
-											if (ct.getSource().getWorld().getBlockState(pos).getBlock() != Blocks.LOOM) {
-												CommandUtil.error(ct, "cmd.wavegen.reqloom");
-												return 0;
-											}
-
 											WaveForm wave;
 											try {
 												wave = WaveForm.parse(new StringReader(StringArgumentType.getString(ct, "wavedef")));
 											} catch (TranslatableException e) {
 												CommandUtil.error(ct, e.getLocalizedMessage());
+												return 0;
+											}
+
+											if (ct.getSource().getWorld().getBlockState(pos).getBlock() != Blocks.LOOM) {
+												CommandUtil.error(ct, "cmd.wavegen.reqloom");
 												return 0;
 											}
 											

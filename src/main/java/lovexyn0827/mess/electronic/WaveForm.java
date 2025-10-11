@@ -5,7 +5,10 @@ import java.util.List;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
+import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
+import it.unimi.dsi.fastutil.chars.CharSet;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.ServerMicroTime;
 import lovexyn0827.mess.util.TranslatableException;
@@ -82,6 +85,7 @@ public final class WaveForm {
 	 */
 	public static WaveForm parse(StringReader in) throws CommandSyntaxException {
 		if (in.peek() == 'S') {
+			in.skip();
 			return parseSimpleMode(in);
 		} else {
 			return parseStandardMode(in);
@@ -121,7 +125,6 @@ public final class WaveForm {
 	}
 	
 	private static WaveForm parseSimpleMode(StringReader in) throws CommandSyntaxException {
-		in.skip();
 		WaveForm.Stage prev = null;
 		List<WaveForm.Stage> stages = new ArrayList<>();
 		while (in.canRead()) {
@@ -135,6 +138,33 @@ public final class WaveForm {
 		return new WaveForm(len, offset, stages);
 	}
 	
+	public static void appendSuggestions(SuggestionsBuilder sb) throws CommandSyntaxException {
+		StringReader in = new StringReader(sb.getRemaining());
+		if (!in.canRead()) {
+			sb.suggest("S").suggest("(").suggest("+").suggest("-");
+			return;
+		}
+		
+		if (in.peek() == 'S') {
+			in.skip();
+			appendSimpleModeSuggentions(in, sb);
+		} else {
+			appendStandardModeSuggestions(in, sb);
+		}
+	}
+	
+	private static void appendStandardModeSuggestions(StringReader in, SuggestionsBuilder sb) 
+			throws CommandSyntaxException {
+		in.setCursor(in.getString().lastIndexOf(' ') + 1);
+		Stage.appendStandardModeSuggestions(in, sb);
+	}
+
+	private static void appendSimpleModeSuggentions(StringReader in, SuggestionsBuilder sb) {
+		if (!in.canRead() || Character.isDigit(in.getRemaining().charAt(in.getRemainingLength() - 1))) {
+			sb.suggest("H").suggest("L");
+		}
+	}
+
 	private static final class Stage implements Comparable<WaveForm.Stage> {
 		private final int fromTick;
 		private final ServerTickingPhase fromPhase;
@@ -306,6 +336,102 @@ public final class WaveForm {
 			return validateOrder(new Stage(from, fromPhase, to, toPhase, level, 
 					suppressesOnUpdates, suppressesOffUpdates), prev);
 			
+		}
+
+		public static void appendStandardModeSuggestions(StringReader in, SuggestionsBuilder sb) {
+			if (!in.canRead()) {
+				sb.suggest(in.getString() + "(");
+				return;
+			}
+
+			in.skip();
+			if (!suggestTick(in, sb, '=')) {
+				return;
+			} else if (!in.canRead()) {
+				sb.suggest(in.getString() + "=>");
+			}
+			
+			in.skip();
+			if (!in.canRead()) {
+				sb.suggest(in.getString() + ">");
+				return;
+			}
+
+			in.skip();
+			if (!suggestTick(in, sb, ')')) {
+				return;
+			} else if (!in.canRead()) {
+				sb.suggest(in.getString() + ")");
+				return;
+			}
+
+			in.skip();
+			if (!in.canRead()) {
+				sb.suggest(in.getString() + "L");
+				return;
+			}
+
+			in.skip();
+			if (!in.canRead()) {
+				sb.suggest(in.getString() + "0").suggest(in.getString() + "15").suggest(in.getString() + "1");
+				return;
+			}
+			
+			while (in.canRead() && Character.isDigit(in.peek())) {
+				in.read();
+			}
+			
+			CharSet updateFlags = new CharOpenHashSet();
+			while (in.canRead()) {
+				char c = in.read();
+				if (c == 'S' || c == 'T') {
+					updateFlags.add(c);
+				}
+			}
+			
+			if (!updateFlags.contains('S')) {
+				sb.suggest(in.getString() + "S");
+			}
+
+			if (!updateFlags.contains('T')) {
+				sb.suggest(in.getString() + "T");
+			}
+			
+		}
+
+		private static boolean suggestTick(StringReader in, SuggestionsBuilder sb, char delim) {
+			if (!in.canRead()) {
+				sb.suggest(in.getString() + "!").suggest(in.getString() + "+");
+				return false;
+			}
+			
+			if (in.peek() == '!' || in.peek() == '+') {
+				in.skip();
+			}
+			
+			int numCount = 0;
+			while (in.canRead() && Character.isDigit(in.peek())) {
+				in.skip();
+				numCount++;
+			}
+			
+			if (numCount > 0) {
+				for (ServerTickingPhase phase : ServerTickingPhase.values()) {
+					if (phase.name().startsWith(in.getRemaining())) {
+						sb.suggest(in.getString() + phase.name().substring(in.getRemainingLength()));
+					}
+				
+					if (phase.abbreviation().startsWith(in.getRemaining())) {
+						sb.suggest(in.getString() + phase.abbreviation().substring(in.getRemainingLength()));
+					}
+				}
+			}
+			
+			while (in.canRead() && in.peek() != delim) {
+				in.skip();
+			}
+			
+			return numCount > 0;
 		}
 
 		@Override
