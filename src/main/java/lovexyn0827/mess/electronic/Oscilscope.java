@@ -190,7 +190,7 @@ public final class Oscilscope {
 			this.color = color;
 			this.updater = new Lazy<>(() -> {
 				return (phase, world) -> {
-					if (world != null) {
+					if (world != null && world.getRegistryKey() == this.dimension) {
 						Oscilscope.this.update(world, pos, world.getReceivedRedstonePower(pos));
 					}
 				};

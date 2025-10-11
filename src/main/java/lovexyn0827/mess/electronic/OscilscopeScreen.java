@@ -92,6 +92,8 @@ public final class OscilscopeScreen extends Screen {
 		this.channelList = new ChannelList();
 		this.addChild(this.trigHistory);
 		this.addChild(this.channelList);
+		this.waveData.takeNewChannels((ch) -> {});
+		this.waveData.takeUnprocessedTriggers((trig) -> {});
 		this.waveData.getAllChannels().forEach(this::onNewChannel);
 		this.waveData.getTriggerHistory().forEach(this.trigHistory::onTrig);
 		this.modeBtn = new ButtonWidget(
