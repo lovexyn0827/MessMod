@@ -632,7 +632,7 @@ public final class OscilscopeScreen extends Screen {
 						this.right, -1, channel, prevEdge, null);
 			});
 			if (!toolTip.isEmpty()) {
-				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, mouseY);
+				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, Math.max(mouseY, 24));
 			}
 		}
 		
@@ -745,7 +745,7 @@ public final class OscilscopeScreen extends Screen {
 			}
 			
 			if (!toolTip.isEmpty()) {
-				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, mouseY);
+				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, Math.max(mouseY, 24));
 			}
 		}
 		
