@@ -128,6 +128,10 @@ public final class WaveForm {
 	
 	private static int readRepeatitionStart(StringReader in) throws CommandSyntaxException {
 		int repeat = in.readInt();
+		if (in.canRead() && in.peek() == '*') {
+			in.skip();
+		}
+		
 		if (!in.canRead() || in.read() != '[') {
 			throw new TranslatableException("cmd.wavegen.err.stgfmt");
 		}
