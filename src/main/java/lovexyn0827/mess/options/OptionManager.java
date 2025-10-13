@@ -379,6 +379,11 @@ public class OptionManager{
 			label = { Label.HIGHLIGHT, Label.MESSMOD })
 	public static String language;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = { Label.HIGHLIGHT, Label.REDSTONE })
+	public static boolean loomWaveGenerator;
+	
 	@Option(defaultValue = "10", 
 			parserClass = IntegerParser.Positive.class, 
 			label = { Label.RESEARCH, Label.BUGFIX })

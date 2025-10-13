@@ -147,6 +147,7 @@
 		"cmd.wavegen.err.reqorder" : "阶段间必须有序，而且不能重叠", 
 		"cmd.wavegen.err.tobeforefrom" : "阶段的开始时间不能在结束之间之后", 
 		"cmd.wavegen.err.largeoffset" : "时间偏移量（%d）必须小于波形长度（%d）", 
+		"cmd.wavegen.reqopt" : "此波形在选项loomWaveGenerator启用前暂时不会生效。（可通过/messcfg loomWaveGenerator true启用此选项)", 
 		
 		//***** Exceptions *****
 		"exp.reqint" : "需要整数， 但是出现了%s", 
@@ -258,6 +259,7 @@
 		"opt.independentEntityPickerForInfomation.desc" : "独立地为信息提供者（目前只包含指令UUID建议）选取目标实体。", 
 		"opt.interactableB36.desc" : "允许玩家破坏36号方块或对准它放置物品。", 
 		"opt.language.desc" : "该Mod的主要语言。", 
+		"opt.loomWaveGenerator.desc" : "将织布机作为一个波形发生器，其输出可由`/wavegen`指令配置。", 
 		"opt.maxClientTicksPerFrame.desc" : "FPS低于20时每帧可以运行多少个客户端游戏刻。", 
 		"opt.maxEndEyeTpRadius.desc" : "设置endEyeTeleport功能的最远传送距离。", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "允许玩家在地面上直接放置矿车。", 

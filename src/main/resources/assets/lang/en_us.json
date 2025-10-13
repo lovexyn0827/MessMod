@@ -147,6 +147,7 @@
 		"cmd.wavegen.err.reqorder" : "Stages should be ordered and should not overlap", 
 		"cmd.wavegen.err.tobeforefrom" : "Start time of stages shouldn't appear after its end time!", 
 		"cmd.wavegen.err.largeoffset" : "Time offset (%d) should be less than the length of waveform (%d)", 
+		"cmd.wavegen.reqopt" : "The waveform won't take effect until the option `loomWaveGenerator` is enabled. (You may enable it with `/messcfg loomWaveGenerator true`)", 
 		
 		//***** Exceptions *****
 		"exp.reqint" : "Requires an integer, but found %s", 
@@ -258,6 +259,7 @@
 		"opt.independentEntityPickerForInfomation.desc" : "Pick crosshair-targeted entities for information providers (currently only the UUID suggestor) independently.", 
 		"opt.interactableB36.desc" : "Allow players to break block-36s and place something against it.", 
 		"opt.language.desc" : "The main language of the Mod.", 
+		"opt.loomWaveGenerator.desc" : "Make loom blocks a wave generator, whose output can be configurated with `/wavegen`.", 
 		"opt.maxClientTicksPerFrame.desc" : "The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.", 
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleportation with `endEyeTeleport`.", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "Allow players to place minecarts directly on the ground.", 
