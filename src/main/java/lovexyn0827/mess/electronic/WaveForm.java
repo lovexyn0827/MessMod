@@ -16,7 +16,6 @@ import lovexyn0827.mess.util.phase.TickingPhase.Event;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-// TODO: oscillating at a single stage
 public final class WaveForm {
 	private final int length;
 	private final int startModLength;
@@ -104,16 +103,18 @@ public final class WaveForm {
 			in.setCursor(cursor);
 			while (in.canRead()) {
 				if (in.peek() == ']') {
+					in.read();
 					break;
 				}
 				
-				// 3*((+0=>+0)L15 (+0=>+0)L0)
-				if (Character.isDigit(in.peek())) {
+				// 3[(+0=>+0)L15 (+0=>+0)L0]
+				char firstCh = in.peek();
+				if (Character.isDigit(firstCh)) {
 					stages.addAll(parseStages(in, prev, readRepeatitionStart(in)));
 					if (!stages.isEmpty()) {
 						prev = stages.get(stages.size() - 1);
 					}
-				} else {
+				} else if (firstCh == '(') {
 					prev = Stage.parseStandardMode(prev, in);
 					stages.add(prev);
 				}
@@ -127,7 +128,7 @@ public final class WaveForm {
 	
 	private static int readRepeatitionStart(StringReader in) throws CommandSyntaxException {
 		int repeat = in.readInt();
-		if (!in.canRead() || in.read() != '*' || !in.canRead() || in.read() != '[') {
+		if (!in.canRead() || in.read() != '[') {
 			throw new TranslatableException("cmd.wavegen.err.stgfmt");
 		}
 		
@@ -405,6 +406,10 @@ public final class WaveForm {
 				}
 			}
 			
+			if (in.canRead() && isDelim(in.peek())) {
+				return;
+			}
+			
 			if (!updateFlags.contains('S')) {
 				sb.suggest(in.getString() + "S");
 			}
@@ -462,5 +467,17 @@ public final class WaveForm {
 			
 			return this.fromPhase.compareTo(s.fromPhase);
 		}
+
+		@Override
+		public String toString() {
+			return String.format("Stage[%d:%s => %d:%s]L%d%c%c", 
+					this.fromTick, this.fromPhase.abbreviation(), 
+					this.toTick, this.toPhase.abbreviation(), 
+					this.level, 
+					this.suppressesOnUpdates ? 'S' : '_', 
+					this.suppressesOffUpdates ? 'T' : '_');
+		}
+		
+		
 	}
 }
