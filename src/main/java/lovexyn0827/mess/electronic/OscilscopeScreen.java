@@ -603,6 +603,17 @@ public final class OscilscopeScreen extends Screen {
 			List<Text> toolTip = new ArrayList<>();
 			Map<Oscilscope.Channel, List<Oscilscope.Edge>> data = 
 					OscilscopeScreen.this.waveData.getWaveData(from, to, false);
+			synchronized (data) {
+				drawSingleWave(matrices, mouseX, mouseY, toolTip, data);
+			}
+			
+			if (!toolTip.isEmpty()) {
+				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, Math.max(mouseY, 24));
+			}
+		}
+
+		private void drawSingleWave(MatrixStack matrices, int mouseX, int mouseY, List<Text> toolTip,
+				Map<Oscilscope.Channel, List<Oscilscope.Edge>> data) {
 			data.forEach((channel, wave) -> {
 				int color = this.getTransformedColor(channel);
 				if (wave.isEmpty()) {
@@ -633,9 +644,6 @@ public final class OscilscopeScreen extends Screen {
 						this.calculatePosOfLevel(prevEdge.newLevel), 
 						this.right, -1, channel, prevEdge, null);
 			});
-			if (!toolTip.isEmpty()) {
-				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, Math.max(mouseY, 24));
-			}
 		}
 		
 		private int calculatePosOfLevel(int level) {
@@ -717,18 +725,20 @@ public final class OscilscopeScreen extends Screen {
 				}
 				
 				Oscilscope.Edge prevEdge = null;
-				for (Oscilscope.Edge edge : wave) {
-					if (prevEdge != null) {
-						int prevX = this.calculatePosOfTime(prevEdge.time);
-						int curX = this.calculatePosOfTime(edge.time);
-						int prevY = this.getWaveY(prevEdge.newLevel > 0, vOffset);
-						int curY = this.getWaveY(edge.newLevel > 0, vOffset);
-						drawHorizontalLine(matrices, prevX, curX, prevY, color);
-						drawVerticalLine(matrices, curX, prevY, curY, color);
-						this.appendToolTipIfNeeded(toolTip, mouseX, mouseY, prevX, prevY, curX, curY, 
-								channel, prevEdge, edge);
+				synchronized (wave) {
+					for (Oscilscope.Edge edge : wave) {
+						if (prevEdge != null) {
+							int prevX = this.calculatePosOfTime(prevEdge.time);
+							int curX = this.calculatePosOfTime(edge.time);
+							int prevY = this.getWaveY(prevEdge.newLevel > 0, vOffset);
+							int curY = this.getWaveY(edge.newLevel > 0, vOffset);
+							drawHorizontalLine(matrices, prevX, curX, prevY, color);
+							drawVerticalLine(matrices, curX, prevY, curY, color);
+							this.appendToolTipIfNeeded(toolTip, mouseX, mouseY, prevX, prevY, curX, curY, 
+									channel, prevEdge, edge);
+						}
+						prevEdge = edge;
 					}
-					prevEdge = edge;
 				}
 				
 				drawHorizontalLine(matrices, this.calculatePosOfTime(prevEdge.time), 

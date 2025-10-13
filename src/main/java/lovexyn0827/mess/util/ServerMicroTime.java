@@ -8,6 +8,8 @@ import net.minecraft.network.PacketByteBuf;
 
 public final class ServerMicroTime implements Comparable<ServerMicroTime> {
 	public static final ServerMicroTime PRE_HISTORY = new ServerMicroTime(-1, ServerTickingPhase.WEATHER_CYCLE);
+	public static final ServerMicroTime END_OF_TIME = new ServerMicroTime(Long.MAX_VALUE, 
+			ServerTickingPhase.REST);
 	public final long gameTime;
 	public final ServerTickingPhase phase;
 	
