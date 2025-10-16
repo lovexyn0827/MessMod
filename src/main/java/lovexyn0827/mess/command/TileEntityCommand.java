@@ -40,12 +40,12 @@ public class TileEntityCommand {
 									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.toTag(tag));
 									return 1;
 								}))).
-				then(literal("set").
+				then(literal("add").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								then(argument("type",IdentifierArgumentType.identifier()).suggests(suggestions ).
 										executes((ct) -> {
 											BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
-											BlockEntity be = getBlockEntity(ct);;
+											BlockEntity be = getBlockEntity(ct);
 											ct.getSource().getWorld().setBlockEntity(pos, be);
 											CommandUtil.feedback(ct, "cmd.general.success");
 											return 1;
@@ -56,6 +56,28 @@ public class TileEntityCommand {
 													BlockEntity be = getBlockEntity(ct);
 													be.fromTag(ct.getSource().getWorld().getBlockState(pos), 
 															(CompoundTag) NbtTagArgumentType.getTag(ct, "tag"));
+													ct.getSource().getWorld().setBlockEntity(pos, be);
+													CommandUtil.feedback(ct, "cmd.general.success");
+													return 1;
+											}))))).
+				then(literal("set").
+						then(argument("pos",BlockPosArgumentType.blockPos()).
+								then(argument("type",IdentifierArgumentType.identifier()).suggests(suggestions ).
+										executes((ct) -> {
+											BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
+											BlockEntity be = getBlockEntity(ct);
+											ct.getSource().getWorld().removeBlockEntity(pos);
+											ct.getSource().getWorld().setBlockEntity(pos, be);
+											CommandUtil.feedback(ct, "cmd.general.success");
+											return 1;
+										}).
+										then(argument("tag",NbtTagArgumentType.nbtTag()).
+												executes((ct)->{
+													BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
+													BlockEntity be = getBlockEntity(ct);
+													be.fromTag(ct.getSource().getWorld().getBlockState(pos), 
+															(CompoundTag) NbtTagArgumentType.getTag(ct, "tag"));
+													ct.getSource().getWorld().removeBlockEntity(pos);
 													ct.getSource().getWorld().setBlockEntity(pos, be);
 													CommandUtil.feedback(ct, "cmd.general.success");
 													return 1;
