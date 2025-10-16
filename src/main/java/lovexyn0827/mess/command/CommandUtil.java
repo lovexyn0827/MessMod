@@ -66,7 +66,6 @@ public class CommandUtil {
 			VariableCommand.reset();
 			LogDeathCommand.reset();
 			LogMovementCommand.reset();
-			WaveGenCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public void sendSystemMessage(Text message, UUID senderUuid) {}

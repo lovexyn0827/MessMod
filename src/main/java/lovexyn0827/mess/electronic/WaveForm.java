@@ -37,7 +37,7 @@ public final class WaveForm {
 			stg.register(targetWorld, pos, this);
 		}
 		
-		WaveGenerator.register(targetWorld, pos, this);
+		MessMod.INSTANCE.getWaveGenerator().register(targetWorld, pos, this);
 	}
 	
 	public void unregister() {

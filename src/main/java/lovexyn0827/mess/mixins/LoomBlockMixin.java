@@ -2,7 +2,7 @@ package lovexyn0827.mess.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 
-import lovexyn0827.mess.electronic.WaveGenerator;
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
@@ -33,6 +33,6 @@ public abstract class LoomBlockMixin extends AbstractBlock {
 			return 0;
 		}
 		
-		return WaveGenerator.getLevelAt(((World) world).getRegistryKey(), pos);
+		return MessMod.INSTANCE.getWaveGenerator().getLevelAt(((World) world).getRegistryKey(), pos);
 	}
 }

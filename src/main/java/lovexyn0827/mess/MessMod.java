@@ -10,6 +10,7 @@ import lovexyn0827.mess.command.CommandUtil;
 import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.electronic.Oscilscope;
+import lovexyn0827.mess.electronic.WaveGenerator;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.entity.EntityLogger;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -47,7 +48,7 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 
-public class MessMod implements ModInitializer {
+public final class MessMod implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final MessMod INSTANCE = new MessMod();
 	private Mapping mapping;
@@ -72,6 +73,7 @@ public class MessMod implements ModInitializer {
 	private ChunkBehaviorLogger chunkLogger;
 	private FlowerFieldRenderer flowerFieldRenderer;
 	private Oscilscope oscilscope;
+	private WaveGenerator waveGenerator;
 	private volatile long gameTime;
 
 	private MessMod() {
@@ -122,6 +124,7 @@ public class MessMod implements ModInitializer {
 		this.shapeSender = ShapeSender.create(server);
 		this.chunkLogger = new ChunkBehaviorLogger(server);
 		this.oscilscope = new Oscilscope();
+		this.waveGenerator = new WaveGenerator();
 	}
 
 	public void onServerShutdown(MinecraftServer server) {
@@ -135,6 +138,7 @@ public class MessMod implements ModInitializer {
 		this.chunkLoadingInfoRenderer = null;
 		this.flowerFieldRenderer = null;
 		this.oscilscope = null;
+		this.waveGenerator = null;
 		ServerTickingPhase.initialize();
 		if(OptionManager.entityLogAutoArchiving) {
 			try {
@@ -310,5 +314,9 @@ public class MessMod implements ModInitializer {
 
 	public Oscilscope getOscilscope() {
 		return this.oscilscope;
+	}
+
+	public WaveGenerator getWaveGenerator() {
+		return this.waveGenerator;
 	}
 }
