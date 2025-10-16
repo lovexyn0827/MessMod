@@ -905,7 +905,8 @@ public final class OscilscopeScreen extends Screen {
 				this.trigLevel.setText(Integer.toString(this.backend.getTrigLevel()));
 				this.show = new CheckboxWidget(ChannelList.this.left + 71, 1, 
 						20, 20, 
-						Text.of(I18N.translateAsText("oscil.gui.show").asTruncatedString(2)), true) {
+						Text.of(I18N.translateAsText("oscil.gui.show").asTruncatedString(2)), 
+						this.backend.isVisible()) {
 					@Override
 					public void onPress() {
 						super.onPress();
@@ -916,7 +917,8 @@ public final class OscilscopeScreen extends Screen {
 						I18N.translateAsText("oscil.gui.show").asTruncatedString(2));
 				this.active = new CheckboxWidget(ChannelList.this.left + 100 + lengthOfShow, 1, 
 						20, 20, 
-						Text.of(I18N.translateAsText("oscil.gui.active").asTruncatedString(2)), true) {
+						Text.of(I18N.translateAsText("oscil.gui.active").asTruncatedString(2)), 
+						this.backend.isUpdatingActively()) {
 					@Override
 					public void onPress() {
 						super.onPress();

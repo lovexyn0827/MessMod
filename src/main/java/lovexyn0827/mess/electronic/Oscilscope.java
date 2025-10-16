@@ -182,6 +182,7 @@ public final class Oscilscope {
 		private int prevLevel = -1;
 		private boolean visible = true;
 		private final Lazy<TickingPhase.Event> updater;
+		private boolean activeUpdate;
 
 		private Channel(RegistryKey<World> dimension, BlockPos pos, int color) {
 			this.id = Oscilscope.this.nextChannelId++;
@@ -195,8 +196,6 @@ public final class Oscilscope {
 					}
 				};
 			});
-			
-			// XXX: Channel auto creation
 			this.setActiveUpdate(true);
 		}
 		
@@ -251,6 +250,7 @@ public final class Oscilscope {
 		}
 		
 		void setActiveUpdate(boolean activeUpdate) {
+			this.activeUpdate = activeUpdate;
 			if (activeUpdate) {
 				ServerTickingPhase.addEventToAll(this.updater.get());
 			} else {
@@ -333,6 +333,10 @@ public final class Oscilscope {
 		
 		public boolean isVisible() {
 			return this.visible;
+		}
+
+		public boolean isUpdatingActively() {
+			return this.activeUpdate;
 		}
 
 		public CompoundTag toTag() {
