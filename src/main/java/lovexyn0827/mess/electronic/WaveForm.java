@@ -84,6 +84,7 @@ public final class WaveForm {
 			throw new TranslatableException("cmd.wavegen.err.empty");
 		}
 		
+		stages.get(stages.size() - 1).setImmediateSuccessor(stages.get(0), true, false);
 		int len = stages.get(stages.size() - 1).toTick + 1;
 		if (offset == null) {
 			offset = (int) (MessMod.INSTANCE.getGameTime() % len);
@@ -115,8 +116,13 @@ public final class WaveForm {
 						prev = stages.get(stages.size() - 1);
 					}
 				} else if (firstCh == '(') {
-					prev = Stage.parseStandardMode(prev, in);
-					stages.add(prev);
+					Stage cur = Stage.parseStandardMode(prev, in);
+					if (prev != null) {
+						prev.setImmediateSuccessor(cur, false, false);
+					}
+					
+					stages.add(cur);
+					prev = cur;
 				}
 				
 				in.skipWhitespace();
@@ -143,12 +149,23 @@ public final class WaveForm {
 		WaveForm.Stage prev = null;
 		List<WaveForm.Stage> stages = new ArrayList<>();
 		while (in.canRead()) {
-			prev = Stage.parseSimpleMode(prev, in);
-			stages.add(prev);
+			Stage cur = Stage.parseSimpleMode(prev, in);
+			if (prev != null) {
+				prev.setImmediateSuccessor(cur, false, true);
+			}
+			
+			stages.add(cur);
+			prev = cur;
 			in.skipWhitespace();
 		}
+
+		if (stages.isEmpty()) {
+			throw new TranslatableException("cmd.wavegen.err.empty");
+		}
 		
-		int len = stages.get(stages.size() - 1).toTick + 1;
+		Stage last = stages.get(stages.size() - 1);
+		last.setImmediateSuccessor(stages.get(0), true, true);
+		int len = last.toTick + 1;
 		int offset = (int) (MessMod.INSTANCE.getGameTime() % len);
 		return new WaveForm(len, offset, stages);
 	}
@@ -191,6 +208,7 @@ public final class WaveForm {
 		private final boolean suppressesOffUpdates;
 		private Event onBlockUpdater;
 		private Event offBlockUpdater;
+		private Stage immediateSuccessor;
 		
 		public Stage(int fromTick, ServerTickingPhase fromPhase, int toTick, ServerTickingPhase toPhase,
 				int level, boolean suppressesOnUpdates, boolean suppressesOffUpdates) {
@@ -237,7 +255,7 @@ public final class WaveForm {
 				
 				long curTimeMod = wave.getTickMod(MessMod.INSTANCE.getGameTime());
 				if (curTimeMod == this.toTick) {
-					wave.currentStage = null;
+					wave.currentStage = this.immediateSuccessor;
 					world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
 				}
 			};
@@ -257,6 +275,23 @@ public final class WaveForm {
 
 		protected boolean canFollow(Stage prev) {
 			return prev == null || this.notBefore(prev.fromTick, prev.fromPhase);
+		}
+		
+		protected void setImmediateSuccessor(Stage successor, boolean atEnds, boolean simpleMode) {
+			boolean noGap;
+			if (atEnds) {
+				noGap = simpleMode 
+						|| successor.fromPhase.ordinal() == 0 && this.toPhase == ServerTickingPhase.REST;
+			} else {
+				noGap = successor.followsImmediately(this);
+			}
+
+			this.immediateSuccessor = noGap ? successor : null;
+			
+		}
+
+		public boolean followsImmediately(Stage prev) {
+			return flatten(this.fromTick, this.fromPhase) == flatten(prev.toTick, prev.toPhase);
 		}
 
 		private static int readTick(int base, StringReader in) throws CommandSyntaxException {
