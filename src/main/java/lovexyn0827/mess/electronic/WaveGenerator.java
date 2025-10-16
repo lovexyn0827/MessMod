@@ -28,7 +28,7 @@ public final class WaveGenerator {
 			CommandContext<ServerCommandSource> ct, SuggestionsBuilder b) {
 		this.waveforms.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), (k) -> new HashMap<>())
 				.keySet().forEach((pos) -> {
-					b.suggest(String.format("%d, %d, %d", pos.getX(), pos.getY(), pos.getZ()));
+					b.suggest(String.format("%d %d %d", pos.getX(), pos.getY(), pos.getZ()));
 				});
 		return b.buildFuture();
 	}
