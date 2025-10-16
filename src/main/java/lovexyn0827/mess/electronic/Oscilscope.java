@@ -25,9 +25,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Lazy;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -67,7 +69,8 @@ public final class Oscilscope {
 		}
 	}
 	
-	public void update(World world, BlockPos pos, int level) {
+	public void update(ServerWorld world, BlockPos pos) {
+		int level = getReceivedLevelUnbounded(world, pos);
 		Pair<RegistryKey<World>, BlockPos> key = new Pair<>(world.getRegistryKey(), pos);
 		if (this.channels.containsKey(key)) {
 			this.channels.get(key).update(level);
@@ -78,6 +81,17 @@ public final class Oscilscope {
 			this.dataSender.sendNewChannel(newChannel);
 			newChannel.update(level);
 		}
+	}
+
+	private static int getReceivedLevelUnbounded(ServerWorld world, BlockPos pos) {
+		int i = Integer.MIN_VALUE;
+		for (Direction direction : Direction.values()) {
+			int j = world.getEmittedRedstonePower(pos.offset(direction), direction);
+			if (j <= i) continue;
+			i = j;
+		}
+		
+		return i;
 	}
 
 	public OscilscopeDataSender getDataSender() {
@@ -191,8 +205,8 @@ public final class Oscilscope {
 			this.color = color;
 			this.updater = new Lazy<>(() -> {
 				return (phase, world) -> {
-					if (world != null && world.getRegistryKey() == this.dimension) {
-						Oscilscope.this.update(world, pos, world.getReceivedRedstonePower(pos));
+					if (world != null && !world.isClient && world.getRegistryKey() == this.dimension) {
+						this.update(getReceivedLevelUnbounded((ServerWorld) world, pos));
 					}
 				};
 			});
