@@ -229,7 +229,7 @@ public final class Oscilscope {
 				fallingEdge = level < this.trigLevel && this.prevLevel >= this.trigLevel;
 			}
 			
-			if (this.trigMode.shouldTrigger(risingEdge, fallingEdge)) {
+			if (this.isVisible() && this.trigMode.shouldTrigger(risingEdge, fallingEdge)) {
 				this.trigger(risingEdge);
 			}
 			
