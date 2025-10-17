@@ -411,6 +411,16 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
+			label = { Label.INTERACTION_TWEAKS })
+	public static boolean playerInputsWhenScreenOpened;
+	
+	@Option(defaultValue = "295", 
+			parserClass = IntegerParser.class, 
+			label = { Label.MESSMOD })
+	public static int playerInputsWhenScreenOpenedHotkey;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
 			label = { Label.CHUNK, Label.ENTITY })
 	public static boolean projectileChunkLoading;
 	

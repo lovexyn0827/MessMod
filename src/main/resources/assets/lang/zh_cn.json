@@ -265,6 +265,8 @@
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "允许玩家在地面上直接放置矿车。", 
 		"opt.mobFastKill.desc" : "在生物被`/kill`杀死时被直接移除而非承受伤害。", 
 		"opt.optimizedEntityPushing.desc" : "跳过不会被推动的实体的挤压运算。实体挤压伤害会被影响。", 
+		"opt.playerInputsWhenScreenOpened.desc" : "按下指定按键（默认为F6）时，允许玩家在进行输入指令等操作时移动或改变视角。", 
+		"opt.playerInputsWhenScreenOpenedHotkey.desc" : "`playerInputsWhenScreenOpened`选项使用的快捷键，由按键码（Key code）指定：\n - `F1` - `F12`：290 - 301", 
 		"opt.projectileChunkLoading.desc" : "允许弹射物在其运算过程中自动加载区块，在制作珍珠炮时可能会有所帮助。注意该功能可能会在弹射物以极高的速度飞行时造成极大的卡顿。", 
 		"opt.projectileChunkLoadingRange.desc" : "`projectileChunkLoading`功能中创建的强加载范围半径。", 
 		"opt.projectileChunkLoadingPermanence.desc" : "弹射物在`projectileChunkLoading`启用时永久加载区块。", 
