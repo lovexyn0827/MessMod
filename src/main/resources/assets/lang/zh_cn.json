@@ -37,6 +37,10 @@
 		//***** countentities *****
 		"cmd.countentities.result" : "共找到%d个实体", 
 		
+		//***** drawshape *****
+		"cmd.drawshape.imgfail": "未能加载图像", 
+		"cmd.drawshape.malurl": "URL格式有误：%s", 
+		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
 		"cmd.ensure.blockat" : "%s处的方块为: %s",

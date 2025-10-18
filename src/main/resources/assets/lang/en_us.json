@@ -37,6 +37,10 @@
 		//***** countentities *****
 		"cmd.countentities.result" : "%d entities were found.", 
 		
+		//***** drawshape *****
+		"cmd.drawshape.imgfail": "Failed to load image!", 
+		"cmd.drawshape.malurl": "Malformed URL: %s", 
+		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
 		"cmd.ensure.blockat" : "Block at %s: %s",

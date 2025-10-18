@@ -13,6 +13,7 @@ import com.mojang.brigadier.CommandDispatcher;
 
 import lovexyn0827.mess.command.AccessingPathCommand;
 import lovexyn0827.mess.command.CountEntitiesCommand;
+import lovexyn0827.mess.command.DrawShapeCommand;
 import lovexyn0827.mess.command.EnsureCommand;
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
@@ -97,6 +98,7 @@ public abstract class CommandMixin {
         TouchCommand.register(this.dispatcher);
         SetBlockRawCommand.register(this.dispatcher);
         NameItemCommand.register(this.dispatcher);
+        DrawShapeCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 
