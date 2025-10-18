@@ -181,7 +181,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		}
 		
 		advancedMixins.forEach((entry) -> {
-			config.computeIfAbsent(entry.name, (k) -> "true");
+			config.computeIfAbsent(entry.name, (k) -> "false");
 		});
 		return config;
 	}
