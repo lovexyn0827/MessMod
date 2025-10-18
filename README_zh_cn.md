@@ -4,7 +4,7 @@
 
 ![](https://img.shields.io/modrinth/dt/messmod?label=Total%20Modrinth%20Downloads)
 
-一个用于提供额外的世界访问能力及一些增强功能的Minecraft Mod  
+一个用于提供额外的世界访问能力及一些增强功能的Minecraft Mod。
 
 正如其名，该模组包含了世界控制、信息显示、特性更改、操作优化以及一些Bug修复等多种功能，整体而言是相当的Messy。
 
@@ -32,6 +32,46 @@
 2. gnembon的地毯Mod（fabric-carpet）（部分功能需要，所以强烈推荐，但并非必需）  
 3. Minecraft 1.16.4及以上
 4. Minecraft需要的所有事项
+
+## 快速入门
+
+### 安装
+
+1. 从Modrinth下载与Minecraft版本匹配的JAR，并复制到`mod`文件夹。
+2. 启动游戏，并打开一个创造存档。
+
+### 尝试HUD
+
+1. 按下`F3 + E`并注视任何一个实体。
+2. 或按下`F3 + M`并四处走动，查看HUD是怎样工作的。
+
+### 启用渲染器
+
+1. 运行`/messcfg serverSyncedBox true`，这样所有实体都会显示一个绿色的碰撞箱。
+2. 运行`/messcfg chunkLoadingInfoRenderer true`并手持鹦鹉螺壳，查看周围区块的加载状态。
+
+### 打开示波器
+
+1. 运行`/messcfg hayOscilloscope true`。
+2. 放置一个干草块，并使用侦测器高频对其充能。
+3. 右键干草块，查看波形。
+
+### 延长物品栏
+
+1. 运行`/messcfg hotbarLength 18`，然后物品栏槽位数量会加倍。
+
+### 进一步探究选项
+
+> 如果曾使用过Carpet模组，您可能会感觉下面的操作思路很熟悉。
+
+1. 运行`/messcfg`。
+2. 点击一个感兴趣的标签，如“渲染”或是“区块”。
+3. 将鼠标悬置于一个选项上方，查看详细描述。
+4. 试着用刚才的方法启用 / 修改一个选项。
+
+### 下一步……
+
+该文件的其余部分是MessMod的完整文档，包含对每条指令，每个选项与特性的详细描述。试着从其中抓取对您最有价值的功能，祝您好运！
 
 ## 命令
 
@@ -74,6 +114,42 @@
 ##### `/countentities <selector> <stackedWith> <maxDistance>`
 
 获取可由`<selector>`选取且坐标与实体`<stackedWith>`的坐标间距离小于`<maxDistance>`的实体的数量。
+
+### 在游戏内绘制标记
+
+##### `/drawshape box <corner1> <corner2> [<color>] [<life>] [<fill>] [<space>]`
+
+在`<corner1>`和 `<conrner2>`之间绘制一个立方体（轴对齐边界箱）。
+
+`<color>`：立方体各棱的颜色。
+
+`<fill>`：立方体各面的颜色。若需透明，请使用`reset`。
+
+`<life>`：图形显示时长，以游戏刻计，默认为100。
+
+`<space>`：图形所属的“图形空间”，用于在指令`/drawshape clear <space>`中批量移除图形。
+
+##### `/drawshape line <corner1> <corner2> [<color>] [<life>] [<space>]`
+
+再`<corner1>`和`<corner2>`之间绘制一条直线。
+
+##### `/drawshape text <pos> <text> [<color>] [<life>] [<scale>] [<space>]`
+
+在`<pos>`处绘制`<text>`指定的一条浮动文本。
+
+`<scale>`：文本大小，默认为1。
+
+##### `/drawshape image <pos> <axis> <url> [<life>] [<scale>] [<space>]`
+
+从指定的`<url>`加载图片并绘制于`<pos>`处。
+
+`<axis>`：绘制的图片所垂直的坐标轴。
+
+`<scale>`：绘制图片的大小，以格计。默认为1格。 
+
+##### `/drawshape clear [<space>]` 
+
+清除绘制的图形。若“图形空间”`<space>`未指定，则清除所有图形。
 
 ### 方块状态校验
 
@@ -511,7 +587,7 @@ killer+directKiller(cause->victim)@(min..max)
 
 ##### `/messcfg`
 
-获取当前Mod版本和配置情况。  
+获取当前Mod版本和配置标签列表。  
 
 ##### `/messcfg reloadConfig`
 
@@ -572,6 +648,12 @@ killer+directKiller(cause->victim)@(min..max)
 ##### `/namentity <entities> <name>`
 
 为选定的实体进行命名。
+
+### Name Items Without Anvils
+
+##### `/nameitem <name>`
+
+将玩家（或执行此命令的实体）主手所持的物品命名为`<name>`。
 
 ### 杀死部分实体
 
@@ -671,13 +753,17 @@ killer+directKiller(cause->victim)@(min..max)
 
 ### 方块实体读写
 
+##### `/tileentity add <pos> <type> <tag>`
+
+在`<pos>`添加`<type>`指定的方块实体。可以指定`<tag>`作为方块实体的初始数据。（若`<pos>`处的方块不支持该方块实体，设置可能会失败）
+
 ##### `/tileentity get <pos>`
 
 取`<pos>`处的方块实体信息。  
 
 ##### `/tileentity set <pos> <type> [<tag>]`
 
-设置`<pos>`处的为`<type>`指定的方块实体。可以指定`<tag>`作为方块实体的初始数据（此时，若`<pos>`处的方块不支持该方块实体，设置会失败）。  
+设置`<pos>`处的为`<type>`指定的方块实体。可以指定`<tag>`作为方块实体的初始数据。
 
 ##### `/tileentity remove <pos>`
 
@@ -732,6 +818,7 @@ killer+directKiller(cause->victim)@(min..max)
 - `client`：`MinecraftClient`实例；
 - `clientWorld`：当前的`ClientWorld`实例；
 - `clientPlayer`：客户端玩家实例。
+- `new`：新创建的对象。示例：`java/lang/Thread<0>()`。
 
 可以指定一个可选的Accessing Path，以在存储前对对象进行变换，并存储Accessing Path的输出而不是对象本身。
 
@@ -769,16 +856,33 @@ killer+directKiller(cause->victim)@(min..max)
 
   时间可以用两种格式指定。一种形如`+游戏刻偏移量 运算阶段`，表示阶段开始于上一个阶段结束若干游戏刻后指定的运算阶段（见`/entitysidebar`指令）开始时，或结束于阶段开始若干游戏刻后指定的运算阶段开始时；另一种形如`!游戏刻偏移量 运算阶段`，表示阶段开始或结束于在整个波形的若干游戏刻后指定运算阶段开始时。
 
+  运算阶段亦可按下表缩写：
+
+  | 运算阶段         | 缩写   |
+  | ---------------- | ------ |
+  | `WEATHER_CYCLE`  | `WTU`  |
+  | `CHUNK`          | `CU`   |
+  | `SCHEDULED_TICK` | `NTE`  |
+  | `VILLAGE`        | `RAID` |
+  | `BLOCK_EVENT`    | `BE`   |
+  | `ENTITY`         | `EU`   |
+  | `TILE_ENTITY`    | `TE`   |
+  | `DIM_REST`       | `END`  |
+  
   理论上，可以指定大于15，甚至是负值的红石信号。
-
+  
   `S` 和`T`分别是用于抑制在阶段开始与结束时发出的方块更新的可选标志。
-
+  
+  同时，这里还给出了一处形如`次数[阶段序列]`（或`次数*[阶段序列]`）的语法，用于重复一系列波形阶段若干次。该语法的作用等价于将方括号内的内容原样重复指定次数，这意味着，括号内不允许使用形如`!刻数`的‘绝对时间偏移“。该结构可嵌套。
+  
   此处给出两个实例：
-
+  
   `(+5SCHEDULE_TICK=>+2DIM_REST)L15T`：在上一个阶段结束5 gt后的计划刻（`5SCHEDULE_TICK`）阶段开始输出等级为15的红石信号，持续到2 gt后的`DIM_REST`阶段（世界运算结束时），在阶段开始时发出方块更新，但不再阶段结束时发出更新。
-
+  
   `(!0=>!5ENTITY)L10`：波形的第0 gt的计划刻阶段开始输出10级红石信号，持续到第5 gt的实体运算（`ENTITY`）阶段，并在开始与结束时发出方块更新。
-
+  
+  `3[(+0=>+0)L15 2[(+2=>+0)L15 (+0=>+0)L0]] (+1=>+3)L15`：展开为`(+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+1=>+3)L15`
+  
   次外，波形定义的开始处可以给出一个时间偏移，使波形的开始处相对于游戏时间（Game Time）为波形整体长度（由最后一个阶段的结束时刻决定）的整倍数的位置偏移若干游戏刻。注意时间偏移量必须包含符号（`+1`而不是`1`）。例如，`+3`表示波形开始于每次游戏时间除以波形长度的余数为3时。
 
 ##### `/wavegen remove <pos>`
@@ -932,6 +1036,14 @@ TNT可以被玩家的攻击杀死。
 可能取值：`true`或`false`
 
 默认值：`true`
+
+##### `clayBlockPlacer`
+
+使用粘土球放置任意技术性方块（如下界传送门）。粘土球的名称指定了放置的方块，例如，在手持名为`grass_block[snowy=true]`的粘土球时，可以通过右键放置积雪的草方块。
+
+可能取值：`true`或`false`
+
+默认值：`false`
 
 ##### `commandExecutionRequirment`
 
@@ -1354,6 +1466,14 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 默认值：`-FOLLOW_SYSTEM_SETTINGS-`
 
+##### `flowerFieldRendererSingleLayer`
+
+将织布机作为一个波形发生器，其输出可由`/wavegen`指令配置。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `maxClientTicksPerFrame`
 
 FPS低于20时每帧可以运行多少个客户端游戏刻。
@@ -1389,6 +1509,24 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 ##### `optimizedEntityPushing`
 
 跳过不会被推动的实体的挤压运算。实体挤压伤害会被影响。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `playerInputsWhenScreenOpened`
+
+按下指定按键（默认为F6）时，允许玩家在进行输入指令等操作时移动或改变视角。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `playerInputsWhenScreenOpenedHotkey`
+
+`playerInputsWhenScreenOpened`选项使用的快捷键，由按键码（Key code）指定：
+
+- `F1` - `F12`：290 - 301
 
 可能取值：`true`或`false`
 
@@ -1517,7 +1655,7 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 ##### `serverSyncedBoxRenderRange`
 
-服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非负值会被认为是无穷大。
+服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非正值会被认为是无穷大。
 
 可能取值：任意实数
 
@@ -1878,6 +2016,8 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 每个包含接收着红石信号的干草块的位置被视为一个通道，由一个数字ID和底部方块在地图中显示的颜色标识。在干草块第一次检测到红石信号时，一个通道就会被创建，此后其ID和颜色将不再变化。
 
+值得注意的是，因为通道与位置一一对应，如果干草块被（活塞等）移动，那么它将与一个新的通道相绑定。换句话说，通道不能被移动。
+
 ### 工作模式
 
 示波器具有数字模式和模拟模式两种工作模式。
@@ -1920,6 +2060,14 @@ In both modes, holding left button of the mouse when the cursor is on some waves
 
 波形区域右侧也有一系列可拖动的小三角，用于标识不同通道的触发电平。
 
+### 主动探测
+
+主动探测使示波器可以检测到不产生方块更新的信号等级变化（例如当红石线改变朝向，并因为连接到一个方块，或从一个方块断开时）该模式下，干草块将会在每个运算阶段开始时测量其接受的信号等级，并检查是否与先前的测量不同。
+
+所有通道均默认为主动测量模式，如需禁用，可取消勾选通道列表中的“主动”复选框。
+
+值得注意的是，所有通道必须先由一次带有方块更新的信号等级变动创建后才能主动探测信号。
+
 ### 微时序支持
 
 默认情况下，水平轴上的每个游戏刻会被划分为若干部分，每一部分代表一个运算阶段（如计划刻和实体运算）。不同运算阶段中的边沿会根据它们所在的运算阶段，显示在不同的水平位置。
@@ -1956,4 +2104,4 @@ In both modes, holding left button of the mouse when the cursor is on some waves
 
 这个Mod最初是我在2021年2月为了研究实体运动而开发的，因此HUD、碰撞箱、工具物品与`/entityfield`是这个Mod最早的一批特性。后来，更多的特性在它们被用到时被引入
 
-在2022年4月后我加快了Mod的开发进度，添加了很多新特性并对一些旧特性进行了彻底的重构。截止到2025年8月27日，该Mod共添加了36条指令，96个选项和10个渲染器。
+在2022年4月后我加快了Mod的开发进度，添加了很多新特性并对一些旧特性进行了彻底的重构。截止到2025年10月19日，该Mod共添加了38条指令，100个选项和10个渲染器。
