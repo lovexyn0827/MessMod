@@ -66,7 +66,7 @@ public class BlockInfoRenderer {
 					String info = Float.toString(fluidHeight)  + '(' + fluid.getLevel() + ')'+ '\n' + flow;
 					Box fluidBox = fluid.getShape(world, pos).getBoundingBox().offset(pos);
 					sr.addShape(new RenderedBox(fluidBox, 0xFF0000FF, 0, 1, time), worldKey, BLOCK_INFO_SPACE, e);
-					sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, time), 
+					sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0xFF0000FF, 1, time), 
 							worldKey, BLOCK_INFO_SPACE, e);
 					if(flow.length() != 0) {
 						Vec3d displayedFlow = flow.multiply(-0.5D)
@@ -94,7 +94,7 @@ public class BlockInfoRenderer {
 						}
 						
 						String info = "Output :" + Integer.toString(out);
-						sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x000000FF, 1, time), 
+						sr.addShape(new RenderedText(info, Vec3d.ofBottomCenter(pos).add(0, 1, 0), 0x0000FFFF, 1, time), 
 								worldKey, BLOCK_INFO_SPACE, e);
 					}
 				}

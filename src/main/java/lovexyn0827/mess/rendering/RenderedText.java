@@ -32,6 +32,7 @@ public class RenderedText extends Shape {
 		super(color, 0x0000002f, life, gt);
 		this.value = value;
 		this.pos = pos;
+		this.scale = 1.0F;
 	}
 
 	public RenderedText(String value, Vec3d pos, int color, float scale, int life, long gt) {
