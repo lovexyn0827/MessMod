@@ -91,7 +91,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
+			label = { Label.INTERACTION_TWEAKS })
 	public static boolean attackableTnt;
 	
 	@Option(defaultValue = "POSSIBLE", 
@@ -134,6 +134,11 @@ public class OptionManager{
 			label = Label.MESSMOD)
 	public static boolean chunkLogAutoArchiving;
 	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = { Label.INTERACTION_TWEAKS })
+	public static boolean clayBlockPlacer;
+	
 	@Option(defaultValue = "true", 
 			parserClass = BooleanParser.class, 
 			label = Label.MESSMOD)
@@ -141,7 +146,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.HIGHLIGHT, Label.REDSTONE })
+			label = { Label.REDSTONE })
 	public static boolean craftingTableBUD;
 	
 	@Option(defaultValue = "false", 
@@ -163,7 +168,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
+			label = { Label.INTERACTION_TWEAKS })
 	public static boolean dedicatedServerCommands;
 	
 	@Option(defaultValue = "REGION,POI", 
@@ -184,7 +189,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.HIGHLIGHT, Label.INTERACTION_TWEAKS })
+			label = { Label.INTERACTION_TWEAKS })
 	public static boolean disableChunkLoadingCheckInCommands;
 	
 	@Option(defaultValue = "false", 
@@ -224,7 +229,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.HIGHLIGHT, Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
+			label = { Label.ENTITY, Label.RESEARCH, Label.MESSMOD})
 	public static boolean dumpTargetEntityDataWithPaper;
 	
 	@Option(defaultValue = "false", 
@@ -301,7 +306,7 @@ public class OptionManager{
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 
-			label = { Label.HIGHLIGHT, Label.RENDERER, Label.MISC })
+			label = { Label.RENDERER, Label.MISC })
 	public static boolean flowerFieldRenderer;
 	
 	@Option(defaultValue = "16", 

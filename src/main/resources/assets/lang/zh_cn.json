@@ -212,6 +212,7 @@
 		"opt.chunkLoadingInfoRenderer.desc" : "手持鹦鹉螺壳时显示区块加载状态。可能会被移至区块加载小地图（ChunkMap）中。", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "区块加载状态显示半径，以区块计。", 
 		"opt.chunkLogAutoArchiving.desc" : "自动存档一个会话内产生的区块行为记录（若有），存档文件可在`世界文件夹/chunklog/archives`找到。", 
+		"opt.clayBlockPlacer.desc" : "使用粘土球放置任意技术性方块。粘土球的名称指定了放置的方块，例如，在手持名为`grass_block[snowy=true]`的粘土球时，可以通过右键放置积雪的草方块。", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
 		"opt.disableCreativeForcePickup.desc" : "创造模式下的玩家在物品栏被填满时不再拾起箭矢和物品。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 

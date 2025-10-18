@@ -212,6 +212,7 @@
 		"opt.chunkLoadingInfoRenderer.desc" : "Display the loading status when holding a nautilus shell. May be moved to the ChunkMap later.", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "The radius of the area where chunk loading statuses are displayed, in chunks.", 
 		"opt.chunkLogAutoArchiving.desc" : "Archive the chunk behavior log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/chunklog/archives`.", 
+		"opt.clayBlockPlacer.desc" : "Place any technical blocks (e.g. nether portals) with clay balls. Clay balls should be named to specify the block to place. For example, with a clay ball named `grass_block[snowy=true]`, you can place snowy grass blocks by right clicks.", 
 		"opt.commandExecutionRequirment.desc" : "Whether or not the execution of commands defined by this mod require OP permission.", 
 		"opt.craftingTableBUD.desc" : "Detect the block updates received by crafting tables.", 
 		"opt.creativeNoVoidDamage.desc" : "Disable void damage for players in creative-like modes.", 
