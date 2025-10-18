@@ -65,6 +65,7 @@ public class WaveGenCommand {
 									BlockPos pos = BlockPosArgumentType.getBlockPos(ct, "pos");
 									MessMod.INSTANCE.getWaveGenerator()
 											.remove(ct.getSource().getWorld().getRegistryKey(), pos);
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);

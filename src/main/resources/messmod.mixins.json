@@ -65,7 +65,9 @@
     "DieableEntityMixin", 
     "LoomBlockMixin", 
     "HayBlockMixin", 
-    "WeightedListMixin"
+    "WeightedListMixin", 
+    "StorageIoWorkerAccessor", 
+    "SerializingRegionBasedStorageAccessor"
   ],
   "client": [
     "MinecraftClientMixin",

@@ -9,6 +9,8 @@
 		"cmd.general.subdup" : "%s has already been subscribed!", 
 		"cmd.general.submulti" : "Subscribed %d items: %s", 
 		"cmd.general.unsubmulti" : "Unsubscribed %d items: %s", 
+		"cmd.general.submulticnt" : "Subscribed %d items", 
+		"cmd.general.unsubmulticnt" : "Unsubscribed %d items", 
 		"cmd.general.found" : "Found at (%d, %d, %d)", 
 		"cmd.general.notfound" : "Not found", 
 		"cmd.general.nodef" : "%s hasn't been defined", 

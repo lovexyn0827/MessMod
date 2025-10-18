@@ -1,6 +1,7 @@
 package lovexyn0827.mess.rendering.hud.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -24,15 +25,15 @@ public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorag
 	public LocalSidebarDataStorage() {
 		this.registerTickingEvents();
 	}
+
+	@Override
+	public Collection<HudLine> getLines() {
+		return this.lines;
+	}
 	
 	@Override
 	public void updateData(Entity entity) {
 		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public List<HudLine> getCustomLines() {
-		return this.lines;
 	}
 
 	@Override
@@ -64,5 +65,4 @@ public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorag
 			}
 		});
 	}
-
 }

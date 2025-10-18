@@ -1,5 +1,6 @@
 package lovexyn0827.mess.rendering.hud.data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -36,6 +37,11 @@ public class RemoteHudDataSender implements HudDataSender {
 				this.lines.add(l);
 			}
 		}
+	}
+
+	@Override
+	public Collection<HudLine> getLines() {
+		return this.lines;
 	}
 	
 	public void updateData(Entity entity) {
@@ -86,11 +92,6 @@ public class RemoteHudDataSender implements HudDataSender {
 		}
 		
 		return false;
-	}
-
-	@Override
-	public List<HudLine> getCustomLines() {
-		return this.lines;
 	}
 	
 	public static class Sidebar extends RemoteHudDataSender implements SidebarDataSender {

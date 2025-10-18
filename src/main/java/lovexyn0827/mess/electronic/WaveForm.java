@@ -123,6 +123,8 @@ public final class WaveForm {
 					
 					stages.add(cur);
 					prev = cur;
+				} else {
+					throw new TranslatableException("cmd.wavegen.err.stgfmt");
 				}
 				
 				in.skipWhitespace();

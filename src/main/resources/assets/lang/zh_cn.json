@@ -9,6 +9,8 @@
 		"cmd.general.subdup" : "%s已被监视", 
 		"cmd.general.submulti" : "已开始监视%d个项目：%s", 
 		"cmd.general.unsubmulti" : "取消监视%d个项目：%s", 
+		"cmd.general.submulticnt" : "已开始监视%d个项目", 
+		"cmd.general.unsubmulticnt" : "取消监视%d个项目", 
 		"cmd.general.found" : "在(%d, %d, %d)找到了POI", 
 		"cmd.general.notfound" : "未找到", 
 		"cmd.general.nodef" : "%s未被定义", 
@@ -114,7 +116,7 @@
 		"cmd.modify.result" : "找到了%d个实体，其中有%d个实体的属性被修改", 
 		
 		//***** partlykill *****
-		"cmd.partlykill.result" : "找到了%d个实体，并实际杀死了其中%d", 
+		"cmd.partlykill.result" : "找到了%d个实体，并实际杀死了其中%d个", 
 		
 		//***** poi *****
 		"cmd.poi.usage" : "TODO", 
