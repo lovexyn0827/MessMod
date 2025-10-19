@@ -20,7 +20,16 @@ import net.minecraft.server.MinecraftServer;
  */
 public interface HudDataSender {
 	void updateData(Entity entity);
-	Collection<HudLine> getCustomLines();
+	Collection<HudLine> getLines();
+
+	/**
+	 * Returns a list of lines added by the user.
+	 */
+	default Collection<HudLine> getCustomLines() {
+		return this.getLines().stream()
+				.filter((l) -> !(l instanceof BuiltinHudInfo))
+				.collect(Collectors.toList());
+	}
 	
 	default boolean hasDuplication(HudLine line) {
 		return this.getCustomLines().stream().anyMatch((l0) -> {
@@ -61,7 +70,6 @@ public interface HudDataSender {
 
 	default List<HudLine> getListenedFields() {
 		return this.getCustomLines().stream()
-				.map((l) -> (ListenedField) l)
 				.collect(Collectors.toList());
 	}
 	

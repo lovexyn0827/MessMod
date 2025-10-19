@@ -68,7 +68,9 @@
     "DieableEntityMixin", 
     "LoomBlockMixin", 
     "HayBlockMixin", 
-    "WeightedListMixin"
+    "WeightedListMixin", 
+    "StorageIoWorkerAccessor", 
+    "SerializingRegionBasedStorageAccessor"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -91,7 +93,8 @@
     "ClientCommandSourceMixin", 
     "DebugHudMixin", 
     "ChatScreenMixin", 
-    "AbstractCommandBlockScreenMixin"
+    "AbstractCommandBlockScreenMixin", 
+    "MouseMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"

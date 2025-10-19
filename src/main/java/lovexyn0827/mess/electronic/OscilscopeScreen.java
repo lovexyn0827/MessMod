@@ -91,6 +91,8 @@ public final class OscilscopeScreen extends Screen {
 		this.channelList = new ChannelList();
 		this.addDrawableChild(this.trigHistory);
 		this.addDrawableChild(this.channelList);
+		this.waveData.takeNewChannels((ch) -> {});
+		this.waveData.takeUnprocessedTriggers((trig) -> {});
 		this.waveData.getAllChannels().forEach(this::onNewChannel);
 		this.waveData.getTriggerHistory().forEach(this.trigHistory::onTrig);
 		this.modeBtn = new ButtonWidget(
@@ -502,7 +504,7 @@ public final class OscilscopeScreen extends Screen {
 					.filter(Oscilscope.Channel::isVisible)
 					.sorted(Comparator.comparing(Oscilscope.Channel::getId))
 					.filter((ch) -> {
-						int yPos = this.bottom - (ch.getTrigLevel() - this.bottomLevel) * this.pixelsPerHDiv;
+						int yPos = this.bottom - (ch.getTrigLevel() - this.bottomLevel) * this.pixelsPerVDiv;
 						return MathHelper.absMax(mouseX - (this.right + 5), mouseY - this.top - yPos) < 10;
 					})
 					.findFirst();
@@ -541,7 +543,7 @@ public final class OscilscopeScreen extends Screen {
 		public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 			if (Screen.hasAltDown()) {
 				if (Screen.hasControlDown()) {
-					this.levelPerDiv = this.calculateNextDivLength(this.levelPerDiv, amount > 0, 100);
+					this.levelPerDiv = this.calculateNextDivLength(this.levelPerDiv, amount < 0, 100);
 				} else {
 					this.bottomLevel += (Screen.hasShiftDown() ? amount * this.vDivs : amount) * this.levelPerDiv;
 				}
@@ -600,6 +602,17 @@ public final class OscilscopeScreen extends Screen {
 			List<Text> toolTip = new ArrayList<>();
 			Map<Oscilscope.Channel, List<Oscilscope.Edge>> data = 
 					OscilscopeScreen.this.waveData.getWaveData(from, to, false);
+			synchronized (data) {
+				drawSingleWave(matrices, mouseX, mouseY, toolTip, data);
+			}
+			
+			if (!toolTip.isEmpty()) {
+				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, Math.max(mouseY, 24));
+			}
+		}
+
+		private void drawSingleWave(MatrixStack matrices, int mouseX, int mouseY, List<Text> toolTip,
+				Map<Oscilscope.Channel, List<Oscilscope.Edge>> data) {
 			data.forEach((channel, wave) -> {
 				int color = this.getTransformedColor(channel);
 				if (wave.isEmpty()) {
@@ -630,9 +643,6 @@ public final class OscilscopeScreen extends Screen {
 						this.calculatePosOfLevel(prevEdge.newLevel), 
 						this.right, -1, channel, prevEdge, null);
 			});
-			if (!toolTip.isEmpty()) {
-				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, mouseY);
-			}
 		}
 		
 		private int calculatePosOfLevel(int level) {
@@ -714,18 +724,20 @@ public final class OscilscopeScreen extends Screen {
 				}
 				
 				Oscilscope.Edge prevEdge = null;
-				for (Oscilscope.Edge edge : wave) {
-					if (prevEdge != null) {
-						int prevX = this.calculatePosOfTime(prevEdge.time);
-						int curX = this.calculatePosOfTime(edge.time);
-						int prevY = this.getWaveY(prevEdge.newLevel > 0, vOffset);
-						int curY = this.getWaveY(edge.newLevel > 0, vOffset);
-						drawHorizontalLine(matrices, prevX, curX, prevY, color);
-						drawVerticalLine(matrices, curX, prevY, curY, color);
-						this.appendToolTipIfNeeded(toolTip, mouseX, mouseY, prevX, prevY, curX, curY, 
-								channel, prevEdge, edge);
+				synchronized (wave) {
+					for (Oscilscope.Edge edge : wave) {
+						if (prevEdge != null) {
+							int prevX = this.calculatePosOfTime(prevEdge.time);
+							int curX = this.calculatePosOfTime(edge.time);
+							int prevY = this.getWaveY(prevEdge.newLevel > 0, vOffset);
+							int curY = this.getWaveY(edge.newLevel > 0, vOffset);
+							drawHorizontalLine(matrices, prevX, curX, prevY, color);
+							drawVerticalLine(matrices, curX, prevY, curY, color);
+							this.appendToolTipIfNeeded(toolTip, mouseX, mouseY, prevX, prevY, curX, curY, 
+									channel, prevEdge, edge);
+						}
+						prevEdge = edge;
 					}
-					prevEdge = edge;
 				}
 				
 				drawHorizontalLine(matrices, this.calculatePosOfTime(prevEdge.time), 
@@ -744,7 +756,7 @@ public final class OscilscopeScreen extends Screen {
 			}
 			
 			if (!toolTip.isEmpty()) {
-				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, mouseY);
+				OscilscopeScreen.this.renderTooltip(matrices, toolTip, mouseX, Math.max(mouseY, 24));
 			}
 		}
 		
@@ -865,21 +877,22 @@ public final class OscilscopeScreen extends Screen {
 			private final ButtonWidget trigMode;
 			private final TextFieldWidget trigLevel;
 			private final CheckboxWidget show; 
+			private final CheckboxWidget active; 
 
 			public Entry(Oscilscope.Channel backend) {
 				this.backend = backend;
 				this.trigMode = new ButtonWidget(ChannelList.this.left + 23, 1, 
-						(int) (ChannelList.this.width * 0.5) - 23, 20, 
-						I18N.translateAsText("oscil.gui.trigmode." + this.backend.getTrigMode()), 
+						20, 20, 
+						this.getTrigModeIndicator(), 
 						(btn) -> {
 							int prevTrigModeOrd = backend.getTrigMode().ordinal();
 							int newTrigModeOrd = (prevTrigModeOrd + 1) % Oscilscope.TrigMode.values().length;
 							Oscilscope.TrigMode newTrigMode = Oscilscope.TrigMode.values()[newTrigModeOrd];
 							this.backend.setTrigMode(newTrigMode);
-							btn.setMessage(I18N.translateAsText("oscil.gui.trigmode." + newTrigMode));
+							btn.setMessage(this.getTrigModeIndicator());
 						});
 				this.trigLevel = new TextFieldWidget(OscilscopeScreen.this.textRenderer, 
-						ChannelList.this.left + (int) (ChannelList.this.width * 0.5) + 4, 4, 
+						ChannelList.this.left + 47, 4, 
 						20, 14, 
 						Text.of(Integer.toString(this.backend.getTrigLevel())));
 				this.trigLevel.setTextPredicate((in) -> in.matches("^[+-]?[0-9]*$"));
@@ -889,15 +902,47 @@ public final class OscilscopeScreen extends Screen {
 					}
 				});
 				this.trigLevel.setText(Integer.toString(this.backend.getTrigLevel()));
-				this.show = new CheckboxWidget(ChannelList.this.left + (int) (ChannelList.this.width * 0.5) + 28, 1, 
-						(int) (ChannelList.this.width * 0.5) - 28, 20, 
-						I18N.translateAsText("oscil.gui.show"), true) {
+				this.show = new CheckboxWidget(ChannelList.this.left + 71, 1, 
+						20, 20, 
+						Text.of(I18N.translateAsText("oscil.gui.show").asTruncatedString(2)), 
+						this.backend.isVisible()) {
 					@Override
 					public void onPress() {
 						super.onPress();
 						Entry.this.backend.setVisible(this.isChecked());
 					}
 				};
+				int lengthOfShow = ChannelList.this.client.textRenderer.getWidth(
+						I18N.translateAsText("oscil.gui.show").asTruncatedString(2));
+				this.active = new CheckboxWidget(ChannelList.this.left + 100 + lengthOfShow, 1, 
+						20, 20, 
+						Text.of(I18N.translateAsText("oscil.gui.active").asTruncatedString(2)), 
+						this.backend.isUpdatingActively()) {
+					@Override
+					public void onPress() {
+						super.onPress();
+						Entry.this.backend.setActiveUpdate(this.isChecked());
+					}
+				};
+				this.backend.setChangeListener((ch) -> {
+					this.trigLevel.setText(Integer.toString(ch.getTrigLevel()));
+				});
+			}
+
+			private Text getTrigModeIndicator() {
+				switch (this.backend.getTrigMode()) {
+				case BOTH:
+					return new FormattedText("\u2B06", "rcl").asMutableText()
+							.append(new FormattedText("\u2B07", "ral").asMutableText());
+				case FALLING:
+					return new FormattedText("\u2B07", "ral").asMutableText();
+				case NONE:
+					return new FormattedText("\u2715", "rcl").asMutableText();
+				case RISING:
+					return new FormattedText("\u2B06", "rcl").asMutableText();
+				default:
+					throw new IllegalStateException();
+				}
 			}
 			
 			@Override
@@ -918,9 +963,11 @@ public final class OscilscopeScreen extends Screen {
 				this.trigMode.y = y + 1;
 				this.trigLevel.y = y + 4;
 				this.show.y = y + 1;
+				this.active.y = y + 1;
 				this.trigMode.render(ms, mouseX, mouseY, var10);
 				this.trigLevel.render(ms, mouseX, mouseY, var10);
 				this.show.render(ms, mouseX, mouseY, var10);
+				this.active.render(ms, mouseX, mouseY, var10);
 				int deltaX = mouseX - x;
 				int deltaY = mouseY - y;
 				if (deltaX >= 2 && deltaX <= 19 && deltaY >= 2 && deltaY <= 19) {
@@ -933,13 +980,32 @@ public final class OscilscopeScreen extends Screen {
 							I18N.translateAsText("oscil.gui.chinf.z", ch.getPos().getZ())
 					);
 				}
+				
+				if (deltaX >= 23 && deltaX <= 43 && deltaY >= 2 && deltaY <= 19) {
+					ChannelList.this.tooltip = Lists.newArrayList(
+							I18N.translateAsText("oscil.gui.trigmode." + this.backend.getTrigMode().name())
+					);
+				}
+				
+				if (deltaX >= 71 && mouseX <= this.active.x && deltaY >= 2 && deltaY <= 19) {
+					ChannelList.this.tooltip = Lists.newArrayList(
+							I18N.translateAsText("oscil.gui.show")
+					);
+				}
+				
+				if (mouseX >= this.active.x && deltaY >= 2 && deltaY <= 19) {
+					ChannelList.this.tooltip = Lists.newArrayList(
+							I18N.translateAsText("oscil.gui.active")
+					);
+				}
 			}
 			
 			@Override
 			public boolean mouseClicked(double mouseX, double mouseY, int button) {
 				return this.trigMode.mouseClicked(mouseX, mouseY, button)
 						|| this.trigLevel.mouseClicked(mouseX, mouseY, button)
-						|| this.show.mouseClicked(mouseX, mouseY, button);
+						|| this.show.mouseClicked(mouseX, mouseY, button)
+						|| this.active.mouseClicked(mouseX, mouseY, button);
 			}
 			
 			@Override

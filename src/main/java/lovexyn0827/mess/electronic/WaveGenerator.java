@@ -14,31 +14,31 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public final class WaveGenerator {
-	static final Map<RegistryKey<World>, Map<BlockPos, WaveForm>> WAVEFORMS = new HashMap<>();
+	private final Map<RegistryKey<World>, Map<BlockPos, WaveForm>> waveforms = new HashMap<>();
 	
-	public static int getLevelAt(RegistryKey<World> dim, BlockPos pos) {
-		if (!WAVEFORMS.containsKey(dim) || !WAVEFORMS.get(dim).containsKey(pos)) {
+	public int getLevelAt(RegistryKey<World> dim, BlockPos pos) {
+		if (!this.waveforms.containsKey(dim) || !this.waveforms.get(dim).containsKey(pos)) {
 			return 0;
 		}
 		
-		return WAVEFORMS.get(dim).get(pos).getCurrentLevel();
+		return this.waveforms.get(dim).get(pos).getCurrentLevel();
 	}
 
-	public static CompletableFuture<Suggestions> suggestDefinedPos(
+	public CompletableFuture<Suggestions> suggestDefinedPos(
 			CommandContext<ServerCommandSource> ct, SuggestionsBuilder b) {
-		WAVEFORMS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), (k) -> new HashMap<>())
+		this.waveforms.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), (k) -> new HashMap<>())
 				.keySet().forEach((pos) -> {
-					b.suggest(String.format("%d, %d, %d", pos.getX(), pos.getY(), pos.getZ()));
+					b.suggest(String.format("%d %d %d", pos.getX(), pos.getY(), pos.getZ()));
 				});
 		return b.buildFuture();
 	}
 
-	public static boolean remove(RegistryKey<World> dim, BlockPos pos) {
-		if (!WAVEFORMS.containsKey(dim)) {
+	public boolean remove(RegistryKey<World> dim, BlockPos pos) {
+		if (!this.waveforms.containsKey(dim)) {
 			return false;
 		}
 		
-		WaveForm removed = WAVEFORMS.get(dim).remove(pos);
+		WaveForm removed = this.waveforms.get(dim).remove(pos);
 		if (removed != null) {
 			removed.unregister();
 			return true;
@@ -47,11 +47,7 @@ public final class WaveGenerator {
 		}
 	}
 
-	public static void reset() {
-		WAVEFORMS.clear();
-	}
-
-	public static void register(World targetWorld, BlockPos pos, WaveForm waveForm) {
-		WAVEFORMS.computeIfAbsent(targetWorld.getRegistryKey(), (k) -> new HashMap<>()).put(pos, waveForm);
+	public void register(World targetWorld, BlockPos pos, WaveForm waveForm) {
+		this.waveforms.computeIfAbsent(targetWorld.getRegistryKey(), (k) -> new HashMap<>()).put(pos, waveForm);
 	}
 }

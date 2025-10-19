@@ -34,6 +34,49 @@ In other languages:
 - Minecraft 1.16.4 and above
 - Everything Minecraft requires. 
 
+## Quick Start
+
+### Installation
+
+1. Download the JAR that is suitable for your Minecraft setup from Modrinth, and copy to the `mod` folder.
+2. Launch the game and open a creative save. 
+
+### Try the HUDs
+
+1. Press `F3 + E`, and target any entity; 
+2. Or press `F3 + M` and move around to see how the HUD works.
+
+### Enable first renders
+
+1. Run `/messcfg serverSyncedBox true`, and found all entities wrapped by a green bounding box.
+2. Run `/messcfg chunkLoadingInfoRenderer true` and hold a nautilus shell to check how nearby chunks are loaded.
+
+### Try the oscilloscope
+
+1. Run `/messcfg hayOscilloscope true`
+2. Place a hay block power it with some changing signals.
+3. Right click the hay block to see the wave.
+
+### Lengthen the hotbar
+
+1. Run `/messcfg hotbarLength 18`, and found the number of slots in the hotbar doubled.
+
+### Further discovery on options
+
+> You would find the usages familiar if you have used the Carpet. 
+
+1. Run `/messcfg`.
+
+2. Click the label you are interested in, like `RENDERERS` or `CHUNK`.
+
+3. Hover the cursor on an option to see a detailed description.
+
+   Try to enable / change the option as you have done just now.
+
+### Next Steps
+
+The rest part of the file is a comprehensive document of MessMod, including detailed descriptions of each commands, options, and other features. Try to grab the most helpful ones for you, good luck!
+
 ## Commands
 
 Names of arguments are wrapped by pointy brackets, and optional components are wrapped by squared brackets.
@@ -76,11 +119,47 @@ Get the number of entities which is selected by `<selector>` and whose distance 
 
 Get the number of entities which is selected by `<selector>` and whose distance to `<stackedWith>` is smaller than `<maxDistance>`.
 
+### Draw In-game Markers
+
+##### `/drawshape box <corner1> <corner2> [<color>] [<life>] [<fill>] [<space>]`
+
+Draw a axis-aligned box between `<corner1>` and `<conrner2>`.
+
+`<color>`: The color of edges.
+
+`<fill>`: The color of faces. Use `reset` if the faces should be completely transparent. 
+
+`<life>`: The duration that the box is rendered for, in game ticks. 100 gt by default.
+
+`<space>`: Shape space of the box, which you can use in `/drawshape clear <space>` to remove all shapes in the same space at once. 
+
+##### `/drawshape line <corner1> <corner2> [<color>] [<life>] [<space>]`
+
+Draw a straight line between two corners.
+
+##### `/drawshape text <pos> <text> [<color>] [<life>] [<scale>] [<space>]`
+
+Draw a floating text at `pos`. 
+
+`<scale>`:  Size of the text, 1.0 by default.
+
+##### `/drawshape image <pos> <axis> <url> [<life>] [<scale>] [<space>]`
+
+Load a image from `<url>` and draw at `<pos>`.
+
+`<axis>`: The axis to which the drawn image is perpendicular.
+
+`<scale>`: Size of drawn image, in blocks. 1 block by default.
+
+##### `/drawshape clear [<space>]` 
+
+Clear drawn shapes. If the argument `<space>` is absent, all shapes will be removed.
+
 ### Block State Checking
 
 ##### `/ensure <pos>`
 
-Get the information of block state and block entity data (if exists) at `<pos>` to check if the block is rendered wrongly or is a ghost block.
+Get the information of block state and block entity data (if exists) at `<pos>`, to check if the block is rendered wrongly or is a ghost block.
 
 ### Entity Behavior Setting
 
@@ -518,7 +597,7 @@ Reset statistics.
 
 ##### `/messcfg`
 
-Display the version and the current configurations of the mod.
+Get the version and list option labels of the MessMod.
 
 ##### `/messcfg <option>`
 
@@ -579,6 +658,12 @@ Move the entity in the way projectile entities move. The displacement is given i
 ##### `/namentity <entities> <name>`
 
 Name selected entities.
+
+### Name Items Without Anvils
+
+##### `/nameitem <name>`
+
+Name the item the player (or executing entity) is holding in main hand to `<name>`.
 
 ### Kill A Part Of Entities
 
@@ -684,13 +769,17 @@ Summon (`<count>` - 1) entities at the position of `<entity>`, to make a stack w
 
 ### Block Entity Manipulation
 
+##### `/tileentity add <pos> <type> <tag>`
+
+Add a block entity at `<pos>`. Optionally, you can specify a `<tag>` as the initial data. (It may fail to take effects when the block at `<pos>` is not suitable.) 
+
 ##### `/tileentity get <pos>`
 
 Get the information about the block entity at `<pos>`.
 
-##### `/tileentity set <pos> <type> <tag>`
+##### `/tileentity replace <pos> <type> <tag>`
 
-Set the block entity at `<pos>` to `<type>`. Optionally, you can specify a `<tag>` as the initial data. (It may fail to execute when the block at `<pos>` is not suitable.) 
+Set the block entity at `<pos>` to `<type>`. Optionally, you can specify a `<tag>` as the initial data.
 
 ##### `/tileentity remove <pos>`
 
@@ -745,6 +834,7 @@ Put the object supplied by `<objSrc>` into `<slot>`. Available suppliers:
 - `client`：`MinecraftClient` instance.
 - `clientWorld`: Current `ClientWorld` instance.
 - `clientPlayer`: Client side player entity.
+- `new`: An object created anew. Example: `java/lang/Thread<0>()`
 
 An optional accessing path can be specified to transform the object and store the output of the path, instead of the object itself, to the variable list.
 
@@ -782,16 +872,33 @@ Waveforms can be defined with either of following two syntax:
 
   Time (field `from` and `to`) has two formats, one of which is `+TickOffset Phase`, meaning the stage starts `TickOffset` ticks after the previous stage (see `/entitysidebar` command) ends (or ends `TickOffset` ticks after its start), at the ticking phase specified by `Phase`. If `Phase` is omitted, it will use a default value of `SCHEDULED_TICK`. The other format is `!TimeOffset Phase`, meaning the stage starts of ends `TimeOffset` ticks after the start of the whole waveform.
 
+  Abbreviated form of ticking phases listed below are allowed:
+
+  | Ticking Phase    | Abbreviation |
+  | ---------------- | ------------ |
+  | `WEATHER_CYCLE`  | `WTU`        |
+  | `CHUNK`          | `CU`         |
+  | `SCHEDULED_TICK` | `NTE`        |
+  | `VILLAGE`        | `RAID`       |
+  | `BLOCK_EVENT`    | `BE`         |
+  | `ENTITY`         | `EU`         |
+  | `TILE_ENTITY`    | `TE`         |
+  | `DIM_REST`       | `END`        |
+  
   In theory, you may specify a signal level above 15, and even a negative value.
-
+  
   `S` and `T` (all in upper cases) is two optional flag to (s)uppress the updated emitted at the start of end of the stage respectively.
-
-  This may be a little bit hard to detail the format, so we are going to simply consider some examples.
-
+  
+  Meanwhile, there is a syntax in the form of `num[stages]` (or `num*[stages]`) to repeat a sequence of  `stages`. Equivalently, the effect of this syntax is to repeat the exact input between the square brackets `num` times as-is, which implies that absolute time offset (in the form of `!Time`) is not permitted in repeated sequences. The structure can be nested in other ones.
+  
+  Well, it may be a little bit hard to detail the format, and so do to understand. Thus, we are going to consider some examples.
+  
   `(+5SCHEDULE_TICK=>+2DIM_REST)L15T`: Output 15 levels of redstone signal for 2 gt, starting from 5 gt after the end of previous stage, at the start of the `SCHEDULE_TICK` phase, and turn off 2 gt after, at the `DIM_REST` phase (the end of world ticking), emitting updates at start but do not emit at end. 
-
+  
   `(!0=>!5ENTITY)L10`: Output 10 levels of redstone signal, from the 0 th tick of the waveform, at the `SCHEDULED_TCIK` phase, and turn off at the 5 th tick, at the start of the `ENTITY` phase, emitting updates on both ends.
-
+  
+  `3[(+0=>+0)L15 2[(+2=>+0)L15 (+0=>+0)L0]] (+1=>+3)L15`: Expanded as  `(+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+1=>+3)L15`
+  
   Additionally, a time offset can be specified at the beginning of a waveform definition, to offset its start time. The offset is relative to n times of the length of the whole waveform (determined by the end of the last stage), and a sign must be present (`+1` instead of `1`). For example +3 means the waveform starts each time the remainder produced when the current game time is divided by the length is 3.
 
 ##### `/wavegen remove <pos>`
@@ -947,6 +1054,16 @@ Archive the chunk behavior log produced within a single session automatically, i
 Available values: `true` / `false`
 
 Default value: `true`
+
+##### `clayBlockPlacer`
+
+Place any technical blocks (e.g. nether portals) with clay balls. 
+
+Clay balls should be named to specify the block to place. For example, with a clay ball named `grass_block[snowy=true]`, you can place snowy grass blocks by right clicks.
+
+Available values: `true` / `false`
+
+Default value: `false`
 
 ##### `commandExecutionRequirment`
 
@@ -1369,6 +1486,14 @@ Available values:
 
 Default value: `-FOLLOW_SYSTEM_SETTINGS-`
 
+##### `loomWaveGenerator`
+
+Make loom blocks a wave generator, whose output can be configurated with `/wavegen`.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `maxClientTicksPerFrame`
 
 The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.
@@ -1412,6 +1537,24 @@ Default value: `false`
 ##### `projectileChunkLoading`
 
 Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `playerInputsWhenScreenOpened`
+
+Allow players to move and turn around while typing commands, etc., if a hotkey, `F6` by default, is pressed.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `playerInputsWhenScreenOpenedHotkey`
+
+Hotkeys for `playerInputsWhenScreenOpened`, specified by a key code.
+
+ - `F1` - `F12`: 290 - 301
 
 Available values: `true` / `false`
 
@@ -1892,6 +2035,8 @@ By clicking a hay block, a GUI can be opened:
 
 Each position with a hay block receiving redstone signals is a channel. Channels are marked with an numerical ID (starting from 0) and the material color (or map color) of the block beneath. When a hay block detects a change of redstone power for the first time, a channel is created, and its ID and color won't change anymore.
 
+A notable consequence of the one-to-one corresponence between channels and positions is that if a hay block is moved, possibly by a piston, it would be associated with a new channel. That is, channels cannot be moved.
+
 ### Modes
 
 The oscilloscope has two working mode, analog mode and digital mode.
@@ -1932,6 +2077,14 @@ When a trigger is detected, the wave will be scrolled to move the triggering edg
 
 There is also draggable triangles on the right side or the wave area, to mark triggering level of different channels.
 
+### Active Probing
+
+Active probing enables the oscilloscope to detect signal level changes without block updates. (Conside when a redstone wire changes its shape and thus connect to or disconnect from a block, for example.) In this mode, hay blocks would try to measure the signal level they receive at the beginning of each ticking phases, to see if the level has changed since the last measurement.
+
+All channels are probing actively by detault. To disable, uncheck the check box labelled `Ac` in the channel list area.
+
+Note that channel must be created with some level changes with block updates to probe actively.
+
 ### Micro-timing Support
 
 By default, on the horizontal axis, a game tick is divided into several smaller parts, each of which stands for a ticking phase like scheduled ticks and entity processing. Edges at different phases are also displayed at different horizontal positions according to the ticking phase it is at.
@@ -1948,7 +2101,7 @@ You can check Align to tick to ignore micro-timing information and align all edg
 
 ## Advanced Mixins
 
-Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are enabled. If you want to disable some advanced mixins, you can press F8 (not available on MacOS) in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
+Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are disabled since `0.10.0+v20251019`. If you want to enable some advanced mixins, you can press F8 (not available on MacOS) in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
 
 Disabling advanced mixins may make related features no longer available.
 
@@ -1970,4 +2123,4 @@ Disabling advanced mixins may make related features no longer available.
 
 Initially, I started this mod in Feb 2021 to do some research on the motion of entities, thus the HUDs, bounding box renderer, tool items and command `/entityfield` were the earliest features of this mod. Later, more features were introduced gradually when needed.
 
-After April 2022, I speeded up the development of the mod, more features were added while many previously added ones were completely refactored. By 2025/08/27, 36 commands, 96 options (or rules) and 10 renderers had been available.
+After April 2022, I speeded up the development of the mod, more features were added while many previously added ones were completely refactored. By 2025/10/19, 38 commands, 100 options (or rules) and 10 renderers had been added.

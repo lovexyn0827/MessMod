@@ -54,7 +54,6 @@ public abstract class HayBlockMixin extends AbstractBlock {
 	}
 	
 	protected void onUpdate(ServerWorld world, BlockPos pos) {
-		int level = world.getReceivedRedstonePower(pos);
-		MessMod.INSTANCE.getOscilscope().update(world, pos, level);
+		MessMod.INSTANCE.getOscilscope().update(world, pos);
 	}
 }

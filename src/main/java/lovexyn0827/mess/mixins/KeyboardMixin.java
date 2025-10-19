@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -22,10 +23,11 @@ import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 
-@Mixin(Keyboard.class)
+@Mixin(value = Keyboard.class, priority = 827)
 public abstract class KeyboardMixin {
 	@Shadow @Final MinecraftClient client;
 	
@@ -92,5 +94,22 @@ public abstract class KeyboardMixin {
 		} else if(key == GLFW.GLFW_KEY_F8 && isBeingPressed && this.client.currentScreen instanceof TitleScreen) {
 			MessModMixinPlugin.tryOpenMixinChoosingFrame(null);
 		}
+	}
+	
+	private static boolean shouldPassPlayInput() {
+		return OptionManager.playerInputsWhenScreenOpened
+				&& InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), 
+						OptionManager.playerInputsWhenScreenOpenedHotkey);
+	}
+	
+	@Redirect(
+			method = { "onKey", "onChar" }, 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/client/MinecraftClient.currentScreen:Lnet/minecraft/client/gui/screen/Screen;"
+			)
+	)
+	private Screen shouldAlwaysHandlePlayerInputs(MinecraftClient client) {
+		return shouldPassPlayInput() ? null : client.currentScreen;
 	}
 }

@@ -71,7 +71,13 @@ public class LogDeathCommand {
 								})
 								.executes((ct) -> {
 									String in = StringArgumentType.getString(ct, "target").replace(" ", "");
-									SUBSCRIPTED_DEATH_PREDICATES.put(in, DeathInfoLoggingItem.parse(in));
+									try {
+										SUBSCRIPTED_DEATH_PREDICATES.put(in, DeathInfoLoggingItem.parse(in));
+									} catch (TranslatableException e) {
+										CommandUtil.error(ct, e.getLocalizedMessage());
+										return 0;
+									}
+									
 									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})))
@@ -95,7 +101,7 @@ public class LogDeathCommand {
 										}
 									}
 									
-									CommandUtil.feedbackWithArgs(ct, "cmd.general.unsub", count, count);
+									CommandUtil.feedbackWithArgs(ct, "cmd.general.unsubmulticnt", count);
 									return Command.SINGLE_SUCCESS;
 								})))
 				.then(literal("subVictimField")

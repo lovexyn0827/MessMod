@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RegionBasedStorageAccessor;
+import lovexyn0827.mess.mixins.SerializingRegionBasedStorageAccessor;
+import lovexyn0827.mess.mixins.StorageIoWorkerAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.map.MapState;
@@ -23,6 +26,7 @@ import net.minecraft.world.poi.PointOfInterestStorage.OccupationStatus;
 import net.minecraft.world.storage.ChunkDataList;
 import net.minecraft.world.storage.EntityChunkDataAccess;
 import net.minecraft.world.storage.RegionBasedStorage;
+import net.minecraft.world.storage.StorageIoWorker;
 
 public final class Region {
 	private final ChunkPos max;
@@ -91,6 +95,12 @@ public final class Region {
 		// FIXME: POIs may be exported incorrectly
 		poiDst.tick(() -> true);
 		entityDst.close();
+		StorageIoWorker ioWorker = ((SerializingRegionBasedStorageAccessor) poiDst).getStorageIoWorkerMessMod();
+		Map<?, ?> unsaved = ((StorageIoWorkerAccessor) ioWorker).getResultsMessMod();
+		while (!unsaved.isEmpty()) {
+			Thread.yield();
+		}
+		
 		poiDst.close();
 	}
 

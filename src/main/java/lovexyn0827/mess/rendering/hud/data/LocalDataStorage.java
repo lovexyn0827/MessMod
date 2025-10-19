@@ -1,6 +1,7 @@
 package lovexyn0827.mess.rendering.hud.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,11 @@ public abstract class LocalDataStorage implements HudDataSender, HudDataStorage 
 	}
 
 	@Override
+	public Collection<HudLine> getLines() {
+		return this.lines;
+	}
+
+	@Override
 	public synchronized void updateData(Entity entity) {
 		this.data.clear();
 		if (entity == null) return;
@@ -32,11 +38,6 @@ public abstract class LocalDataStorage implements HudDataSender, HudDataStorage 
 				this.data.put(f, f.getFrom(entity));
 			}
 		});
-	}
-
-	@Override
-	public List<HudLine> getCustomLines() {
-		return this.lines;
 	}
 
 	@Override

@@ -85,9 +85,10 @@ public abstract class Shape {
 					new Vec3d(tag.getDouble("X1"), tag.getDouble("Y1"), tag.getDouble("Z1")), 
 					tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
 		case "text" : 
+			float scale = tag.contains("scale") ? tag.getFloat("Scale") : 1.0F;
 			return new RenderedText(tag.getString("Value"), 
 					new Vec3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z")), 
-							tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
+							tag.getInt("Color"), scale, tag.getInt("Life"), tag.getLong("GT"));
 		case "bitmap" : 
 			// XXX Will GZIP bring some performance improvement?
 			return RenderedBitmap.fromTag(tag);
@@ -100,5 +101,6 @@ public abstract class Shape {
 		IDS.put("box", RenderedBox.class);
 		IDS.put("line", RenderedLine.class);
 		IDS.put("text", RenderedText.class);
+		IDS.put("bitmap", RenderedBitmap.class);
 	}
 }

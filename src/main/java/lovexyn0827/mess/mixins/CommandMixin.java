@@ -13,6 +13,7 @@ import com.mojang.brigadier.CommandDispatcher;
 
 import lovexyn0827.mess.command.AccessingPathCommand;
 import lovexyn0827.mess.command.CountEntitiesCommand;
+import lovexyn0827.mess.command.DrawShapeCommand;
 import lovexyn0827.mess.command.EnsureCommand;
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
@@ -34,6 +35,7 @@ import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
 import lovexyn0827.mess.command.MoveEntityCommand;
 import lovexyn0827.mess.command.NameEntityCommand;
+import lovexyn0827.mess.command.NameItemCommand;
 import lovexyn0827.mess.command.PartlyKillCommand;
 import lovexyn0827.mess.command.PoiCommand;
 import lovexyn0827.mess.command.RaycastCommand;
@@ -95,6 +97,8 @@ public abstract class CommandMixin {
         WaveGenCommand.register(this.dispatcher);
         TouchCommand.register(this.dispatcher);
         SetBlockRawCommand.register(this.dispatcher);
+        NameItemCommand.register(this.dispatcher);
+        DrawShapeCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 

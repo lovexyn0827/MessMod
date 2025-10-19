@@ -39,13 +39,14 @@ public class TileEntityCommand {
 									CommandUtil.feedbackWithArgs(ct, "cmd.tileentity.data", be.writeNbt(new NbtCompound()));
 									return 1;
 								}))).
-				then(literal("set").
+				then(literal("add").
 						then(argument("pos",BlockPosArgumentType.blockPos()).
 								then(argument("type",IdentifierArgumentType.identifier()).suggests(suggestions ).
 										executes((ct) -> {
 											BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
 											BlockEntity be = getBlockEntity(ct, pos);
 											ct.getSource().getWorld().addBlockEntity(be);
+											CommandUtil.feedback(ct, "cmd.general.success");
 											return 1;
 										}).
 										then(argument("tag",NbtCompoundArgumentType.nbtCompound()).
@@ -54,6 +55,27 @@ public class TileEntityCommand {
 													BlockEntity be = getBlockEntity(ct, pos);
 													be.readNbt((NbtCompound) NbtCompoundArgumentType.getNbtCompound(ct, "tag"));
 													ct.getSource().getWorld().addBlockEntity(be);
+													return 1;
+											}))))).
+				then(literal("set").
+						then(argument("pos",BlockPosArgumentType.blockPos()).
+								then(argument("type",IdentifierArgumentType.identifier()).suggests(suggestions ).
+										executes((ct) -> {
+											BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
+											BlockEntity be = getBlockEntity(ct, pos);
+											ct.getSource().getWorld().removeBlockEntity(pos);
+											ct.getSource().getWorld().addBlockEntity(be);
+											CommandUtil.feedback(ct, "cmd.general.success");
+											return 1;
+										}).
+										then(argument("tag",NbtCompoundArgumentType.nbtCompound()).
+												executes((ct)->{
+													BlockPos pos = (BlockPosArgumentType.getLoadedBlockPos(ct, "pos"));
+													BlockEntity be = getBlockEntity(ct, pos);
+													be.readNbt((NbtCompound) NbtCompoundArgumentType.getNbtCompound(ct, "tag"));
+													ct.getSource().getWorld().removeBlockEntity(pos);
+													ct.getSource().getWorld().addBlockEntity(be);
+													CommandUtil.feedback(ct, "cmd.general.success");
 													return 1;
 											}))))).
 				then(literal("remove").

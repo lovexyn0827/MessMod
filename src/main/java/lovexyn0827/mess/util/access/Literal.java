@@ -495,12 +495,16 @@ public abstract class Literal<T> {
 		protected ArrayL(String strRep) throws CommandSyntaxException {
 			super(strRep);
 			this.compiled = false;
-			// TODO Handle [int
-			int dimListOffset = strRep.indexOf('[');
+			int dimListOffset = strRep.indexOf(']');
 			if (dimListOffset == -1) {
 				throw new TranslatableException("exp.atleast1dim");
 			}
 
+			dimListOffset = strRep.substring(0, dimListOffset).lastIndexOf('[');
+			if (dimListOffset == -1) {
+				throw new TranslatableException("exp.atleast1dim");
+			}
+			
 			// Parse class name
 			String namedClass = strRep.substring(2, dimListOffset).replace('/', '.');
 			String srg = MessMod.INSTANCE.getMapping().srgClass(namedClass);

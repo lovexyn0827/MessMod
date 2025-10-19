@@ -9,6 +9,8 @@
 		"cmd.general.subdup" : "%s已被监视", 
 		"cmd.general.submulti" : "已开始监视%d个项目：%s", 
 		"cmd.general.unsubmulti" : "取消监视%d个项目：%s", 
+		"cmd.general.submulticnt" : "已开始监视%d个项目", 
+		"cmd.general.unsubmulticnt" : "取消监视%d个项目", 
 		"cmd.general.found" : "在(%d, %d, %d)找到了POI", 
 		"cmd.general.notfound" : "未找到", 
 		"cmd.general.nodef" : "%s未被定义", 
@@ -34,6 +36,10 @@
 		
 		//***** countentities *****
 		"cmd.countentities.result" : "共找到%d个实体", 
+		
+		//***** drawshape *****
+		"cmd.drawshape.imgfail": "未能加载图像", 
+		"cmd.drawshape.malurl": "URL格式有误：%s", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -105,15 +111,16 @@
 		"cmd.messcfg.set" : "选项%s的值现在已被设为%s", 
 		"cmd.messcfg.setglobal" : "全局作用域中选项%s的值现在已被设为%s", 
 		"cmd.messcfg.globalonly" : "存档局部设置中不支持选项%s，请点击这里以在全局作用域中设置该选项", 
-		"cmd.messcfg.withtag" : "带有标签%s的选项：", 
+		"cmd.messcfg.withtag" : "带有标签%s（%s）的选项：", 
 		"cmd.messcfg.deprecated" : "\n该选项已被废弃，不再推荐对其取值进行修改！", 
+		"cmd.messcfg.labels" : "类别（点击标签查看详情）：", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
 		"cmd.modify.result" : "找到了%d个实体，其中有%d个实体的属性被修改", 
 		
 		//***** partlykill *****
-		"cmd.partlykill.result" : "找到了%d个实体，并实际杀死了其中%d", 
+		"cmd.partlykill.result" : "找到了%d个实体，并实际杀死了其中%d个", 
 		
 		//***** poi *****
 		"cmd.poi.usage" : "TODO", 
@@ -146,6 +153,7 @@
 		"cmd.wavegen.err.reqorder" : "阶段间必须有序，而且不能重叠", 
 		"cmd.wavegen.err.tobeforefrom" : "阶段的开始时间不能在结束之间之后", 
 		"cmd.wavegen.err.largeoffset" : "时间偏移量（%d）必须小于波形长度（%d）", 
+		"cmd.wavegen.reqopt" : "此波形在选项loomWaveGenerator启用前暂时不会生效。（可通过/messcfg loomWaveGenerator true启用此选项)", 
 		
 		//***** Exceptions *****
 		"exp.reqint" : "需要整数， 但是出现了%s", 
@@ -210,6 +218,7 @@
 		"opt.chunkLoadingInfoRenderer.desc" : "手持鹦鹉螺壳时显示区块加载状态。可能会被移至区块加载小地图（ChunkMap）中。", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "区块加载状态显示半径，以区块计。", 
 		"opt.chunkLogAutoArchiving.desc" : "自动存档一个会话内产生的区块行为记录（若有），存档文件可在`世界文件夹/chunklog/archives`找到。", 
+		"opt.clayBlockPlacer.desc" : "使用粘土球放置任意技术性方块（如下界传送门）。粘土球的名称指定了放置的方块，例如，在手持名为`grass_block[snowy=true]`的粘土球时，可以通过右键放置积雪的草方块。", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
 		"opt.disableCreativeForcePickup.desc" : "创造模式下的玩家在物品栏被填满时不再拾起箭矢和物品。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 
@@ -257,11 +266,14 @@
 		"opt.independentEntityPickerForInfomation.desc" : "独立地为信息提供者（目前只包含指令UUID建议）选取目标实体。", 
 		"opt.interactableB36.desc" : "允许玩家破坏36号方块或对准它放置物品。", 
 		"opt.language.desc" : "该Mod的主要语言。", 
+		"opt.loomWaveGenerator.desc" : "将织布机作为一个波形发生器，其输出可由`/wavegen`指令配置。", 
 		"opt.maxClientTicksPerFrame.desc" : "FPS低于20时每帧可以运行多少个客户端游戏刻。", 
 		"opt.maxEndEyeTpRadius.desc" : "设置endEyeTeleport功能的最远传送距离。", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "允许玩家在地面上直接放置矿车。", 
 		"opt.mobFastKill.desc" : "在生物被`/kill`杀死时被直接移除而非承受伤害。", 
 		"opt.optimizedEntityPushing.desc" : "跳过不会被推动的实体的挤压运算。实体挤压伤害会被影响。", 
+		"opt.playerInputsWhenScreenOpened.desc" : "按下指定按键（默认为F6）时，允许玩家在进行输入指令等操作时移动或改变视角。", 
+		"opt.playerInputsWhenScreenOpenedHotkey.desc" : "`playerInputsWhenScreenOpened`选项使用的快捷键，由按键码（Key code）指定：\n - `F1` - `F12`：290 - 301", 
 		"opt.projectileChunkLoading.desc" : "允许弹射物在其运算过程中自动加载区块，在制作珍珠炮时可能会有所帮助。注意该功能可能会在弹射物以极高的速度飞行时造成极大的卡顿。", 
 		"opt.projectileChunkLoadingRange.desc" : "`projectileChunkLoading`功能中创建的强加载范围半径。", 
 		"opt.projectileChunkLoadingPermanence.desc" : "弹射物在`projectileChunkLoading`启用时永久加载区块。", 
@@ -276,7 +288,7 @@
 		"opt.renderRedstoneGateInfo.desc" : "显示玩家注视的红石中继器或红石比较器的信号等级。", 
 		"opt.resistanceReducesVoidDamage.desc" : "抗性提升效果可以减免虚空伤害。", 
 		"opt.serverSyncedBox.desc" : "服务端碰撞箱显示。", 
-		"opt.serverSyncedBoxRenderRange.desc" : "服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非负值会被认为是无穷大。", 
+		"opt.serverSyncedBoxRenderRange.desc" : "服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非正值会被认为是无穷大。", 
 		"opt.serverSyncedBoxUpdateModeInFrozenTicks.desc" : "游戏运算被地毯端中/tick指令暂停时服务端碰撞箱渲染器的行为。", 
 		"opt.skippedGenerationStages.desc" : "跳过一些世界生成阶段。不支持跳过`biome`和`full`，它们的缺失会使服务端崩溃。", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "忽略未加载区块中的潜在碰撞，可以降低远距离raycast的卡顿。", 
@@ -305,6 +317,33 @@
 		"opt.err.reqbool" : "只能使用true或false", 
 		"opt.err.conflict.carpet.1425" : "该选项与Carpet 1.4.25以上版本冲突", 
 		
+		//***** Labels of options *****
+		"opt.label.HIGHLIGHT.name" : "常用", 
+		"opt.label.RENDERER.name" : "渲染", 
+		"opt.label.INTERACTION_TWEAKS.name" : "辅助", 
+		"opt.label.RESEARCH.name" : "研究", 
+		"opt.label.REDSTONE.name" : "红石", 
+		"opt.label.ENTITY.name" : "实体", 
+		"opt.label.MESSMOD.name" : "设置", 
+		"opt.label.EXPLOSION.name" : "爆炸", 
+		"opt.label.CHUNK.name" : "区块", 
+		"opt.label.BUGFIX.name" : "修复", 
+		"opt.label.BREAKING_OPTIMIZATION.name" : "优化", 
+		"opt.label.MISC.name" : "杂项", 
+		
+		"opt.label.HIGHLIGHT.desc" : "最常用的若干功能", 
+		"opt.label.RENDERER.desc" : "用于启用或设置渲染器", 
+		"opt.label.INTERACTION_TWEAKS.desc" : "交互辅助", 
+		"opt.label.RESEARCH.desc" : "深度机制研究专用", 
+		"opt.label.REDSTONE.desc" : "红石调试工具包", 
+		"opt.label.ENTITY.desc" : "实体相关", 
+		"opt.label.MESSMOD.desc" : "模组本身及其功能的设置", 
+		"opt.label.EXPLOSION.desc" : "监视或更改爆炸行为", 
+		"opt.label.CHUNK.desc" : "区块加载与世界生成", 
+		"opt.label.BUGFIX.desc" : "Bug修复", 
+		"opt.label.BREAKING_OPTIMIZATION.desc" : "激进的优化，可能影响原版机制", 
+		"opt.label.MISC.desc" : "未分类的选项", 
+		
 		//***** Oscilscope *****
 		"oscilscope.gui.title" : "示波器", 
 		"oscil.gui.trigmode.RISING" : "上升沿", 
@@ -312,6 +351,7 @@
 		"oscil.gui.trigmode.BOTH" : "上下边沿", 
 		"oscil.gui.trigmode.NONE" : "无触发", 
 		"oscil.gui.show" : "显示", 
+		"oscil.gui.active" : "主动探测", 
 		"oscil.gui.triginf" : "通道 %d @ %d", 
 		"oscil.gui.mode" : "模式", 
 		"oscil.gui.mode.analog" : "模拟模式", 

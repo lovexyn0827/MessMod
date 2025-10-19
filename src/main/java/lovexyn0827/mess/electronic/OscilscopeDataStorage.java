@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
@@ -18,19 +18,19 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.ServerMicroTime;
 
 abstract class OscilscopeDataStorage {
-	// Using LinkedList brings about ~1.5X heap overhead, but fine since it make it possible to purge old edges
-	private final Map<Oscilscope.Channel, LinkedList<Oscilscope.Edge>> waveData = new HashMap<>();
+	private static final double PURGE_START_THRESHOLD = 1.5;
+	private final Map<Oscilscope.Channel, List<Oscilscope.Edge>> waveData = new ConcurrentHashMap<>();
 	private final ConcurrentLinkedDeque<Oscilscope.Trigger> newTriggers = new ConcurrentLinkedDeque<>();
-	private final LinkedList<Oscilscope.Trigger> triggers = new LinkedList<>();
+	private final ConcurrentLinkedDeque<Oscilscope.Trigger> triggers = new ConcurrentLinkedDeque<>();
 	private final ConcurrentLinkedQueue<Oscilscope.Channel> newChannels = new ConcurrentLinkedQueue<>();
-	private final List<Oscilscope.Channel> channels = new ArrayList<>();
+	private final ConcurrentLinkedDeque<Oscilscope.Channel> channels = new ConcurrentLinkedDeque<>();
 	private int storageDepth;
 	
 	static OscilscopeDataStorage get() {
 		return MessMod.INSTANCE.getOscilscope().getDataStorage();
 	}
 
-	protected Map<Oscilscope.Channel, LinkedList<Oscilscope.Edge>> getWaveData() {
+	protected Map<Oscilscope.Channel, List<Oscilscope.Edge>> getWaveData() {
 		return this.waveData;
 	}
 
@@ -53,11 +53,20 @@ abstract class OscilscopeDataStorage {
 		
 		Map<Oscilscope.Channel, ServerMicroTime> lowerBounds = new HashMap<>();
 		this.waveData.forEach((ch, wave) -> {
-			while (wave.size() > this.storageDepth) {
-				wave.removeFirst();
+			if (wave.size() < this.storageDepth * PURGE_START_THRESHOLD) {
+				return;
 			}
 			
-			ServerMicroTime oldestEdgeTime = wave.getFirst().time;
+			int trimStart = wave.size() - this.storageDepth - 1;
+			int trimEnd = wave.size() - 1;
+			Oscilscope.Edge[] trimmed = wave.subList(trimStart, trimEnd)
+					.toArray(new Oscilscope.Edge[this.storageDepth]);
+			wave.clear();
+			for (Oscilscope.Edge edge : trimmed) {
+				wave.add(edge);
+			}
+			
+			ServerMicroTime oldestEdgeTime = wave.isEmpty() ? ServerMicroTime.END_OF_TIME : wave.get(0).time;
 			lowerBounds.put(ch, oldestEdgeTime);
 		});
 		purgeTriggers(this.triggers, lowerBounds);
@@ -96,15 +105,15 @@ abstract class OscilscopeDataStorage {
 	}
 	
 	protected void addEdge(Oscilscope.Channel channel, Oscilscope.Edge edge) {
-		this.waveData.computeIfAbsent(channel, (k) -> new LinkedList<>()).add(edge);
+		this.waveData.computeIfAbsent(channel, (k) -> Collections.synchronizedList(new ArrayList<>())).add(edge);
 		this.purge();	// XXX: purge in anther thread
 	}
 
-	public List<Oscilscope.Trigger> getTriggerHistory() {
+	public ConcurrentLinkedDeque<Oscilscope.Trigger> getTriggerHistory() {
 		return this.triggers;
 	}
 
-	public List<Oscilscope.Channel> getAllChannels() {
+	public ConcurrentLinkedDeque<Oscilscope.Channel> getAllChannels() {
 		return this.channels;
 	}
 	

@@ -174,6 +174,7 @@ public class HudCommand {
 									}
 									
 									MessMod.INSTANCE.getServerHudManager().setServerPlayerHudTarget(profiles.iterator().next());
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);

@@ -16,6 +16,8 @@ import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.ServerMicroTime;
+import lovexyn0827.mess.util.phase.ServerTickingPhase;
+import lovexyn0827.mess.util.phase.TickingPhase;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.nbt.NbtCompound;
@@ -23,8 +25,11 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Lazy;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
@@ -64,7 +69,8 @@ public final class Oscilscope {
 		}
 	}
 	
-	public void update(World world, BlockPos pos, int level) {
+	public void update(ServerWorld world, BlockPos pos) {
+		int level = getReceivedLevelUnbounded(world, pos);
 		Pair<RegistryKey<World>, BlockPos> key = new Pair<>(world.getRegistryKey(), pos);
 		if (this.channels.containsKey(key)) {
 			this.channels.get(key).update(level);
@@ -75,6 +81,17 @@ public final class Oscilscope {
 			this.dataSender.sendNewChannel(newChannel);
 			newChannel.update(level);
 		}
+	}
+
+	private static int getReceivedLevelUnbounded(ServerWorld world, BlockPos pos) {
+		int i = Integer.MIN_VALUE;
+		for (Direction direction : Direction.values()) {
+			int j = world.getEmittedRedstonePower(pos.offset(direction), direction);
+			if (j <= i) continue;
+			i = j;
+		}
+		
+		return i;
 	}
 
 	public OscilscopeDataSender getDataSender() {
@@ -178,12 +195,24 @@ public final class Oscilscope {
 		private int trigLevel = 1;
 		private int prevLevel = -1;
 		private boolean visible = true;
+		private final Lazy<TickingPhase.Event> updater;
+		private boolean activeUpdate;
+		@Environment(EnvType.CLIENT)
+		private Consumer<Channel> changeListener;
 
 		private Channel(RegistryKey<World> dimension, BlockPos pos, int color) {
 			this.id = Oscilscope.this.nextChannelId++;
 			this.dimension = dimension;
 			this.pos = pos;
 			this.color = color;
+			this.updater = new Lazy<>(() -> {
+				return (phase, world) -> {
+					if (world != null && !world.isClient && world.getRegistryKey() == this.dimension) {
+						this.update(getReceivedLevelUnbounded((ServerWorld) world, pos));
+					}
+				};
+			});
+			this.setActiveUpdate(true);
 		}
 		
 		/**
@@ -197,6 +226,7 @@ public final class Oscilscope {
 			this.color = color;
 			this.trigMode = trigMode;
 			this.trigLevel = trigLevel;
+			this.updater = new Lazy<>(() -> (p, w) -> {});
 		}
 
 		void update(int level) {
@@ -215,7 +245,7 @@ public final class Oscilscope {
 				fallingEdge = level < this.trigLevel && this.prevLevel >= this.trigLevel;
 			}
 			
-			if (this.trigMode.shouldTrigger(risingEdge, fallingEdge)) {
+			if (this.isVisible() && this.trigMode.shouldTrigger(risingEdge, fallingEdge)) {
 				this.trigger(risingEdge);
 			}
 			
@@ -233,6 +263,19 @@ public final class Oscilscope {
 			int result = 1;
 			result = prime * result + Objects.hash(dimension, pos);
 			return result;
+		}
+		
+		void setActiveUpdate(boolean activeUpdate) {
+			if (activeUpdate == this.activeUpdate) {
+				return;
+			}
+			
+			this.activeUpdate = activeUpdate;
+			if (activeUpdate) {
+				ServerTickingPhase.addEventToAll(this.updater.get());
+			} else {
+				ServerTickingPhase.removeEventFromAll(this.updater.get());
+			}
 		}
 
 		@Override
@@ -260,21 +303,43 @@ public final class Oscilscope {
 		}
 
 		@Environment(EnvType.CLIENT)
+		void setChangeListener(Consumer<Channel> listener) {
+			this.changeListener = listener;
+		}
+
+		@Environment(EnvType.CLIENT)
+		void notifyChangeListener() {
+			if (this.changeListener != null) {
+				this.changeListener.accept(this);
+			}
+		}
+		
+		@Environment(EnvType.CLIENT)
 		void setTrigMode(TrigMode mode) {
+			if (mode == this.trigMode) {
+				return;
+			}
+			
 			this.trigMode = mode;
 			Oscilscope.this.uploadConfig(TRIG_MODE, (buf) -> {
 				buf.writeInt(this.id);
 				buf.writeInt(this.trigMode.ordinal());
 			});
+			this.notifyChangeListener();
 		}
 
 		@Environment(EnvType.CLIENT)
 		void setTrigLevel(int level) {
+			if (level == this.trigLevel) {
+				return;
+			}
+			
 			this.trigLevel = level;
 			Oscilscope.this.uploadConfig(TRIG_LEVEL, (buf) -> {
 				buf.writeInt(this.id);
 				buf.writeInt(this.trigLevel);
 			});
+			this.notifyChangeListener();
 		}
 
 		public TrigMode getTrigMode() {
@@ -299,17 +364,26 @@ public final class Oscilscope {
 
 		@Environment(EnvType.CLIENT)
 		public void setVisible(boolean visible) {
+			if (visible == this.visible) {
+				return;
+			}
+			
 			this.visible = visible;
 			if (OptionManager.hayOscilloscopeChannelVisibilityBroadcast) {
 				Oscilscope.this.uploadConfig(VISIBILITY, (buf) -> {
 					buf.writeInt(this.id);
 					buf.writeBoolean(visible);
 				});
+				this.notifyChangeListener();
 			}
 		}
 		
 		public boolean isVisible() {
 			return this.visible;
+		}
+		
+		public boolean isUpdatingActively() {
+			return this.activeUpdate;
 		}
 
 		public NbtCompound toTag() {

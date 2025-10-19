@@ -9,6 +9,8 @@
 		"cmd.general.subdup" : "%s has already been subscribed!", 
 		"cmd.general.submulti" : "Subscribed %d items: %s", 
 		"cmd.general.unsubmulti" : "Unsubscribed %d items: %s", 
+		"cmd.general.submulticnt" : "Subscribed %d items", 
+		"cmd.general.unsubmulticnt" : "Unsubscribed %d items", 
 		"cmd.general.found" : "Found at (%d, %d, %d)", 
 		"cmd.general.notfound" : "Not found", 
 		"cmd.general.nodef" : "%s hasn't been defined", 
@@ -34,6 +36,10 @@
 		
 		//***** countentities *****
 		"cmd.countentities.result" : "%d entities were found.", 
+		
+		//***** drawshape *****
+		"cmd.drawshape.imgfail": "Failed to load image!", 
+		"cmd.drawshape.malurl": "Malformed URL: %s", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -105,8 +111,9 @@
 		"cmd.messcfg.set" : "Option %s is now set to %s", 
 		"cmd.messcfg.setglobal" : "Option %s is now set to %s globally", 
 		"cmd.messcfg.globalonly" : "Option %s isn't supported in save-local storage, please click here to set it globally.", 
-		"cmd.messcfg.withtag" : "Options with tag %s:", 
+		"cmd.messcfg.withtag" : "Options with tag %s (%s):", 
 		"cmd.messcfg.deprecated" : "\nThis option is deprecated, and modification to its value is no longer recommended！", 
+		"cmd.messcfg.labels" : "Categories (click for details):", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -146,6 +153,7 @@
 		"cmd.wavegen.err.reqorder" : "Stages should be ordered and should not overlap", 
 		"cmd.wavegen.err.tobeforefrom" : "Start time of stages shouldn't appear after its end time!", 
 		"cmd.wavegen.err.largeoffset" : "Time offset (%d) should be less than the length of waveform (%d)", 
+		"cmd.wavegen.reqopt" : "The waveform won't take effect until the option `loomWaveGenerator` is enabled. (You may enable it with `/messcfg loomWaveGenerator true`)", 
 		
 		//***** Exceptions *****
 		"exp.reqint" : "Requires an integer, but found %s", 
@@ -210,6 +218,7 @@
 		"opt.chunkLoadingInfoRenderer.desc" : "Display the loading status when holding a nautilus shell. May be moved to the ChunkMap later.", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "The radius of the area where chunk loading statuses are displayed, in chunks.", 
 		"opt.chunkLogAutoArchiving.desc" : "Archive the chunk behavior log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/chunklog/archives`.", 
+		"opt.clayBlockPlacer.desc" : "Place any technical blocks (e.g. nether portals) with clay balls. Clay balls should be named to specify the block to place. For example, with a clay ball named `grass_block[snowy=true]`, you can place snowy grass blocks by right clicks.", 
 		"opt.commandExecutionRequirment.desc" : "Whether or not the execution of commands defined by this mod require OP permission.", 
 		"opt.craftingTableBUD.desc" : "Detect the block updates received by crafting tables.", 
 		"opt.creativeNoVoidDamage.desc" : "Disable void damage for players in creative-like modes.", 
@@ -257,11 +266,14 @@
 		"opt.independentEntityPickerForInfomation.desc" : "Pick crosshair-targeted entities for information providers (currently only the UUID suggestor) independently.", 
 		"opt.interactableB36.desc" : "Allow players to break block-36s and place something against it.", 
 		"opt.language.desc" : "The main language of the Mod.", 
+		"opt.loomWaveGenerator.desc" : "Make loom blocks a wave generator, whose output can be configurated with `/wavegen`.", 
 		"opt.maxClientTicksPerFrame.desc" : "The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.", 
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleportation with `endEyeTeleport`.", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "Allow players to place minecarts directly on the ground.", 
 		"opt.mobFastKill.desc" : "`/kill` kill mobs by removing them directly instead of damaging them.", 
 		"opt.optimizedEntityPushing.desc" : "Skip the calculation of cramming between entities which wouldn't be pushed. The damage caused by entity cramming will be influenced.", 
+		"opt.playerInputsWhenScreenOpened.desc" : "Allow players to move and turn around while typing commands, etc., if a hotkey, `F6` by default, is pressed.", 
+		"opt.playerInputsWhenScreenOpenedHotkey.desc" : "Hotkeys for `playerInputsWhenScreenOpened`, specified by a key code.\n - `F1` - `F12`: 290 - 301", 
 		"opt.projectileChunkLoading.desc" : "Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.", 
 		"opt.projectileChunkLoadingRange.desc" : "Set the radius of entity processing chunks loaded by `projectileChunkLoading`.", 
 		"opt.projectileChunkLoadingPermanence.desc" : "Projectiles load the chunks permanently when `projectileChunkLoading` is enabled.", 
@@ -305,6 +317,33 @@
 		"opt.err.reqbool" : "Use true of false here!", 
 		"opt.err.conflict.carpet.1425" : "This option conflicts with Carpet 1.4.25 and above!", 
 		
+		//***** Labels of options *****
+		"opt.label.HIGHLIGHT.name" : "Highlights", 
+		"opt.label.RENDERER.name" : "Renderers", 
+		"opt.label.INTERACTION_TWEAKS.name" : "Tweakers", 
+		"opt.label.RESEARCH.name" : "Research", 
+		"opt.label.REDSTONE.name" : "Redstone", 
+		"opt.label.ENTITY.name" : "Entity", 
+		"opt.label.MESSMOD.name" : "MessMod", 
+		"opt.label.EXPLOSION.name" : "Explosion", 
+		"opt.label.CHUNK.name" : "Chunk", 
+		"opt.label.BUGFIX.name" : "BugFix", 
+		"opt.label.BREAKING_OPTIMIZATION.name" : "Optimization", 
+		"opt.label.MISC.name" : "Misc", 
+		
+		"opt.label.HIGHLIGHT.desc" : "The most frequently-used features.", 
+		"opt.label.RENDERER.desc" : "Options to enable and configure renders", 
+		"opt.label.INTERACTION_TWEAKS.desc" : "Interaction tweakers.", 
+		"opt.label.RESEARCH.desc" : "Helpful when dealing with details of game mechanics.", 
+		"opt.label.REDSTONE.desc" : "The redstone debugging toolkit.", 
+		"opt.label.ENTITY.desc" : "Stuff releated with entities.", 
+		"opt.label.MESSMOD.desc" : "Configurations of the Mod itself and its features.", 
+		"opt.label.EXPLOSION.desc" : "Observe or change the behaviors of explosions.", 
+		"opt.label.CHUNK.desc" : "Chunk loading & world generation.", 
+		"opt.label.BUGFIX.desc" : "Bug fixes.", 
+		"opt.label.BREAKING_OPTIMIZATION.desc" : "Aggressive optimizations, may change the behavior.", 
+		"opt.label.MISC.desc" : "Uncategorized stuff.", 
+		
 		//***** Oscilscope *****
 		"oscilscope.gui.title" : "Oscilscope", 
 		"oscil.gui.trigmode.RISING" : "Rising Edge", 
@@ -312,6 +351,7 @@
 		"oscil.gui.trigmode.BOTH" : "Both", 
 		"oscil.gui.trigmode.NONE" : "None", 
 		"oscil.gui.show" : "Show", 
+		"oscil.gui.active" : "Active Probing", 
 		"oscil.gui.triginf" : "Channel %d @ %d", 
 		"oscil.gui.mode" : "Mode", 
 		"oscil.gui.mode.analog" : "Analog Mode", 
