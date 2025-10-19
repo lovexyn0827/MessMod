@@ -73,7 +73,7 @@ public class RngCommand {
 	}
 	
 	@SuppressWarnings("resource")
-	private static Random getRandom(CommandContext<ServerCommandSource> ct) {
+	private static Random getRandom(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
 		boolean isWorld = false;
 		Iterator<ParsedCommandNode<ServerCommandSource>> itr = ct.getNodes().iterator();
 		while (itr.hasNext()) {
@@ -92,13 +92,8 @@ public class RngCommand {
 		if(isWorld) {
 			return ct.getSource().getWorld().random;
 		}else {
-			try {
-				Entity entity = EntityArgumentType.getEntity(ct, "target");
-				return ((EntityAccessor)entity).getRamdomMCWMEM();
-			} catch (CommandSyntaxException e) {
-				CommandUtil.error(ct, e);
-			}
+			Entity entity = EntityArgumentType.getEntity(ct, "target");
+			return ((EntityAccessor)entity).getRamdomMCWMEM();
 		}
-		return null;
 	}
 }

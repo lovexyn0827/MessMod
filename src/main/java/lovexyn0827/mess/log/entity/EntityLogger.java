@@ -112,7 +112,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 		}
 		
 		if(!this.isIdle()) {
-			throw new TranslatableException("cmd.entitilog.reqidle");
+			throw new TranslatableException("cmd.entitylog.reqidle");
 		}
 		
 		if(this.customFields.containsKey(name)) {

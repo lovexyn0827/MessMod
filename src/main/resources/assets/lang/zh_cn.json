@@ -6,8 +6,11 @@
 		"cmd.general.unsub" : "找到了%d个实体，并取消了对其中的%d个实体的记录", 
 		"cmd.general.subgen" : "已开始监视%s", 
 		"cmd.general.unsubgen" : "取消监视%s", 
+		"cmd.general.subdup" : "%s已被监视", 
 		"cmd.general.submulti" : "已开始监视%d个项目：%s", 
 		"cmd.general.unsubmulti" : "取消监视%d个项目：%s", 
+		"cmd.general.submulticnt" : "已开始监视%d个项目", 
+		"cmd.general.unsubmulticnt" : "取消监视%d个项目", 
 		"cmd.general.found" : "在(%d, %d, %d)找到了POI", 
 		"cmd.general.notfound" : "未找到", 
 		"cmd.general.nodef" : "%s未被定义", 
@@ -23,6 +26,8 @@
 		"cmd.general.flush" : "已将新内容保存到磁盘", 
 		"cmd.general.count" : "共有%d个被监视实体", 
 		"cmd.general.reqmixin" : "%s需要高级Mixin %s", 
+		"cmd.general.alexist" : "%s已存在", 
+		"cmd.general.alstartlog" : "已有记录在进行中！", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "无法加载保存的自定义节点：%s", 
@@ -31,6 +36,10 @@
 		
 		//***** countentities *****
 		"cmd.countentities.result" : "共找到%d个实体", 
+		
+		//***** drawshape *****
+		"cmd.drawshape.imgfail": "未能加载图像", 
+		"cmd.drawshape.malurl": "URL格式有误：%s", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -69,6 +78,11 @@
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "需要1个目标，但是找到了%d个", 
 		
+		//***** loadjavaagent *****
+		"cmd.loadjavaagent.loadsuc": "成功加载了Java agent: %s", 
+		"cmd.loadjavaagent.fail": "Java Agent加载失败！", 
+		"cmd.loadjavaagent.malurl": "URL格式有误！", 
+		
 		//***** lag *****
 		"cmd.lag.unsupported" : "专用服务器环境下无法访问线程%s", 
 		"cmd.lag.done" : "卡顿完成", 
@@ -77,6 +91,13 @@
 		"cmd.logchunkbehavior.reqidle" : "该操作仅在记录器空闲时可用", 
 		"cmd.logchunkbehavior.alreadystarted" : "记录器已被启用", 
 		"cmd.logchunkbehavior.alreadystopped" : "记录器已经停止工作", 
+		
+		//***** logdeath *****
+		"cmd.logdeath.fmterr" : "死亡原因格式错误，应形如pillager+arrow(projectile)->villager", 
+		"cmd.logdeath.nonnull" : "在此处不可使用null", 
+		"cmd.logdeath.noentype" : "实体类型%s未被定义",
+		"cmd.logdeath.dmginf" : "\n ======= 伤害源 =======", 
+		"cmd.logdeath.vctinf" : "\n ======= 受伤者 =======",  
 		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "当前配置", 
@@ -90,14 +111,16 @@
 		"cmd.messcfg.set" : "选项%s的值现在已被设为%s", 
 		"cmd.messcfg.setglobal" : "全局作用域中选项%s的值现在已被设为%s", 
 		"cmd.messcfg.globalonly" : "存档局部设置中不支持选项%s，请点击这里以在全局作用域中设置该选项", 
-		"cmd.messcfg.withtag" : "带有标签%s的选项：", 
+		"cmd.messcfg.withtag" : "带有标签%s（%s）的选项：", 
+		"cmd.messcfg.deprecated" : "\n该选项已被废弃，不再推荐对其取值进行修改！", 
+		"cmd.messcfg.labels" : "类别（点击标签查看详情）：", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
 		"cmd.modify.result" : "找到了%d个实体，其中有%d个实体的属性被修改", 
 		
 		//***** partlykill *****
-		"cmd.partlykill.result" : "找到了%d个实体，并实际杀死了其中%d", 
+		"cmd.partlykill.result" : "找到了%d个实体，并实际杀死了其中%d个", 
 		
 		//***** poi *****
 		"cmd.poi.usage" : "TODO", 
@@ -121,6 +144,16 @@
 		//***** variable *****
 		"cmd.variable.reqarray" : "给定槽位中的对象应为数组", 
 		"cmd.variable.invconstructor" : "无法解析构造器\n应类似于java/lang/Integer<1>、java/lang/Integer<I>V或java/lang/Integer.", 
+		
+		//***** wavegen *****
+		"cmd.wavegen.reqloom" : "选中位置的方块必须为织布机", 
+		"cmd.wavegen.err.empty" : "波形定义中必须至少包含一个阶段", 
+		"cmd.wavegen.err.stgfmt" : "波形定义语法错误，示例：(!1ENTITY=>!2)L15", 
+		"cmd.wavegen.err.stgfmt.simp" : "波形定义语法错误，示例：SH17L18H3L16", 
+		"cmd.wavegen.err.reqorder" : "阶段间必须有序，而且不能重叠", 
+		"cmd.wavegen.err.tobeforefrom" : "阶段的开始时间不能在结束之间之后", 
+		"cmd.wavegen.err.largeoffset" : "时间偏移量（%d）必须小于波形长度（%d）", 
+		"cmd.wavegen.reqopt" : "此波形在选项loomWaveGenerator启用前暂时不会生效。（可通过/messcfg loomWaveGenerator true启用此选项)", 
 		
 		//***** Exceptions *****
 		"exp.reqint" : "需要整数， 但是出现了%s", 
@@ -162,6 +195,8 @@
 		"exp.unknownescape" : "不支持的转义字符：%s", 
 		"exp.incompquote" : "不完整的字符引文", 
 		"exp.noconstructor" : "指定的构造器在%s中不存在", 
+		"exp.atleast1dim" : "必须为数组指定至少一个维度", 
+		"exp.invarray" : "%s不是数组的合法表示", 
 		
 		//***** HUDs *****
 		"hud.target" : "目标实体信息HUD: ", 
@@ -183,13 +218,19 @@
 		"opt.chunkLoadingInfoRenderer.desc" : "手持鹦鹉螺壳时显示区块加载状态。可能会被移至区块加载小地图（ChunkMap）中。", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "区块加载状态显示半径，以区块计。", 
 		"opt.chunkLogAutoArchiving.desc" : "自动存档一个会话内产生的区块行为记录（若有），存档文件可在`世界文件夹/chunklog/archives`找到。", 
+		"opt.clayBlockPlacer.desc" : "使用粘土球放置任意技术性方块（如下界传送门）。粘土球的名称指定了放置的方块，例如，在手持名为`grass_block[snowy=true]`的粘土球时，可以通过右键放置积雪的草方块。", 
 		"opt.commandExecutionRequirment.desc" : "该Mod中定义的命令是否需要OP权限。", 
+		"opt.disableCreativeForcePickup.desc" : "创造模式下的玩家在物品栏被填满时不再拾起箭矢和物品。", 
 		"opt.craftingTableBUD.desc" : "监听工作台收到的方块更新。", 
+		"opt.creativeNoVoidDamage.desc" : "为创造模式下的玩家禁用虚空伤害。", 
 		"opt.creativeUpwardsSpeed.desc" : "调节创造模式下玩家向上飞行（加）速度大小。以m/s为单位，玩家真正的最终速度大约为该选项值的150倍。", 
 		"opt.debugStickSkipsInvaildState.desc" : "防止调试棒将方块调整到非法状态。目前这个选项在一些情况下不能正常工作，例如调整铁轨的shape属性时仍可以将其调整到非法状态使其掉落。", 
 		"opt.dedicatedServerCommands.desc" : "在单人游戏中启用专用于服务器的指令。", 
 		"opt.defaultSaveComponents.desc" : "默认包含在导出的存档中的存档组件。", 
+		"opt.detailedChunkTaskLogging.desc" : "在区块事件记录器（`/logchunkbehavior`）生成的文件中包含关于区块任务的更多细节.", 
+		"opt.directChunkAccessForMessMod.desc" : "MessMod中一些持续工作的功能（如渲染器）可以直接从`ThreadedAnvilChunkStorage`中获取区块而不使用`ServerChunkManager`，以避免其对区块管理系统造成潜在影响。", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "禁用指令中对方块是否被加载的检查。", 
+		"opt.disableClientChunkUnloading.desc" : "忽略来自服务端的区块卸载请求。", 
 		"opt.disableEnchantCommandRestriction.desc" : "移除`/enchant`中对附魔等级与附魔兼容性的检查。", 
 		"opt.disableExplosionExposureCalculation.desc" : "禁用爆炸接触率计算以缩短堆叠TNT的爆炸卡顿时间。这会使方块无法防止其后方实体被爆炸影响。\n在安装Lithium后可能不能正常工作。", 
 		"opt.disableItemUsageCooldown.desc" : "禁用末影珍珠和紫颂果等物品的的使用冷却时长。", 
@@ -201,6 +242,7 @@
 		"opt.dumpTargetEntitySummonCommand.desc" : "生成用于生成目标实体的一条指令。如果手持的物品被附魔，实体的完整NBT数据（不含UUID）会被添加到 指令中，否则，只有实体类型，维度、坐标、动量与朝向信息会出现在指令中。", 
 		"opt.enabledTools.desc" : "启用或禁用工具物品。\n - 骨头：`/tick step <骨头数目>` \n - 红砖：`/tick freeze` \n - 下界合金锭：`/kill @e[type!=player]`", 
 		"opt.endEyeTeleport.desc" : "在使用末影之眼时将玩家传送到玩家注视的地方。", 
+		"opt.entityExplosionImpulseScale.desc" : "调整爆炸对实体造成的变速大小。", 
 		"opt.entityExplosionInfluence.desc" : "爆炸影响到实体时在聊天栏输出实体被影响的情况。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。\n与Lithium不兼容。", 
 		"opt.entityExplosionRaysVisiblity.desc" : "启用或禁用实体爆炸射线渲染。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。", 
 		"opt.entityExplosionRaysLifetime.desc" : "设置实体爆炸射线的显示时长，单位为刻。", 
@@ -209,8 +251,13 @@
 		"opt.fillHistory.desc" : "记录`/fill`产生的方块变更以便在将来撤销或重做。", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "指定被记录的脉冲类型。", 
 		"opt.fletchingTablePulseDetector.desc" : "记录制箭台接收到的红石脉冲的长度。", 
+		"opt.flowerFieldRenderer.desc" : "显示当前区域可能在使用骨粉时生成的花朵种类。", 
+		"opt.flowerFieldRendererRadius.desc" : "`flowerFieldRenderer`的最大渲染距离。", 
+		"opt.flowerFieldRendererSingleLayer.desc" : "将`flowerFieldRenderer`生成的图像渲染在同一层（范围内最高方块顶部的水平面）。", 
 		"opt.generateChunkGrid.desc" : "在地表生层一层玻璃来标记区块。", 
 		"opt.getEntityRangeExpansion.desc" : "在原版的`getEntity()`方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。", 
+		"opt.hayOscilloscope.desc" : "将干草块作为一个示波器 / 信号分析仪。", 
+		"opt.hayOscilloscopeChannelVisibilityBroadcast.desc" : "同步所有客户端的示波器通道可见性设置。", 
 		"opt.hideSurvivalSaves.desc" : "隐藏可能的生存存档以防止其被意外地打开。只能在全局范围内设置。", 
 		"opt.hotbarLength.desc" : "物品栏可包含的物品堆叠数量。目前该功能并未完全完成，如物品栏的保存等特性暂不可用。", 
 		"opt.hudAlignMode.desc" : "设置实体信息HUD的位置。", 
@@ -219,30 +266,39 @@
 		"opt.independentEntityPickerForInfomation.desc" : "独立地为信息提供者（目前只包含指令UUID建议）选取目标实体。", 
 		"opt.interactableB36.desc" : "允许玩家破坏36号方块或对准它放置物品。", 
 		"opt.language.desc" : "该Mod的主要语言。", 
+		"opt.loomWaveGenerator.desc" : "将织布机作为一个波形发生器，其输出可由`/wavegen`指令配置。", 
 		"opt.maxClientTicksPerFrame.desc" : "FPS低于20时每帧可以运行多少个客户端游戏刻。", 
 		"opt.maxEndEyeTpRadius.desc" : "设置endEyeTeleport功能的最远传送距离。", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "允许玩家在地面上直接放置矿车。", 
 		"opt.mobFastKill.desc" : "在生物被`/kill`杀死时被直接移除而非承受伤害。", 
 		"opt.optimizedEntityPushing.desc" : "跳过不会被推动的实体的挤压运算。实体挤压伤害会被影响。", 
+		"opt.playerInputsWhenScreenOpened.desc" : "按下指定按键（默认为F6）时，允许玩家在进行输入指令等操作时移动或改变视角。", 
+		"opt.playerInputsWhenScreenOpenedHotkey.desc" : "`playerInputsWhenScreenOpened`选项使用的快捷键，由按键码（Key code）指定：\n - `F1` - `F12`：290 - 301", 
 		"opt.projectileChunkLoading.desc" : "允许弹射物在其运算过程中自动加载区块，在制作珍珠炮时可能会有所帮助。注意该功能可能会在弹射物以极高的速度飞行时造成极大的卡顿。", 
 		"opt.projectileChunkLoadingRange.desc" : "`projectileChunkLoading`功能中创建的强加载范围半径。", 
 		"opt.projectileChunkLoadingPermanence.desc" : "弹射物在`projectileChunkLoading`启用时永久加载区块。", 
 		"opt.projectileRandomnessScale.desc" : "弹射物随机性大小。大部分弹射物附加的随机初始速度会被乘以该选项的值。", 
 		"opt.quickMobMounting.desc" : "潜行时用刷怪蛋向载具中放置生物。", 
-		"opt.quickStackedEntityKilling.desc" : "杀死被砖块敲击的实体以及所有位置与其相同的实体。", 
+		"opt.quickStackedEntityKilling.desc" : "杀死被砖块敲击的实体以及所有位置与其相同的实体。可以使用指令`quickStackedEntityKillingOneTypeOnly`规定是否只杀死与玩家直接交互的实体同类型的实体。", 
+		"opt.quickStackedEntityKillingOneTypeOnly.desc" : "在触发`quickStackedEntityKilling`功能时只杀死被砖块敲击的实体以及所有位置与其相同的实体。", 
 		"opt.railNoAutoConnection.desc" : "防止铁轨的形态被邻近的铁轨影响。", 
 		"opt.rejectChunkTicket.desc" : "防止区块被以某种形式加载。", 
 		"opt.renderBlockShape.desc" : "方块轮廓渲染。", 
 		"opt.renderFluidShape.desc" : "流体轮廓、高度和流向向量渲染。", 
 		"opt.renderRedstoneGateInfo.desc" : "显示玩家注视的红石中继器或红石比较器的信号等级。", 
+		"opt.resistanceReducesVoidDamage.desc" : "抗性提升效果可以减免虚空伤害。", 
 		"opt.serverSyncedBox.desc" : "服务端碰撞箱显示。", 
-		"opt.serverSyncedBoxRenderRange.desc" : "服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非负值会被认为是无穷大。", 
+		"opt.serverSyncedBoxRenderRange.desc" : "服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非正值会被认为是无穷大。", 
 		"opt.serverSyncedBoxUpdateModeInFrozenTicks.desc" : "游戏运算被地毯端中/tick指令暂停时服务端碰撞箱渲染器的行为。", 
 		"opt.skippedGenerationStages.desc" : "跳过一些世界生成阶段。不支持跳过`biome`和`full`，它们的缺失会使服务端崩溃。", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "忽略未加载区块中的潜在碰撞，可以降低远距离raycast的卡顿。", 
+		"opt.smartCursorMode.desc" : "在使用Ctrl + 方向键或Ctrl + 退格编辑指令时，允许光标在空格以外的分隔符（如实体选择器中的逗号）处停住。", 
+		"opt.smartCursorCustomWordDelimiters.desc" : "自定义的分隔符列表，在smartCursorMode = CUSTOM时有效。此处出现的所有字符均会被视为分隔符。", 
 		"opt.stableHudLocation.desc" : "使HUD的位置在数据长度频繁变化时更加稳定。", 
 		"opt.strictAccessingPathParsing.desc" : "解释阶段严格检查Accessing Path。目前这一严格检查系统尚未完善，不建议启用该选项。", 
 		"opt.superSuperSecretSetting.desc" : "wlujkgfdhlqcmyfdhj...千万不要打开！", 
+		"opt.survivalStatusBarInCreativeMode.desc" : "创造模式下显示生存模式状态栏（生命值与饥饿值）。", 
+		"opt.survivalXpBarInCreativeMode.desc" : "创造模式下显示经验栏。", 
 		"opt.tntChunkLoading.desc" : "允许TNT实体在其运算过程中自动加载区块。", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT在`tntChunkLoading`启用时永久加载区块。", 
 		"opt.tntChunkLoadingRange.desc" : "设置`tntChunkLoading`功能中创建的强加载范围的半径。", 
@@ -260,6 +316,54 @@
 		"opt.err.reqcarpet" : "该选项需要安装Carpet", 
 		"opt.err.reqbool" : "只能使用true或false", 
 		"opt.err.conflict.carpet.1425" : "该选项与Carpet 1.4.25以上版本冲突", 
+		
+		//***** Labels of options *****
+		"opt.label.HIGHLIGHT.name" : "常用", 
+		"opt.label.RENDERER.name" : "渲染", 
+		"opt.label.INTERACTION_TWEAKS.name" : "辅助", 
+		"opt.label.RESEARCH.name" : "研究", 
+		"opt.label.REDSTONE.name" : "红石", 
+		"opt.label.ENTITY.name" : "实体", 
+		"opt.label.MESSMOD.name" : "设置", 
+		"opt.label.EXPLOSION.name" : "爆炸", 
+		"opt.label.CHUNK.name" : "区块", 
+		"opt.label.BUGFIX.name" : "修复", 
+		"opt.label.BREAKING_OPTIMIZATION.name" : "优化", 
+		"opt.label.MISC.name" : "杂项", 
+		
+		"opt.label.HIGHLIGHT.desc" : "最常用的若干功能", 
+		"opt.label.RENDERER.desc" : "用于启用或设置渲染器", 
+		"opt.label.INTERACTION_TWEAKS.desc" : "交互辅助", 
+		"opt.label.RESEARCH.desc" : "深度机制研究专用", 
+		"opt.label.REDSTONE.desc" : "红石调试工具包", 
+		"opt.label.ENTITY.desc" : "实体相关", 
+		"opt.label.MESSMOD.desc" : "模组本身及其功能的设置", 
+		"opt.label.EXPLOSION.desc" : "监视或更改爆炸行为", 
+		"opt.label.CHUNK.desc" : "区块加载与世界生成", 
+		"opt.label.BUGFIX.desc" : "Bug修复", 
+		"opt.label.BREAKING_OPTIMIZATION.desc" : "激进的优化，可能影响原版机制", 
+		"opt.label.MISC.desc" : "未分类的选项", 
+		
+		//***** Oscilscope *****
+		"oscilscope.gui.title" : "示波器", 
+		"oscil.gui.trigmode.RISING" : "上升沿", 
+		"oscil.gui.trigmode.FALLING" : "下降沿", 
+		"oscil.gui.trigmode.BOTH" : "上下边沿", 
+		"oscil.gui.trigmode.NONE" : "无触发", 
+		"oscil.gui.show" : "显示", 
+		"oscil.gui.active" : "主动探测", 
+		"oscil.gui.triginf" : "通道 %d @ %d", 
+		"oscil.gui.mode" : "模式", 
+		"oscil.gui.mode.analog" : "模拟模式", 
+		"oscil.gui.mode.digital" : "数字模式", 
+		"oscil.gui.tickaligned" : "对齐到游戏刻", 
+		"oscil.gui.storage" : "存储深度", 
+		"oscil.gui.reset" : "重置", 
+		"oscil.gui.chinf.1" : "通道 %d", 
+		"oscil.gui.chinf.2" : "维度：%s", 
+		"oscil.gui.chinf.x" : "X：%d", 
+		"oscil.gui.chinf.y" : "Y：%d", 
+		"oscil.gui.chinf.z" : "Z：%d", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "id不能为负值", 

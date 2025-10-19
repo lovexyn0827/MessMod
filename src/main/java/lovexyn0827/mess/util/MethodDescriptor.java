@@ -24,13 +24,22 @@ public final class MethodDescriptor {
 	}
 	
 	public static MethodDescriptor parse(String desc) {
-		Type asmType;
 		try{
-			asmType = Type.getMethodType(desc);
+			return of(Type.getMethodType(desc));
 		} catch (RuntimeException e) {
 			throw new TranslatableException("exp.descriptor");
 		}
-		
+	}
+	
+	public static MethodDescriptor of(Method m) {
+		try{
+			return of(Type.getType(m));
+		} catch (RuntimeException e) {
+			throw new TranslatableException("exp.descriptor");
+		}
+	}
+	
+	public static MethodDescriptor of(Type asmType) {
 		Type[] argsAT = asmType.getArgumentTypes();
 		Class<?>[] argsT = new Class<?>[argsAT.length];
 		for(int i = 0; i < argsAT.length; i++) {
@@ -38,7 +47,8 @@ public final class MethodDescriptor {
 		}
 		
 		Type returnAT = asmType.getReturnType();
-		return new MethodDescriptor(desc, asmType, toClassOrThrow(returnAT), argsT, returnAT, argsAT);
+		return new MethodDescriptor(asmType.getDescriptor(), asmType, toClassOrThrow(returnAT), 
+				argsT, returnAT, argsAT);
 	}
 	
 	private static Class<?> toClassOrThrow(Type type) {

@@ -4,9 +4,9 @@
 
 ![](https://img.shields.io/modrinth/dt/messmod?label=Total%20Modrinth%20Downloads)
 
-一个用于提供额外的世界访问能力及一些增强功能的Minecraft Mod  
+一个用于提供额外的世界访问能力及一些增强功能的Minecraft Mod。
 
-正如其名字中所说，这个Mod包含了很多方面的功能（世界控制，信息显示，特性更改以及一些Bug修复等），有些还是随便写的，非常乱，就连代码风格也很乱。
+正如其名，该模组包含了世界控制、信息显示、特性更改、操作优化以及一些Bug修复等多种功能，整体而言是相当的Messy。
 
 其他语言： 
 [English](/README.md)  
@@ -14,11 +14,12 @@
 ## 特色功能
 
 - 更准确的实体碰撞箱显示；
+- 十种直观易用的渲染器（详见下文）；
 - 使/tick更简捷的工具物品；
 - 实体信息实时显示与记录（导出为表格）；
 - 从代码层面控制游戏运作；
 - 功能多样的Accessing Path；
-- 六种直观易用的渲染器（详见下文）；
+- 示波器与波形发生器；
 - 导出指定区域为存档；
 - 使用Ctrl + Z / Ctrl + U撤销/重做方块放置与破坏；
 - 区块网格生成；
@@ -29,8 +30,48 @@
 
 1. Fabric Loader 0.8.0+  
 2. gnembon的地毯Mod（fabric-carpet）（部分功能需要，所以强烈推荐，但并非必需）  
-3. Minecraft 1.16.4/1.16.5/1.17.1/1.18.2
+3. Minecraft 1.16.4及以上
 4. Minecraft需要的所有事项
+
+## 快速入门
+
+### 安装
+
+1. 从Modrinth下载与Minecraft版本匹配的JAR，并复制到`mod`文件夹。
+2. 启动游戏，并打开一个创造存档。
+
+### 尝试HUD
+
+1. 按下`F3 + E`并注视任何一个实体。
+2. 或按下`F3 + M`并四处走动，查看HUD是怎样工作的。
+
+### 启用渲染器
+
+1. 运行`/messcfg serverSyncedBox true`，这样所有实体都会显示一个绿色的碰撞箱。
+2. 运行`/messcfg chunkLoadingInfoRenderer true`并手持鹦鹉螺壳，查看周围区块的加载状态。
+
+### 打开示波器
+
+1. 运行`/messcfg hayOscilloscope true`。
+2. 放置一个干草块，并使用侦测器高频对其充能。
+3. 右键干草块，查看波形。
+
+### 延长物品栏
+
+1. 运行`/messcfg hotbarLength 18`，然后物品栏槽位数量会加倍。
+
+### 进一步探究选项
+
+> 如果曾使用过Carpet模组，您可能会感觉下面的操作思路很熟悉。
+
+1. 运行`/messcfg`。
+2. 点击一个感兴趣的标签，如“渲染”或是“区块”。
+3. 将鼠标悬置于一个选项上方，查看详细描述。
+4. 试着用刚才的方法启用 / 修改一个选项。
+
+### 下一步……
+
+该文件的其余部分是MessMod的完整文档，包含对每条指令，每个选项与特性的详细描述。试着从其中抓取对您最有价值的功能，祝您好运！
 
 ## 命令
 
@@ -73,6 +114,42 @@
 ##### `/countentities <selector> <stackedWith> <maxDistance>`
 
 获取可由`<selector>`选取且坐标与实体`<stackedWith>`的坐标间距离小于`<maxDistance>`的实体的数量。
+
+### 在游戏内绘制标记
+
+##### `/drawshape box <corner1> <corner2> [<color>] [<life>] [<fill>] [<space>]`
+
+在`<corner1>`和 `<conrner2>`之间绘制一个立方体（轴对齐边界箱）。
+
+`<color>`：立方体各棱的颜色。
+
+`<fill>`：立方体各面的颜色。若需透明，请使用`reset`。
+
+`<life>`：图形显示时长，以游戏刻计，默认为100。
+
+`<space>`：图形所属的“图形空间”，用于在指令`/drawshape clear <space>`中批量移除图形。
+
+##### `/drawshape line <corner1> <corner2> [<color>] [<life>] [<space>]`
+
+再`<corner1>`和`<corner2>`之间绘制一条直线。
+
+##### `/drawshape text <pos> <text> [<color>] [<life>] [<scale>] [<space>]`
+
+在`<pos>`处绘制`<text>`指定的一条浮动文本。
+
+`<scale>`：文本大小，默认为1。
+
+##### `/drawshape image <pos> <axis> <url> [<life>] [<scale>] [<space>]`
+
+从指定的`<url>`加载图片并绘制于`<pos>`处。
+
+`<axis>`：绘制的图片所垂直的坐标轴。
+
+`<scale>`：绘制图片的大小，以格计。默认为1格。 
+
+##### `/drawshape clear [<space>]` 
+
+清除绘制的图形。若“图形空间”`<space>`未指定，则清除所有图形。
 
 ### 方块状态校验
 
@@ -275,6 +352,20 @@
 
 恢复至初始状态。
 
+### 向容器填充物品
+
+##### `/fillinventory <corner1> <corner2> full <item>`
+
+将`<corner1>`和`<corner2>`指定的位置之间所有容器（箱子、漏斗等）的所有槽位填充为`<item>`指定的物品。
+
+##### `/fillinventory <corner1> <corner2> replace <from> <to>`
+
+将`<corner1>`和`<corner2>`指定的位置之间所有容器中由`<from>`指定的物品替换为`<to>`。
+
+##### `/fillinventory <corner1> <corner2> sorter <main> <occupier>`
+
+将`<corner1>`和`<corner2>`指定的位置之间所有容器中按物品分类器的模式填充，即在第一个槽位放置一个有`<main>`指定的物品，并在其它槽位各放置一个`<occupier>`指定的物品。
+
 ### 冻结实体运算
 
 ##### `/freezentity freeze|resume <entities>`
@@ -330,6 +421,12 @@
 ##### `/lazyload remove <corner1> <corner2>`
 
 移除以方块坐标`<corner1>`所在的区块和方块坐标`<corner2>`所在的区块为两个相对顶点的矩形区域中区块的弱加载标记。
+
+### 加载Java Agent
+
+##### `/loadjavaagent fromFile | fromURL <path>`
+
+从指定的本地JAR文件或URL加载Java Agent。
 
 ### 记录区块行为
 
@@ -391,6 +488,67 @@
 
 取消关注一个区块事件。
 
+### 记录实体死亡原因
+
+##### `/logdeath sub <target>`
+
+开始监听`<target>`指定的死亡事件。`<target>`具有如下格式：
+
+````
+killer+directKiller(cause->victim)@(min..max)
+````
+
+对参数简介如下：
+
+- `killer`：“有意”杀死实体的实体。
+- `directKiller`：更直接地造成死亡的实体。例如，当掠夺者射杀村民时，掠夺者是`killer`，而箭矢则是`directKiller`。
+- `cause`：实体死亡的原因，如`explosion`（爆炸）、`drowned`（溺水）等。
+- `victim`：被杀死的实体。
+- `min`：“最后一击”的最低伤害值。
+- `min`：“最后一击”的最高伤害值。
+
+所有参数均可被忽略，而且前四个参数还可以被设为“*”，以不对其进行限制。
+
+实例：`player+tnt(explosion->zombie)@(0..1)`，`(->item)`
+
+下面是描述`<target>`格式的正则表达式，以供参考：
+
+```
+^(?<killer>[!a-zA-Z_]*|\*)??(\+(?<directKiller>[!a-zA-Z_]*|\*))??(\((?<cause>[!a-zA-Z_\.]*|\*)\))??\-\>(?<victim>[!a-zA-Z_]*|\*)??(@(?<min>[0-9\\.]+)??\.\.(?<max>[0-9\.]+)??)?$
+```
+
+##### `/logdeath unsub <target>`
+
+停止监听一些死亡事件。可以使用DOS文件通配符以匹配多个对象。
+
+##### `/logdeath subVictimField | subDamageField <target> <name> <path>`
+
+监听被杀死的实体或者伤害对应的`DamageSource`对象的字段。注意`name`只是给予监听器的一个名称，而不是字段名，所监听的实际值由指定的Accessing Path获取。
+
+##### `/logdeath unsubVictimField | unsubDamageField <target> <name>`
+
+取消监听被杀死的实体或者伤害对应的`DamageSource`对象的字段。
+
+##### `/logdeath setVisible <target> <visible>`
+
+设置`<target>`对应的死亡的“死亡报告”是否会被输出到聊天栏。
+
+##### `/logdeath stats [<target>]`
+
+获取所监听的死亡事件的统计信息。
+
+##### `/logdeath autoStats`
+
+获取自动分类的实体死亡原因统计。
+
+##### `/logdeath autoStats reset`
+
+重置自动统计信息。
+
+##### `/logdeath reset [<target>]`
+
+重置统计信息。若未指定`<target>`，自动统计亦会被重置。
+
 ### 监视活塞推动实体
 
 ##### `/logmovement sub <target>`
@@ -409,11 +567,27 @@
 
 也可以使用类似于DOS文件名通配符的格式选取多个项目。
 
+##### `/logpacket startRecording <format> <saveTo>`
+
+开始录制数据包信息，并将其存储在`<saveTo>`指定的文件中。目前只支持CSV格式。
+
+##### `/logpacket stopRecording`
+
+停止录制数据包信息。
+
+##### `/logpacket stats [<types>]`
+
+获取统计信息。`<types>`中可以使用DOS文件名通配符以选择若干数据包类。
+
+##### `/logpacket stats reset`
+
+重置统计信息。
+
 ### MessMod配置
 
 ##### `/messcfg`
 
-获取当前Mod版本和配置情况。  
+获取当前Mod版本和配置标签列表。  
 
 ##### `/messcfg reloadConfig`
 
@@ -474,6 +648,12 @@
 ##### `/namentity <entities> <name>`
 
 为选定的实体进行命名。
+
+### Name Items Without Anvils
+
+##### `/nameitem <name>`
+
+将玩家（或执行此命令的实体）主手所持的物品命名为`<name>`。
 
 ### 杀死部分实体
 
@@ -549,13 +729,33 @@
 
 和前三条命令类似，只是RNG来自`<target>`指定的实体而非该维度。  
 
+### 底层版的setblock命令
+
+##### `/setblockraw <pos> <block> [<flags> [<depth> [<p2>]]]`
+
+直接使用`setBlockState()`方法放置方块。
+
+`<flag>`为8时，可以用来放置幽灵方块。
+
+若`<p2>`存在，该命令将以`/fill`的行为运作，并在`<pos>`和`<p2>`之间放置方块.
+
 ### 设置爆炸产生的方块
 
 ##### `/setexplosionblock <blockState> [<fireState>]`
 
 使爆炸在破坏方块时放置`<blockState>`指定的方块而不是空气，并将爆炸将要放置的火全部替换成`<fireState>`指定的方块。  
 
+### 生成
+
+##### `/stackentity <entity> <count>`
+
+在`<entity>`所在的位置生成(`<count>` - 1)个实体，以生成一个具有`<count>`个实体的实体堆。
+
 ### 方块实体读写
+
+##### `/tileentity add <pos> <type> <tag>`
+
+在`<pos>`添加`<type>`指定的方块实体。可以指定`<tag>`作为方块实体的初始数据。（若`<pos>`处的方块不支持该方块实体，设置可能会失败）
 
 ##### `/tileentity get <pos>`
 
@@ -563,11 +763,29 @@
 
 ##### `/tileentity set <pos> <type> [<tag>]`
 
-设置`<pos>`处的为`<type>`指定的方块实体。可以指定`<tag>`作为方块实体的初始数据（此时，若`<pos>`处的方块不支持该方块实体，设置会失败）。  
+设置`<pos>`处的为`<type>`指定的方块实体。可以指定`<tag>`作为方块实体的初始数据。
 
 ##### `/tileentity remove <pos>`
 
 移除`<pos>`处的方块实体。在目前版本中，如果该处存在一个需要方块实体的方块，在移除后该处方块实体会被该方块重新设置（一个Bug）。  
+
+### Update A Large Area Of Blocks
+
+##### `/touch <from> [<to>]`
+
+从所有方向对`<from>`和`<to>`之间的所有方块发送NC和PP方块更新。若未指定`<to>`，则只对`<from>`处的方块发出更新。
+
+##### `/touch <from> <to> nc [<srcPos> [<srcBlock>]]`
+
+对`<from>`和`<to>`之间的所有方块发送NC更新
+
+若未提供任何可选参数，被选中的方块会从各个方向收到更新；若已指定，方块会被`World.updateNeighbor()` 更新，参数会从按指令参数原样传递。如果`<srcBlock>`被省略，世界中`<srcPos>`处的方块会被作为默认值。
+
+##### `/touch <from> <to> pp [<maxUpdateDepth> [<flags> [<oldState> [<newState>]]]]`
+
+对`<from>`和`<to>`之间的所有方块发送PP更新
+
+因为涉及了太多技术细节，请阅读源码中的`TouchCommand.java`获取详细信息。
 
 ### 变量管理
 
@@ -585,7 +803,11 @@
 
 将字面值`<value>`的值放入变量`<slot>`当中。
 
-##### `/variable set <slot> <objSrc>`
+##### `/variable set <slot> entity [<path>]`
+
+将实体存入`<slot>`指定的变量中。可以指定一个可选的Accessing Path，以在存储前对实体进行变换，并存储Accessing Path的输出而不是实体本身。
+
+##### `/variable set <slot> <objSrc> [<path>]`
 
 将`<objSrc>`提供的对象放入变量`<slot>`当中。可用的对象提供者有：
 
@@ -596,6 +818,9 @@
 - `client`：`MinecraftClient`实例；
 - `clientWorld`：当前的`ClientWorld`实例；
 - `clientPlayer`：客户端玩家实例。
+- `new`：新创建的对象。示例：`java/lang/Thread<0>()`。
+
+可以指定一个可选的Accessing Path，以在存储前对对象进行变换，并存储Accessing Path的输出而不是对象本身。
 
 ##### `/variable map <slotSrc> <slotDst> <path>`
 
@@ -606,16 +831,65 @@
 输出变量`<slot>`的值，最后一个参数决定输出的格式：
 
 - `array`：使用`Arrays.toString()`进行格式化，只适用于数组；
-- `toString`：使用变量的`toString()`方法进行格式化；
-- `dumpFields`：输出变量的所有非静态字段及内容。
+- `toString`：使用变量的`toString()`方法进行格式化，后面可指定一个Accessing Path来在输出前对对象进行一些变换；
+- `dumpFields`：输出变量的所有非静态字段及内容，后面可指定输出时的最大展开层数。
 
 ##### `/variable list`
 
 列出目前定义的变量列表。
 
-## 配置项
+### 信号发生器
 
-以下选项均通过`/messcfg`命令设置，格式均为`/messcfg <选项名> <值>`，如启用实体碰撞箱显示可使用`/messcfg serverSyncedBox true`
+##### `/wavegen new <pos> <wavedef>`
+
+将`<pos>`处的织布机方块设为波形发生器（信号发生器），并发出由`<wavedef>`定义的波形。注意波形发生器只有在`<pos>`处的方块为织布机时才能正常工作。
+
+波形可由如下两种语法定义：
+
+- **简单模式** 波形以字符S开头，后面紧随一串形如`H刻数`或`L刻数`的“波形阶段”，其中H和L分别对应高低电平。
+
+  例如，`SH15L9`表示一个15 gt高电平 + 9 gt低电平的周期性波形。
+
+  信号输出在对应游戏刻的计划刻阶段开始时改变。
+
+- **标准模式**  波形由若干个形如`(开始=>结束)L信号等级ST`的“波形阶段”组成，规定了每个阶段的开始时间，结束时间，输出等级，以及开始与结束时是否会发出方块更新。
+
+  时间可以用两种格式指定。一种形如`+游戏刻偏移量 运算阶段`，表示阶段开始于上一个阶段结束若干游戏刻后指定的运算阶段（见`/entitysidebar`指令）开始时，或结束于阶段开始若干游戏刻后指定的运算阶段开始时；另一种形如`!游戏刻偏移量 运算阶段`，表示阶段开始或结束于在整个波形的若干游戏刻后指定运算阶段开始时。
+
+  运算阶段亦可按下表缩写：
+
+  | 运算阶段         | 缩写   |
+  | ---------------- | ------ |
+  | `WEATHER_CYCLE`  | `WTU`  |
+  | `CHUNK`          | `CU`   |
+  | `SCHEDULED_TICK` | `NTE`  |
+  | `VILLAGE`        | `RAID` |
+  | `BLOCK_EVENT`    | `BE`   |
+  | `ENTITY`         | `EU`   |
+  | `TILE_ENTITY`    | `TE`   |
+  | `DIM_REST`       | `END`  |
+  
+  理论上，可以指定大于15，甚至是负值的红石信号。
+  
+  `S` 和`T`分别是用于抑制在阶段开始与结束时发出的方块更新的可选标志。
+  
+  同时，这里还给出了一处形如`次数[阶段序列]`（或`次数*[阶段序列]`）的语法，用于重复一系列波形阶段若干次。该语法的作用等价于将方括号内的内容原样重复指定次数，这意味着，括号内不允许使用形如`!刻数`的‘绝对时间偏移“。该结构可嵌套。
+  
+  此处给出两个实例：
+  
+  `(+5SCHEDULE_TICK=>+2DIM_REST)L15T`：在上一个阶段结束5 gt后的计划刻（`5SCHEDULE_TICK`）阶段开始输出等级为15的红石信号，持续到2 gt后的`DIM_REST`阶段（世界运算结束时），在阶段开始时发出方块更新，但不再阶段结束时发出更新。
+  
+  `(!0=>!5ENTITY)L10`：波形的第0 gt的计划刻阶段开始输出10级红石信号，持续到第5 gt的实体运算（`ENTITY`）阶段，并在开始与结束时发出方块更新。
+  
+  `3[(+0=>+0)L15 2[(+2=>+0)L15 (+0=>+0)L0]] (+1=>+3)L15`：展开为`(+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+1=>+3)L15`
+  
+  次外，波形定义的开始处可以给出一个时间偏移，使波形的开始处相对于游戏时间（Game Time）为波形整体长度（由最后一个阶段的结束时刻决定）的整倍数的位置偏移若干游戏刻。注意时间偏移量必须包含符号（`+1`而不是`1`）。例如，`+3`表示波形开始于每次游戏时间除以波形长度的余数为3时。
+
+##### `/wavegen remove <pos>`
+
+Remove the wave generator at `<pos>`.
+
+## 配置项
 
 ##### `accessingPathDynamicAutoCompletion`
 
@@ -763,6 +1037,14 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`true`
 
+##### `clayBlockPlacer`
+
+使用粘土球放置任意技术性方块（如下界传送门）。粘土球的名称指定了放置的方块，例如，在手持名为`grass_block[snowy=true]`的粘土球时，可以通过右键放置积雪的草方块。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `commandExecutionRequirment`
 
 该Mod中定义的命令是否需要OP权限。
@@ -779,11 +1061,19 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`false`
 
+##### `creativeNoVoidDamage`
+
+为创造模式下的玩家禁用虚空伤害。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `creativeUpwardsSpeed`
 
 调节创造模式下玩家向上飞行（加）速度大小。以m/s为单位，玩家真正的最终速度大约为该选项值的150倍。
 
-可能取值：任意正实数
+可能取值：任意实数
 
 默认值：`NaN`
 
@@ -831,9 +1121,41 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`REGION,POI`
 
+##### `detailedChunkTaskLogging`
+
+在区块事件记录器（`/logchunkbehavior`）生成的文件中包含关于区块任务的更多细节.
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `directChunkAccessForMessMod`
+
+MessMod中一些持续工作的功能（如渲染器）可以直接从`ThreadedAnvilChunkStorage`中获取区块而不使用`ServerChunkManager`，以避免其对区块管理系统造成潜在影响。
+
+可能取值：`true`或`false`
+
+默认值：`true`
+
 ##### `disableChunkLoadingCheckInCommands`
 
 禁用指令中对方块是否被加载的检查。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `disableClientChunkUnloading`
+
+忽略来自服务端的区块卸载请求。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `disableCreativeForcePickup`
+
+创造模式下的玩家在物品栏被填满时不再拾起箭矢和物品。
 
 可能取值：`true`或`false`
 
@@ -932,6 +1254,14 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`false`
 
+##### `entityExplosionImpulseScale`
+
+调整爆炸对实体造成的变速大小。
+
+可能取值：任意实数
+
+默认值：`1.0`
+
 ##### `entityExplosionInfluence`
 
 爆炸影响到实体时在聊天栏输出实体被影响的情况。在测试TNT复制阵列时请禁用该选项，否则游戏可能会被卡死。
@@ -1001,6 +1331,30 @@ TNT可以被玩家的攻击杀死。
 
 默认值：`false`
 
+##### `flowerFieldRenderer`
+
+显示当前区域可能在使用骨粉时生成的花朵种类。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `flowerFieldRendererRadius`
+
+`flowerFieldRenderer`的最大渲染距离。
+
+可能取值：任意正整数
+
+默认值：`16`
+
+##### `flowerFieldRendererSingleLayer`
+
+将`flowerFieldRenderer`生成的图像渲染在同一层（范围内最高方块顶部的水平面）。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `generateChunkGrid`
 
 在地表生层一层玻璃来标记区块。
@@ -1013,9 +1367,25 @@ TNT可以被玩家的攻击杀死。
 
 在原版的`getEntity()`方法中，只有与给定AABB的切比雪夫距离小于2m的区段中的实体会被“看到” ，有时这会导致一些较大实体与外界的交互出现问题。将该选项改为一个较大值可以修复这一Bug。
 
-可能取值：任意实数
+可能取值：任意正实数
 
 默认值：`2.0`
+
+##### `hayOscilloscope`
+
+将干草块作为一个示波器 / 信号分析仪。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `hayOscilloscopeChannelVisibilityBroadcast`
+
+同步所有客户端的示波器通道可见性设置。
+
+可能取值：`true`或`false`
+
+默认值：`true`
 
 ##### `hideSurvivalSaves`
 
@@ -1062,7 +1432,7 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 调节HUD字体大小。
 
-可能取值：任意实数
+可能取值：任意正实数
 
 默认值：`1.0`
 
@@ -1096,6 +1466,14 @@ HUD的渲染样式, 包括了下面的零个至多个标志:
 
 默认值：`-FOLLOW_SYSTEM_SETTINGS-`
 
+##### `flowerFieldRendererSingleLayer`
+
+将织布机作为一个波形发生器，其输出可由`/wavegen`指令配置。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `maxClientTicksPerFrame`
 
 FPS低于20时每帧可以运行多少个客户端游戏刻。
@@ -1108,7 +1486,7 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 设置endEyeTeleport功能的最远传送距离。
 
-可能取值：任意实数
+可能取值：任意正实数
 
 默认值：`180`
 
@@ -1131,6 +1509,24 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 ##### `optimizedEntityPushing`
 
 跳过不会被推动的实体的挤压运算。实体挤压伤害会被影响。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `playerInputsWhenScreenOpened`
+
+按下指定按键（默认为F6）时，允许玩家在进行输入指令等操作时移动或改变视角。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `playerInputsWhenScreenOpenedHotkey`
+
+`playerInputsWhenScreenOpened`选项使用的快捷键，由按键码（Key code）指定：
+
+- `F1` - `F12`：290 - 301
 
 可能取值：`true`或`false`
 
@@ -1178,7 +1574,15 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 ##### `quickStackedEntityKilling`
 
-杀死被砖块敲击的实体以及所有位置与其相同的实体。
+杀死被砖块敲击的实体以及所有位置与其相同的实体。可以使用指令`quickStackedEntityKillingOneTypeOnly`规定是否只杀死与玩家直接交互的实体同类型的实体。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `quickStackedEntityKillingOneTypeOnly`
+
+在触发`quickStackedEntityKilling`功能时只杀死被砖块敲击的实体以及所有位置与其相同的实体。
 
 可能取值：`true`或`false`
 
@@ -1233,6 +1637,14 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 默认值：`false`
 
+##### `resistanceReducesVoidDamage`
+
+抗性提升效果可以减免虚空伤害。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
 ##### `serverSyncedBox`
 
 服务端碰撞箱显示。
@@ -1243,7 +1655,7 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 ##### `serverSyncedBoxRenderRange`
 
-服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非负值会被认为是无穷大。
+服务端碰撞箱的渲染范围（以m为单位的切比雪夫距离）。任何非正值会被认为是无穷大。
 
 可能取值：任意实数
 
@@ -1273,7 +1685,7 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 
 跳过一些世界生成阶段。不支持跳过`biome`和`full`，它们的缺失会使服务端崩溃。
 
-可能取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一些下方的一些项目或`...`：
+可能取值：`[]`（空列表）或一个`a,b,c`形式的列表，包含一些下方的一些项目：
 
 - `empty`
 - `structure_starts`
@@ -1288,6 +1700,29 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 - `heightmaps`
 
 默认值：`[]`
+
+##### `smartCursorCustomWordDelimiters`
+
+自定义的分隔符列表，在smartCursorMode = CUSTOM时有效。此处出现的所有字符均会被视为分隔符。
+
+可能取值：任何字符串
+
+默认值：` `
+
+##### `smartCursorMode`
+
+在使用Ctrl + 方向键或Ctrl + 退格编辑指令时，允许光标在空格以外的分隔符（如实体选择器中的逗号）处停住。
+
+可能取值：
+
+- `VANILLA`
+- `NON_LITERAL`
+- `NERDY`
+- `NORMAL`
+- `GREEDY`
+- `CUSTOM`
+
+默认值：`VANILLA`
 
 ##### `stableHudLocation`
 
@@ -1308,6 +1743,22 @@ FPS低于20时每帧可以运行多少个客户端游戏刻。
 ##### `superSuperSecretSetting`
 
 wlujkgfdhlqcmyfdhj...千万不要打开！
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `survivalStatusBarInCreativeMode`
+
+创造模式下显示生存模式状态栏（生命值与饥饿值）。
+
+可能取值：`true`或`false`
+
+默认值：`false`
+
+##### `survivalXpBarInCreativeMode`
+
+创造模式下显示经验栏。
 
 可能取值：`true`或`false`
 
@@ -1341,9 +1792,9 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 缩放TPS（MSPT）图表以使其可以在屏幕中完整显示。
 
-可能取值：`true`或`false`
+可能取值：任意正实数
 
-默认值：`false`
+默认值：`1.0`
 
 ##### `vanillaDebugRenderers`
 
@@ -1553,6 +2004,76 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 指定选取的实体类名（包名可选）满足的正则表达式。
 
+## 示波器
+
+选项`havOscilloscope`为true时，干草块可被用作示波器，以记录输入的红石信号。
+
+右键干草块可打开如下的GUI：
+
+![oscilloscope_gui_zh_cn.png](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/oscilloscope_gui_zh_cn.png)
+
+### 通道
+
+每个包含接收着红石信号的干草块的位置被视为一个通道，由一个数字ID和底部方块在地图中显示的颜色标识。在干草块第一次检测到红石信号时，一个通道就会被创建，此后其ID和颜色将不再变化。
+
+值得注意的是，因为通道与位置一一对应，如果干草块被（活塞等）移动，那么它将与一个新的通道相绑定。换句话说，通道不能被移动。
+
+### 工作模式
+
+示波器具有数字模式和模拟模式两种工作模式。
+
+如下图，模拟模式下，不同通道的波形会被显示在相同的位置，如下图所示：
+
+![oscilloscope_analog.png](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/oscilloscope_analog.png)
+
+而数字模式下，不同通道的波形会平行显示，且只显示各通道有没有受到信号，而不考虑信号等级。
+
+![oscilloscope_digital.png](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/oscilloscope_digital.png)
+
+In both modes, holding left button of the mouse when the cursor is on some waves, a tool tip is drawn to display the level, start time, end time, and length of pulses.
+
+两种模式下，对着波形按下鼠标左键可显示一个浮动框，以查看对应的信号等级，开始时间，结束时间，和信号脉冲的长度。
+
+### 波形区域
+
+可以使用鼠标滚轮简单地操作波形区域：
+
+**`滚轮`**：水平滑动；
+
+**`Shift + 滚轮`**：快速水平滑动
+
+**`Crtl + 滚轮`**：水平缩放
+
+**`Alt + 滚轮`**：竖直滑动
+
+**`Alt + Shift + 滚轮`**：快速竖直滑动
+
+**`Crrl + Alt + 滚轮`**：水平缩放
+
+次外，还可以使用键盘方向键来进行滑动或缩放（按住`Ctrl`）。
+
+### 触发
+
+当接收到的信号等级上升或下降到一个设定的等级（触发电平），对应通道会产生一个称为“触发”的事件。点击通道设置栏中的触发模式设置可开始监听来自特定通道的触发。
+
+检测到触发时，波形区域会自动发生滚动，以将产生触发的边沿对齐到水平标记（波形区上方的黄色三角，可拖动）的位置。
+
+波形区域右侧也有一系列可拖动的小三角，用于标识不同通道的触发电平。
+
+### 主动探测
+
+主动探测使示波器可以检测到不产生方块更新的信号等级变化（例如当红石线改变朝向，并因为连接到一个方块，或从一个方块断开时）该模式下，干草块将会在每个运算阶段开始时测量其接受的信号等级，并检查是否与先前的测量不同。
+
+所有通道均默认为主动测量模式，如需禁用，可取消勾选通道列表中的“主动”复选框。
+
+值得注意的是，所有通道必须先由一次带有方块更新的信号等级变动创建后才能主动探测信号。
+
+### 微时序支持
+
+默认情况下，水平轴上的每个游戏刻会被划分为若干部分，每一部分代表一个运算阶段（如计划刻和实体运算）。不同运算阶段中的边沿会根据它们所在的运算阶段，显示在不同的水平位置。
+
+可以勾选
+
 ## Mapping加载机制
 
 1. 如果Minecraft已经被反混淆为Yarn名（由Entity类判断），则Mapping不会被加载。
@@ -1563,9 +2084,9 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 ## 高级Mixin
 
-该模组当中的一些Mixin可能会对MC的运行性能造成较为明显的影响或对涉及多线程的原版行为产生意外的影响，所以，那些Mixin会被定义为可选的。默认情况下，这些Mixin处于启用状态，如果需要禁用相关的Mixin，可以在标题界面下按下F8（不适用于MacOS）或者修改游戏目录下的`advanced_mixins.prop`。在修改完毕后需要重启客户端或服务端才能使设置生效。
+该模组当中的一些Mixin可能会对MC的运行性能造成较为明显的影响或对涉及多线程的原版行为产生意外的影响，所以，那些Mixin会被定义为可选的。自`0.10.0+v20251019`版本开始，默认情况下，这些Mixin处于禁用状态，如果需要启用相关的Mixin，可以在标题界面下按下F8（不适用于MacOS）或者修改游戏目录下的`advanced_mixins.prop`。在修改完毕后需要重启客户端或服务端才能使设置生效。
 
-禁用高级Mixin可能会使相关的功能不再可用。
+禁用高级Mixin可能会使相关的功能暂不可用。
 
 ## 其他特性
 
@@ -1583,4 +2104,4 @@ TNT在`tntChunkLoading`启用时永久加载区块。
 
 这个Mod最初是我在2021年2月为了研究实体运动而开发的，因此HUD、碰撞箱、工具物品与`/entityfield`是这个Mod最早的一批特性。后来，更多的特性在它们被用到时被引入
 
-在2022年4月后我加快了Mod的开发进度，添加了很多新特性并对一些旧特性进行了彻底的重构。截止到2023年8月20日，该Mod共添加了28条指令，70个选项和9个渲染器。
+在2022年4月后我加快了Mod的开发进度，添加了很多新特性并对一些旧特性进行了彻底的重构。截止到2025年10月19日，该Mod共添加了38条指令，100个选项和10个渲染器。

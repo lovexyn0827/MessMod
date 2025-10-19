@@ -4,12 +4,9 @@
 
 ![](https://img.shields.io/modrinth/dt/messmod?label=Total%20Modrinth%20Downloads)
 
-A Minecraft mod that contains many features ranging from world 
-manipulation and information providing to bug fixes and so on, allowing 
-you to take more control of the game, see more information, and do some 
-work easier.
+A Minecraft mod containing numerous features ranging from world manipulation and information displaying to bug fixes and so on, allowing you to take more control of the game, see more internal details, and finish your tasks easier.
 
-Just like what the name says, the Mod contains functions in many fields, therefore the Mod seems to be messy, and even the style of the source code is messy.
+Just like what the name says, the Mod contains features concerning many fields, making the Mod a complete mess.
 
 In other languages:
 
@@ -18,11 +15,12 @@ In other languages:
 ## Highlights
 
 - More accurate hitboxes than ones on the vanilla client.
+- 10 easy-to-use renderers (see below).
 - Tool items which make using `/tick` more convenient.
 - Real-time display of entity information.
 - Controlling the game at the level of the source code.
+- Oscilloscopes and wave generators.
 - Multifunctional accessing paths.
-- 8 easy-to-use renderers (see below).
 - Exporting given areas as a new save.
 - Undo / Redoing changes to blocks with `Ctrl + Z` and `Ctrl + Y`.
 - Chunk grid generation.
@@ -33,12 +31,55 @@ In other languages:
 
 - Fabric Loader 0.8.0+. 
 - The fabric-carpet by gnembon. (Strongly recommended, but not necessary) 
-- Minecraft 1.16.4/1.16.5/1.17.1/1.18.2/1.19.4/1.20.1
+- Minecraft 1.16.4 and above
 - Everything Minecraft requires. 
+
+## Quick Start
+
+### Installation
+
+1. Download the JAR that is suitable for your Minecraft setup from Modrinth, and copy to the `mod` folder.
+2. Launch the game and open a creative save. 
+
+### Try the HUDs
+
+1. Press `F3 + E`, and target any entity; 
+2. Or press `F3 + M` and move around to see how the HUD works.
+
+### Enable first renders
+
+1. Run `/messcfg serverSyncedBox true`, and found all entities wrapped by a green bounding box.
+2. Run `/messcfg chunkLoadingInfoRenderer true` and hold a nautilus shell to check how nearby chunks are loaded.
+
+### Try the oscilloscope
+
+1. Run `/messcfg hayOscilloscope true`
+2. Place a hay block power it with some changing signals.
+3. Right click the hay block to see the wave.
+
+### Lengthen the hotbar
+
+1. Run `/messcfg hotbarLength 18`, and found the number of slots in the hotbar doubled.
+
+### Further discovery on options
+
+> You would find the usages familiar if you have used the Carpet. 
+
+1. Run `/messcfg`.
+
+2. Click the label you are interested in, like `RENDERERS` or `CHUNK`.
+
+3. Hover the cursor on an option to see a detailed description.
+
+   Try to enable / change the option as you have done just now.
+
+### Next Steps
+
+The rest part of the file is a comprehensive document of MessMod, including detailed descriptions of each commands, options, and other features. Try to grab the most helpful ones for you, good luck!
 
 ## Commands
 
-Names of arguments are wrapped by pointy semicolons, and optional components are wrapped by squared semicolons.
+Names of arguments are wrapped by pointy brackets, and optional components are wrapped by squared brackets.
 
 ### Accessing Path Settings
 
@@ -78,11 +119,47 @@ Get the number of entities which is selected by `<selector>` and whose distance 
 
 Get the number of entities which is selected by `<selector>` and whose distance to `<stackedWith>` is smaller than `<maxDistance>`.
 
+### Draw In-game Markers
+
+##### `/drawshape box <corner1> <corner2> [<color>] [<life>] [<fill>] [<space>]`
+
+Draw a axis-aligned box between `<corner1>` and `<conrner2>`.
+
+`<color>`: The color of edges.
+
+`<fill>`: The color of faces. Use `reset` if the faces should be completely transparent. 
+
+`<life>`: The duration that the box is rendered for, in game ticks. 100 gt by default.
+
+`<space>`: Shape space of the box, which you can use in `/drawshape clear <space>` to remove all shapes in the same space at once. 
+
+##### `/drawshape line <corner1> <corner2> [<color>] [<life>] [<space>]`
+
+Draw a straight line between two corners.
+
+##### `/drawshape text <pos> <text> [<color>] [<life>] [<scale>] [<space>]`
+
+Draw a floating text at `pos`. 
+
+`<scale>`:  Size of the text, 1.0 by default.
+
+##### `/drawshape image <pos> <axis> <url> [<life>] [<scale>] [<space>]`
+
+Load a image from `<url>` and draw at `<pos>`.
+
+`<axis>`: The axis to which the drawn image is perpendicular.
+
+`<scale>`: Size of drawn image, in blocks. 1 block by default.
+
+##### `/drawshape clear [<space>]` 
+
+Clear drawn shapes. If the argument `<space>` is absent, all shapes will be removed.
+
 ### Block State Checking
 
 ##### `/ensure <pos>`
 
-Get the information of block state and block entity data (if exists) at `<pos>` to check if the block is rendered wrongly or is a ghost block.
+Get the information of block state and block entity data (if exists) at `<pos>`, to check if the block is rendered wrongly or is a ghost block.
 
 ### Entity Behavior Setting
 
@@ -289,6 +366,20 @@ Exclude a save component.
 
 Reset the save exported.
 
+### Fill Containers With Items
+
+##### `/fillinventory <corner1> <corner2> full <item>`
+
+Fill all slots of all containers (chest, hopper, etc.) between `<corner1>` and `<corner2>` with `<item>`.
+
+##### `/fillinventory <corner1> <corner2> replace <from> <to>`
+
+Replace item `<from>` in containers (chest, hopper, etc.) between `<corner1>` and `<corner2>` with `<to>`.
+
+##### `/fillinventory <corner1> <corner2> sorter <main> <occupier>`
+
+Fill containers (chest, hopper, etc.) between `<corner1>` and `<corner2>` with the pattern used in item sorters, that is, set the first slot to 1 item specified by `<main>`, and set following slots to 1 `<occupier>`.
+
 ### Freeze Some Entities
 
 ##### `/freezentity freeze|resume <entities>`
@@ -341,6 +432,12 @@ Mark the chunk within a rectangle whose two opposite vertexes are the chunks con
 
 No longer mark the chunk within a rectangle whose two opposite vertexes are the chunks containing block position `<corner1>` and `<corner2>` as lazy loaded so that its entities will be able to get ticked.
 
+### Attach A Java Agent
+
+##### `/loadjavaagent fromFile | fromURL <path>`
+
+Attach a Java agent to current JVM, from a local JAR file or URL.
+
 ### Record Chunk Behavior
 
 ##### ` /logchunkbehavior listSubscribed`
@@ -353,7 +450,7 @@ Start to record chunk events. Recorded events will be written to a CSV file in `
 
 The file has 7 columns: 
 
-- Event`: The name of the event.
+- `Event`: The name of the event.
 - `Pos`: The chunk coordinate of the chunk where the event happened in (or rather, for).
 - `Dimension`: The ID of the dimension where the event happened.
 - `GameTime`: The game time when the event happened (ingame tick).
@@ -401,6 +498,67 @@ Using DOS file name wildcards to select multiple items is allowed.
 
 Unsubscribe a chunk event.
 
+### Record Death Causes Of Entities
+
+##### `/logdeath sub <target>`
+
+Subscribe to some deaths specified by `<target>`, which has following format:
+
+````
+killer+directKiller(cause->victim)@(min..max)
+````
+
+Follow is a brief description of each parameters:
+
+- `killer`: The type of entities killing victims "with intention".
+- `directKiller`: A more direct causer of deaths. For example, when a pillager shots a villager, the pillager is `killer`, while its arrow is the `directKiller`.
+- `cause`: The cause of deaths. e.g. `explosion`, `drowned`, etc.
+- `victim`: The entity being killed.
+- `min`: The minimum damage amount of the "final hit".
+- `min`: The maximum damage amount of the "final hit".
+
+All of the following can be omitted, and the first four parameters can be a "`*`" to make no restriction on them.
+
+Examples: `player+tnt(explosion->zombie)@(0..1)`, `(->item)`.
+
+Following is the regular expression matching `<target>`:
+
+```
+^(?<killer>[!a-zA-Z_]*|\*)??(\+(?<directKiller>[!a-zA-Z_]*|\*))??(\((?<cause>[!a-zA-Z_\.]*|\*)\))??\-\>(?<victim>[!a-zA-Z_]*|\*)??(@(?<min>[0-9\\.]+)??\.\.(?<max>[0-9\.]+)??)?$
+```
+
+##### `/logdeath unsub <target>`
+
+Unsubscribe some type of deaths. You may use syntax of DOS file name wildcard to match multiple objects.
+
+##### `/logdeath subVictimField | subDamageField <target> <name> <path>`
+
+Subscribe to some fields of the entity being killed or the `DamageSource` object. Note that the `name` is simply a name for the listener, but not the field name. The actual value of fields is gotten with the accessing path given.
+
+##### `/logdeath unsubVictimField | unsubDamageField <target> <name>`
+
+Unsubscribe some fields of the entity being killed or the `DamageSource` object. 
+
+##### `/logdeath setVisible <target> <visible>`
+
+Set whether the "death reports" of some death causes will be outputted to the chat. 
+
+##### `/logdeath stats [<target>]`
+
+Get statistics on subscribed items.
+
+##### `/logdeath autoStats`
+
+Get statistics automatically classified by death causes. 
+
+##### `/logdeath autoStats reset`
+
+Reset automatic statistics.
+
+##### `/logdeath reset [<target>]`
+
+Reset statistics. If no target is supplied, the automatic statistics is also reset.
+
 ### Monition Piston Pushing Entities
 
 ##### `/logmovement sub <target>`
@@ -419,11 +577,27 @@ Start| Stop listening to packets between the server and the client(s). For some 
 
 Using DOS file name wildcards to select multiple items is allowed.
 
+##### `/logpacket startRecording <format> <saveTo>`
+
+Record packets, and save it to a file specified with `<saveTo>`. Currently only the CSV format is supported.
+
+##### `/logpacket stopRecording`
+
+Stop recording packets.
+
+##### `/logpacket stats [<types>]`
+
+Get statistics. A filter may be supplied with the syntax of DOS file name wildcard.
+
+##### `/logpacket stats reset`
+
+Reset statistics.
+
 ### MessMod Configuration
 
 ##### `/messcfg`
 
-Display the version and the current configurations of the mod.
+Get the version and list option labels of the MessMod.
 
 ##### `/messcfg <option>`
 
@@ -484,6 +658,12 @@ Move the entity in the way projectile entities move. The displacement is given i
 ##### `/namentity <entities> <name>`
 
 Name selected entities.
+
+### Name Items Without Anvils
+
+##### `/nameitem <name>`
+
+Name the item the player (or executing entity) is holding in main hand to `<name>`.
 
 ### Kill A Part Of Entities
 
@@ -565,25 +745,63 @@ Get the next value generated by the RNG of the dimension.
 
 Do something with the RNGs of `<target>` (some entities), just like the last three commands. 
 
+### Low-Level Setblock Command
+
+##### `/setblockraw <pos> <block> [<flags> [<depth> [<p2>]]]`
+
+Set blocks with the `setBlockState()` method directly. 
+
+This can be used to generate "ghost blocks" when the `<flag>` has the value 8.
+
+If `<p2>` is present, the command behaves like `/fill`, setting blocks between `<pos>` and `<p2>`.
+
 ### Replace Blocks Produced By Explosions
 
 ##### `/setexplosionblock <blockState> <fireState>`
 
 Make explosions place `<blockState>` instead of air and `<fireState>` instead of fire. 
 
+### Summon Stacked Entities
+
+##### `/stackentity <entity> <count>`
+
+Summon (`<count>` - 1) entities at the position of `<entity>`, to make a stack with `<count>` entities. If there is no initial entity, it would be preferable to use `/repeat`.
+
 ### Block Entity Manipulation
+
+##### `/tileentity add <pos> <type> <tag>`
+
+Add a block entity at `<pos>`. Optionally, you can specify a `<tag>` as the initial data. (It may fail to take effects when the block at `<pos>` is not suitable.) 
 
 ##### `/tileentity get <pos>`
 
 Get the information about the block entity at `<pos>`.
 
-##### `/tileentity set <pos> <type> <tag>`
+##### `/tileentity replace <pos> <type> <tag>`
 
-Set the block entity at `<pos>` to `<type>`. Optionally, you can specify a `<tag>` as the initial data. (It may fail to execute when the block at `<pos>` is not suitable.) 
+Set the block entity at `<pos>` to `<type>`. Optionally, you can specify a `<tag>` as the initial data.
 
 ##### `/tileentity remove <pos>`
 
 Remove the block entity at `<pos>`.In the current version of the mod, if a block needs a block entity, the block entity will be recreated after its removal that is a bug). 
+
+### Update A Large Area Of Blocks
+
+##### `/touch <from> [<to>]`
+
+Update the blocks between `<from>` and `<to>` (or only the block at `<from>` if `<to>` is omitted) with both PP and NC updates, from all directions.
+
+##### `/touch <from> <to> nc [<srcPos> [<srcBlock>]]`
+
+Update the blocks between `<from>` and `<to>` with NC updates. 
+
+If no optional argument is supplied, selected blocks will receive updates from all directions; if specified, the block will be updated with the `World.updateNeighbor()` method, with arguments passes as-is. If `<srcBlock>` is omitted, it will get the block at `<srcPos>` as the default value.
+
+##### `/touch <from> <to> pp [<maxUpdateDepth> [<flags> [<oldState> [<newState>]]]]`
+
+Update the blocks between `<from>` and `<to>` with PP updates. 
+
+Read the source code at `TouchCommand.java` as too many technical details are involved.
 
 ### Variable Management
 
@@ -601,7 +819,11 @@ Literals separated by commas may be served arguments when necessary.
 
 Put the value of the literal specified by argument `<value>` into `<slot>`.
 
-##### `/variable set <slot> <objSrc>`
+##### `/variable set <slot> entity [<path>]`
+
+Put an entity into `<slot>`. An optional accessing path can be specified to transform the entity and store the output of the path, instead of the entity itself, to the variable list.
+
+##### `/variable set <slot> <objSrc> [<path>]`
 
 Put the object supplied by `<objSrc>` into `<slot>`. Available suppliers:
 
@@ -612,6 +834,9 @@ Put the object supplied by `<objSrc>` into `<slot>`. Available suppliers:
 - `client`：`MinecraftClient` instance.
 - `clientWorld`: Current `ClientWorld` instance.
 - `clientPlayer`: Client side player entity.
+- `new`: An object created anew. Example: `java/lang/Thread<0>()`
+
+An optional accessing path can be specified to transform the object and store the output of the path, instead of the object itself, to the variable list.
 
 ##### `/variable map <slotSrc> <slotDst> <path>`
 
@@ -622,14 +847,63 @@ Process the value in `<slotSrc>` with a given Accessing Path and put the result 
 Get the value in `<slot>`.
 
 - `array`: Format the value with`Arrays.toString()`, thus only arrays are permitted.
-- `toString`: Format the value using its `toString()` method.
-- `dumpFields`: Print all non-static fields of the value.
+- `toString`: Format the value using its `toString()` method. An optional accessing path may follow to apply some transform before outputting.
+- `dumpFields`: Print all non-static fields of the value. An additional argument `[<depth>]` may follow to specify the maximum depth of nested objects to have their fields dumped.
 
 ##### `/variable list`
 
 List all variables.
 
-## 配置项
+### Wave Generator
+
+##### `/wavegen new <pos> <wavedef>`
+
+Make the loom block at `<pos>` a wave generator (a.k.a. function generator), with an output defined with `<wavedef>`. Note that the wave generator works only when the block at `<pos>` is a loom.
+
+Waveforms can be defined with either of following two syntax:
+
+- **Simple Mode** The waveform definition start with character S (upper case), which indicates (S)imple Mode, and a series of stages in the form of or Hticks or Lticks immediately follows, where H, L stands for (H)igh (15 levels of redstone power) and (L)ow (0 level), respectively. 
+
+  For example, `SH15L9` stands for a periodic wave which is on for 15 gameticks of, and then off for 9 gt. 
+
+  Outputs changes at the very beginning of scheduled tick phase.
+
+- **Standard mode**  The waveform definition is composed of several stages, each of which has a full format of `(From=>To)LlevelST`, specifying its start time, end time, output level, and whether block updates are emitted when it starts or ends. 
+
+  Time (field `from` and `to`) has two formats, one of which is `+TickOffset Phase`, meaning the stage starts `TickOffset` ticks after the previous stage (see `/entitysidebar` command) ends (or ends `TickOffset` ticks after its start), at the ticking phase specified by `Phase`. If `Phase` is omitted, it will use a default value of `SCHEDULED_TICK`. The other format is `!TimeOffset Phase`, meaning the stage starts of ends `TimeOffset` ticks after the start of the whole waveform.
+
+  Abbreviated form of ticking phases listed below are allowed:
+
+  | Ticking Phase    | Abbreviation |
+  | ---------------- | ------------ |
+  | `WEATHER_CYCLE`  | `WTU`        |
+  | `CHUNK`          | `CU`         |
+  | `SCHEDULED_TICK` | `NTE`        |
+  | `VILLAGE`        | `RAID`       |
+  | `BLOCK_EVENT`    | `BE`         |
+  | `ENTITY`         | `EU`         |
+  | `TILE_ENTITY`    | `TE`         |
+  | `DIM_REST`       | `END`        |
+  
+  In theory, you may specify a signal level above 15, and even a negative value.
+  
+  `S` and `T` (all in upper cases) is two optional flag to (s)uppress the updated emitted at the start of end of the stage respectively.
+  
+  Meanwhile, there is a syntax in the form of `num[stages]` (or `num*[stages]`) to repeat a sequence of  `stages`. Equivalently, the effect of this syntax is to repeat the exact input between the square brackets `num` times as-is, which implies that absolute time offset (in the form of `!Time`) is not permitted in repeated sequences. The structure can be nested in other ones.
+  
+  Well, it may be a little bit hard to detail the format, and so do to understand. Thus, we are going to consider some examples.
+  
+  `(+5SCHEDULE_TICK=>+2DIM_REST)L15T`: Output 15 levels of redstone signal for 2 gt, starting from 5 gt after the end of previous stage, at the start of the `SCHEDULE_TICK` phase, and turn off 2 gt after, at the `DIM_REST` phase (the end of world ticking), emitting updates at start but do not emit at end. 
+  
+  `(!0=>!5ENTITY)L10`: Output 10 levels of redstone signal, from the 0 th tick of the waveform, at the `SCHEDULED_TCIK` phase, and turn off at the 5 th tick, at the start of the `ENTITY` phase, emitting updates on both ends.
+  
+  `3[(+0=>+0)L15 2[(+2=>+0)L15 (+0=>+0)L0]] (+1=>+3)L15`: Expanded as  `(+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+0=>+0)L15 (+2=>+0)L15 (+0=>+0)L0 (+2=>+0)L15 (+0=>+0)L0 (+1=>+3)L15`
+  
+  Additionally, a time offset can be specified at the beginning of a waveform definition, to offset its start time. The offset is relative to n times of the length of the whole waveform (determined by the end of the last stage), and a sign must be present (`+1` instead of `1`). For example +3 means the waveform starts each time the remainder produced when the current game time is divided by the length is 3.
+
+##### `/wavegen remove <pos>`
+
+Remove the wave generator at `<pos>`.
 
 ## Options
 
@@ -661,7 +935,7 @@ Default value: `STANDARD`
 
 ##### `allowSelectingDeadEntities`
 
-Allow entity selector `@e` dead entities.
+Allow entity selector `@e` to select dead entities.
 
 Available values: `true` / `false`
 
@@ -781,6 +1055,16 @@ Available values: `true` / `false`
 
 Default value: `true`
 
+##### `clayBlockPlacer`
+
+Place any technical blocks (e.g. nether portals) with clay balls. 
+
+Clay balls should be named to specify the block to place. For example, with a clay ball named `grass_block[snowy=true]`, you can place snowy grass blocks by right clicks.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `commandExecutionRequirment`
 
 Whether or not the execution of commands defined by this mod require OP permission.
@@ -797,11 +1081,19 @@ Available values: `true` / `false`
 
 Default value: `false`
 
+##### `creativeNoVoidDamage`
+
+Disable void damage for players in creative-like modes.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `creativeUpwardsSpeed`
 
-Set the vertical speed flying speed in the creative mode. The actual terminal speed (in m/s) of players is roughly 150 * `creativeUpwardsSpeed`.
+Set the vertical speed flying speed in the creative mode. The actual terminal speed (in m/s) of players is roughly 150 * `creativeUpwardsSpeed`. Set to `NaN` to leave vanilla settings untouched.
 
-Available values: Any positive real number
+Available values: Any real number, and NaN
 
 Default value: `NaN`
 
@@ -849,9 +1141,41 @@ Available values: `[]` (empty list) or some of the following elements, separated
 
 Default value: `REGION,POI`
 
+##### `detailedChunkTaskLogging`
+
+More details of chunk tasks are included in log files generated with `/logchunkbehavior`.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `directChunkAccessForMessMod`
+
+Some continuously working parts in MessMod like renderers can access chunks from `ThreadedAnvilChunkStorage` directly, without using `ServerChunkManager`, to avoid potential impact on the behaviors of the chunk managerment system.
+
+Available values: `true` / `false`
+
+Default value: `true`
+
 ##### `disableChunkLoadingCheckInCommands`
 
 As the name says, you can fill some blocks in unloaded chunks.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `disableClientChunkUnloading`
+
+Ignore chunk unloading requests from the server.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `disableCreativeForcePickup`
+
+Creative players with full a inventory don't pick up items and arrows anymore.
 
 Available values: `true` / `false`
 
@@ -950,6 +1274,14 @@ Available values: `true` / `false`
 
 Default value: `false`
 
+##### `entityExplosionImpulseScale`
+
+Scale the acceleration caused by explosions.
+
+Available values: Any non-negative real number
+
+Default value: `1.0`
+
 ##### `entityExplosionInfluence`
 
 Tell you how entities are affected by explosions. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.
@@ -1019,6 +1351,30 @@ Available values: `true` / `false`
 
 Default value: `false`
 
+##### `flowerFieldRenderer`
+
+Displays which type of flower can generate within a given area when using bone meals.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `flowerFieldRendererRadius`
+
+Maximum rendering distance of `flowerFieldRenderer`.
+
+Available values: Any positive integer
+
+Default value: `16`
+
+##### `flowerFieldRendererSingleLayer`
+
+Render flower fields at the same level (the highest level within range).
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `generateChunkGrid`
 
 Generate a layer of glass on the ground to show the chunks.
@@ -1031,9 +1387,25 @@ Default value: `false`
 
 In the vanilla `getEntities()` method, only entities that are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually, it doesn't matter, but when the height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Changing it to a higher value may fix some bugs about the interaction between entities and something else.
 
-Available values: Any real number
+Available values: Any positive real number
 
 Default value: `2.0`
+
+##### `hayOscilloscope`
+
+Make hay block a oscilloscope / logic analyzer.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `hayOscilloscopeChannelVisibilityBroadcast`
+
+Synchronize visibility setting of oscilloscope channels on all clients.
+
+Available values: `true` / `false`
+
+Default value: `true`
 
 ##### `hideSurvivalSaves`
 
@@ -1080,7 +1452,7 @@ Default value: `(BL)^2/(mR)`
 
 Set the size of the text in the HUDs.
 
-Available values: Any real number
+Available values: Any positive real number
 
 Default value: `1.0`
 
@@ -1114,6 +1486,14 @@ Available values:
 
 Default value: `-FOLLOW_SYSTEM_SETTINGS-`
 
+##### `loomWaveGenerator`
+
+Make loom blocks a wave generator, whose output can be configurated with `/wavegen`.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
 ##### `maxClientTicksPerFrame`
 
 The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.
@@ -1126,7 +1506,7 @@ Default value: `10`
 
 Set the maximum range of teleportation with `endEyeTeleport`.
 
-Available values: Any real number
+Available values: Any positive real number
 
 Default value: `180`
 
@@ -1157,6 +1537,24 @@ Default value: `false`
 ##### `projectileChunkLoading`
 
 Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `playerInputsWhenScreenOpened`
+
+Allow players to move and turn around while typing commands, etc., if a hotkey, `F6` by default, is pressed.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `playerInputsWhenScreenOpenedHotkey`
+
+Hotkeys for `playerInputsWhenScreenOpened`, specified by a key code.
+
+ - `F1` - `F12`: 290 - 301
 
 Available values: `true` / `false`
 
@@ -1197,6 +1595,14 @@ Default value: `false`
 ##### `quickStackedEntityKilling`
 
 Kill the entity being knocked by a brick, along with all entities being at the same position as it.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `quickStackedEntityKillingOneTypeOnly`
+
+Only entities of the same type as the entity the entity directly attacked by the play are killed when using `quickStackedEntityKilling`.
 
 Available values: `true` / `false`
 
@@ -1246,6 +1652,14 @@ Default value: `false`
 ##### `renderRedstoneGateInfo`
 
 Display the output level of repeaters and comparators the player looks at.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `resistanceReducesVoidDamage`
+
+Entities with resistance effect are protected from void damages.
 
 Available values: `true` / `false`
 
@@ -1307,6 +1721,29 @@ Available values: `[]` (empty list) or some of the following elements, separated
 
 Default value: `[]`
 
+##### `smartCursorCustomWordDelimiters`
+
+A list of word delimiters, used when smartCursorMode = CUSTOM. Any characters apperas in this option will be recognized as a word delimiter.
+
+Available values: Any string
+
+Default value: ` `
+
+##### `smartCursorMode`
+
+Allow cursors to stop at word delimiters other than spaces (e.g. commas in entity selectors) when editing commands with Ctrl + Arrow or Ctrl + Backspace.
+
+Available values: 
+
+- `VANILLA`
+- `NON_LITERAL`
+- `NERDY`
+- `NORMAL`
+- `GREEDY`
+- `CUSTOM`
+
+Default value: `VANILLA`
+
 ##### `stableHudLocation`
 
 Make the location of HUDs more stable when the length of lines change frequently.
@@ -1326,6 +1763,22 @@ Default value: `false`
 ##### `superSuperSecretSetting`
 
 wlujkgfdhlqcmyfdhj...Never turn it on!
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `survivalStatusBarInCreativeMode`
+
+Dispaly survival status bar (health & hungry) in creative mode.
+
+Available values: `true` / `false`
+
+Default value: `false`
+
+##### `survivalXpBarInCreativeMode`
+
+Dispaly experience bar in creative mode.
 
 Available values: `true` / `false`
 
@@ -1359,9 +1812,9 @@ Default value: `3`
 
 Scale the TPS (MSPT) graph so that it can be held by the screen.
 
-Available values: `true` / `false`
+Available values: Any positive real number
 
-Default value: `false`
+Default value: `1.0`
 
 ##### `vanillaDebugRenderers`
 
@@ -1408,7 +1861,7 @@ Default value: `[]`
 
 #### Entity information HUD
 
-Information about the entity that the player is looking at is obtained at the end of server ticks, and the information about the local player is obtained at the end of client ticks. More information about that is available below.
+Information about the entity that the player is looking at is obtained at the end of server ticks, and the information about the local player is obtained at the end of client ticks. Further discussion on them are available in the next section.
 
 ![](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/HUD-demo.png)
 
@@ -1570,17 +2023,85 @@ Possible values: A quoted regular expression.
 
 Specify a regular expression matching the class (package name is optional) of selected entities.
 
+## Oscilloscope
+
+When option `hayOscilloscope` is set to true, hay blocks can be used as an oscilloscope to record redstone signal input.
+
+By clicking a hay block, a GUI can be opened:
+
+![oscilloscope_gui.png](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/oscilloscope_gui.png)
+
+### Channels
+
+Each position with a hay block receiving redstone signals is a channel. Channels are marked with an numerical ID (starting from 0) and the material color (or map color) of the block beneath. When a hay block detects a change of redstone power for the first time, a channel is created, and its ID and color won't change anymore.
+
+A notable consequence of the one-to-one corresponence between channels and positions is that if a hay block is moved, possibly by a piston, it would be associated with a new channel. That is, channels cannot be moved.
+
+### Modes
+
+The oscilloscope has two working mode, analog mode and digital mode.
+
+In analog mode, waves from different channels are drawn at the same place in the wave area, as shown in the below.
+
+![oscilloscope_analog.png](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/oscilloscope_analog.png)
+
+In digital mode, waves are drawn in parallel, and only show if any redstone signal is received, ignoring their levels.
+
+![oscilloscope_digital.png](https://raw.githubusercontent.com/wiki/lovexyn0827/MessMod/media/oscilloscope_digital.png)
+
+In both modes, holding left button of the mouse when the cursor is on some waves, a tool tip is drawn to display the level, start time, end time, and length of pulses.
+
+### Wave Area
+
+You can easily navigate in the wave area with mouse scroll wheel:
+
+**`Scroll`**: Scroll horizontally.
+
+**`Shift + Scroll`**: Zoom horizontally, faster.
+
+**`Crtl + Scroll`**: Zoom horizontally.
+
+**`Alt + Scroll`**: Scroll vertically.
+
+**`Alt + Shift + Scroll`**: Scroll vertically, faster.
+
+**`Crrl + Alt + Scroll`**: Zoom vertically.
+
+Besides, the arrow key on the keyboard can also be used to scroll / zoom (with `Ctrl` down).
+
+### Trigger
+
+When the signal level some channels receives rise or fall to a set level (trig level), an event called "trigger" is emitted, and the wave area would be automatically scrolled to where the trigger happens. By clicking the Trig Mode setting in the channel settings bar, we can monitor triggers emitted by some channels.
+
+When a trigger is detected, the wave will be scrolled to move the triggering edge to the horizontal marker (a yellow triangle above the wave area, which can be dragged with mouse).
+
+There is also draggable triangles on the right side or the wave area, to mark triggering level of different channels.
+
+### Active Probing
+
+Active probing enables the oscilloscope to detect signal level changes without block updates. (Conside when a redstone wire changes its shape and thus connect to or disconnect from a block, for example.) In this mode, hay blocks would try to measure the signal level they receive at the beginning of each ticking phases, to see if the level has changed since the last measurement.
+
+All channels are probing actively by detault. To disable, uncheck the check box labelled `Ac` in the channel list area.
+
+Note that channel must be created with some level changes with block updates to probe actively.
+
+### Micro-timing Support
+
+By default, on the horizontal axis, a game tick is divided into several smaller parts, each of which stands for a ticking phase like scheduled ticks and entity processing. Edges at different phases are also displayed at different horizontal positions according to the ticking phase it is at.
+
+You can check Align to tick to ignore micro-timing information and align all edges to corresponding horizontal position of the tick it is in.
+
 ## Mapping Loading
 
 1. If Minecraft is deobfuscated, the mapping won't be loaded.
-2. Check the `mapping` folder for corresponding mapping (i.e.`<mcversion>.ting`, like `1.16.4.tiny`).
+2. Check the `mapping` folder for corresponding mapping (i.e.`<mcversion>.tiny`, like `1.16.4.tiny`).
 3. Otherwise, try to download the latest compatible mapping from Fabric's official maven repository.
 4. Otherwise, if the TIS Carpet Addition is loaded, try to load its bundled mapping.
 5. Otherwise, the mapping won't be loaded.
 
 ## Advanced Mixins
 
-Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are enabled. If you want to disable some advanced mixins, you can press F8 (not available on MacOS) in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
+Some mixins is this Mod may bring about significant performance cost and may has unexpected impact on the vanilla multi-thread mechanism. Therefore, these mixins are optional. By default, all advanced mixins are disabled since `0.10.0+v20251019`. If you want to enable some advanced mixins, you can press F8 (not available on MacOS) in the title screen or edit `advanced_mixins.prop` in the game directory. Note that modifications to advanced mixin configurations requires a restart to take effect.
 
 Disabling advanced mixins may make related features no longer available.
 
@@ -1588,16 +2109,18 @@ Disabling advanced mixins may make related features no longer available.
 
 - Stacktrace will be printed when the Carpet Mod is not loaded. If the Carpet Mod is loaded, enabling the `superSecretSetting` has the same effect.
 - A warning screen is popped when trying to open a survival with MessMod installed for the first time.
+- Players can select entities targeted by the crosshair with entity selector `@t`.
 
 ## Notice
 
 - The mod is still in development, some feature is not available or buggy, please tell me if you find something working not properly. 
 - Dedicated servers are not supported well currently and there are many unsolved bugs related to the connection between the server and the client, so only use the mod in single-player mode or the host client of a LAN server. 
 - Some commands like /explode ~ ~ ~ 2147483647 true can freeze the server, be careful.
-- The mod is not intended to be used in survival saves, as it may break vanilla mechanisms or enable the players to cheat accidentally, especially when some options are modified. To ensure this, the option `hideSurvivalSaves` could be enabled.
+- The Mod is not intended to be used in survival saves, as it may break vanilla mechanisms or enable the players to cheat accidentally, especially when some options are modified. To ensure this, the option `hideSurvivalSaves` could be enabled.
+- To minimumize potential impact on the game and make the usage of this mod as convenient as possible, almost no measures are taken to check if any operation can cause server crashes or any other serious impacts,  so using the Mod only on singleplayer mode or servers played by trusted players.
 
 ## About
 
-Initially, I started this mod in Feb 2021 to do some research on the motion of entities, thus the HUDs, bounding box renderer, tool items and command `/entityfield` were the earliest features of this mod. Later, more features were introduced gradually if they were needed.
+Initially, I started this mod in Feb 2021 to do some research on the motion of entities, thus the HUDs, bounding box renderer, tool items and command `/entityfield` were the earliest features of this mod. Later, more features were introduced gradually when needed.
 
-After April 2022, I speeded up the development of the mod, more features were added while many previously added ones were completely refactored. By 2023/08/20, 28 commands, 70 options (or rules) and 9 renderers had been available.
+After April 2022, I speeded up the development of the mod, more features were added while many previously added ones were completely refactored. By 2025/10/19, 38 commands, 100 options (or rules) and 10 renderers had been added.

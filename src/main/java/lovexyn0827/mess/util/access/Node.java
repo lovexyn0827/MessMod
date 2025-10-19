@@ -66,7 +66,7 @@ abstract class Node {
 	 */
 	void initialize(Type lastOutClass) throws AccessingFailureException {
 		try {
-			this.outputType =  this.resolveOutputType(lastOutClass);
+			this.outputType = this.resolveOutputType(lastOutClass);
 		} catch (InvalidLiteralException e) {
 			throw AccessingFailureException.create(e, this);
 		}

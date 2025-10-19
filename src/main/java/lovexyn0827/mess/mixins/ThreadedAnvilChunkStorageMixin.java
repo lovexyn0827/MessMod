@@ -18,9 +18,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.util.Either;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.ChunkTaskPrioritySystemInterface;
 import lovexyn0827.mess.fakes.ChunkTicketManagerInterface;
+import lovexyn0827.mess.fakes.ThreadedAnvilChunkStorageInterface;
 import lovexyn0827.mess.log.chunk.ChunkBehaviorLogger;
 import lovexyn0827.mess.log.chunk.ChunkEvent;
 import lovexyn0827.mess.util.blame.StackTrace;
@@ -42,7 +44,7 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.level.storage.LevelStorage;
 
 @Mixin(ThreadedAnvilChunkStorage.class)
-public abstract class ThreadedAnvilChunkStorageMixin {	
+public abstract class ThreadedAnvilChunkStorageMixin implements ThreadedAnvilChunkStorageInterface {	
 	@Shadow @Final
 	private ServerWorld world;
 	
@@ -51,6 +53,9 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 	
 	@Shadow @Final
 	private ChunkTaskPrioritySystem chunkTaskPrioritySystem;
+	
+	@Shadow @Final
+	private volatile Long2ObjectLinkedOpenHashMap<ChunkHolder> chunkHolders;
 	
 	@Inject(method = "loadChunk", 
 			at = @At(value = "HEAD")
@@ -255,5 +260,10 @@ public abstract class ThreadedAnvilChunkStorageMixin {
 		if(this.chunkTaskPrioritySystem instanceof ChunkTaskPrioritySystemInterface) {
 			((ChunkTaskPrioritySystemInterface) this.chunkTaskPrioritySystem).initWorld(world);
 		}
+	}
+	
+	@Override
+	public final ChunkHolder getCHForMessMod(long pos) {
+		return this.chunkHolders.get(pos);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -40,6 +41,7 @@ public abstract class ExplosionMixin {
 		return customFireState == null ? fireState : customFireState;
 	}
 	
+	// Actually this version is better as invocations is fewer.
 	@Inject(method = "getExposure",
 			at = @At(value = "INVOKE",
 							target = "Lnet/minecraft/world/World;raycast"
@@ -69,28 +71,6 @@ public abstract class ExplosionMixin {
 						entity.getEntityWorld().getRegistryKey(), 
 						null);
 			}
-		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Inject(method = "collectBlocksAndDamageEntities", 
-			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z"
-			),
-			locals = LocalCapture.CAPTURE_FAILSOFT, 
-			require = 0
-	)
-	private void onExplosionInfluencedEntity(CallbackInfo ci, Set set, int i, float j, int k, int l, int d, int q, 
-			int e, int r, List f, Vec3d vec3d, int g, Entity entity, double h, double s, double t, double u, 
-			double blockPos, double fluidState, double v) {
-		// FIXME: Not compatible with Lithium, may be fixed via disabling the Mixin of it.
-		if(OptionManager.entityExplosionInfluence && !entity.getWorld().isClient) {
-			StringBuilder entityInfoBuilder = new StringBuilder(entity.getType().getTranslationKey().replaceFirst("^.+\\u002e", "")).
-					append("[").append(entity.getId()).append(",").append(entity.getPos()).append("]");
-			MessMod.INSTANCE.sendMessageToEveryone("Affected Entity: ", entityInfoBuilder.toString(), "\n", 
-					"Exposure: ", fluidState, "\n", 
-					"Infulence: ", v);
-			
 		}
 	}
 	
@@ -124,5 +104,17 @@ public abstract class ExplosionMixin {
 			cir.setReturnValue(1.0F);
 			cir.cancel();
 		}
+	}
+	
+	@ModifyVariable(method = "collectBlocksAndDamageEntities", 
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/util/math/Vec3d;add(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;", 
+					shift = At.Shift.BY, 
+					by = -2
+			), 
+			name = "vec3d2"
+	)
+	private Vec3d scaleImpulse(Vec3d in) {
+		return in.multiply(OptionManager.entityExplosionImpulseScale);
 	}
 }
