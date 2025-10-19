@@ -44,6 +44,7 @@
     "CommandManagerRegistrationEnvironmentAccessor", 
     "EntityPredicatesMixin", 
     "ThreadedAnvilChunkStorageMixin", 
+    "ThreadedAnvilChunkStorageAccessor", 
     "ServerChunkManagerMixin", 
     "FletchingTableBlockMixin", 
     "ServerPlayerEntityMixin", 
@@ -60,7 +61,22 @@
     "ItemCooldownManagerMixin", 
     "SectionedEntityCacheMixin", 
     "ServerPlayNetworkHandler_1Mixin", 
-    "ChunkTaskPrioritySystemMixin"
+    "ChunkTaskPrioritySystemMixin", 
+    "ServerEntityManagerMixin", 
+    "ServerPlayNetworkHandler_1Mixin", 
+    "ServerWorldAccessor", 
+    "SectionedEntityCacheMixin", 
+    "ItemCooldownManagerMixin", 
+    "ArgumentTypesMixin", 
+    "ChunkTaskPrioritySystemMixin", 
+    "LivingEntityMixin", 
+    "IdCountsStateAccessor", 
+    "DieableEntityMixin", 
+    "LoomBlockMixin", 
+    "HayBlockMixin", 
+    "WeightedListMixin", 
+    "StorageIoWorkerAccessor", 
+    "SerializingRegionBasedStorageAccessor"
   ],
   "client": [
     "MinecraftClientMixin",
@@ -81,7 +97,10 @@
     "WorldListWidgetEntryMixin", 
     "EntitySelectorMixin_Client", 
     "ClientCommandSourceMixin", 
-    "DebugHudMixin"
+    "DebugHudMixin", 
+    "ChatScreenMixin", 
+    "AbstractCommandBlockScreenMixin", 
+    "MouseMixin"
   ],
   "server": [
     "EntitySelectorMixin_Server"

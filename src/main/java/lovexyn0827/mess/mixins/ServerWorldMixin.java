@@ -1,22 +1,32 @@
 package lovexyn0827.mess.mixins;
 
+import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
 
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.fakes.EntityInterface;
+import lovexyn0827.mess.fakes.ServerEntityManagerInterface;
 import lovexyn0827.mess.fakes.ServerWorldInterface;
 import lovexyn0827.mess.options.OptionManager;
+import lovexyn0827.mess.util.NoChunkLoadingWorld;
 import lovexyn0827.mess.util.PulseRecorder;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WorldGenerationProgressListener;
+import net.minecraft.server.world.ServerEntityManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -27,10 +37,25 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionOptions;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
+import net.minecraft.world.level.ServerWorldProperties;
+import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.world.spawner.Spawner;
 
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin implements BlockView, ServerWorldInterface {
 	private final PulseRecorder pulseRecorder = new PulseRecorder();
+	private @Final NoChunkLoadingWorld noChunkLoadingWorld;
+	
+	@Inject(method = "<init>", at = @At("RETURN"))
+	public void onCreated(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey<World> worldKey, DimensionOptions dimensionOptions, WorldGenerationProgressListener worldGenerationProgressListener, boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime, CallbackInfo ci) {
+		this.noChunkLoadingWorld = new NoChunkLoadingWorld((ServerWorld) (Object) this);
+	}
+	
+	@Shadow
+	private @Final ServerEntityManager<?> entityManager;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -65,10 +90,6 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 			)
 	private void startTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
 		ServerTickingPhase.WEATHER_CYCLE.begin((ServerWorld)(Object) this);
-		// Actually here is also the ending of WTU
-		if(((ServerWorld)(Object) this).getRegistryKey() == World.OVERWORLD) {
-			MessMod.INSTANCE.updateTime(((ServerWorld)(Object) this).getTime());
-		}
 	}
 	
 	@Inject(method = "tick", 
@@ -148,5 +169,22 @@ public abstract class ServerWorldMixin implements BlockView, ServerWorldInterfac
 		if(((EntityInterface) entity).isFrozen()) {
 			ci.cancel();
 		}
+	}
+	
+	@Inject(
+			method = "<init>", 
+			at = @At(
+					value = "FIELD", 
+					target = "net/minecraft/server/world/ServerWorld.entityManager:Lnet/minecraft/server/world/ServerEntityManager;", 
+					opcode = Opcodes.PUTFIELD, 
+					shift = At.Shift.AFTER
+			)
+	)
+	private void onCreatedEntityManager(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey<World> worldKey, DimensionOptions dimensionOptions, WorldGenerationProgressListener worldGenerationProgressListener, boolean debugWorld, long seed, List<Spawner> spawners, boolean shouldTickTime, CallbackInfo ci) {
+		((ServerEntityManagerInterface) this.entityManager).initWorld((ServerWorld)(Object) this);
+	}
+	
+	public NoChunkLoadingWorld toNoChunkLoadingWorld() {
+		return this.noChunkLoadingWorld;
 	}
 }

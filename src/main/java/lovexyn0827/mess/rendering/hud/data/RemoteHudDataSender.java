@@ -1,5 +1,6 @@
 package lovexyn0827.mess.rendering.hud.data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -24,13 +25,23 @@ import net.minecraft.world.World;
 public class RemoteHudDataSender implements HudDataSender {
 	/** Used to determine the delta */
 	protected NbtCompound lastData = new NbtCompound();
-	protected final List<HudLine> customLines = Lists.newArrayList();
+	protected final List<HudLine> lines = Lists.newArrayList();
 	protected final MinecraftServer server;
 	private final HudType type;
 
-	public RemoteHudDataSender(MinecraftServer server, HudType type) {
+	public RemoteHudDataSender(MinecraftServer server, HudType type, boolean addDefaultLines) {
 		this.server = server;
 		this.type = type;
+		if (addDefaultLines) {
+			for(HudLine l : BuiltinHudInfo.values()) {
+				this.lines.add(l);
+			}
+		}
+	}
+
+	@Override
+	public Collection<HudLine> getLines() {
+		return this.lines;
 	}
 	
 	public void updateData(Entity entity) {
@@ -63,7 +74,7 @@ public class RemoteHudDataSender implements HudDataSender {
 	}
 	
 	protected Stream<HudLine> streamAllLines() {
-		return Stream.concat(Stream.of(BuiltinHudInfo.values()), this.customLines.stream());
+		return this.lines.stream();
 	}
 
 	/**
@@ -83,30 +94,10 @@ public class RemoteHudDataSender implements HudDataSender {
 		
 		return false;
 	}
-
-	@Override
-	public List<HudLine> getCustomLines() {
-		return this.customLines;
-	}
-	
-	public static class Player extends RemoteHudDataSender implements PlayerHudDataSender {
-		public Player(MinecraftServer server, HudType type) {
-			super(server, type);
-		}
-
-		@Override
-		public void updatePlayer() {
-		}
-
-		@Override
-		public void updateData() {
-		}
-		
-	}
 	
 	public static class Sidebar extends RemoteHudDataSender implements SidebarDataSender {
 		public Sidebar(MinecraftServer server) {
-			super(server, HudType.SIDEBAR);
+			super(server, HudType.SIDEBAR, false);
 			this.registerTickingEvents();
 		}
 
@@ -145,7 +136,7 @@ public class RemoteHudDataSender implements HudDataSender {
 		
 		@Override
 		protected Stream<HudLine> streamAllLines() {
-			return this.customLines.stream();
+			return this.lines.stream();
 		}
 	}
 }

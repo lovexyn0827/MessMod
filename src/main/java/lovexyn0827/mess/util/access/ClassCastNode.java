@@ -7,6 +7,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.TypeInsnNode;
 
+import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.util.TranslatableException;
 
 public class ClassCastNode extends Node {
@@ -14,7 +15,8 @@ public class ClassCastNode extends Node {
 	
 	public ClassCastNode(String className) {
 		try {
-			this.castTo = Class.forName(className.replace('/', '.'));
+			String runtimtClassName = MessMod.INSTANCE.getMapping().srgClass(className.replace('/', '.'));
+			this.castTo = Class.forName(runtimtClassName);
 		} catch (ClassNotFoundException e) {
 			TranslatableException e1 = new TranslatableException("exp.noclass", className);
 			e1.initCause(e);

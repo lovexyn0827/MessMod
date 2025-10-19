@@ -36,7 +36,7 @@ public abstract class WorldListWidgetEntryMixin {
 				if(bool) {
 					this.start();
 				} else {
-					this.client.setScreen(screen);
+					this.client.setScreen(this.screen);
 				}
 			};
 			this.client.setScreen(new ConfirmScreen(bc, new FormattedText("misc.warnsur.title", "cl").asMutableText(), 

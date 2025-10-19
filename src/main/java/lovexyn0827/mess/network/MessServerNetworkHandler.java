@@ -87,6 +87,9 @@ public class MessServerNetworkHandler {
 				EntityDataDumpHelper.tryDumpTarget(player);
 			});
 		});
+		register(Channels.OSCILSCOPE_CONF, (player, channel, buf) -> {
+			MessMod.INSTANCE.getOscilscope().handleConfigPacket(buf);
+		});
 	}
 	
 	public interface PacketHandler {
@@ -95,5 +98,9 @@ public class MessServerNetworkHandler {
 
 	public void sendToEveryone(CustomPayloadS2CPacket packet) {
 		this.server.getPlayerManager().sendToAll(packet);
+	}
+
+	public void sendPacketTo(CustomPayloadS2CPacket pkt, ServerPlayerEntity player) {
+		player.networkHandler.sendPacket(pkt);
 	}
 }

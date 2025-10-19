@@ -13,9 +13,12 @@ import com.mojang.brigadier.context.CommandContext;
 
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import lovexyn0827.mess.mixins.ServerWorldAccessor;
+import lovexyn0827.mess.mixins.ThreadedAnvilChunkStorageAccessor;
 import net.minecraft.command.argument.ColumnPosArgumentType;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ChunkHolder;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ColumnPos;
 import net.minecraft.world.World;
@@ -31,6 +34,8 @@ public class LazyLoadCommand {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
 									LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), (k) -> new LongOpenHashSet())
 											.add(ChunkPos.toLong(pos.x() >> 4, pos.z() >> 4));
+									((ServerWorldAccessor) ct.getSource().getWorld()).getEntityManager()
+											.updateTrackingStatus(new ChunkPos(pos.x() >> 4, pos.z() >>4), ChunkHolder.LevelType.TICKING);
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
@@ -38,7 +43,11 @@ public class LazyLoadCommand {
 										.executes((ct) -> {
 											LongSet posSet = LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), 
 													(k) -> new LongOpenHashSet());
-											forEachSelected(ct, posSet::add);
+											forEachSelected(ct, (pos) -> {
+												posSet.add(pos);
+												((ServerWorldAccessor) ct.getSource().getWorld()).getEntityManager()
+														.updateTrackingStatus(new ChunkPos(pos), ChunkHolder.LevelType.TICKING);
+											});
 											CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 											return Command.SINGLE_SUCCESS;
 										}))))
@@ -48,7 +57,13 @@ public class LazyLoadCommand {
 									ColumnPos pos = ColumnPosArgumentType.getColumnPos(ct, "corner1");
 									LongSet posSet = LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), 
 											(k) -> new LongOpenHashSet());
-									posSet.remove(ChunkPos.toLong(pos.x() >> 4, pos.z() >> 4));
+									long posL = ChunkPos.toLong(pos.x() >> 4, pos.z() >> 4);
+									posSet.remove(posL);
+									@SuppressWarnings("resource")
+									ChunkHolder.LevelType type = ((ThreadedAnvilChunkStorageAccessor) ct.getSource().getWorld()
+											.getChunkManager().threadedAnvilChunkStorage).getCH(posL).getLevelType();
+									((ServerWorldAccessor) ct.getSource().getWorld()).getEntityManager()
+											.updateTrackingStatus(new ChunkPos(pos.x() >> 4, pos.z() >>4), type);
 									CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})
@@ -56,7 +71,14 @@ public class LazyLoadCommand {
 										.executes((ct) -> {
 											LongSet posSet = LAZY_CHUNKS.computeIfAbsent(ct.getSource().getWorld().getRegistryKey(), 
 													(k) -> new LongOpenHashSet());
-											forEachSelected(ct, posSet::remove);
+											forEachSelected(ct, (posL) -> {
+												posSet.remove(posL);
+												@SuppressWarnings("resource")
+												ChunkHolder.LevelType type = ((ThreadedAnvilChunkStorageAccessor) ct.getSource().getWorld()
+														.getChunkManager().threadedAnvilChunkStorage).getCH(posL).getLevelType();
+												((ServerWorldAccessor) ct.getSource().getWorld()).getEntityManager()
+														.updateTrackingStatus(new ChunkPos(posL), type);
+											});
 											CommandUtil.feedbackWithArgs(ct, "cmd.general.success");
 											return Command.SINGLE_SUCCESS;
 										}))));
