@@ -197,6 +197,8 @@ public final class Oscilscope {
 		private boolean visible = true;
 		private final Lazy<TickingPhase.Event> updater;
 		private boolean activeUpdate;
+		@Environment(EnvType.CLIENT)
+		private Consumer<Channel> changeListener;
 
 		private Channel(RegistryKey<World> dimension, BlockPos pos, int color) {
 			this.id = Oscilscope.this.nextChannelId++;
@@ -264,6 +266,10 @@ public final class Oscilscope {
 		}
 		
 		void setActiveUpdate(boolean activeUpdate) {
+			if (activeUpdate == this.activeUpdate) {
+				return;
+			}
+			
 			this.activeUpdate = activeUpdate;
 			if (activeUpdate) {
 				ServerTickingPhase.addEventToAll(this.updater.get());
@@ -297,21 +303,43 @@ public final class Oscilscope {
 		}
 
 		@Environment(EnvType.CLIENT)
+		void setChangeListener(Consumer<Channel> listener) {
+			this.changeListener = listener;
+		}
+
+		@Environment(EnvType.CLIENT)
+		void notifyChangeListener() {
+			if (this.changeListener != null) {
+				this.changeListener.accept(this);
+			}
+		}
+		
+		@Environment(EnvType.CLIENT)
 		void setTrigMode(TrigMode mode) {
+			if (mode == this.trigMode) {
+				return;
+			}
+			
 			this.trigMode = mode;
 			Oscilscope.this.uploadConfig(TRIG_MODE, (buf) -> {
 				buf.writeInt(this.id);
 				buf.writeInt(this.trigMode.ordinal());
 			});
+			this.notifyChangeListener();
 		}
 
 		@Environment(EnvType.CLIENT)
 		void setTrigLevel(int level) {
+			if (level == this.trigLevel) {
+				return;
+			}
+			
 			this.trigLevel = level;
 			Oscilscope.this.uploadConfig(TRIG_LEVEL, (buf) -> {
 				buf.writeInt(this.id);
 				buf.writeInt(this.trigLevel);
 			});
+			this.notifyChangeListener();
 		}
 
 		public TrigMode getTrigMode() {
@@ -336,12 +364,17 @@ public final class Oscilscope {
 
 		@Environment(EnvType.CLIENT)
 		public void setVisible(boolean visible) {
+			if (visible == this.visible) {
+				return;
+			}
+			
 			this.visible = visible;
 			if (OptionManager.hayOscilloscopeChannelVisibilityBroadcast) {
 				Oscilscope.this.uploadConfig(VISIBILITY, (buf) -> {
 					buf.writeInt(this.id);
 					buf.writeBoolean(visible);
 				});
+				this.notifyChangeListener();
 			}
 		}
 		

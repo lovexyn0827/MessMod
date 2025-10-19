@@ -505,7 +505,7 @@ public final class OscilscopeScreen extends Screen {
 					.filter(Oscilscope.Channel::isVisible)
 					.sorted(Comparator.comparing(Oscilscope.Channel::getId))
 					.filter((ch) -> {
-						int yPos = this.bottom - (ch.getTrigLevel() - this.bottomLevel) * this.pixelsPerHDiv;
+						int yPos = this.bottom - (ch.getTrigLevel() - this.bottomLevel) * this.pixelsPerVDiv;
 						return MathHelper.absMax(mouseX - (this.right + 5), mouseY - this.top - yPos) < 10;
 					})
 					.findFirst();
@@ -544,7 +544,7 @@ public final class OscilscopeScreen extends Screen {
 		public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
 			if (Screen.hasAltDown()) {
 				if (Screen.hasControlDown()) {
-					this.levelPerDiv = this.calculateNextDivLength(this.levelPerDiv, amount > 0, 100);
+					this.levelPerDiv = this.calculateNextDivLength(this.levelPerDiv, amount < 0, 100);
 				} else {
 					this.bottomLevel += (Screen.hasShiftDown() ? amount * this.vDivs : amount) * this.levelPerDiv;
 				}
@@ -925,8 +925,11 @@ public final class OscilscopeScreen extends Screen {
 						Entry.this.backend.setActiveUpdate(this.isChecked());
 					}
 				};
+				this.backend.setChangeListener((ch) -> {
+					this.trigLevel.setText(Integer.toString(ch.getTrigLevel()));
+				});
 			}
-			
+
 			private Text getTrigModeIndicator() {
 				switch (this.backend.getTrigMode()) {
 				case BOTH:
