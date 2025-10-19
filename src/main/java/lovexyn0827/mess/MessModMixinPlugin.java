@@ -100,7 +100,6 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 	}
 	
-	@SuppressWarnings("deprecation")
 	private static BooleanSupplier isModLoaded(String id, @Nullable String minVer, @Nullable String maxVer) {
 		Optional<ModContainer> mayMod = FabricLoader.getInstance().getModContainer(id);
 		SemanticVersion minSemiVer;
@@ -124,13 +123,8 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		return () -> {
 			if(mayMod.isPresent()) {
 				Version ver = mayMod.get().getMetadata().getVersion();
-				if(ver instanceof SemanticVersion) {
-					SemanticVersion semVer = (SemanticVersion) ver;
-					return (maxSemiVer == null ? true : maxSemiVer.compareTo(semVer) >= 0) 
-							&& (minSemiVer == null ? true : minSemiVer.compareTo(semVer) <= 0);
-				} else {
-					return true;
-				}
+				return (maxSemiVer == null ? true : maxSemiVer.compareTo(ver) >= 0) 
+						&& (minSemiVer == null ? true : minSemiVer.compareTo(ver) <= 0);
 			} else {
 				return true;
 			}
@@ -182,7 +176,7 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		}
 		
 		advancedMixins.forEach((entry) -> {
-			config.computeIfAbsent(entry.name, (k) -> "true");
+			config.computeIfAbsent(entry.name, (k) -> "false");
 		});
 		return config;
 	}
@@ -218,13 +212,11 @@ public class MessModMixinPlugin implements IMixinConfigPlugin {
 		ADVANCED_MIXINS = AdvancedMixinInfoBuilder.create()
 				.add("ServerChunkManagerMainThreadExecutorMixin")
 				.addUsages("ASYNC_TASKS", "ASYNC_TASK_SINGLE", "ASYNC_TASK_ADDITION").costly().risky()
-				.add("WorldMixin_GetEntityExpansion")
-				.addUsages("getEntityRangeExpansion").costly()
-				.add("WorldChunkMixin_GetEntityExpansion")
+				.add("SectionedEntityCacheMixin")
 				.addUsages("getEntityRangeExpansion").costly()
 				.add("ChunkTicketManagerNearbyChunkTicketUpdaterMixin")
 				.addUsages("PLAYER_TICKER_UPDATE").risky().costly()
-				.add("ChunkTaskPrioritySystem")
+				.add("ChunkTaskPrioritySystemMixin")
 				.addUsages("CTPS_LEVEL", "CTPS_REMOVE", "CTPS_CHUNK").risky().costly()
 				.build();
 		ACTIVIATED_ADVANCED_MIXINS = getActiviatedAdvancedMixins(ADVANCED_MIXINS);

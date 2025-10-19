@@ -131,7 +131,7 @@ public abstract class EntityMixin implements EntityInterface {
 	)
 	private void onCollisionMovementRestriction(MovementType type, Vec3d movement, CallbackInfo ci, Vec3d vec3d) {
 		if(currentReport != null && !vec3d.equals(lastMovement) && !this.world.isClient) {
-			currentReport.add(Text.literal("Collision restricted the movement to " + movement));
+			currentReport.add(Text.literal("Collision restricted the movement to " + vec3d));
 			lastMovement = vec3d;
 		}
 	}

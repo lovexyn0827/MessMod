@@ -83,11 +83,9 @@ public class ListenedField implements HudLine, Comparable<HudLine> {
 	public int compareTo(HudLine o) {
 		if(o instanceof BuiltinHudInfo) {
 			return 1;
-		} else if(o instanceof ListenedField) {
-			return this.name.compareTo(((ListenedField) o).name);
+		} else {
+			return this.getName().compareTo(o.getName());
 		}
-		
-		return 0;
 	}
 	
 	@Override

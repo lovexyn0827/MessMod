@@ -14,7 +14,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.rendering.hud.data.HudDataSender;
-import lovexyn0827.mess.rendering.hud.data.PlayerHudDataSender;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingPath;
 import lovexyn0827.mess.util.access.AccessingPathArgumentType;
@@ -175,6 +174,7 @@ public class HudCommand {
 									}
 									
 									MessMod.INSTANCE.getServerHudManager().setServerPlayerHudTarget(profiles.iterator().next());
+									CommandUtil.feedback(ct, "cmd.general.success");
 									return Command.SINGLE_SUCCESS;
 								})));
 		dispatcher.register(command);
@@ -190,7 +190,7 @@ public class HudCommand {
 		}
 	}
 
-	private static void addListenedWithNameAndPath(CommandContext<ServerCommandSource> ct, PlayerHudDataSender playerHudS, Class<?> cl) {
+	private static void addListenedWithNameAndPath(CommandContext<ServerCommandSource> ct, HudDataSender playerHudS, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
 		AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
@@ -201,7 +201,7 @@ public class HudCommand {
 		}
 	}
 	
-	private static void addListenedWithName(CommandContext<ServerCommandSource> ct, PlayerHudDataSender playerHudC, Class<?> cl) {
+	private static void addListenedWithName(CommandContext<ServerCommandSource> ct, HudDataSender playerHudC, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
 		if(!playerHudC.addField(cl, field, name, null)) {
@@ -211,7 +211,7 @@ public class HudCommand {
 		}
 	}
 	
-	private static void addListened(CommandContext<ServerCommandSource> ct, PlayerHudDataSender playerHudC, Class<?> cl) {
+	private static void addListened(CommandContext<ServerCommandSource> ct, HudDataSender playerHudC, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		if(!playerHudC.addField(cl, field)) {
 			CommandUtil.error(ct, "exp.dupfield");

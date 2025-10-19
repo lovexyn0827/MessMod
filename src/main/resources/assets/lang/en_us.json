@@ -6,8 +6,11 @@
 		"cmd.general.unsub" : "Found %d entities, and unsubscribed %d entities among them", 
 		"cmd.general.subgen" : "Subscribed %s", 
 		"cmd.general.unsubgen" : "Unsubscribed %s", 
+		"cmd.general.subdup" : "%s has already been subscribed!", 
 		"cmd.general.submulti" : "Subscribed %d items: %s", 
 		"cmd.general.unsubmulti" : "Unsubscribed %d items: %s", 
+		"cmd.general.submulticnt" : "Subscribed %d items", 
+		"cmd.general.unsubmulticnt" : "Unsubscribed %d items", 
 		"cmd.general.found" : "Found at (%d, %d, %d)", 
 		"cmd.general.notfound" : "Not found", 
 		"cmd.general.nodef" : "%s hasn't been defined", 
@@ -23,6 +26,8 @@
 		"cmd.general.flush" : "Flushed all changes", 
 		"cmd.general.count" : "%d active subscribed entity in total", 
 		"cmd.general.reqmixin" : "%s requires advanced mixin %s", 
+		"cmd.general.alexist" : "%s has already exists!", 
+		"cmd.general.alstartlog" : "The recorder / logger has already started!", 
 		
 		//***** accessingpath *****
 		"cmd.accessingpath.filefail" : "Failed to load saved custom nodes: %s", 
@@ -31,6 +36,10 @@
 		
 		//***** countentities *****
 		"cmd.countentities.result" : "%d entities were found.", 
+		
+		//***** drawshape *****
+		"cmd.drawshape.imgfail": "Failed to load image!", 
+		"cmd.drawshape.malurl": "Malformed URL: %s", 
 		
 		//***** ensure *****
 		"cmd.ensure.usage" : "TODO", 
@@ -69,6 +78,11 @@
 		//***** hud *****
 		"cmd.hud.reqsinglepf" : "Epected 1 targets, but %d targets were found.", 
 		
+		//***** loadjavaagent *****
+		"cmd.loadjavaagent.loadsuc": "Loaded Java agent: %s", 
+		"cmd.loadjavaagent.fail": "Failed to load agent!", 
+		"cmd.loadjavaagent.malurl": "Malformed URL!", 
+		
 		//***** lag *****
 		"cmd.lag.unsupported" : "Unable to access thread %s in the dedicated server environment.", 
 		"cmd.lag.done" : "Lagging completed", 
@@ -77,6 +91,13 @@
 		"cmd.logchunkbehavior.reqidle" : "This operation is only available when the logger is not working.", 
 		"cmd.logchunkbehavior.alreadystarted" : "The logger has already been started.", 
 		"cmd.logchunkbehavior.alreadystopped" : "The logger has alerady been stopped.", 
+		
+		//***** logdeath *****
+		"cmd.logdeath.fmterr" : "Incorrect format for death info specifier. Try something like pillager+arrow(projectile)->villager.", 
+		"cmd.logdeath.nonnull" : "null is not allowed here!", 
+		"cmd.logdeath.noentype" : "Entity type %s is not defined!", 
+		"cmd.logdeath.dmginf" : "\n ======= Damage =======", 
+		"cmd.logdeath.vctinf" : "\n ======= Victim =======", 
 		
 		//***** messcfg *****
 		"cmd.messcfg.list" : "Current Options", 
@@ -90,7 +111,9 @@
 		"cmd.messcfg.set" : "Option %s is now set to %s", 
 		"cmd.messcfg.setglobal" : "Option %s is now set to %s globally", 
 		"cmd.messcfg.globalonly" : "Option %s isn't supported in save-local storage, please click here to set it globally.", 
-		"cmd.messcfg.withtag" : "Options with tag %s:", 
+		"cmd.messcfg.withtag" : "Options with tag %s (%s):", 
+		"cmd.messcfg.deprecated" : "\nThis option is deprecated, and modification to its value is no longer recommended！", 
+		"cmd.messcfg.labels" : "Categories (click for details):", 
 		
 		//***** modify *****
 		"cmd.modify.usags" : "TODO", 
@@ -121,6 +144,16 @@
 		//***** variable *****
 		"cmd.variable.reqarray" : "The object in this slot should be an array", 
 		"cmd.variable.invconstructor" : "Failed to parse constructor.\nShould be something like java/lang/Integer<1>, java/lang/Integer<I>V, or java/lang/Integer.", 
+		
+		//***** wavegen *****
+		"cmd.wavegen.reqloom" : "The block at targeted position must be a loom!", 
+		"cmd.wavegen.err.empty" : "There should be one stage in the waveform definition at least.", 
+		"cmd.wavegen.err.stgfmt" : "There is syntax error in waveform definition. Examples: (!1ENTITY=>!2)L15", 
+		"cmd.wavegen.err.stgfmt.simp" : "There is syntax error in waveform definition. Examples: SH17L18H3L16", 
+		"cmd.wavegen.err.reqorder" : "Stages should be ordered and should not overlap", 
+		"cmd.wavegen.err.tobeforefrom" : "Start time of stages shouldn't appear after its end time!", 
+		"cmd.wavegen.err.largeoffset" : "Time offset (%d) should be less than the length of waveform (%d)", 
+		"cmd.wavegen.reqopt" : "The waveform won't take effect until the option `loomWaveGenerator` is enabled. (You may enable it with `/messcfg loomWaveGenerator true`)", 
 		
 		//***** Exceptions *****
 		"exp.reqint" : "Requires an integer, but found %s", 
@@ -162,6 +195,8 @@
 		"exp.unknownescape" : "Unsupported escape: %s", 
 		"exp.incompquote" : "Incomplete quote", 
 		"exp.noconstructor" : "Specified constructor was not found in %s",
+		"exp.atleast1dim" : "At least one dimension size is required in array definition.", 
+		"exp.invarray" : "%s is not a valid representation of an array!", 
 		
 		//***** HUDs *****
 		"hud.target" : "Looking At Entity HUD: ", 
@@ -171,7 +206,7 @@
 		//***** Options *****
 		"opt.accessingPathDynamicAutoCompletion.desc" : "Support suggestions for fields and methods when auto completing Accessing paths.", 
 		"opt.accessingPathInitStrategy.desc" : "There are there initializing strategies available: \n- Legacy strategy: Accessing paths are only initialized once for its first input, then the result, including the resolved `Member` instances and so on, will be used to handle all subsequent inputs.\n- Standard strategy: Accessing paths are parsed for every different inputs, and the parsed copies are cached until the inputs are discarded by the garbage collector.\n- Strict Strategy: Accessing paths are reinitialized each time they are used.", 
-		"opt.allowSelectingDeadEntities.desc" : "Allow entity selector `@e` dead entities.", 
+		"opt.allowSelectingDeadEntities.desc" : "Allow entity selector `@e` to select dead entities.", 
 		"opt.allowTargetingSpecialEntities.desc" : "Allow the player to target entities like items, snowballs and arrows, enabling command suggestions for them.",
 		"opt.antiHostCheating.desc" : "Enable anti-cheating for the host player in the SP & LAN game.", 
 		"opt.attackableTnt.desc" : "TNT entities can be killed by players' attacking.", 
@@ -183,13 +218,19 @@
 		"opt.chunkLoadingInfoRenderer.desc" : "Display the loading status when holding a nautilus shell. May be moved to the ChunkMap later.", 
 		"opt.chunkLoadingInfoRenderRadius.desc" : "The radius of the area where chunk loading statuses are displayed, in chunks.", 
 		"opt.chunkLogAutoArchiving.desc" : "Archive the chunk behavior log produced within a single session automatically, if any. These archives can be found in the folder `World Folder/chunklog/archives`.", 
-		"opt.commandExecutionRequirment.desc" : "Whether or not the execution of commands defined by this mod require OP permission.",  
+		"opt.clayBlockPlacer.desc" : "Place any technical blocks (e.g. nether portals) with clay balls. Clay balls should be named to specify the block to place. For example, with a clay ball named `grass_block[snowy=true]`, you can place snowy grass blocks by right clicks.", 
+		"opt.commandExecutionRequirment.desc" : "Whether or not the execution of commands defined by this mod require OP permission.", 
 		"opt.craftingTableBUD.desc" : "Detect the block updates received by crafting tables.", 
+		"opt.creativeNoVoidDamage.desc" : "Disable void damage for players in creative-like modes.", 
 		"opt.creativeUpwardsSpeed.desc" : "Set the vertical speed flying speed in the creative mode. The actual terminal speed (in m/s) of players is roughly 150 * `creativeUpwardsSpeed`.", 
 		"opt.debugStickSkipsInvaildState.desc" : "Prevent debug sticks from changing blocks to an invalid state. By now, the option doesn't work in many cases, for example, changing the `shape` property of a rail can still turn the rail into an illegal state and have the rail broken. ", 
 		"opt.dedicatedServerCommands.desc" : "Enable commands for dedicated servers in single-player games.", 
 		"opt.defaultSaveComponents.desc" : "Save components that are included in export saves by default.", 
+		"opt.detailedChunkTaskLogging.desc" : "More details of chunk tasks are included in log files generated with `/logchunkbehavior`.", 
+		"opt.directChunkAccessForMessMod.desc" : "Some continuously working parts in MessMod like renderers can access chunks from `ThreadedAnvilChunkStorage` directly, without using `ServerChunkManager`, to avoid potential impact on the behaviors of the chunk managerment system.", 
 		"opt.disableChunkLoadingCheckInCommands.desc" : "As the name says, you can fill some blocks in unloaded chunks.", 
+		"opt.disableClientChunkUnloading.desc" : "Ignore chunk unloading requests from the server.", 
+		"opt.disableCreativeForcePickup.desc" : "Creative players with full a inventory don't pick up items and arrows anymore.", 
 		"opt.disableItemUsageCooldown.desc" : "Disable item usages cooldown for ender pearls and chorus fruits, etc.", 
 		"opt.disableEnchantCommandRestriction.desc" : "Remove the restriction on enchantment level and compatibility from `/enchant`.", 
 		"opt.disableExplosionExposureCalculation.desc" : "Disable the calculation of explosion exposure to reduce the lag caused by stacked TNT explosions, especially when the TNTs are at the same spot. This will also mean that blocks cannot prevent entities from being influenced by explosions. \nThis feature may not work properly if the Lithium is loaded.", 
@@ -201,6 +242,7 @@
 		"opt.dumpTargetEntitySummonCommand.desc" : "Generate a command to summon the target entity. If the held item is enchanted, the full NBT data with UUID(s) stripped off are included in the generated command, otherwise, only the entity type, dimension, position, motion and rotation are present in the command.", 
 		"opt.enabledTools.desc" : "Item tools, which make bone and bricks useful. Requires carpet-fabric.\n - Bone: `/tick step <countOfBones>` \n - Brick: `/tick freeze` \n - Netherite Ingot: `/kill @e[type!=player]`", 
 		"opt.endEyeTeleport.desc" : "When the player uses ender eyes, teleport it to where it looks at.", 
+		"opt.entityExplosionImpulseScale.desc" : "Scale the acceleration caused by explosions.", 
 		"opt.entityExplosionInfluence.desc" : "Tell you how entities are affected by explosions. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.\nIncompatible with Lithium.", 
 		"opt.entityExplosionRaysVisiblity.desc" : "Explosion ray (used in the calculation of the exposure of entities) renderer. Remember to turn it off if you are going to test something like TNT compressors, or the game will be frozen.", 
 		"opt.entityExplosionRaysLifetime.desc" : "The number of ticks the rendered rays remains. ", 
@@ -209,8 +251,13 @@
 		"opt.fillHistory.desc" : "Record block changes caused by `/fill` so that they can be undone or redone later.", 
 		"opt.fletchingTablePulseDetectingMode.desc" : "Specify which type of pulses are recorded.", 
 		"opt.fletchingTablePulseDetector.desc" : "Record the lengths of redstone signal pulses received by fletching tables.", 
+		"opt.flowerFieldRenderer.desc" : "Displays which type of flower can generate within a given area when using bone meals.", 
+		"opt.flowerFieldRendererRadius.desc" : "Maximum rendering distance of `flowerFieldRenderer`.", 
+		"opt.flowerFieldRendererSingleLayer.desc" : "Render flower fields at the same level (the highest level within range).", 
 		"opt.generateChunkGrid.desc" : "Generate a layer of glass on the ground to show the chunks.", 
 		"opt.getEntityRangeExpansion.desc" : "In the vanilla `getEntities()` method, only entities that are in subchunks whose Cheshev distances to the given AABB are smaller than 2 blocks are seen. Usually, it doesn't matter, but when the height of some of the entities is greater than 2 blocks or the width is greater than 4 blocks, it can lead to some problems, especially when the entity is close to the boundary of subchunks. Changing it to a higher value may fix some bugs about the interaction between entities and something else.", 
+		"opt.hayOscilloscope.desc" : "Make hay block a oscilloscope / logic analyzer.", 
+		"opt.hayOscilloscopeChannelVisibilityBroadcast.desc" : "Synchronize visibility setting of oscilloscope channels on all clients.", 
 		"opt.hideSurvivalSaves.desc" : "Hide worlds that are likely to be survival saves to prevent it from being opened accidentally. Can only be set globally.", 
 		"opt.hotbarLength.desc" : "The number of item stacks the hotbar can contain. Note that this feature is not finished currently, some features like saving hotbars are not available.", 
 		"opt.hudAlignMode.desc" : "Move the HUDs to a given location.", 
@@ -219,30 +266,39 @@
 		"opt.independentEntityPickerForInfomation.desc" : "Pick crosshair-targeted entities for information providers (currently only the UUID suggestor) independently.", 
 		"opt.interactableB36.desc" : "Allow players to break block-36s and place something against it.", 
 		"opt.language.desc" : "The main language of the Mod.", 
+		"opt.loomWaveGenerator.desc" : "Make loom blocks a wave generator, whose output can be configurated with `/wavegen`.", 
 		"opt.maxClientTicksPerFrame.desc" : "The maximum number of client-side ticks can be processed within a single frame when the FPS is lower than 20.", 
 		"opt.maxEndEyeTpRadius.desc" : "Set the maximum range of teleportation with `endEyeTeleport`.", 
 		"opt.minecartPlacementOnNonRailBlocks.desc" : "Allow players to place minecarts directly on the ground.", 
 		"opt.mobFastKill.desc" : "`/kill` kill mobs by removing them directly instead of damaging them.", 
 		"opt.optimizedEntityPushing.desc" : "Skip the calculation of cramming between entities which wouldn't be pushed. The damage caused by entity cramming will be influenced.", 
+		"opt.playerInputsWhenScreenOpened.desc" : "Allow players to move and turn around while typing commands, etc., if a hotkey, `F6` by default, is pressed.", 
+		"opt.playerInputsWhenScreenOpenedHotkey.desc" : "Hotkeys for `playerInputsWhenScreenOpened`, specified by a key code.\n - `F1` - `F12`: 290 - 301", 
 		"opt.projectileChunkLoading.desc" : "Allow projectiles to load chunks for themselves in their calculations, which may be helpful in testing pearl canons.  Note that if a projectile flies at a extremely high speed when the option is set to true, the server may be lagged greatly.", 
 		"opt.projectileChunkLoadingRange.desc" : "Set the radius of entity processing chunks loaded by `projectileChunkLoading`.", 
 		"opt.projectileChunkLoadingPermanence.desc" : "Projectiles load the chunks permanently when `projectileChunkLoading` is enabled.", 
 		"opt.projectileRandomnessScale.desc" : "The amount of the randomness of projectiles. Most projectiles will have their additional random initial speeds multipled by the value of this option.", 
 		"opt.quickMobMounting.desc" : "Placing mobs into vehicles.", 
 		"opt.quickStackedEntityKilling.desc" : "Kill the entity being knocked by a brick, along with all entities being at the same position as it.", 
+		"opt.quickStackedEntityKillingOneTypeOnly.desc" : "Only entities of the same type as the entity the entity directly attacked by the play are killed when using `quickStackedEntityKilling`.", 
 		"opt.railNoAutoConnection.desc" : "Prevent the shape of rails from being changed by surrounding rails.", 
 		"opt.rejectChunkTicket.desc" : "Prevent the chunks from being loaded in some ways.", 
 		"opt.renderBlockShape.desc" : "Enhanced block outline renderer.", 
 		"opt.renderFluidShape.desc" : "Display the outlines, heights, and vectors describing the flowing directions of the target fluid blocks.", 
 		"opt.renderRedstoneGateInfo.desc" : "Display the output level of repeaters and comparators the player looks at.", 
+		"opt.resistanceReducesVoidDamage.desc" : "Entities with resistance effect are protected from void damages.", 
 		"opt.serverSyncedBox.desc" : "Enable or disable the server-side hitbox renderer.", 
 		"opt.serverSyncedBoxRenderRange.desc" : "The maximum Cheshev distance between the player and the entities with their bounding boxes rendered. All non-positive values are considered as positive infinite.", 
 		"opt.serverSyncedBoxUpdateModeInFrozenTicks.desc" : "What the server-side hitbox renderer should do in ticks frozen by the Carpet.", 
 		"opt.skipUnloadedChunkInRaycasting.desc" : "Ignore potential collisions in unloaded chunks in raycasts. Enabling it may speed up long-distance raycasts.", 
 		"opt.skippedGenerationStages.desc" : "Skip some stages in the world generation. Skipping stage `biome` and `full` is not supported, as the absence of them will make the server crash." , 
+		"opt.smartCursorMode.desc" : "Allow cursors to stop at word delimiters other than spaces (e.g. commas in entity selectors) when editing commands with Ctrl + Arrow or Ctrl + Backspace.", 
+		"opt.smartCursorCustomWordDelimiters.desc" : "A list of word delimiters, used when smartCursorMode = CUSTOM. Any characters apperas in this option will be recognized as a word delimiter.", 
 		"opt.stableHudLocation.desc" : "Make the location of HUDs more stable when the length of lines change frequently.", 
 		"opt.strictAccessingPathParsing.desc" : "Parse accessing paths more strictly, to make them more reliable. Currently the strictly checking system is not completed, so it is not recommended to enable it.", 
 		"opt.superSuperSecretSetting.desc" : "wlujkgfdhlqcmyfdhj...Never turn it on!", 
+		"opt.survivalStatusBarInCreativeMode.desc" : "Dispaly survival status bar (health & hungry) in creative mode.", 
+		"opt.survivalXpBarInCreativeMode.desc" : "Dispaly experience bar in creative mode.", 
 		"opt.tntChunkLoading.desc" : "Allow TNT entities to load chunks for themselves in their ticking, which may be helpful in designing some kinds of TNT canons.", 
 		"opt.tntChunkLoadingPermanence.desc" : "TNT entities load the chunks permanently when `tntChunkLoading` is enabled.", 
 		"opt.tntChunkLoadingRange.desc" : "The radius of entity processing chunks loaded by `tntChunkLoading`.", 
@@ -260,6 +316,54 @@
 		"opt.err.reqcarpet" : "This option require Carpet to function!", 
 		"opt.err.reqbool" : "Use true of false here!", 
 		"opt.err.conflict.carpet.1425" : "This option conflicts with Carpet 1.4.25 and above!", 
+		
+		//***** Labels of options *****
+		"opt.label.HIGHLIGHT.name" : "Highlights", 
+		"opt.label.RENDERER.name" : "Renderers", 
+		"opt.label.INTERACTION_TWEAKS.name" : "Tweakers", 
+		"opt.label.RESEARCH.name" : "Research", 
+		"opt.label.REDSTONE.name" : "Redstone", 
+		"opt.label.ENTITY.name" : "Entity", 
+		"opt.label.MESSMOD.name" : "MessMod", 
+		"opt.label.EXPLOSION.name" : "Explosion", 
+		"opt.label.CHUNK.name" : "Chunk", 
+		"opt.label.BUGFIX.name" : "BugFix", 
+		"opt.label.BREAKING_OPTIMIZATION.name" : "Optimization", 
+		"opt.label.MISC.name" : "Misc", 
+		
+		"opt.label.HIGHLIGHT.desc" : "The most frequently-used features.", 
+		"opt.label.RENDERER.desc" : "Options to enable and configure renders", 
+		"opt.label.INTERACTION_TWEAKS.desc" : "Interaction tweakers.", 
+		"opt.label.RESEARCH.desc" : "Helpful when dealing with details of game mechanics.", 
+		"opt.label.REDSTONE.desc" : "The redstone debugging toolkit.", 
+		"opt.label.ENTITY.desc" : "Stuff releated with entities.", 
+		"opt.label.MESSMOD.desc" : "Configurations of the Mod itself and its features.", 
+		"opt.label.EXPLOSION.desc" : "Observe or change the behaviors of explosions.", 
+		"opt.label.CHUNK.desc" : "Chunk loading & world generation.", 
+		"opt.label.BUGFIX.desc" : "Bug fixes.", 
+		"opt.label.BREAKING_OPTIMIZATION.desc" : "Aggressive optimizations, may change the behavior.", 
+		"opt.label.MISC.desc" : "Uncategorized stuff.", 
+		
+		//***** Oscilscope *****
+		"oscilscope.gui.title" : "Oscilscope", 
+		"oscil.gui.trigmode.RISING" : "Rising Edge", 
+		"oscil.gui.trigmode.FALLING" : "Falling Edge", 
+		"oscil.gui.trigmode.BOTH" : "Both", 
+		"oscil.gui.trigmode.NONE" : "None", 
+		"oscil.gui.show" : "Show", 
+		"oscil.gui.active" : "Active Probing", 
+		"oscil.gui.triginf" : "Channel %d @ %d", 
+		"oscil.gui.mode" : "Mode", 
+		"oscil.gui.mode.analog" : "Analog Mode", 
+		"oscil.gui.mode.digital" : "Digital Mode", 
+		"oscil.gui.tickaligned" : "Align to tick", 
+		"oscil.gui.storage" : "Storage depth", 
+		"oscil.gui.reset" : "Reset", 
+		"oscil.gui.chinf.1" : "Channel %d", 
+		"oscil.gui.chinf.2" : "Dimension: %s", 
+		"oscil.gui.chinf.x" : "X: %d", 
+		"oscil.gui.chinf.y" : "Y: %d", 
+		"oscil.gui.chinf.z" : "Z: %d", 
 		
 		//***** Misc *****
 		"misc.negativeid" : "The value of id cannot be negative", 
