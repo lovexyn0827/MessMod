@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.command.TranslatableCommandExceptionType;
 import lovexyn0827.mess.fakes.EntitySelectorReaderInterface;
 import lovexyn0827.mess.util.i18n.I18N;
 import net.minecraft.command.CommandSource;
@@ -28,9 +28,8 @@ import net.minecraft.text.Text;
 
 @Mixin(EntitySelectorOptions.class)
 public class EntitySelectorOptionsMixin {
-	// FIXME Dynamic translation
-	private static final SimpleCommandExceptionType NEGATIVE_ID_EXCEPTION = 
-			new SimpleCommandExceptionType(new LiteralText(I18N.translate("misc.negativeid")));
+	private static final TranslatableCommandExceptionType NEGATIVE_ID_EXCEPTION = 
+			new TranslatableCommandExceptionType("misc.negativeid");
 	private static final DynamicCommandExceptionType UNDEFINED_EXCEPTION = 
 			new DynamicCommandExceptionType((side) -> {
 				return new LiteralText(I18N.translate("cmd.general.nodef", side));
