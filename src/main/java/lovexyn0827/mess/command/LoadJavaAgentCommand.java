@@ -22,7 +22,6 @@ public class LoadJavaAgentCommand {
 				.then(literal("fromFile")
 						.then(argument("path", StringArgumentType.greedyString())
 								.executes((ct) -> {
-									// TODO Translate
 									boolean success = false;
 									Path jarPath = Paths.get(StringArgumentType.getString(ct, "path"));
 									try {

@@ -4,11 +4,8 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
