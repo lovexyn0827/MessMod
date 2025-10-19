@@ -6,15 +6,32 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import io.netty.buffer.Unpooled;
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.network.Channels;
 import lovexyn0827.mess.util.phase.ServerTickingPhase;
 
 import org.spongepowered.asm.mixin.injection.At;
 
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.CustomPayloadS2CPacket;
 import net.minecraft.server.MinecraftServer;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
+	@Inject(method = "tick", at = @At("HEAD"))
+	public void onTickStart(BooleanSupplier bs, CallbackInfo ci) {
+		// Actually here is before WTU and thus +1 is necessary for consistence
+		long gameTime = ((MinecraftServer)(Object) this).getOverworld().getTime() + 1;
+		MessMod.INSTANCE.updateTime(gameTime);
+		if (MessMod.isDedicatedServerEnv()) {
+			PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+			buf.writeLong(gameTime);
+			CustomPayloadS2CPacket timePkt = new CustomPayloadS2CPacket(Channels.TIME, buf);
+			MessMod.INSTANCE.getServerNetworkHandler().sendToEveryone(timePkt);
+		}
+	}
+	
 	@Inject(method = "tick", at = @At(value = "RETURN"))
 	public void onTicked(BooleanSupplier bs, CallbackInfo ci) {
 		ServerTickingPhase.TICKED_ALL_WORLDS.begin(null);

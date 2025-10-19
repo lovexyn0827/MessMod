@@ -29,7 +29,7 @@ public class RemoteShapeSender implements ShapeSender {
 		buffer.writeNbt(shape.toTag(tag));
 		CustomPayloadS2CPacket packet = new CustomPayloadS2CPacket(Channels.SHAPE, buffer);
 		if(player == null) {
-			this.server.getPlayerManager().sendToDimension(packet, dim);
+			this.server.getPlayerManager().sendToAll(packet);
 		} else {
 			if(player.networkHandler != null) {
 				player.networkHandler.sendPacket(packet);

@@ -2,8 +2,12 @@ package lovexyn0827.mess.util;
 
 import java.util.Optional;
 
+import lovexyn0827.mess.fakes.ServerWorldInterface;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.EntityView;
 
 public final class RaycastUtil {
 	public static Entity getTargetEntity(Entity player) {
@@ -12,7 +16,9 @@ public final class RaycastUtil {
 		Vec3d max = pos.add(direction);
 		Entity target = null;
 		double minDistance = 18;
-		for(Entity entity : player.world.getEntitiesByClass((Class<? extends Entity>) Entity.class, 
+		EntityView world = OptionManager.directChunkAccessForMessMod && player.world instanceof ServerWorld ? 
+				((ServerWorldInterface) player.world).toNoChunkLoadingWorld() : player.world;
+		for(Entity entity : world.getEntitiesByClass((Class<? extends Entity>) Entity.class, 
 				player.getBoundingBox().expand(10),  
 				(e) -> e != player)) {
 			if(entity.getId() == player.getId()) {

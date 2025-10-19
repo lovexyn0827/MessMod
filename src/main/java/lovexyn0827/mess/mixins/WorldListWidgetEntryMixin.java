@@ -39,7 +39,7 @@ public abstract class WorldListWidgetEntryMixin {
 					this.start();
 					this.client.startIntegratedServer(this.level.getName());
 				} else {
-					this.client.setScreen(screen);
+					this.client.setScreen(this.screen);
 				}
 			};
 			this.client.setScreen(new ConfirmScreen(bc, new FormattedText("misc.warnsur.title", "cl").asMutableText(), 

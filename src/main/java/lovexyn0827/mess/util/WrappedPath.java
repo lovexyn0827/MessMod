@@ -64,6 +64,10 @@ public class WrappedPath implements HudLine, Comparable<HudLine> {
 
 	@Override
 	public @NotNull String getFrom(Entity in) {
+		return this.getFrom((Object) in);
+	}
+	
+	public @NotNull String getFrom(Object in) {
 		try {
 			Object ob = this.path.access(in, in.getClass());
 			return ob != null ? ob.toString() : "null";

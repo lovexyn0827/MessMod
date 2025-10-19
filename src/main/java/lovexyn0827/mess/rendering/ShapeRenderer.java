@@ -98,7 +98,14 @@ public class ShapeRenderer {
         synchronized (shapes) {
         	this.shapes.getAllShapes().values().forEach((map) -> {
     			map.forEach((space3, set) -> {
-                	set.removeIf((entry) -> entry.isExpired(this.shapes.getTime()));
+                	set.removeIf((entry) -> {
+                		if (entry.isExpired(this.shapes.getTime())) {
+                			entry.close();
+                			return true;
+                		} else {
+                			return false;
+                		}
+                	});
                 });
     		});
         	shapesInDim.forEach((space, set) -> {

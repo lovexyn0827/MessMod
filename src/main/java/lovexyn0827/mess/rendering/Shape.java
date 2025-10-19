@@ -1,5 +1,7 @@
 package lovexyn0827.mess.rendering;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -58,6 +60,7 @@ public abstract class Shape {
 		return this.life + this.createdTime - gameTime < 0;
 	}
 
+	@Nullable
 	protected NbtCompound toTag(NbtCompound tag) {
 		tag.putString("ID", IDS.inverse().get(this.getClass()));
 		tag.putInt("Color", this.color);
@@ -66,7 +69,11 @@ public abstract class Shape {
 		tag.putLong("GT", this.createdTime);
 		return tag;
 	}
+	
+	protected void close() {
+	}
 
+	@Nullable
 	public static Shape fromTag(NbtCompound tag) {
 		switch(tag.get("ID").asString()) {
 		case "box" : 
@@ -78,9 +85,13 @@ public abstract class Shape {
 					new Vec3d(tag.getDouble("X1"), tag.getDouble("Y1"), tag.getDouble("Z1")), 
 					tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
 		case "text" : 
+			float scale = tag.contains("scale") ? tag.getFloat("Scale") : 1.0F;
 			return new RenderedText(tag.getString("Value"), 
 					new Vec3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z")), 
-							tag.getInt("Color"), tag.getInt("Life"), tag.getLong("GT"));
+							tag.getInt("Color"), scale, tag.getInt("Life"), tag.getLong("GT"));
+		case "bitmap" : 
+			// XXX Will GZIP bring some performance improvement?
+			return RenderedBitmap.fromTag(tag);
 		}
 		
 		return null;
@@ -90,5 +101,6 @@ public abstract class Shape {
 		IDS.put("box", RenderedBox.class);
 		IDS.put("line", RenderedLine.class);
 		IDS.put("text", RenderedText.class);
+		IDS.put("bitmap", RenderedBitmap.class);
 	}
 }

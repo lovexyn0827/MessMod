@@ -129,6 +129,7 @@ public class PoiCommand {
 		}
 		
 		poiList.forEach(action);
+		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
 

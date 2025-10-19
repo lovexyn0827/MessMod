@@ -8,6 +8,7 @@ import org.objectweb.asm.Type;
 /**
  * @implSpec The input, instead of {@code null} should be returned if the corresponding entries doesn't exist.
  */
+// TODO Handle array classes gracefully
 public interface Mapping {
 	/**
 	 * Get the deobfuscated name of a class from its srg name
@@ -107,6 +108,17 @@ public interface Mapping {
 		return named.substring(named.lastIndexOf('.') + 1, named.length());
 	}
 	
+	/**
+	 * @see Mapping#namedClass(String)
+	 */
+	default String namedClass(Class<?> clz) {
+		return this.namedClass(clz.getName());
+	}
+	
+	default String simpleNamedClass(Class<?> clz) {
+		return this.simpleNamedClass(clz.getName());
+	}
+	
 	default String srgDescriptor(String namedDesc) {
 		if(namedDesc.isEmpty()) {
 			throw new IllegalArgumentException("Descriptors mustn't be empty!");
@@ -133,6 +145,32 @@ public interface Mapping {
 		}
 	}
 	
+	default String namedDescriptor(String srgDesc) {
+		if(srgDesc.isEmpty()) {
+			throw new IllegalArgumentException("Descriptors mustn't be empty!");
+		}
+		
+		switch(srgDesc.charAt(0)) {
+		case 'I':
+		case 'F':
+		case 'D':
+		case 'Z':
+		case 'J':
+		case 'B':
+		case 'S':
+		case 'C':
+		case 'V':
+			return srgDesc;
+		case '[':
+			return '[' + this.namedDescriptor(srgDesc.substring(1));
+		case 'L':
+			return 'L' + this.namedClass(srgDesc.substring(1, srgDesc.length() - 1)
+					.replace('/', '.')).replace('.', '/') + ';';
+		default :
+			throw new IllegalArgumentException("Malformed descriptor: " + srgDesc);
+		}
+	}
+	
 	default String srgMethodDescriptor(String namedDesc) {
 		Type descType = Type.getMethodType(namedDesc);
 		Type[] srgArgTypes = Arrays.stream(descType.getArgumentTypes())
@@ -142,6 +180,18 @@ public interface Mapping {
 				.toArray((count) -> new Type[count]);
 		return Type.getMethodDescriptor(Type.getType(this.srgDescriptor(descType.getReturnType().getDescriptor())), 
 				srgArgTypes);
+		
+	}
+	
+	default String namedMethodDescriptor(String srgDesc) {
+		Type descType = Type.getMethodType(srgDesc);
+		Type[] namedArgTypes = Arrays.stream(descType.getArgumentTypes())
+				.map(Type::getDescriptor)
+				.map(this::namedDescriptor)
+				.map(Type::getType)
+				.toArray((count) -> new Type[count]);
+		return Type.getMethodDescriptor(Type.getType(this.namedDescriptor(descType.getReturnType().getDescriptor())), 
+				namedArgTypes);
 		
 	}
 }

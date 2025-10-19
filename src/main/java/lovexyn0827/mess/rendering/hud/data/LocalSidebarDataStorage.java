@@ -1,6 +1,7 @@
 package lovexyn0827.mess.rendering.hud.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -11,9 +12,12 @@ import lovexyn0827.mess.util.phase.TickingPhase;
 
 import java.util.TreeMap;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
+@Environment(EnvType.CLIENT)
 public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorage {
 	private TreeMap<HudLine, Object> data = new TreeMap<>();
 	private List<HudLine> lines = new ArrayList<>();
@@ -21,15 +25,15 @@ public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorag
 	public LocalSidebarDataStorage() {
 		this.registerTickingEvents();
 	}
+
+	@Override
+	public Collection<HudLine> getLines() {
+		return this.lines;
+	}
 	
 	@Override
 	public void updateData(Entity entity) {
 		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public List<HudLine> getCustomLines() {
-		return this.lines;
 	}
 
 	@Override
@@ -61,5 +65,4 @@ public class LocalSidebarDataStorage implements SidebarDataSender, HudDataStorag
 			}
 		});
 	}
-
 }

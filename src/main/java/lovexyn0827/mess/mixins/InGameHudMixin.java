@@ -1,18 +1,34 @@
 package lovexyn0827.mess.mixins;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import lovexyn0827.mess.options.OptionManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
 
 @Mixin(InGameHud.class)
-public class InGameHudMixin extends DrawableHelper {
+public abstract class InGameHudMixin extends DrawableHelper {
+	@Shadow
+	private @Final MinecraftClient client;
+	
+	@Shadow
+	abstract void renderStatusBars(MatrixStack matrices);
+	
+	@Shadow
+	abstract void renderExperienceBar(MatrixStack matrices, int x);
+	
 	@ModifyConstant(method = "renderHotbar", constant = @Constant(intValue = 9))
 	private int modifyHotbarLength(int lengthO) {
 		return OptionManager.hotbarLength;
@@ -44,6 +60,32 @@ public class InGameHudMixin extends DrawableHelper {
 			for(int i = 0; i < slots; i++) {
 				hud.drawTexture(matrices, x + i * 20 + 1, y, 1, 0, 20, 22);
 			}
+		}
+	}
+	
+	@Inject(method = "render", 
+			at = @At(value = "INVOKE", 
+					target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;hasStatusBars()Z"
+			)
+	)
+	private void drawSurivialHudInCreativeMode(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+		if (OptionManager.survivalStatusBarInCreativeMode 
+				&& this.client.interactionManager.getCurrentGameMode().isCreative()) {
+			this.renderStatusBars(matrices);
+		}
+	}
+	
+	@Inject(method = "render", 
+			at = @At(value = "INVOKE", 
+					target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;hasExperienceBar()Z"
+			), 
+			locals = LocalCapture.CAPTURE_FAILHARD
+	)
+	private void drawSurivialXpBarInCreativeMode(MatrixStack matrices, float tickDelta, CallbackInfo ci, 
+			TextRenderer textRenderer, int i) {
+		if (OptionManager.survivalXpBarInCreativeMode 
+				&& this.client.interactionManager.getCurrentGameMode().isCreative()) {
+			this.renderExperienceBar(matrices, i);
 		}
 	}
 }

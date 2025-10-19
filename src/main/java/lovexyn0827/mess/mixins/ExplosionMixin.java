@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -49,6 +50,7 @@ public abstract class ExplosionMixin {
 		return customFireState == null ? fireState : customFireState;
 	}
 	
+	// Actually this version is better as invocations is fewer.
 	@Inject(method = "getExposure",
 			at = @At(value = "INVOKE",
 							target = "Lnet/minecraft/world/World;raycast"
@@ -108,5 +110,16 @@ public abstract class ExplosionMixin {
 			cir.setReturnValue(1.0F);
 			cir.cancel();
 		}
+	}
+	
+	@ModifyVariable(method = "collectBlocksAndDamageEntities", 
+			at = @At(value = "INVOKE",
+					target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", 
+					shift = At.Shift.AFTER
+			), 
+			index = 26
+	)
+	private double scaleImpulse(double in) {
+		return in * OptionManager.entityExplosionImpulseScale;
 	}
 }
