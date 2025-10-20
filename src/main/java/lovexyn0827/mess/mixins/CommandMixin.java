@@ -13,33 +13,42 @@ import com.mojang.brigadier.CommandDispatcher;
 
 import lovexyn0827.mess.command.AccessingPathCommand;
 import lovexyn0827.mess.command.CountEntitiesCommand;
+import lovexyn0827.mess.command.DrawShapeCommand;
 import lovexyn0827.mess.command.EnsureCommand;
 import lovexyn0827.mess.command.EntityConfigCommand;
 import lovexyn0827.mess.command.EntityFieldCommand;
 import lovexyn0827.mess.command.EntityLogCommand;
 import lovexyn0827.mess.command.ExplodeCommand;
 import lovexyn0827.mess.command.ExportSaveCommand;
+import lovexyn0827.mess.command.FillInventoryCommand;
 import lovexyn0827.mess.command.FreezeEntityCommand;
 import lovexyn0827.mess.command.EntitySidebarCommand;
 import lovexyn0827.mess.command.HudCommand;
 import lovexyn0827.mess.command.LagCommand;
 import lovexyn0827.mess.command.LazyLoadCommand;
+import lovexyn0827.mess.command.LoadJavaAgentCommand;
 import lovexyn0827.mess.command.LogChunkBehaviorCommand;
+import lovexyn0827.mess.command.LogDeathCommand;
 import lovexyn0827.mess.command.LogMovementCommand;
 import lovexyn0827.mess.command.LogPacketCommand;
 import lovexyn0827.mess.command.MessCfgCommand;
 import lovexyn0827.mess.command.ModifyCommand;
 import lovexyn0827.mess.command.MoveEntityCommand;
 import lovexyn0827.mess.command.NameEntityCommand;
+import lovexyn0827.mess.command.NameItemCommand;
 import lovexyn0827.mess.command.PartlyKillCommand;
 import lovexyn0827.mess.command.PoiCommand;
 import lovexyn0827.mess.command.RaycastCommand;
 import lovexyn0827.mess.command.RepeatCommand;
 import lovexyn0827.mess.command.RideCommand;
 import lovexyn0827.mess.command.RngCommand;
+import lovexyn0827.mess.command.SetBlockRawCommand;
 import lovexyn0827.mess.command.SetExplosionBlockCommand;
+import lovexyn0827.mess.command.StackEntityCommand;
 import lovexyn0827.mess.command.TileEntityCommand;
+import lovexyn0827.mess.command.TouchCommand;
 import lovexyn0827.mess.command.VariableCommand;
+import lovexyn0827.mess.command.WaveGenCommand;
 import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
@@ -83,6 +92,15 @@ public abstract class CommandMixin {
         LazyLoadCommand.register(this.dispatcher);
         CountEntitiesCommand.register(this.dispatcher);
         VariableCommand.register(this.dispatcher);
+        LoadJavaAgentCommand.register(this.dispatcher);
+        LogDeathCommand.register(this.dispatcher);
+        StackEntityCommand.register(this.dispatcher);
+        FillInventoryCommand.register(this.dispatcher, cra);
+        WaveGenCommand.register(this.dispatcher);
+        TouchCommand.register(this.dispatcher, cra);
+        SetBlockRawCommand.register(this.dispatcher, cra);
+        NameItemCommand.register(this.dispatcher);
+        DrawShapeCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 

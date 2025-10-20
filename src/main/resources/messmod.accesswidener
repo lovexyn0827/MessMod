@@ -4,3 +4,6 @@ accessible class net/minecraft/server/world/ChunkTicketManager$NearbyChunkTicket
 accessible class net/minecraft/server/world/ServerChunkManager$MainThreadExecutor
 accessible class net/minecraft/server/world/ServerChunkLoadingManager$TicketManager
 accessible class net/minecraft/network/NetworkStateBuilder$PacketType
+accessible class net/minecraft/server/world/ThreadedAnvilChunkStorage$TicketManager
+
+extendable method net/minecraft/client/gui/widget/TextFieldWidget getWordSkipPosition (IIZ)I

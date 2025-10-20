@@ -5,22 +5,22 @@ import java.util.List;
 import com.mojang.authlib.GameProfile;
 
 import lovexyn0827.mess.rendering.hud.data.HudDataSender;
-import lovexyn0827.mess.rendering.hud.data.PlayerHudDataSender;
 import lovexyn0827.mess.rendering.hud.data.SidebarDataSender;
+import lovexyn0827.mess.util.RaycastUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ServerHudManager implements HudManager {
 	public final HudDataSender lookingHud;
-	public final PlayerHudDataSender playerHudC;
-	public final PlayerHudDataSender playerHudS;
+	public final HudDataSender playerHudC;
+	public final HudDataSender playerHudS;
 	public final SidebarDataSender sidebar;
 	private GameProfile subscribedProfile;
 	
 	public ServerHudManager(MinecraftServer server) {
 		lookingHud = HudDataSender.createHudDataSenderer(HudType.TARGET, server);
-		playerHudC = (PlayerHudDataSender) HudDataSender.createHudDataSenderer(HudType.CLIENT_PLAYER, server);
-		playerHudS = (PlayerHudDataSender) HudDataSender.createHudDataSenderer(HudType.SERVER_PLAYER, server);
+		playerHudC = HudDataSender.createHudDataSenderer(HudType.CLIENT_PLAYER, server);
+		playerHudS = HudDataSender.createHudDataSenderer(HudType.SERVER_PLAYER, server);
 		sidebar = SidebarDataSender.create(server);
 	}
 
@@ -42,7 +42,7 @@ public class ServerHudManager implements HudManager {
 		if (this.getServerPlayerHudTarget() != null) {
 			ServerPlayerEntity player = server.getPlayerManager().getPlayer(this.getServerPlayerHudTarget().getId());
 			if(player != null && this.lookingHud != null) {
-				this.lookingHud.updateLookingAtEntityData(player);
+				this.lookingHud.updateData(RaycastUtil.getTargetEntity(player));
 			}
 			
 			if(player != null && this.playerHudS != null) {

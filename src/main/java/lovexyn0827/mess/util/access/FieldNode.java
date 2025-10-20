@@ -84,7 +84,7 @@ final class FieldNode extends Node {
 
 	@Override
 	protected Type resolveOutputType(Type lastOutType) throws AccessingFailureException {
-		return this.field.getGenericType();
+		return Reflection.resolveMemberType(this.field.getGenericType(), lastOutType);
 	}
 
 	@Override

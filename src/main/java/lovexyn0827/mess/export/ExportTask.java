@@ -25,6 +25,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.mixins.DataCommandStorageAccessor;
+import lovexyn0827.mess.mixins.IdCountsStateAccessor;
 import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RaidManagerAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
@@ -113,7 +114,7 @@ public final class ExportTask {
 		Path temp = Files.createTempDirectory(this.server.getSavePath(EXPORT_PATH), "export_");
 		this.regions.forEach((n, region) -> {
 			try {
-				region.export(temp, this.components);
+				region.exportMcas(temp, this.components);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -229,13 +230,19 @@ public final class ExportTask {
 	private void tryExportMaps(ServerWorld world, PersistentStateManager psm) {
 		boolean copyLocal = this.components.contains(SaveComponent.MAP_LOCAL);
 		boolean copyOther = this.components.contains(SaveComponent.MAP_OTHER);
-		int nextId = world.increaseAndGetMapId().id();
 		DynamicRegistryManager reg = world.getRegistryManager();
+		IdCountsState idCounts = world.getPersistentStateManager()
+		        .getOrCreate(IdCountsState.getPersistentStateType(), "idcounts");
+		if (idCounts == null) {
+			return;
+		}
+		
+		int nextId = ((IdCountsStateAccessor) idCounts).getIdCountsForMessMod().getOrDefault("map", 0) + 1;
 		for(int i = 0; i < nextId; i++) {
 			MapIdComponent id = new MapIdComponent(i);
             MapState origin = world.getMapState(id);
 			if(origin == null) {
-				return;
+				continue;
 			}
 			
             MapState ms = MapState.fromNbt(origin.writeNbt(new NbtCompound(), reg), reg);
@@ -249,8 +256,8 @@ public final class ExportTask {
 		}
 		
 		if((copyLocal || copyOther) && world.getRegistryKey() == World.OVERWORLD) {
-			psm.set("idcounts", world.getPersistentStateManager()
-			        .getOrCreate(IdCountsState.getPersistentStateType(), "idcounts"));
+			idCounts.markDirty();
+			psm.set("idcounts", idCounts);
 		}
 	}
 

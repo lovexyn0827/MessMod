@@ -30,18 +30,35 @@ import net.minecraft.util.Formatting;
 public class MessCfgCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		Command<ServerCommandSource> listAllCmd = (ct) -> {
-			ModMetadata metadata = FabricLoader.getInstance().getModContainer("messmod").get().getMetadata();
-			ServerCommandSource s = ct.getSource();
-			s.sendFeedback(() -> Text.literal(metadata.getName() + " " + metadata.getVersion()).formatted(Formatting.BOLD), false);
-			CommandUtil.feedbackRaw(ct, metadata.getDescription());
-			s.sendFeedback(() -> new FormattedText("cmd.messcfg.list", "l").asMutableText(), false);
+			ct.getSource().sendMessage(new FormattedText("cmd.messcfg.list", "l").asMutableText());
 			OptionManager.OPTIONS.forEach((name, opt) -> {
-				dumpOption(s, name, opt);
+				dumpOption(ct.getSource(), name, opt);
 			});
-			return 1;
+			return Command.SINGLE_SUCCESS;
 		};
 		LiteralArgumentBuilder<ServerCommandSource> command = literal("messcfg").requires(CommandUtil.COMMAND_REQUMENT)
-				.executes(listAllCmd)
+				.executes((ct) -> {
+					ModMetadata metadata = FabricLoader.getInstance().getModContainer("messmod").get().getMetadata();
+					ServerCommandSource s = ct.getSource();
+					s.sendMessage(Text.literal(metadata.getName() + " " + metadata.getVersion()).formatted(Formatting.BOLD));
+					CommandUtil.feedbackRaw(ct, metadata.getDescription());
+					s.sendMessage(new FormattedText("cmd.messcfg.labels", "l").asMutableText());
+					MutableText labels = Text.literal("").formatted(Formatting.GREEN, Formatting.BOLD);
+					for (Label label : Label.values()) {
+						MutableText labelText = Text.literal(String.format("[%s]", label.getReadableName()));
+						labelText.styled((style) -> {
+							ClickEvent onClick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, 
+									String.format("/messcfg list %s", label.name()));
+							HoverEvent onHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
+									Text.literal(label.getDescription()));
+							return style.withClickEvent(onClick).withHoverEvent(onHover).withUnderline(true);
+						});
+						labels.append(Text.literal(" ").append(labelText));
+					}
+					
+					s.sendMessage(labels);
+					return Command.SINGLE_SUCCESS;
+				})
 				.then(literal("reloadConfig")
 						.executes((ct) -> {
 							OptionManager.reload();
@@ -68,7 +85,8 @@ public class MessCfgCommand {
 										return 0;
 									}
 									
-									CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.withtag", lName);
+									CommandUtil.feedbackWithArgs(ct, "cmd.messcfg.withtag", 
+											lName, label.getReadableName());
 									ServerCommandSource s = ct.getSource();
 									OptionManager.OPTIONS.forEach((name, opt) -> {
 										for(Label l0 : opt.labels()) {
@@ -85,21 +103,25 @@ public class MessCfgCommand {
 			command.then(literal(name).requires(CommandUtil.COMMAND_REQUMENT)
 					.executes((ct) -> {
 						MutableText text = new FormattedText(name, "a", false).asMutableText();
-						if(opt.isExperimental()) {
+						if (opt.isExperimental()) {
 							text.append(new FormattedText("cmd.messcfg.exp", "rcl").asMutableText());
+						}
+						
+						if (opt.isDeprecated()) {
+							text.append(new FormattedText("cmd.messcfg.deprecated", "rcl").asMutableText());
 						}
 						
 						text.append(Text.literal("\n" + opt.getDescription() + "\n")
 								.formatted(Formatting.GRAY));
 						String value = OptionManager.getActiveOptionSet().getSerialized(name);
 						text.append(new FormattedText("cmd.messcfg.current", "f", true, value).asMutableText());
-						if(!opt.getDefaultValue().equals(value)) {
+						if (!opt.getDefaultValue().equals(value)) {
 							text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
 						}
 						
 						String globalValue = OptionManager.getGlobalOptionSet().getSerialized(name);
 						text.append(new FormattedText("cmd.messcfg.global", "f", true, globalValue).asMutableText());
-						if(!opt.getDefaultValue().equals(globalValue)) {
+						if (!opt.getDefaultValue().equals(globalValue)) {
 							text.append(new FormattedText("cmd.messcfg.modified", "cl").asMutableText());
 						}
 						

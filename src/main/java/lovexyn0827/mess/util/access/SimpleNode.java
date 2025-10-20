@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
@@ -81,6 +82,8 @@ class SimpleNode<I, O> extends Node {
 			insns.add(new InsnNode(Opcodes.SWAP));
 			insns.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, "java/util/function/Function", 
 					"apply", "(Ljava/lang/Object;)Ljava/lang/Object;"));
+			insns.add(new TypeInsnNode(Opcodes.CHECKCAST, org.objectweb.asm.Type.getInternalName(this.out)));
+			ctx.endNode(this.out);
 			return insns;
 		};
 	}

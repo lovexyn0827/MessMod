@@ -80,6 +80,10 @@ public final class OptionWrapper {
 	public boolean isExperimental() {
 		return this.option.experimental();
 	}
+	
+	public boolean isDeprecated() {
+		return this.option.deprecated();
+	}
 
 	public boolean globalOnly() {
 		return this.option.globalOnly();

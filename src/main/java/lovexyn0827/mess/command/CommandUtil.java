@@ -9,7 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.tree.ArgumentCommandNode;
 
 import lovexyn0827.mess.mixins.ArgumentTypesAccessor;
 import lovexyn0827.mess.options.OptionManager;
@@ -36,7 +38,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class CommandUtil {
 	public static final Predicate<ServerCommandSource> COMMAND_REQUMENT = (s) -> 
-			!OptionManager.commandExecutionRequirment || s.hasPermissionLevel(1);
+			!OptionManager.commandExecutionRequirment || s.hasPermissionLevel(2);
 	public static final SuggestionProvider<ServerCommandSource> ENTITY_TYPES = (ct, b) -> {
 		Registries.ENTITY_TYPE.getIds().stream().map(Identifier::getPath).forEach(b::suggest);
 		return b.buildFuture();
@@ -66,6 +68,8 @@ public class CommandUtil {
 			LogPacketCommand.reset();
 			LazyLoadCommand.reset();
 			VariableCommand.reset();
+			LogDeathCommand.reset();
+			LogMovementCommand.reset();
 		} else {
 			 noreplyOutput = new CommandOutput(){
 				public boolean shouldReceiveFeedback() {
@@ -109,6 +113,10 @@ public class CommandUtil {
 	
 	public static void feedbackRaw(CommandContext<? extends ServerCommandSource> ct, Object ob) {
 		ct.getSource().sendFeedback(() -> Text.literal(ob == null ? "[null]" : ob.toString()), false);
+	}
+	
+	public static void feedbackRawWithArgs(CommandContext<? extends ServerCommandSource> ct, String fmt, Object ... args) {
+		ct.getSource().sendMessage(Text.literal(String.format(fmt, args)));
 	}
 	
 	public static void error(CommandContext<? extends ServerCommandSource> ct, Object ob) {
@@ -239,6 +247,12 @@ public class CommandUtil {
 			
 			Field f = Reflection.getFieldFromNamed(Reflection.ENTITY_TYPE_TO_CLASS.get(type), fName);
 			return f == null ? Object.class : f.getType();
+		});
+	}
+	
+	public static boolean hasArgument(CommandContext<ServerCommandSource> ct, String argName) {
+		return ct.getNodes().stream().map(ParsedCommandNode::getNode).anyMatch((n) -> {
+			return n instanceof ArgumentCommandNode && ((ArgumentCommandNode<?, ?>) n).getName().equals(argName);
 		});
 	}
 }
