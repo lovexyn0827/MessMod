@@ -60,7 +60,8 @@ public class RenderedBitmap extends Shape {
 		}
 		
 		TextureManager tm = MinecraftClient.getInstance().getTextureManager();
-		Identifier textureId = tm.registerDynamicTexture("messmod_bitmap_" + NEXT_ID.getAndIncrement(), texture);
+		Identifier textureId = Identifier.of("messmod", "messmod_bitmap_" + NEXT_ID.getAndIncrement());
+		tm.registerTexture(textureId, texture);
 		texture.upload();
 		this.texture = texture;
 		this.layer = RenderLayer.getText(textureId);

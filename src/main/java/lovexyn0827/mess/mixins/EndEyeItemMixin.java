@@ -9,7 +9,6 @@ import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnderEyeItem;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
@@ -43,8 +42,6 @@ public class EndEyeItemMixin {
 						sp));
 				if(hit.getType() != HitResult.Type.MISS) {
 					Vec3d pos = hit.getPos();
-					sp.getServerWorld().getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, 
-							sp.getChunkPos(), 1, sp.getId());
 					sp.networkHandler.requestTeleport(pos.x, pos.y, pos.z, sp.getYaw(), sp.getPitch());
 				}
 			}

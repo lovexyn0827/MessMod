@@ -5,7 +5,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.DefaultFramebufferSet;
 import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.FrameGraphBuilder;
-import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderPass;
 import net.minecraft.client.render.WorldRenderer;
 
@@ -27,7 +26,7 @@ public class WorldRendererMixin {
 					value = "RETURN"
 			)
 	)
-	private void renderShapes(FrameGraphBuilder frameGraphBuilder, Camera camera, LightmapTextureManager ltm,  float f, Fog fogParameters, CallbackInfo ci) {
+	private void renderShapes(FrameGraphBuilder frameGraphBuilder, Camera camera, float tickDelta, Fog fog, CallbackInfo ci) {
 		if (MessMod.INSTANCE.shapeRenderer != null) {
 			RenderPass pass = frameGraphBuilder.createPass("messmod_shapes");
 			framebufferSet.mainFramebuffer = pass.transfer(framebufferSet.mainFramebuffer);

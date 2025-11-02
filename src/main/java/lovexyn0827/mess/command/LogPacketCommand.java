@@ -151,11 +151,11 @@ public class LogPacketCommand {
 	}
 
 	public static boolean isSubscribed(Packet<?> packet) {
-		return SUBSCRIBED_TYPES.contains(packet.getPacketId().id());
+		return SUBSCRIBED_TYPES.contains(packet.getPacketType().id());
 	}
 	
 	public static void onPacket(NetworkSide side, Packet<?> packet, boolean sending) {
-		STATS.computeLong(packet.getPacketId().id(), (clz, original) -> (original == null ? 0 : original) + 1);
+		STATS.computeLong(packet.getPacketType().id(), (clz, original) -> (original == null ? 0 : original) + 1);
 		String strRep = toString(packet);
 		LOGGER.info(sending ? "{}: Sended Packet: {}" : "", 
 				side == NetworkSide.CLIENTBOUND ? "CLIENT" : "SERVER", 
