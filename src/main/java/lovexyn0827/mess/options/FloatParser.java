@@ -28,6 +28,19 @@ public class FloatParser implements OptionParser<Float> {
 		}
 	}
 	
+	public static class NonNegative extends FloatParser {
+		@Override
+		public Float tryParse(String str) throws InvalidOptionException {
+			Float f = super.tryParse(str);
+			if(f >= 0) {
+				return f;
+			} else {
+				throw new InvalidOptionException("opt.err.rnonnegative");
+			}
+		}
+	}
+	
+	
 	public static class NaNablePositive extends Positive {
 		@Override
 		public Float tryParse(String str) throws InvalidOptionException {

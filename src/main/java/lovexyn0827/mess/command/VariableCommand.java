@@ -6,6 +6,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -39,9 +41,13 @@ import lovexyn0827.mess.util.access.InvalidLiteralException;
 import lovexyn0827.mess.util.access.Literal;
 import lovexyn0827.mess.util.deobfuscating.Mapping;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.dedicated.MinecraftDedicatedServer;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
@@ -62,6 +68,25 @@ public class VariableCommand {
 					b.put("client", (ct) -> MinecraftClient.getInstance());
 					b.put("clientWorld", (ct) -> MinecraftClient.getInstance().world);
 					b.put("clientPlayer", (ct) -> MinecraftClient.getInstance().player);
+				}
+				
+				return b.build();
+			});
+	private static final ImmutableMap<String, Function<CommandContext<ServerCommandSource>, Type>>
+			BUILTIN_OBJECT_TYPES = Util.make(() -> {
+				ImmutableMap.Builder<String, Function<CommandContext<ServerCommandSource>, Type>> b = 
+						ImmutableMap.builder();
+				b.put("sender", (ct) -> ServerCommandSource.class);
+				b.put("world", (ct) -> ServerCommandSource.class);
+				b.put("senderEntity", (ct) -> ct.getSource().getEntity() != null 
+						? ct.getSource().getEntity().getClass() : Entity.class);
+				if(!MessMod.isDedicatedServerEnv()) {
+					b.put("client", (ct) -> MinecraftClient.class);
+					b.put("clientWorld", (ct) -> ClientWorld.class);
+					b.put("clientPlayer", (ct) -> ClientPlayerEntity.class);
+					b.put("server", (ct) -> IntegratedServer.class);
+				} else {
+					b.put("server", (ct) -> MinecraftDedicatedServer.class);
 				}
 				
 				return b.build();
@@ -89,11 +114,18 @@ public class VariableCommand {
 												.executes(VariableCommand::setLiteral)))
 								.then(literal("entity")
 										.then(argument("selector", EntityArgumentType.entity())
-												.executes(VariableCommand::setEntity)))
+												.executes(VariableCommand::setEntity)
+												.then(argument("path", AccessingPathArgumentType.accessingPathArg(Entity.class))
+														.executes(VariableCommand::setEntity))))
 								.then(argument("objSrc", StringArgumentType.word())
 										.suggests(CommandUtil.immutableSuggestions(
 												BUILTIN_OBJECT_PROVIDERS.keySet().toArray()))
-										.executes(VariableCommand::setBulitin))))
+										.executes(VariableCommand::setBulitin)
+										.then(argument("path", AccessingPathArgumentType.accessingPathArg((ct) -> {
+											return BUILTIN_OBJECT_TYPES.get(StringArgumentType.getString(ct, "objSrc"))
+													.apply(ct);
+										}))
+												.executes(VariableCommand::setBulitin)))))
 				.then(literal("map")
 						.then(argument("slotSrc", StringArgumentType.word())
 								.suggests(slotSuggestion)
@@ -108,6 +140,11 @@ public class VariableCommand {
 				.then(literal("print")
 						.then(argument("slot", StringArgumentType.word())
 								.suggests(slotSuggestion)
+								.executes((ct) -> {
+									String slot = StringArgumentType.getString(ct, "slot");
+									CommandUtil.feedbackRaw(ct, VARIABLES.get(slot));
+									return Command.SINGLE_SUCCESS;
+								})
 								.then(literal("array")
 										.executes((ct) -> {
 											String slot = StringArgumentType.getString(ct, "slot");
@@ -126,13 +163,38 @@ public class VariableCommand {
 											String slot = StringArgumentType.getString(ct, "slot");
 											CommandUtil.feedbackRaw(ct, VARIABLES.get(slot));
 											return Command.SINGLE_SUCCESS;
+										})
+										.then(argument("func", AccessingPathArgumentType.accessingPathArg((ct) -> {
+											String slot = StringArgumentType.getString(ct, "slot");
+											Object ob = VARIABLES.get(slot);
+											return ob == null ? Object.class : ob.getClass();
 										}))
+												.executes((ct) -> {
+													AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "func");
+													String slot = StringArgumentType.getString(ct, "slot");
+													Object obj = VARIABLES.get(slot);
+													try {
+														CommandUtil.feedbackRaw(ct, path.access(obj, obj.getClass()));
+													} catch (AccessingFailureException e) {
+														CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
+														return 0;
+													}
+													
+													return Command.SINGLE_SUCCESS;
+												})))
 								.then(literal("dumpFields")
 										.executes((ct) -> {
 											String slot = StringArgumentType.getString(ct, "slot");
-											ct.getSource().sendFeedback(() -> toText(VARIABLES.get(slot)), false);
+											ct.getSource().sendFeedback(() -> toText(VARIABLES.get(slot), 1), false);
 											return Command.SINGLE_SUCCESS;
-										}))))
+										})
+										.then(argument("depth", IntegerArgumentType.integer(1))
+												.executes((ct) -> {
+													String slot = StringArgumentType.getString(ct, "slot");
+													int d = IntegerArgumentType.getInteger(ct, "depth");
+													ct.getSource().sendFeedback(() -> toText(VARIABLES.get(slot), d), false);
+													return Command.SINGLE_SUCCESS;
+												})))))
 				.then(literal("list")
 						.executes((ct) -> {
 							VARIABLES.forEach((key, val) -> {
@@ -144,7 +206,15 @@ public class VariableCommand {
 		dispatcher.register(command);
 	}
 	
-	private static Text toText(Object ob) {
+	private static Text toText(Object ob, int depth) {
+		if (ob == null) {
+			return new FormattedText("null", "r7").asMutableText();
+		}
+		
+		if (depth == 0) {
+			return new FormattedText(ob.toString(), "r7").asMutableText();
+		}
+		
 		Mapping map = MessMod.INSTANCE.getMapping();
 		MutableText text = new FormattedText(map.namedClass(ob.getClass().getName()), "").asMutableText();
 		text.append(new FormattedText("[", "rla").asMutableText());
@@ -156,7 +226,7 @@ public class VariableCommand {
 			text.append(new FormattedText(map.namedField("="), "r6").asMutableText());
 			try {
 				Object val = f.get(ob);
-				text.append(new FormattedText(val == null ? "null" : val.toString(), "r7").asMutableText());
+				text.append(f.getType().isPrimitive() ? toText(val, 0) : toText(val, depth - 1));
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();
 				text.append(new FormattedText(f.getName(), "r7k").asMutableText());
@@ -221,6 +291,7 @@ public class VariableCommand {
 					ArgumentListTokenizer tokenizer = new ArgumentListTokenizer(argsStr);
 					try {
 						String[] argsStrArray = tokenizer.toArray();
+						Type[] argTypes = c.getGenericParameterTypes();
 						if(argsStrArray.length != c.getParameterCount()) {
 							CommandUtil.errorWithArgs(ct, "exp.badarg", argsStr, c);
 							return 0;
@@ -230,10 +301,11 @@ public class VariableCommand {
 						for(int i = 0; i < argsStrArray.length; i++) {
 							if (!argsStrArray[i].isEmpty()) {
 								try {
-									args[i] = Literal.parse(argsStrArray[i]).get(c.getGenericParameterTypes()[i]);
+									args[i] = Literal.parse(argsStrArray[i]).get(argTypes[i]);
 								} catch (CommandSyntaxException e) {
 									throw e;
 								} catch (InvalidLiteralException e) {
+									CommandUtil.error(ct, e.getLocalizedMessage(), e);
 									e.printStackTrace();
 								}
 							} else {
@@ -290,6 +362,9 @@ public class VariableCommand {
 		} catch (InvalidLiteralException e) {
 			CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
 			return 0;
+		} catch (TranslatableException e) {
+			CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
+			return 0;
 		}
 		
 		VARIABLES.put(slot, val);
@@ -300,7 +375,18 @@ public class VariableCommand {
 	private static int setEntity(CommandContext<ServerCommandSource> ct) throws CommandSyntaxException {
 		String slot = StringArgumentType.getString(ct, "slot");
 		Entity e = EntityArgumentType.getEntity(ct, "selector");
-		VARIABLES.put(slot, e);
+		if (CommandUtil.hasArgument(ct, "path")) {
+			AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
+			try {
+				VARIABLES.put(slot, path.access(e, e.getClass()));
+			} catch (AccessingFailureException ex) {
+				CommandUtil.errorRaw(ct, ex.getLocalizedMessage(), ex);
+				return 0;
+			}
+		} else {
+			VARIABLES.put(slot, e);
+		}
+		
 		CommandUtil.feedback(ct, "cmd.general.success");
 		return Command.SINGLE_SUCCESS;
 	}
@@ -310,10 +396,18 @@ public class VariableCommand {
 		String name = StringArgumentType.getString(ct, "objSrc");
 		Function<CommandContext<ServerCommandSource>, Object> getter = BUILTIN_OBJECT_PROVIDERS.get(name);
 		if(getter != null) {
-			VARIABLES.put(slot, getter.apply(ct));
-		} else {
-			CommandUtil.errorWithArgs(ct, "cmd.general.nodef", name);
-			return 0;
+			Object ob = getter.apply(ct);
+			if (CommandUtil.hasArgument(ct, "path")) {
+				AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
+				try {
+					VARIABLES.put(slot, path.access(ob, ob.getClass()));
+				} catch (AccessingFailureException e) {
+					CommandUtil.errorRaw(ct, e.getLocalizedMessage(), e);
+					return 0;
+				}
+			} else {
+				VARIABLES.put(slot, ob);
+			}
 		}
 
 		CommandUtil.feedback(ct, "cmd.general.success");

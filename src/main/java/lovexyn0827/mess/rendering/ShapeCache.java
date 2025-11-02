@@ -16,18 +16,12 @@ public abstract class ShapeCache {
 	protected final Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> backend = Maps.newHashMap();
 	protected long time;
 	
-	ShapeCache() {
-		this.backend.put(World.OVERWORLD, new HashMap<>());
-		this.backend.put(World.NETHER, new HashMap<>());
-		this.backend.put(World.END, new HashMap<>());
-	}
-	
 	public final synchronized Map<RegistryKey<World>, Map<ShapeSpace, Set<Shape>>> getAllShapes() {
 		return this.backend;
 	}
 	
 	public final synchronized Map<ShapeSpace, Set<Shape>> getShapesInDimension(RegistryKey<World> dimensionType) {
-		return this.backend.get(dimensionType);
+		return this.backend.computeIfAbsent(dimensionType, (k) -> new HashMap<>());
 	}
 	
 	public final synchronized void reset() {
@@ -35,7 +29,7 @@ public abstract class ShapeCache {
 	}
 	
 	public final synchronized void clearSpace(ShapeSpace ss) {
-		this.backend.values().forEach((map) -> map.computeIfAbsent(ss, (ss1) -> Sets.newHashSet()).clear());
+		this.backend.values().forEach((map) -> map.computeIfAbsent(ss, (ss1) -> Sets.newConcurrentHashSet()).clear());
 	}
 	
 	public static ShapeCache create(MinecraftClient mc) {

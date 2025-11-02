@@ -1,17 +1,22 @@
 package lovexyn0827.mess.util.access;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.command.VariableCommand;
 import lovexyn0827.mess.util.TranslatableException;
@@ -58,13 +63,18 @@ public abstract class Literal<T> {
 		}
 		
 		Literal<?> other = (Literal<?>) obj;
-		return this.compiled && stringRepresentation.equals(other.stringRepresentation);
+		return this.compiled && other.compiled && this.stringRepresentation.equals(other.stringRepresentation);
+	}
+	
+	@Override
+	public String toString() {
+		return this.stringRepresentation;
 	}
 
 	/**
 	 * @param type The type which the literal is expected to be parsed as, or null if unknown.
 	 * @throws InvalidLiteralException 
-	 * @implNote If the value of the literal is primitive types, argument type shouldn't be used.
+	 * @implNote For literals of primitive types, {@code type} shouldn't be used. No side-effects permitted.
 	 */
 	@Nullable
 	public abstract T get(@Nullable Type type) throws InvalidLiteralException;
@@ -89,6 +99,12 @@ public abstract class Literal<T> {
 		case 'C' : 
 			if(strRep.charAt(1) == '+') {
 				return new ClassL(strRep);
+			}
+			
+			break;
+		case 'A' : 
+			if (strRep.charAt(1) == '+') {
+				return new ArrayL(strRep);
 			}
 			
 			break;
@@ -419,8 +435,9 @@ public abstract class Literal<T> {
 			}
 			
 			String className = this.stringRepresentation.substring(2).replace('/', '.');
+			String srg = MessMod.INSTANCE.getMapping().srgClass(className);
 			try {
-				this.classVal = Reflection.getClassIncludingPrimitive(className);
+				this.classVal = Reflection.getClassIncludingPrimitive(srg);
 				this.compiled = true;
 				return this.classVal;
 			} catch (ClassNotFoundException e) {
@@ -466,6 +483,64 @@ public abstract class Literal<T> {
 		@Override
 		public @Nullable Object get(@Nullable Type type) throws InvalidLiteralException {
 			return VariableCommand.getVariable(this.slot);
+		}
+		
+	}
+	
+	// Returning Object since Object[] is not assignable from int[]
+	public static class ArrayL extends Literal<Object> {
+		private final Supplier<Object> arrayCreator;
+
+		// ClazzSignature[dim0][dim1]...
+		protected ArrayL(String strRep) throws CommandSyntaxException {
+			super(strRep);
+			this.compiled = false;
+			int dimListOffset = strRep.indexOf(']');
+			if (dimListOffset == -1) {
+				throw new TranslatableException("exp.atleast1dim");
+			}
+
+			dimListOffset = strRep.substring(0, dimListOffset).lastIndexOf('[');
+			if (dimListOffset == -1) {
+				throw new TranslatableException("exp.atleast1dim");
+			}
+			
+			// Parse class name
+			String namedClass = strRep.substring(2, dimListOffset).replace('/', '.');
+			String srg = MessMod.INSTANCE.getMapping().srgClass(namedClass);
+			Class<?> clazz;
+			try {
+				clazz = Reflection.getClassIncludingPrimitive(srg);
+			} catch (ClassNotFoundException e) {
+				throw new TranslatableException("exp.noclass", namedClass);
+			}
+			
+			// Parse dimensions
+			IntList dims = new IntArrayList();
+			StringReader sr = new StringReader(strRep.substring(dimListOffset));
+			while (sr.canRead()) {
+				sr.skipWhitespace();
+				if (sr.read() != '[' || !sr.canRead()) {
+					throw new TranslatableException("exp.invarray", strRep);
+				}
+
+				dims.add(sr.readInt());
+				if (!sr.canRead() || sr.read() != ']') {
+					throw new TranslatableException("exp.invarray", strRep);
+				}
+			}
+			
+			// Build array creator
+			int[] dimensions = dims.toIntArray();
+			
+			this.arrayCreator = () -> {
+				return Array.newInstance(clazz, dimensions);
+			};
+		}
+
+		@Override
+		public @Nullable Object get(@Nullable Type type) throws InvalidLiteralException {
+			return this.arrayCreator.get();
 		}
 		
 	}

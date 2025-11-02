@@ -37,6 +37,10 @@ public class ServerPlayNetworkHandler_1Mixin {
 			int count = 0;
 			Entity entity = this.field_28962;
 			for(Entity e : entity.getWorld().getOtherEntities(null, entity.getBoundingBox().expand(10E-3))) {
+				if (OptionManager.quickStackedEntityKillingOneTypeOnly && e.getType() != entity.getType()) {
+					continue;
+				}
+				
 				if(e.getPos().equals(entity.getPos())) {
 					if(OptionManager.mobFastKill) {
 						e.remove(RemovalReason.KILLED);

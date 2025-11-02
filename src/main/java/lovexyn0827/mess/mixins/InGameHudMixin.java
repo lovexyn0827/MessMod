@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import lovexyn0827.mess.MessMod;
 import lovexyn0827.mess.options.OptionManager;
@@ -19,15 +20,25 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.LayeredDrawer;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Identifier;
 
 @Mixin(InGameHud.class)
-public class InGameHudMixin {
+public abstract class InGameHudMixin {
 	@Shadow
 	private static final Identifier HOTBAR_TEXTURE = Identifier.of("hud/hotbar");
     
 	@Shadow @Final
 	private LayeredDrawer layeredDrawer;
+
+	@Shadow
+	private @Final MinecraftClient client;
+	
+	@Shadow
+	abstract void renderStatusBars(DrawContext ctx);
+	
+	@Shadow
+	abstract void renderExperienceBar(DrawContext ctx, int x);
 	
 	@ModifyConstant(method = "renderHotbar", constant = @Constant(intValue = 9))
 	private int modifyHotbarLength(int lengthO) {
@@ -75,5 +86,31 @@ public class InGameHudMixin {
 				MessMod.INSTANCE.getClientHudManager().render(mc.player, mc.getServer());
 			}
 		});
+	}
+
+	@Inject(method = "renderMainHud", 
+			at = @At(value = "INVOKE", 
+					target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;hasStatusBars()Z"
+			)
+	)
+	private void drawSurivialHudInCreativeMode(DrawContext ctx, RenderTickCounter tickCounter, CallbackInfo ci) {
+		if (OptionManager.survivalStatusBarInCreativeMode 
+				&& this.client.interactionManager.getCurrentGameMode().isCreative()) {
+			this.renderStatusBars(ctx);
+		}
+	}
+	
+	@Inject(method = "renderMainHud", 
+			at = @At(value = "INVOKE", 
+					target = "Lnet/minecraft/client/gui/hud/InGameHud;shouldRenderExperience()Z"
+			), 
+			locals = LocalCapture.CAPTURE_FAILHARD
+	)
+	private void drawSurivialXpBarInCreativeMode(DrawContext ctx, RenderTickCounter tickCounter, CallbackInfo ci, 
+			int i) {
+		if (OptionManager.survivalXpBarInCreativeMode 
+				&& this.client.interactionManager.getCurrentGameMode().isCreative()) {
+			this.renderExperienceBar(ctx, i);
+		}
 	}
 }

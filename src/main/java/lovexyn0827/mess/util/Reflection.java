@@ -7,8 +7,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -472,6 +474,52 @@ public class Reflection {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static Type resolveMemberType(Type mType, Type context) {
+		Map<String, Type> resolvedArgs = new HashMap<>();
+		if (!(context instanceof ParameterizedType) || mType instanceof Class<?>) {
+			return mType;
+		}
+		
+		ParameterizedType ctxGenType = (ParameterizedType) context;
+		TypeVariable<?>[] ctxTypeVars = Reflection.getRawType(context).getTypeParameters();
+		Type[] lastTypeArgs = ctxGenType.getActualTypeArguments();
+		for (int i = 0; i < ctxTypeVars.length; i++) {
+			TypeVariable<?> var = ctxTypeVars[i];
+			Type arg = lastTypeArgs[i];
+			resolvedArgs.put(var.getName(), arg);
+		}
+		
+		if (mType instanceof TypeVariable) {
+			String mTypeName = ((TypeVariable<?>) mType).getName();
+			if (resolvedArgs.containsKey(mTypeName)) {
+				return resolvedArgs.get(mTypeName);
+			} else {
+				return mType;
+			}
+		} else if (mType instanceof ParameterizedType) {
+			return resolveParameterizedType((ParameterizedType) mType, resolvedArgs);
+		} else {
+			return mType;
+		}
+	}
+	
+	public static ParameterizedType resolveParameterizedType(ParameterizedType mType, Map<String, Type> resolvedArgs) {
+		Type[] mTypeArgs = ((ParameterizedType) mType).getActualTypeArguments();
+		for (int i = 0; i < mTypeArgs.length; i++) {
+			Type t = mTypeArgs[i];
+			if (t instanceof ParameterizedType) {
+				mTypeArgs[i] = resolveParameterizedType((ParameterizedType) t, resolvedArgs);
+			} else if (t instanceof TypeVariable) {
+				String name = ((TypeVariable<?>) t).getName();
+				if (resolvedArgs.containsKey(name)) {
+					mTypeArgs[i] = resolvedArgs.get(name);
+				}
+			}
+		}
+		
+		return new ParameterizedTypeImpl(((ParameterizedType) mType).getRawType(), mTypeArgs);
 	}
 
 	static {

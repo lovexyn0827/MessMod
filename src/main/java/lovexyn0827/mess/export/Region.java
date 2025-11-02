@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
+import lovexyn0827.mess.mixins.ChunkPosKeyedStorageAccessor;
 import lovexyn0827.mess.mixins.MinecraftServerAccessor;
 import lovexyn0827.mess.mixins.RegionBasedStorageAccessor;
+import lovexyn0827.mess.mixins.SerializingRegionBasedStorageAccessor;
+import lovexyn0827.mess.mixins.StorageIoWorkerAccessor;
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.entity.Entity;
@@ -27,6 +31,7 @@ import net.minecraft.world.storage.ChunkPosKeyedStorage;
 import net.minecraft.world.storage.EntityChunkDataAccess;
 import net.minecraft.world.storage.RegionBasedStorage;
 import net.minecraft.world.storage.StorageKey;
+import net.minecraft.world.storage.StorageIoWorker;
 
 public final class Region {
 	private final ChunkPos max;
@@ -55,7 +60,7 @@ public final class Region {
 		return this.dimension;
 	}
 
-	public void export(Path temp, EnumSet<SaveComponent> components) throws IOException {
+	public void exportMcas(Path temp, EnumSet<SaveComponent> components) throws IOException {
 		Path dir = this.dimension.getServer().getSavePath(WorldSavePathMixin.create(""))
 				.relativize(((MinecraftServerAccessor) this.dimension.getServer()).getSession()
 						.getWorldDirectory(this.dimension.getRegistryKey()));
@@ -105,12 +110,19 @@ public final class Region {
 		// FIXME: POIs may be exported incorrectly
 		poiDst.tick(() -> true);
 		entityDst.close();
+		ChunkPosKeyedStorage cpks = ((SerializingRegionBasedStorageAccessor) poiDst).getStorageAccessMessMod();
+		StorageIoWorker ioWorker = ((ChunkPosKeyedStorageAccessor) cpks).getStorageIoWorkerMessMod();
+		Map<?, ?> unsaved = ((StorageIoWorkerAccessor) ioWorker).getResultsMessMod();
+		while (!unsaved.isEmpty()) {
+			Thread.yield();
+		}
+		
 		poiDst.close();
 	}
 
 	public boolean contains(ServerWorld world, BlockPos pos) {
-		return this.dimension == world && this.min.x << 4 <= pos.getX() && this.max.x << 4  + 15 >= pos.getX()
-				&& this.min.z << 4 <= pos.getZ() && this.max.z << 4  + 15 >= pos.getZ();
+		return this.dimension == world && this.min.x << 4 <= pos.getX() && (this.max.x << 4)  + 15 >= pos.getX()
+				&& this.min.z << 4 <= pos.getZ() && (this.max.z << 4) + 15 >= pos.getZ();
 	}
 
 	boolean contains(MapState ms) {
@@ -118,10 +130,10 @@ public final class Region {
 		int r = 63 * scale;
 		int x0 = this.min.x << 4;
 		int z0 = this.min.z << 4;
-		int x1 = this.max.x << 4 + 15;
-		int z1 = this.max.z << 4 + 15;
+		int x1 = (this.max.x << 4) + 15;
+		int z1 = (this.max.z << 4) + 15;
 		return this.dimension.getRegistryKey().equals(ms.dimension)
-				&& ms.centerX + r >= x0 && ms.centerX - r <= x1 && ms.centerZ + r > z0 && ms.centerZ < z1;
+				&& ms.centerX + r >= x0 && ms.centerX - r <= x1 && ms.centerZ + r >= z0 && ms.centerZ - r <= z1;
 	}
 
 	public boolean contains(ServerWorld world, long pos) {

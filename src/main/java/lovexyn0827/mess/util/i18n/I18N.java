@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 
 import lovexyn0827.mess.MessMod;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.text.Text;
 import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 
@@ -26,6 +27,14 @@ public class I18N {
 
 	public static String translate(String translationKey, Object ... args) {
 		return String.format(translate(translationKey), args);
+	}
+	
+	public static Text translateAsText(String translationKey) {
+		return Text.literal(translate(translationKey));
+	}
+	
+	public static Text translateAsText(String translationKey, Object ... args) {
+		return Text.literal(String.format(translate(translationKey), args));
 	}
 	
 	public static boolean canUseLanguage(String name, boolean forceLoad) {
