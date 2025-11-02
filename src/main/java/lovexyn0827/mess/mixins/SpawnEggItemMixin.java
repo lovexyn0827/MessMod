@@ -21,7 +21,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-@Mixin(value = SpawnEggItem.class, priority = 1001)
+@Mixin(value = SpawnEggItem.class, priority = 999)
 public abstract class SpawnEggItemMixin {
 	@Shadow
 	protected abstract EntityType<?> getEntityType(ItemStack stack);

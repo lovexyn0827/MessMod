@@ -62,7 +62,8 @@
     "CustomPayloadMixin", 
     "NetworkStateBuilderMixin", 
     "ServerCommonNetworkHandlerMixin", 
-    "ChunkGenerationStepMixin"
+    "ChunkGenerationStepMixin", 
+    "ThreadedAnvilChunkStorageMixin"
   ],
   "client": [
     "MinecraftClientMixin",

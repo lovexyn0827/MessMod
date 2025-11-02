@@ -30,17 +30,17 @@ import net.minecraft.world.explosion.ExplosionImpl;
 
 @Mixin(ExplosionImpl.class)
 public abstract class ExplosionMixin {
-	@ModifyArg(method = "affectWorld",
+	@ModifyArg(method = "createFire",
 			at = @At(value = "INVOKE",
-					target = "Lnet/minecraft/world/World;setBlockState"
-							+ "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"),
+					target = "Lnet/minecraft/server/world/ServerWorld;setBlockState"
+							+ "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"), 
 			index = 1)
 	private BlockState replaceToCustomFireState(BlockState fireState) {
 		BlockState customFireState = SetExplosionBlockCommand.getFireState();
 		return customFireState == null ? fireState : customFireState;
 	}
 	
-	@Inject(method = "getExposure",
+	@Inject(method = "calculateReceivedDamage",
 			at = @At(value = "INVOKE",
 							target = "Lnet/minecraft/world/World;raycast"
 									+ "(Lnet/minecraft/world/RaycastContext;)Lnet/minecraft/util/hit/BlockHitResult;", 
@@ -118,7 +118,7 @@ public abstract class ExplosionMixin {
 		}
 	}
 	
-	@Inject(method = "getExposure", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "calculateReceivedDamage", at = @At("HEAD"), cancellable = true)
 	private static void tryDisableExpsure(Vec3d pos, Entity e, CallbackInfoReturnable<Float> cir) {
 		if(OptionManager.disableExplosionExposureCalculation) {
 			cir.setReturnValue(1.0F);

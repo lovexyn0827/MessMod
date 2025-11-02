@@ -61,8 +61,9 @@ public class ChunkTicketManagerMixin implements ChunkTicketManagerInterface {
 	@Inject(method = "shouldTickEntities", at = @At("HEAD"), cancellable = true)
 	private void tickEntityIfNeeded(long pos, CallbackInfoReturnable<Boolean> cir) {
 		if(!LazyLoadCommand.LAZY_CHUNKS.isEmpty()) {
+			// TODO Back port
 			if(LazyLoadCommand.LAZY_CHUNKS.containsKey(this.world.getRegistryKey())
-					|| LazyLoadCommand.LAZY_CHUNKS.get(this.world.getRegistryKey()).contains(pos)) {
+					&& LazyLoadCommand.LAZY_CHUNKS.get(this.world.getRegistryKey()).contains(pos)) {
 				cir.setReturnValue(false);
 				cir.cancel();
 			}
