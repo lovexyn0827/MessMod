@@ -1,16 +1,11 @@
 package lovexyn0827.mess.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import com.mojang.brigadier.StringReader;
 
 public final class NameFilter implements Predicate<String> {
 	private final Predicate<String> nameFilter;
@@ -68,157 +63,40 @@ public final class NameFilter implements Predicate<String> {
 		return filtered;
 	}
 	
-	public static NameFilter compile(String in) {
-		if("*".equals(in)) {
-			return new NameFilter((n) -> true);
+	public static NameFilter compile(String pattern) {
+		// No actual compilation after rewriting
+		return new NameFilter((s) -> matchWildcard(s, pattern));
+	}
+	
+	// Reference: https://en.wikipedia.org/wiki/Matching_wildcards
+	// Tested with: https://leetcode.com/problems/wildcard-matching/description/
+	private static boolean matchWildcard(String s, String p) {
+		int lenS = s.length();
+		int lenP = p.length();
+		boolean[][] matches = new boolean[lenS + 1][lenP + 1];
+		matches[0][0] = true;
+		for (int i = 1; i <= lenS; i++) {
+			matches[i][0] = false;
 		}
-		
-		if(!in.contains("*") && !in.contains("?")) {
-			return new NameFilter(in::equals);
+
+		for (int j = 1; j <= lenP; j++) {
+			matches[0][j] = matches[0][j - 1] && p.charAt(j - 1) == '*';
 		}
-		
-		StringReader sr = new StringReader(in);
-		List<Node> nodes = new ArrayList<>();
-		StringBuilder sb = new StringBuilder();
-		while(sr.canRead()) {
-			char c = sr.read();
-			switch(c) {
-			case '*':
-				if(sb.length() != 0) {
-					nodes.add(new TextNode(sb.toString()));
-					sb = new StringBuilder();
-				}
-				
-				nodes.add(AsteriskNode.INSTANCE);
-				continue;
-			case '?':
-				if(sb.length() != 0) {
-					nodes.add(new TextNode(sb.toString()));
-					sb = new StringBuilder();
-				}
-				
-				// get the length of the sequence of '?'
-				int count;
-				for(count = 1; sr.canRead() && sr.peek() == '?'; sr.skip(), count++);
-				nodes.add(new QmNode(count));
-				continue;
-			}
-			
-			sb.append(c);
-		}
-		
-		if(sb.length() != 0) {
-			nodes.add(new TextNode(sb.toString()));
-		}
-		
-		return new NameFilter((s) -> {
-			ListIterator<Node> itr = nodes.listIterator();
-			Node n;
-			int l = s.length();
-			int i = 0;
-			while(itr.hasNext()) {
-				n = itr.next();
-				checkNode:
-				switch(n.type()) {
-				case ASTERISK:
-					if(itr.hasNext()) {
-						n = itr.next();
-						if(n.type() == NodeType.TEXT) {
-							TextNode tn = (TextNode) n;
-							char start = tn.text.charAt(0);
-							// cursor is at the first character of the sequence denoted by '*'
-							// then read until the starting character
-							for(; i < l && s.charAt(i) != start; i++);
-							// cursor moved to the first character of the first suspected sequence 
-							// or exactly after the end of input
-							if(i == l) {
-								return false;
-							}
-							
-							// cursor is at the first character of the first suspected sequence
-							while(i + tn.length - 1 < l) {
-								if(s.regionMatches(i, tn.text, 0, tn.length)) {
-									i += tn.length;
-									break checkNode;
-								}
-								
-								i++;
-							}
-							
-							return false;
-						} else {
-							throw new IllegalStateException();
-						}
-					} else {
-						return true;
-					}
-				case QM:
-					QmNode qmn = (QmNode) n;
-					if(i + qmn.length - 1 >= l) {
-						return false;
-					}
-					
-					i += qmn.length;
-					break;
-				case TEXT:
-					TextNode tn = (TextNode) n;
-					if(s.regionMatches(i, tn.text, 0, tn.length)) {
-						i += tn.length;
-						break checkNode;
-					}
-					
-					return false;
+
+		for (int i = 1; i <= lenS; i++) {
+			for (int j = 1; j <= lenP; j++) {
+				char si = s.charAt(i - 1);
+				char pj = p.charAt(j - 1);
+				if (pj == '?' || pj == si) {
+					matches[i][j] = matches[i - 1][j - 1];
+				} else if (pj == '*') {
+					matches[i][j] = matches[i - 1][j] || matches[i][j - 1];
+				} else {
+					matches[i][j] = false;
 				}
 			}
-			
-			return true;
-		});
-	}
-	
-	private static interface Node {
-		NodeType type();
-	}
-	
-	private static enum AsteriskNode implements Node {
-		INSTANCE;
-
-		@Override
-		public NodeType type() {
-			return NodeType.ASTERISK;
-		}
-	}
-	
-	private static final class QmNode implements Node {
-		protected final int length;
-		
-		protected QmNode(int length) {
-			this.length = length;
 		}
 
-		@Override
-		public NodeType type() {
-			return NodeType.QM;
-		}
-	}
-	
-	private static final class TextNode implements Node {
-		protected final int length;
-		protected final String text;
-		
-		protected TextNode(String text) {
-			this.length = text.length();
-			this.text = text;
-		}
-
-		@Override
-		public NodeType type() {
-			return NodeType.TEXT;
-		}
-	}
-	
-	private static enum NodeType {
-		ASTERISK, 
-		QM, 
-		TEXT;
+		return matches[lenS][lenP];
 	}
 }
