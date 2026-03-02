@@ -168,7 +168,7 @@ public final class OptionSet {
 				this.backend.load(in);
 				this.replaceInvalidValues();
 			} catch (IOException e) {
-				MessMod.LOGGER.fatal("Failed to open mcwmem.prop, the Minecraft may crash later.");
+				MessMod.LOGGER.fatal("Failed to open mcwmem.prop, the Minecraft instance may crash later.");
 				e.printStackTrace();
 			}
 		} else {

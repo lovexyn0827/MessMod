@@ -64,11 +64,13 @@ class PathCompiler {
 		}
 		
 		this.classFile = new ClassNode();
+		
 		// 1. Build class metadata
 		this.classFile.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, 
 				this.className, null, 
 				org.objectweb.asm.Type.getInternalName(CompiledPath.class), 
 				new String[] {});
+		
 		// 2. Add default constructor
 		MethodNode initMethod = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC, 
 				"<init>", "()V", null, new String[] {});
@@ -79,21 +81,26 @@ class PathCompiler {
 				org.objectweb.asm.Type.getInternalName(CompiledPath.class), "<init>", "(Ljava/lang/String;)V"));
 		initInsns.add(new InsnNode(Opcodes.RETURN));
 		this.classFile.methods.add(initMethod);
+		
 		// 3. Build access method & compile nodes
 		this.buildAccessMethod();
+		
 		// 4. Create class initializer
 		MethodNode clinit = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_SYNTHETIC | Opcodes.ACC_STATIC, 
 				"<clinit>", "()V", null, new String[] {});
 		this.classFile.methods.add(clinit);
 		this.clinitInsns = clinit.instructions;
+		
 		// 5. Prepare constants
 //		this.buildConstantCountSupplier();
 		this.prepareStaticConstants();
 		this.prepareLambdas();
 		this.prepareSubPaths();
 		this.prepareDynamicLiterals();
+		
 		// 6. Finish class initializer creation
 		this.clinitInsns.add(new InsnNode(Opcodes.RETURN));
+		
 		// 7. Replace uncertain field descriptors
 		Map<String, FieldNode> fieldsByName = new HashMap<>();
 		this.classFile.fields.forEach((fn) -> fieldsByName.put(fn.name, fn));
@@ -116,6 +123,7 @@ class PathCompiler {
 				Reflection.wrapPrimitiveType(ctx.getLastOutputClass()))));
 		gOTInsns.add(new InsnNode(Opcodes.ARETURN));
 		this.classFile.methods.add(getOutputType);
+		
 		// 9. Generate and load class
 		this.classFile.accept(wrappedCw);
 		byte[] clBytes = cw.toByteArray();

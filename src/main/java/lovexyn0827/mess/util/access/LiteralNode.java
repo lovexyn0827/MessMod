@@ -9,6 +9,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lovexyn0827.mess.util.ArgumentListTokenizer;
 import lovexyn0827.mess.util.Reflection;
 
+// FIXME: No toString()
 public class LiteralNode extends Node {
 	private Literal<?> literal;
 
