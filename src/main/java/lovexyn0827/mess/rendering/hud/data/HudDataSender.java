@@ -24,6 +24,8 @@ public interface HudDataSender {
 
 	/**
 	 * Returns a list of lines added by the user.
+	 * Modifying the collection doesn't update underlying list for HUD lines. 
+	 * Use {@code getLines()} instead to add / remove lines from the HUD.
 	 */
 	default Collection<HudLine> getCustomLines() {
 		return this.getLines().stream()
@@ -45,13 +47,13 @@ public interface HudDataSender {
 		if(this.hasDuplication(line)) {
 			return false;
 		} else {
-			this.getCustomLines().add(line);
+			this.getLines().add(line);
 			return true;
 		}
 	}
 	
 	default boolean removeCustomLine(String name) {
-		return this.getCustomLines().removeIf(((line) -> line.getName().equals(name)));
+		return this.getLines().removeIf(((line) -> line.getName().equals(name)));
 	}
 	
 	default boolean addField(Class<?> cl, String field) {
