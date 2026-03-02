@@ -38,6 +38,7 @@ import lovexyn0827.mess.command.NameEntityCommand;
 import lovexyn0827.mess.command.NameItemCommand;
 import lovexyn0827.mess.command.PartlyKillCommand;
 import lovexyn0827.mess.command.PoiCommand;
+import lovexyn0827.mess.command.ProbeBusCommand;
 import lovexyn0827.mess.command.RaycastCommand;
 import lovexyn0827.mess.command.RepeatCommand;
 import lovexyn0827.mess.command.RideCommand;
@@ -99,6 +100,7 @@ public abstract class CommandMixin {
         SetBlockRawCommand.register(this.dispatcher);
         NameItemCommand.register(this.dispatcher);
         DrawShapeCommand.register(this.dispatcher);
+        ProbeBusCommand.register(this.dispatcher);
     }
     
     @Redirect(method = "execute", 
