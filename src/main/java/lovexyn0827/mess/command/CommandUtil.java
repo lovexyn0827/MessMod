@@ -95,6 +95,7 @@ public class CommandUtil {
 					null);
 			commandManager = serverIn.getCommandManager();
 			server = serverIn;
+			ProbeBusCommand.reload(serverIn);
 		}
 	}
 	
@@ -127,8 +128,15 @@ public class CommandUtil {
 			Thread.dumpStack();
 		}
 	}
+	
+	public static void errorWithArgs(CommandContext<? extends ServerCommandSource> ct, Throwable e, String fmt, Object ... args) {
+		ct.getSource().sendError(new LiteralText(String.format(I18N.translate(fmt), args)));
+		if(OptionManager.superSuperSecretSetting) {
+			Thread.dumpStack();
+		}
+	}
 
-	public static void error(CommandContext<ServerCommandSource> ct, String string, Exception e) {
+	public static void error(CommandContext<ServerCommandSource> ct, String string, @NotNull Throwable e) {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(I18N.translate(string) + ": " + I18N.translate(e.getMessage()))
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));
@@ -138,7 +146,7 @@ public class CommandUtil {
 		}
 	}
 	
-	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, @NotNull Exception e) {
+	public static void errorRaw(CommandContext<ServerCommandSource> ct, String str, @NotNull Throwable e) {
 		String details = e.toString() + '\n' + e.getStackTrace()[0];
 		ct.getSource().sendError(new LiteralText(str == null ? "[null]" : str)
 				.styled((s) -> s.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(details)))));

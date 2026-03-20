@@ -127,6 +127,9 @@
 		"cmd.poi.modify" : "修改了(%d, %d, %d)处的POI", 
 		"cmd.poi.existed" : "(%d, %d, %d)处已经存在一个POI", 
 		
+		//***** probebus *****
+		"cmd.probebus.savefail" : "未能保存总线定义：%s", 
+		
 		//***** raycast *****
 		"cmd.raycast.usage" : "TODO", 
 		"cmd.raycast.result.block" : "撞击位置：(%.15f, %.15f, %.15f)\n方块坐标：(%d, %d, %d)\n方块：%s\n撞击面：%s", 

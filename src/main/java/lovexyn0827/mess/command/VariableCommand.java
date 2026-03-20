@@ -325,7 +325,7 @@ public class VariableCommand {
 				try {
 					newObj = c.newInstance(args);
 				} catch (IllegalAccessException | InstantiationException e) {
-					CommandUtil.errorWithArgs(ct, "exp.unexc", e);
+					CommandUtil.errorWithArgs(ct, "exp.unexc", e.getClass().getSimpleName(), e);
 					e.printStackTrace();
 					return 0;
 				} catch (IllegalArgumentException e) {

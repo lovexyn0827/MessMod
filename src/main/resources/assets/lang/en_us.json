@@ -127,6 +127,9 @@
 		"cmd.poi.modify" : "Modified POI at (%d, %d, %d)", 
 		"cmd.poi.existed" : "POI already exists at (%d, %d, %d)", 
 		
+		//***** probebus *****
+		"cmd.probebus.savefail" : "Unable to save bus definition: %s", 
+		
 		//***** raycast *****
 		"cmd.raycast.usage" : "TODO", 
 		"cmd.raycast.result.block" : "Hit at (%.15f, %.15f, %.15f)\nBlockPos: (%d, %d, %d)\nBlockState: %s\nSide: %s", 
