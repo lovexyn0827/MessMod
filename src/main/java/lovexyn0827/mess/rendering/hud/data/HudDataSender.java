@@ -1,8 +1,9 @@
 package lovexyn0827.mess.rendering.hud.data;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import lovexyn0827.mess.MessMod;
@@ -20,23 +21,22 @@ import net.minecraft.server.MinecraftServer;
  */
 public interface HudDataSender {
 	void updateData(Entity entity);
-	Collection<HudLine> getLines();
+	Map<String, HudLine> getLines();
 
 	/**
 	 * Returns a list of lines added by the user.
 	 * Modifying the collection doesn't update underlying list for HUD lines. 
 	 * Use {@code getLines()} instead to add / remove lines from the HUD.
 	 */
-	default Collection<HudLine> getCustomLines() {
-		return this.getLines().stream()
-				.filter((l) -> !(l instanceof BuiltinHudInfo))
-				.collect(Collectors.toList());
+	default Map<String, HudLine> getCustomLines() {
+		return this.getLines().entrySet().stream()
+				.filter((e) -> !(e.getValue() instanceof BuiltinHudInfo))
+				.collect(TreeMap::new, (map, e) -> map.put(e.getKey(), e.getValue()), (map1, map2) -> map1.putAll(map2));
 	}
 	
 	default boolean hasDuplication(HudLine line) {
-		return this.getCustomLines().stream().anyMatch((l0) -> {
-			return l0.getName().equals(line.getName()) || l0.equals(line);
-		});
+		Map<String, HudLine> customLines = this.getCustomLines();
+		return customLines.containsKey(line.getName()) || customLines.containsValue(line);
 	}
 	
 	/**
@@ -47,31 +47,50 @@ public interface HudDataSender {
 		if(this.hasDuplication(line)) {
 			return false;
 		} else {
-			this.getLines().add(line);
+			this.getLines().put(line.getName(), line);
 			return true;
 		}
 	}
 	
+	/**
+	 * @implNote Custom lines whose name is the same as the one of the names of in built-in lines should be rejected.
+	 */
+	default boolean addOrReplaceCustomLine(HudLine line) {
+		this.getLines().put(line.getName(), line);
+		return true;
+	}
+	
 	default boolean removeCustomLine(String name) {
-		return this.getLines().removeIf(((line) -> line.getName().equals(name)));
+		return this.getLines().remove(name) != null;
 	}
 	
 	default boolean addField(Class<?> cl, String field) {
 		return this.addField(cl, field, field, AccessingPath.DUMMY);
 	}
 	
-	default boolean addField(Class<?> cl, String field, String name, AccessingPath path) {
+	default boolean addOrReplaceField(Class<?> cl, String field) {
+		return this.addOrReplaceField(cl, field, field, AccessingPath.DUMMY);
+	}
+	
+	static HudLine createFieldLine(Class<?> cl, String field, String name, AccessingPath path) {
 		if ("-THIS-".equals(field)) {
-			return this.addCustomLine(new WrappedPath(path, name));
+			return new WrappedPath(path, name);
 		}
 		
 		Field f = Reflection.getFieldFromNamed(cl, field);
-		ListenedField lf = new ListenedField(f, path, name);
-		return this.addCustomLine(lf);
+		return new ListenedField(f, path, name);
+	}
+	
+	default boolean addField(Class<?> cl, String field, String name, AccessingPath path) {
+		return this.addCustomLine(createFieldLine(cl, field, name, path));
+	}
+	
+	default boolean addOrReplaceField(Class<?> cl, String field, String name, AccessingPath path) {
+		return this.addOrReplaceCustomLine(createFieldLine(cl, field, name, path));
 	}
 
 	default List<HudLine> getListenedFields() {
-		return this.getCustomLines().stream()
+		return this.getCustomLines().values().stream()
 				.collect(Collectors.toList());
 	}
 	

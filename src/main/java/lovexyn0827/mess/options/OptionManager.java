@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -88,6 +89,41 @@ public class OptionManager{
 			parserClass = BooleanParser.class, 
 			label = Label.RESEARCH)
 	public static boolean antiHostCheating;
+	
+	@Option(defaultValue = DelegatableBooleamParser.DELEGATE_STR, 
+			parserClass = DelegatableBooleamParser.class, 
+			label = Label.MESSMOD)
+	public static Optional<Boolean> autoReplaceAccessingPath;
+	
+	@Option(defaultValue = DelegatableBooleamParser.DELEGATE_STR, 
+			parserClass = DelegatableBooleamParser.class, 
+			label = Label.MESSMOD)
+	public static Optional<Boolean> autoReplaceBusDefintion;
+	
+	@Option(defaultValue = DelegatableBooleamParser.DELEGATE_STR, 
+			parserClass = DelegatableBooleamParser.class, 
+			label = Label.MESSMOD)
+	public static Optional<Boolean> autoReplaceEntityLogColumn;
+	
+	@Option(defaultValue = DelegatableBooleamParser.DELEGATE_STR, 
+			parserClass = DelegatableBooleamParser.class, 
+			label = Label.MESSMOD)
+	public static Optional<Boolean> autoReplaceEntitySidebarLine;
+	
+	@Option(defaultValue = DelegatableBooleamParser.DELEGATE_STR, 
+			parserClass = DelegatableBooleamParser.class, 
+			label = Label.MESSMOD)
+	public static Optional<Boolean> autoReplaceExportedRegion;
+	
+	@Option(defaultValue = DelegatableBooleamParser.DELEGATE_STR, 
+			parserClass = DelegatableBooleamParser.class, 
+			label = Label.MESSMOD)
+	public static Optional<Boolean> autoReplaceHudLine;
+	
+	@Option(defaultValue = "false", 
+			parserClass = BooleanParser.class, 
+			label = Label.MESSMOD)
+	public static boolean autoReplaceNamedObject;
 	
 	@Option(defaultValue = "false", 
 			parserClass = BooleanParser.class, 

@@ -29,6 +29,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
 import lovexyn0827.mess.mixins.WorldSavePathMixin;
+import lovexyn0827.mess.options.OptionManager;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -145,7 +146,14 @@ public class ProbeBusCommand {
 			String name, BlockPos bit0, BlockPos spacing, int bits, boolean permanent) {
 		ServerWorld world = ct.getSource().getWorld();
 		Bus bus = createBus(world, bit0, spacing, bits);
-		BUSES.put(name, bus);
+		boolean canReplace = OptionManager.autoReplaceBusDefintion.orElse(OptionManager.autoReplaceNamedObject);
+		if (canReplace || !BUSES.containsKey(name)) {
+			BUSES.put(name, bus);
+		} else {
+			CommandUtil.error(ct, "exp.dupname");
+			return 0;
+		}
+		
 		if (!permanent) {
 			CommandUtil.feedback(ct, "cmd.general.success");
 			return Command.SINGLE_SUCCESS;

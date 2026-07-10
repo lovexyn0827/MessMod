@@ -52,9 +52,9 @@ public class CustomNode extends Node {
 		return this.backend.getOutputType();
 	}
 
-	public static void define(String name, String path, boolean permanent, MinecraftServer server)
+	public static void define(String name, String path, boolean permanent, MinecraftServer server, boolean canReplace)
 			throws CommandSyntaxException {
-		if(NODES_BY_NAME.containsKey(name) || COMPILED_NODES_BY_NAME.containsKey(name)) {
+		if((NODES_BY_NAME.containsKey(name) || COMPILED_NODES_BY_NAME.containsKey(name)) && !canReplace) {
 			throw new TranslatableException("cmd.general.dupname");
 		} else {
 			// Validate the given accessing path. 

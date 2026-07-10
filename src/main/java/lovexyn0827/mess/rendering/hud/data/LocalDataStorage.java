@@ -1,9 +1,6 @@
 package lovexyn0827.mess.rendering.hud.data;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -15,17 +12,17 @@ import net.minecraft.entity.Entity;
 
 @Environment(EnvType.CLIENT)
 public abstract class LocalDataStorage implements HudDataSender, HudDataStorage {
-	private Map<HudLine, Object> data = new TreeMap<>();
-	private List<HudLine> lines = new ArrayList<>();
+	private Map<HudLine, Object> data = new TreeMap<>(HudLine::compare);
+	private Map<String, HudLine> lines = new TreeMap<>();
 	
 	public LocalDataStorage() {
 		for(HudLine l : BuiltinHudInfo.values()) {
-			this.lines.add(l);
+			this.lines.put(l.getName(), l);
 		}
 	}
 
 	@Override
-	public Collection<HudLine> getLines() {
+	public Map<String, HudLine> getLines() {
 		return this.lines;
 	}
 
@@ -33,7 +30,7 @@ public abstract class LocalDataStorage implements HudDataSender, HudDataStorage 
 	public synchronized void updateData(Entity entity) {
 		this.data.clear();
 		if (entity == null) return;
-		this.lines.forEach((f) -> {
+		this.lines.forEach((name, f) -> {
 			if(f.canGetFrom(entity)) {
 				this.data.put(f, f.getFrom(entity));
 			}

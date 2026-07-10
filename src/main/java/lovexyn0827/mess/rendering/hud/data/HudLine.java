@@ -11,6 +11,18 @@ public interface HudLine {
 	boolean canGetFrom(Entity entity);
 	String getName();
 	
+	static int compare(HudLine x, HudLine y) {
+		if (x instanceof BuiltinHudInfo && y instanceof BuiltinHudInfo) {
+			return ((BuiltinHudInfo) x).ordinal() - ((BuiltinHudInfo) y).ordinal();
+		} else if (x instanceof BuiltinHudInfo && !(y instanceof BuiltinHudInfo)) {
+			return -1;
+		} else if (!(x instanceof BuiltinHudInfo) && y instanceof BuiltinHudInfo) {
+			return 1;
+		} else {
+			return x.getName().compareTo(y.getName());
+		}
+	}
+	
 	/**
 	 * Used on remote clients, to represent a custom field.
 	 */

@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import lovexyn0827.mess.log.AbstractAchivingLogger;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.CarpetUtil;
 import lovexyn0827.mess.util.ListenedField;
 import lovexyn0827.mess.util.Reflection;
@@ -108,6 +109,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 
 	public void listenToField(String field, EntityType<?> type, String name, 
 			@Nullable AccessingPath path, TickingPhase phase) {
+		boolean canReplace = OptionManager.autoReplaceEntityLogColumn.orElse(OptionManager.autoReplaceNamedObject);
 		if(path == null) {
 			path = AccessingPath.DUMMY;
 		}
@@ -116,7 +118,7 @@ public final class EntityLogger extends AbstractAchivingLogger {
 			throw new TranslatableException("cmd.entitylog.reqidle");
 		}
 		
-		if(this.customFields.containsKey(name)) {
+		if(this.customFields.containsKey(name) && !canReplace) {
 			throw new TranslatableException("exp.dupname");
 		}
 		

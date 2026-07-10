@@ -1,7 +1,8 @@
 package lovexyn0827.mess.rendering.hud.data;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,7 @@ import net.minecraft.world.World;
 public class RemoteHudDataSender implements HudDataSender {
 	/** Used to determine the delta */
 	protected CompoundTag lastData = new CompoundTag();
-	protected final List<HudLine> lines = Lists.newArrayList();
+	protected final Map<String, HudLine> lines = new TreeMap<>();
 	protected final MinecraftServer server;
 	private final HudType type;
 
@@ -34,20 +35,20 @@ public class RemoteHudDataSender implements HudDataSender {
 		this.type = type;
 		if (addDefaultLines) {
 			for(HudLine l : BuiltinHudInfo.values()) {
-				this.lines.add(l);
+				this.lines.put(l.getName(), l);
 			}
 		}
 	}
 
 	@Override
-	public Collection<HudLine> getLines() {
+	public Map<String, HudLine> getLines() {
 		return this.lines;
 	}
 	
 	public void updateData(Entity entity) {
 		CompoundTag data = new CompoundTag();
 		List<String> unused = Lists.newArrayList(this.lastData.getKeys());
-		Stream<HudLine> lines = this.streamAllLines();
+		Stream<HudLine> lines = this.lines.values().stream();
 		if (entity != null) {
 			lines.forEach((l) -> {
 				if (this.tryPutData(entity, l, data)) {
@@ -70,10 +71,6 @@ public class RemoteHudDataSender implements HudDataSender {
 		this.server.getPlayerManager().getPlayerList().stream()
 				.filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(this.type))
 				.forEach((p) -> p.networkHandler.sendPacket(packet));
-	}
-	
-	protected Stream<HudLine> streamAllLines() {
-		return this.lines.stream();
 	}
 
 	/**
@@ -104,7 +101,7 @@ public class RemoteHudDataSender implements HudDataSender {
 		public void updateData(TickingPhase phase, @Nullable World world) {
 			CompoundTag data = new CompoundTag();
 			List<String> unused = Lists.newArrayList(this.lastData.getKeys());
-			Stream<HudLine> lines = this.streamAllLines();
+			Stream<HudLine> lines = this.lines.values().stream();
 			lines.forEach((l) -> {
 				if(l instanceof SidebarLine) {
 					SidebarLine line = (SidebarLine) l;
@@ -131,11 +128,6 @@ public class RemoteHudDataSender implements HudDataSender {
 			this.server.getPlayerManager().getPlayerList().stream()
 					//TODO .filter((p) -> ((HudDataSubscribeState) p.networkHandler).isSubscribed(HudType.SIDEBAR))
 					.forEach((p) -> p.networkHandler.sendPacket(packet));
-		}
-		
-		@Override
-		protected Stream<HudLine> streamAllLines() {
-			return this.lines.stream();
 		}
 	}
 }

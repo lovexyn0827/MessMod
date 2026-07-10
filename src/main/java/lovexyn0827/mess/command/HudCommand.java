@@ -13,6 +13,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.rendering.hud.data.HudDataSender;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.access.AccessingPath;
@@ -190,30 +191,33 @@ public class HudCommand {
 		}
 	}
 
-	private static void addListenedWithNameAndPath(CommandContext<ServerCommandSource> ct, HudDataSender playerHudS, Class<?> cl) {
+	private static void addListenedWithNameAndPath(CommandContext<ServerCommandSource> ct, HudDataSender hud, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
 		AccessingPath path = AccessingPathArgumentType.getAccessingPath(ct, "path");
-		if(!playerHudS.addField(cl, field, name, path)) {
+		boolean canReplace = OptionManager.autoReplaceHudLine.orElse(OptionManager.autoReplaceNamedObject);
+		if(canReplace ? !hud.addOrReplaceField(cl, field, name, path) : !hud.addField(cl, field, name, path)) {
 			CommandUtil.error(ct, "exp.dupfield");
 		} else {
 			CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field + '.' + path);
 		}
 	}
 	
-	private static void addListenedWithName(CommandContext<ServerCommandSource> ct, HudDataSender playerHudC, Class<?> cl) {
+	private static void addListenedWithName(CommandContext<ServerCommandSource> ct, HudDataSender hud, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
 		String name = StringArgumentType.getString(ct, "name");
-		if(!playerHudC.addField(cl, field, name, null)) {
+		boolean canReplace = OptionManager.autoReplaceHudLine.orElse(OptionManager.autoReplaceNamedObject);
+		if(canReplace ? !hud.addOrReplaceField(cl, field, name, null) : !hud.addField(cl, field, name, null)) {
 			CommandUtil.error(ct, "exp.dupfield");
 		} else {
 			CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);
 		}
 	}
 	
-	private static void addListened(CommandContext<ServerCommandSource> ct, HudDataSender playerHudC, Class<?> cl) {
+	private static void addListened(CommandContext<ServerCommandSource> ct, HudDataSender hud, Class<?> cl) {
 		String field = StringArgumentType.getString(ct, "field");
-		if(!playerHudC.addField(cl, field)) {
+		boolean canReplace = OptionManager.autoReplaceHudLine.orElse(OptionManager.autoReplaceNamedObject);
+		if(canReplace ? !hud.addOrReplaceField(cl, field) : !hud.addField(cl, field)) {
 			CommandUtil.error(ct, "exp.dupfield");
 		} else {
 			CommandUtil.feedbackWithArgs(ct, "cmd.entitylog.listen", field);

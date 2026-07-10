@@ -213,6 +213,13 @@
 		"opt.allowTargetingSpecialEntities.desc" : "Allow the player to target entities like items, snowballs and arrows, enabling command suggestions for them.",
 		"opt.antiHostCheating.desc" : "Enable anti-cheating for the host player in the SP & LAN game.", 
 		"opt.attackableTnt.desc" : "TNT entities can be killed by players' attacking.", 
+		"opt.autoReplaceAccessingPath.desc" : "Replace existing custom accession path node with a newer definition on attempts to create ones with a used name.", 
+		"opt.autoReplaceBusDefintion.desc" : "Replace existing named bus with a newer definition on attempts to create ones with a used name.", 
+		"opt.autoReplaceEntityLogColumn.desc" : "Replace existing named entity log column with a newer definition on attempts to create ones with a used name.", 
+		"opt.autoReplaceEntitySidebarLine.desc" : "Replace existing named entity sidebar line with a newer definition on attempts to create ones with a used name.", 
+		"opt.autoReplaceExportedRegion.desc" : "Replace existing regions (to export to a save) with a newer definition on attempts to create ones with a used name.", 
+		"opt.autoReplaceHudLine.desc" : "Replace existing custom HUD lines with a newer definition on attempts to create ones with a used name.", 
+		"opt.autoReplaceNamedObject.desc" : "Replace existing named subscriptions with a newer definition on attempts to create ones with a used name (as a default fallback). Affects: \n- `/accessingpath defineNode`\n- `/entitylog listenfield`\n- `/entitysidebar add`\n- `/exportsave addRegion`\n- `/hud subField`\n- `/probebus newBus`", 
 		"opt.blameThreshold.desc" : "The minimum confidence level at which a cause can be believed and recorded. Never set it to `IMPOSSIBLE`.", 
 		"opt.blamingMode.desc" : "Specify how the causes of events like chunk loading are recorded.\n- `DISABLED`: Disable cause recording completely\n- `SIMPLE_TRACE`: Record the stack trace from where the events happened, without applying any deobfuscation.\n- `DEOBFUSCATED_TRACE`: Record deobfuscated stack trace, which is the most decent but leads to larger logs and higher performance costs.\n- `ANALYZED`: Compute a couple of tags from the stack trace. This can make logs significantly smaller than ones with stacktraces, however, the performance cost may be even higher.", 
 		"opt.blockInfoRendererUpdateInFrozenTicks.desc" : "What the block information renderers should do in ticks frozen by the Carpet.", 
@@ -318,6 +325,7 @@
 		"opt.err.lithium" : "This option is incompatible with Lithium!", 
 		"opt.err.reqcarpet" : "This option require Carpet to function!", 
 		"opt.err.reqbool" : "Use true of false here!", 
+		"opt.err.reqdelegbool" : "Only true, false and inherit are accepted here!", 
 		"opt.err.conflict.carpet.1425" : "This option conflicts with Carpet 1.4.25 and above!", 
 		
 		//***** Labels of options *****

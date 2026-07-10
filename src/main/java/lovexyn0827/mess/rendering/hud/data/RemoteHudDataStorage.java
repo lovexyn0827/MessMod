@@ -9,7 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 
 public class RemoteHudDataStorage implements HudDataStorage {
-	private Map<HudLine, Object> cache = new TreeMap<>();
+	private Map<HudLine, Object> cache = new TreeMap<>(HudLine::compare);
 	
 	public synchronized void pushData(CompoundTag tag) {
 		tag.getList("ToRemove", 8).forEach((item) -> this.cache.remove(generateHudLine(item.asString())));

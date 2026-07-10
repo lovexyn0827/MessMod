@@ -213,6 +213,13 @@
 		"opt.allowTargetingSpecialEntities.desc" : "允许玩家将光标对准物品、雪球和箭矢等实体以获取相应的指令建议。", 
 		"opt.antiHostCheating.desc" : "对局域网游戏的房主启用反作弊。", 
 		"opt.attackableTnt.desc" : "TNT可以被玩家的攻击杀死。", 
+		"opt.autoReplaceAccessingPath.desc" : "使用既有名称创建自定义Accessing Path节点时自动替换现有定义。", 
+		"opt.autoReplaceBusDefintion.desc" : "使用既有名称创建总线时自动替换现有定义。", 
+		"opt.autoReplaceEntityLogColumn.desc" : "使用既有名称创建实体信息记录器自定义信息栏时自动替换现有定义。", 
+		"opt.autoReplaceEntitySidebarLine.desc" : "使用既有名称创建实体信息侧边栏条目时自动替换现有定义。", 
+		"opt.autoReplaceExportedRegion.desc" : "使用既有名称创建（导出到新存档）的区域时自动替换现有定义。", 
+		"opt.autoReplaceHudLine.desc" : "使用既有名称创建自定义HUD信息条目时自动替换现有定义。", 
+		"opt.autoReplaceNamedObject.desc" : "使用既有名称创建自定义带名称对象时自动替换现有定义（作为默认回退）。影响： \n- `/accessingpath defineNode`\n- `/entitylog listenfield`\n- `/entitysidebar add`\n- `/exportsave addRegion`\n- `/hud subField`\n- `/probebus newBus`", 
 		"opt.blameThreshold.desc" : "事件原因可以被相信并记录时的最小置信度。不要将其设为`IMPOSSIBLE`。", 
 		"opt.blamingMode.desc" : "指定区块加载等事件的原因的记录方式。\n- `DISABLED`：完全禁用原因记录。\n- `SIMPLE_TRACE`：记录事件发生位置的堆栈踪迹而不进行反混淆。\n- `DEOBFUSCATED_TRACE`：记录反混淆后的堆栈踪迹。输出质量最好，但会增大日志文件大小与性能开销。\n- `ANALYZED`：使用堆栈踪迹计算出几个标签。这时日志文件会明显减小，但性能消耗却可能更大。", 
 		"opt.blockInfoRendererUpdateInFrozenTicks.desc" : "游戏运算被地毯端中/tick指令暂停时方块信息渲染器的行为。", 
@@ -318,6 +325,7 @@
 		"opt.err.lithium" : "此选项与Lithium不兼容", 
 		"opt.err.reqcarpet" : "该选项需要安装Carpet", 
 		"opt.err.reqbool" : "只能使用true或false", 
+		"opt.err.reqdelegbool" : "只能使用true、false或`inherit", 
 		"opt.err.conflict.carpet.1425" : "该选项与Carpet 1.4.25以上版本冲突", 
 		
 		//***** Labels of options *****

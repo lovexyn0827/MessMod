@@ -64,7 +64,7 @@ public class EntitySidebarCommand {
 				.then(literal("remove")
 						.then(argument("name",StringArgumentType.string())
 								.suggests((ct, b) -> {
-									MessMod.INSTANCE.getServerHudManager().sidebar.getCustomLines().forEach((l) -> b.suggest(l.getName()));
+									MessMod.INSTANCE.getServerHudManager().sidebar.getCustomLines().forEach((n, l) -> b.suggest(n));
 									return b.buildFuture();
 								})
 								.executes((ct) -> {

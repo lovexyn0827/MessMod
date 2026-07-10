@@ -12,6 +12,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import lovexyn0827.mess.MessMod;
+import lovexyn0827.mess.options.OptionManager;
 import lovexyn0827.mess.util.Reflection;
 import lovexyn0827.mess.util.TranslatableException;
 import lovexyn0827.mess.util.access.CustomNode;
@@ -33,10 +34,12 @@ public class AccessingPathCommand {
 													}
 													
 													String backendStr = StringArgumentType.getString(ct, "backend");
+													boolean canReplace = OptionManager.autoReplaceAccessingPath.orElse(OptionManager.autoReplaceNamedObject);
 													try {
 														CustomNode.define(name, backendStr, 
 																!BoolArgumentType.getBool(ct, "temporary"), 
-																ct.getSource().getMinecraftServer());
+																ct.getSource().getMinecraftServer(), 
+																canReplace);
 													} catch (TranslatableException e) {
 														CommandUtil.errorRaw(ct, e.getMessage(), e);
 														return 0;
