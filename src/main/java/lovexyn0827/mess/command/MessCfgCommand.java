@@ -51,7 +51,7 @@ public class MessCfgCommand {
 									String.format("/messcfg list %s", label.name()));
 							HoverEvent onHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
 									new LiteralText(label.getDescription()));
-							return style.withClickEvent(onClick).withHoverEvent(onHover).withUnderline(true);
+							return style.withClickEvent(onClick).withHoverEvent(onHover).withFormatting(Formatting.UNDERLINE);
 						});
 						labels.append(new LiteralText(" ").append(labelText));
 					}
